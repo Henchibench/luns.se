@@ -43,8 +43,13 @@ body {
 }
 
 .restaurant .list-group-item {
-    background-color: transparent; /* Ensure list items have a transparent background */
-    border: none; /* Remove any borders if necessary */
+    background-color: transparent;
+    border-bottom: 1px dotted #ccc; /* Dotted border between items */
+    padding: 10px 0;
+}
+
+.restaurant .list-group-item:last-child {
+    border-bottom: none;
 }
 
 /*.restaurant:hover {
@@ -181,6 +186,11 @@ h1 img {
 .form-group .form-control:focus {
     border-color: var(--text-box-color); /* Change border color on focus */
     box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25); /* Add shadow on focus */
+}
+
+.restaurant .list-group-item strong {
+    font-weight: 700; /* Make the bold text more prominent */
+    color: #002836; /* Optional: different color for the food type */
 }
 
 

@@ -153,7 +153,7 @@ def scrape_lunchlindholmen():
                     price_div = menu_items.find('div', class_='table-list__column table-list__column--price')
                     price = price_div.text.strip() if price_div else "Unknown"
                     
-                    # Add formatted dish to menu
+                    # Format the menu item with HTML-safe bold tags
                     lunch_menus[display_name].append(f"{food_type}: {dish_name} - {price}")
                     menu_items = menu_items.find_next_sibling('div', class_='table-list__row')
                     

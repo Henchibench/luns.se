@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from markupsafe import Markup
 from .scraper import (
     get_cached_menus, 
     restaurant_locations, 
@@ -46,6 +47,9 @@ def home():
     food_types = get_food_types(menus)
     filtered_menus = filter_menus_by_food_type(menus, selected_food_type)
     filtered_menus = filter_menus_by_search_term(filtered_menus, selected_search_term)
+    
+    # Format the menu items to make food types bold
+    filtered_menus = format_menu_items(filtered_menus)
     
     # Add debug logging
     logging.debug(f"Available restaurants: {list(filtered_menus.keys())}")
@@ -114,3 +118,19 @@ def filter_menus_by_search_term(menus, search_term):
         if filtered_menu:
             filtered_menus[restaurant] = filtered_menu
     return filtered_menus
+
+# Format the menu items to make food types bold
+def format_menu_items(menus):
+    formatted_menus = {}
+    for restaurant, menu in menus.items():
+        formatted_menu = []
+        for item in menu:
+            if ': ' in item:
+                food_type, rest = item.split(': ', 1)
+                # Use Markup to prevent escaping
+                formatted_item = Markup(f"<strong>{food_type}</strong>: {rest}")
+                formatted_menu.append(formatted_item)
+            else:
+                formatted_menu.append(item)
+        formatted_menus[restaurant] = formatted_menu
+    return formatted_menus
