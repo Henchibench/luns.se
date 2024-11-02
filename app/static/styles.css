@@ -1,0 +1,186 @@
+:root {
+    --body-color: #002836;    /* Light sky blue background */
+    --secondary-color: #e3f2fd;  /* Turquoise */
+    --box-color: #f3f3f3;      
+    --text-color: #2c3e50;       /* Dark blue-gray for text */
+    --text-box-color: #ffffff;
+    --button-hover-color: #5d8f88; /* Darker version for button hover */
+    --button-bg-color: white; /* White background for buttons */
+    --button-border-color: #d1d1d1; /* Subtle light gray border */
+    --button-hover-bg-color: #f0f0f0; /* Slightly darker gray on hover */
+    --button-hover-border-color: #b0b0b0; /* Darker border on hover */
+    --button-text-color: #002836; /* Dark teal text color */
+}
+
+body {
+    background-color: var(--body-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.frame {
+    background-color: var(--box-color);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    border: 2px solid #e3f2fd;
+}
+
+.restaurant {
+    margin-bottom: 20px;
+    background-color: var(--box-color);
+    border-radius: 12px;
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.restaurant .list-group {
+    background-color: var(--text-box-color) !important; /* Light gray background for food items */
+    padding: 10px; /* Optional: Add padding for better spacing */
+    border-radius: 8px; /* Optional: Round the corners */
+}
+
+.restaurant .list-group-item {
+    background-color: transparent; /* Ensure list items have a transparent background */
+    border: none; /* Remove any borders if necessary */
+}
+
+/*.restaurant:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* Buttons styling */
+.btn-primary {
+    background-color: var(--button-bg-color); /* Use variable for background */
+    border: 1px solid var(--button-border-color); /* Use variable for border */
+    color: var(--button-text-color); /* Use variable for text color */
+}
+
+.btn-primary:hover {
+    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
+    border-color: var(--button-hover-border-color); /* Use variable for hover border */
+    color: var(--button-text-color); /* Keep text color */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.btn-info {
+    background-color: var(--button-bg-color); /* Use variable for background */
+    border: 1px solid var(--button-border-color); /* Use variable for border */
+    color: var(--button-text-color); /* Use variable for text color */
+}
+
+.btn-info:hover {
+    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
+    border-color: var(--button-hover-border-color); /* Use variable for hover border */
+    color: var(--button-text-color); /* Keep text color */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.btn-secondary {
+    background-color: var(--button-bg-color); /* Use variable for background */
+    border: 1px solid var(--button-border-color); /* Use variable for border */
+    color: var(--button-text-color); /* Use variable for text color */
+}
+
+.btn-secondary:hover {
+    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
+    border-color: var(--button-hover-border-color); /* Use variable for hover border */
+    color: var(--button-text-color); /* Keep text color */
+    transform: translateY(-1px);
+}
+
+/* Badge styling */
+.badge-info {
+    background-color: var(--secondary-color) !important;
+}
+
+h1 {
+    text-align: center;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.restaurant h2 {
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+/* Checkbox group */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Map related styles */
+.map-iframe {
+    width: 100%;
+    height: 400px;  /* Made taller */
+    border: none;
+    border-radius: 4px;
+}
+
+.map-container {
+    margin-top: 10px;
+    transition: all 0.3s ease-in-out;  /* Smooth transition */
+    overflow: hidden;
+}
+
+/* Animation for collapse */
+.collapse {
+    transition: all 0.3s ease-in-out;
+}
+
+.collapse:not(.show) {
+    display: block;
+    height: 0;
+    opacity: 0;
+}
+
+.collapse.show {
+    height: 450px;  /* Height for map + button */
+    opacity: 1;
+}
+
+/* Optional: Smooth rotation for the button arrow */
+.map-btn-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+[aria-expanded="true"] .map-btn-icon {
+    transform: rotate(180deg);
+}
+
+h1 img {
+    max-width: 100px; /* Set a maximum width for the logo */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 auto; /* Center the logo */
+    display: block; /* Centering with margin auto */
+}
+
+.form-group .form-control {
+    background-color: var(--text-box-color); /* Light gray background for the dropdown */
+    color: #002836; /* Dark teal text color */
+    border: 1px solid #d1d1d1; /* Subtle light gray border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px; /* Padding for better spacing */
+}
+
+.form-group .form-control:focus {
+    border-color: var(--text-box-color); /* Change border color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25); /* Add shadow on focus */
+}
+
+
