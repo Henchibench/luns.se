@@ -11,15 +11,6 @@ import logging
 # Create a Blueprint for our main routes
 main = Blueprint('main', __name__)
 
-# Add new route for cache clearing
-@main.route('/clear-cache')
-def clear_cache_route():
-    if clear_cache():
-        logging.info("[CACHE] Cache cleared via web request")
-        # Force a new fetch of menus
-        get_cached_menus()
-        return redirect(url_for('main.home'))
-    return "Failed to clear cache", 500
 
 @main.route('/', methods=['GET', 'POST'])
 def home():
@@ -104,11 +95,9 @@ def filter_menus_by_search_term(menus, search_term):
     
     # Dictionary of search terms and their variations
     search_terms = {
-        'burgare': ['burger', 'högrevsburgare', 'hamburgare', 'cheeseburger', 
-                   'veggieburger', 'veganburger', 'halloumiburger'],
+        'burgare': ['burger', 'högrevsburgare', 'hamburgare', 'cheeseburger','veggieburger', 'veganburger', 'halloumiburger'],
         'mos': ['potatismos', 'mos', 'potatispure', 'potatispuré', 'smashed potatoes'],
-        'körv': ['korv', 'falukorv', 'wienerkorv', 'prinskorv', 'chorizo', 
-                'grillkorv', 'braadwurst']
+        'körv': ['korv', 'falukorv', 'wienerkorv', 'prinskorv', 'chorizo', 'grillkorv', 'braadwurst'],
     }
     
     terms = search_terms.get(search_term, [])

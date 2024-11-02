@@ -51,14 +51,14 @@ def cached_menu(f):
 
 # Dictionary for restaurant name modifications
 restaurant_name_modifications = {
-    "Rollin Bistros": "Rollin Bistros Piren"
+    "Rollin Bistros": "Piren"
 }
 
 # Dictionary mapping restaurant names to their Google Maps links and website URLs
 restaurant_locations = {
     "Alkemisten Kaffebar & Kafé": {
         "maps": "https://maps.app.goo.gl/HrvVSYgfaqzw7ARf8",
-        "website": "https://www.facebook.com/alkemistenkaffebar/"
+        "website": "https://www.alkemistenkaffebar.se/"
     },
     "Bistrot": {
         "maps": "https://maps.app.goo.gl/avRsfzoVuwcrawUK7",
@@ -100,9 +100,9 @@ restaurant_locations = {
         "maps": "https://maps.app.goo.gl/VMJKfEYDJ6QFrtfn6",
         "website": "https://nordrest.se/"
     },
-    "Rollin Bistros Piren": {
+    "Piren": {
         "maps": "https://maps.app.goo.gl/25UAJZWyC2wp5myh8",
-        "website": "https://www.rollinbistros.se/"
+        "website": "https://www.pirengbg.se/"
     },
     "Uni3 – World of Food": {
         "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
