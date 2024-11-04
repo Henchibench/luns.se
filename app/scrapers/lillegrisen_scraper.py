@@ -7,7 +7,7 @@ class LilleGrisenScraper(BaseScraper):
     def __init__(self):
         super().__init__({
             'name': 'Lille Grisen',
-            'url': 'https://lillegrisen.se/veckans-lunch/'
+            'url': 'https://lillegrisen.se/jonsered/'
         })
         self.day_names = {
             0: "MÅNDAG",
