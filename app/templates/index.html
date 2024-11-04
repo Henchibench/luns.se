@@ -42,41 +42,46 @@
         <h1 class="my-4">
             <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Lunch på Lindis" style="max-width: 100%; height: auto;">
         </h1>
-        <div class="frame">
-            <form id="filterForm" method="post">
-                <div class="form-group">
-                    <label for="food_type">Va vill du ha då?:</label>
-                    <select class="form-control" name="food_type" id="food_type" onchange="submitForm()">
-                        <option value="">All</option>
+        <div class="frame mb-4">
+            <form method="GET" action="{{ url_for('main.home') }}" class="filter-row justify-content-between">
+                <!-- Location Dropdown -->
+                <div class="filter-item">
+                    <select name="location" id="location" class="form-select" onchange="this.form.submit()">
+                        <option value="">Alla Områden</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
+                            {{ location }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Food Type Dropdown -->
+                <div class="filter-item">
+                    <select name="food_type" id="food_type" class="form-select" onchange="this.form.submit()">
+                        <option value="">Alla Maträtter</option>
                         {% for food_type in food_types %}
-                            <option value="{{ food_type }}" {% if food_type == selected_food_type %}selected{% endif %}>{{ food_type }}</option>
+                        <option value="{{ food_type }}" {% if food_type == selected_food_type %}selected{% endif %}>
+                            {{ food_type }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="search_term">Unna dig lite nu då:</label>
-                    <select class="form-control" name="search_term" id="search_term" onchange="submitForm()">
-                        <option value="">All</option>
-                        <option value="burgare" {% if selected_search_term == 'burgare' %}selected{% endif %}>Burgare</option>
-                        <option value="mos" {% if selected_search_term == 'mos' %}selected{% endif %}>Mos</option>
-                        <option value="körv" {% if selected_search_term == 'körv' %}selected{% endif %}>Körv</option>
+
+                <!-- Search Terms Dropdown -->
+                <div class="filter-item">
+                    <select name="search_term" id="search_term" class="form-select" onchange="this.form.submit()">
+                        <option value="">Cravings 😋</option>
+                        <option value="burgare" {% if selected_search_term == 'burgare' %}selected{% endif %}>Hamburgare</option>
+                        <option value="mos" {% if selected_search_term == 'mos' %}selected{% endif %}>Potatismos</option>
+                        <option value="körv" {% if selected_search_term == 'körv' %}selected{% endif %}>Korv</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Var vill du äta då?:</label>
-                    <div class="checkbox-group">
-                        {% for restaurant in menus.keys() %}
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" name="restaurants[]" value="{{ restaurant }}" {% if restaurant in selected_restaurants %}checked{% endif %} onchange="submitForm()">
-                                <label class="form-check-label">{{ restaurant }}</label>
-                            </div>
-                        {% endfor %}
-                    </div>
+
+                <!-- Reset Button -->
+                <div class="filter-item">
+                    <a href="{{ url_for('main.home') }}" class="btn btn-secondary reset-button">Återställ Filter</a>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Återställ</button>
-                <!--<button type="button" class="btn btn-warning btn-sm" onclick="clearCache()">
-                    Refresh Data
-                </button>-->
             </form>
         </div>
         {% for restaurant, menu in menus.items() %}
@@ -98,6 +103,13 @@
                                    target="_blank" 
                                    class="btn btn-primary btn-sm ml-2">
                                    🏠  
+                                </a>
+                            {% endif %}
+                            {% if linked_restaurants[restaurant].instagram %}
+                                <a href="{{ linked_restaurants[restaurant].instagram }}" 
+                                   target="_blank" 
+                                   class="btn btn-primary btn-sm ml-2">
+                                   📸
                                 </a>
                             {% endif %}
                             {% if linked_restaurants[restaurant].review_score %}

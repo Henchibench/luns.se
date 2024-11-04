@@ -4,7 +4,7 @@ A web application that displays and filters lunch menus from restaurants around 
 
 ## Features
 
-- Real-time lunch menu scraping from Lindholmen's official website
+- Real-time lunch menu scraping from the restaurants' official websites
 - Filter menus by:
   - Food type
   - Specific items (burgare, mos, körv)

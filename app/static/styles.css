@@ -193,4 +193,176 @@ h1 img {
     color: #002836; /* Optional: different color for the food type */
 }
 
+/* Add or update filter styles */
+.form-select {
+    background-color: var(--text-box-color);
+    color: var(--text-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    height: 45px;  /* Consistent height for all elements */
+    font-size: 0.95rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 15px;
+    padding-right: 45px;
+}
+
+.form-select:hover {
+    border-color: var(--button-hover-border-color);
+    background-color: #f8f9fa;
+}
+
+.form-select:focus {
+    border-color: var(--button-hover-border-color);
+    box-shadow: 0 0 0 3px rgba(0, 40, 54, 0.1);
+    outline: none;
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Updated dropdown and filter section styling */
+.frame {
+    background-color: var(--box-color);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    border: 2px solid #e3f2fd;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;  /* Even spacing between all elements */
+}
+
+.filter-item {
+    flex: 1;  /* Make dropdowns take equal space */
+}
+
+.filter-item:last-child {
+    flex: 0 0 auto;  /* Don't expand the button container */
+}
+
+.form-select {
+    width: 100%;
+    height: 45px;
+}
+
+.reset-button {
+    height: 45px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 120px;
+}
+
+/* Style for the clear filters button */
+.btn-secondary {
+    height: 45px;  /* Match height with dropdowns */
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: var(--button-bg-color);
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-border-color);
+    transform: translateY(-1px);
+}
+
+/* Updated button styling for all buttons */
+.btn {
+    height: 38px;  /* Slightly smaller than filters but consistent with each other */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: var(--button-bg-color);
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+    margin-left: 8px;  /* Consistent spacing between buttons */
+}
+
+.btn:hover {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-border-color);
+    transform: translateY(-1px);
+    color: var(--button-text-color);  /* Maintain text color on hover */
+}
+
+/* Specific styles for primary buttons (maps, website, instagram) */
+.btn-primary {
+    background-color: var(--button-bg-color); /* Use variable for background */
+    border: 1px solid var(--button-border-color); /* Use variable for border */
+    color: var(--button-text-color); /* Use variable for text color */
+}
+
+.btn-primary:hover {
+    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
+    border-color: var(--button-hover-border-color); /* Use variable for hover border */
+    color: var(--button-text-color); /* Keep text color */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+/* Style for the clear filters button */
+.btn-secondary {
+    height: 45px;  /* Match height with dropdowns */
+    padding: 10px 20px;
+    width: 100%;
+}
+
+/* Badge styling update to match new design */
+.badge-info {
+    background-color: var(--text-box-color) !important;
+    color: var(--button-text-color);
+    border: 1px solid var(--button-border-color);
+    padding: 8px 12px;
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+/* Update map button specific styling */
+.btn-outline-primary {
+    background-color: transparent;
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-border-color);
+    color: var(--button-text-color);
+}
+
+.reset-button {
+    height: 45px;  /* Same height as dropdowns */
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;  /* Let the button width be determined by content */
+    min-width: 120px;  /* Minimum width to look good */
+}
+
+.form-select {
+    height: 45px;
+}
+
 

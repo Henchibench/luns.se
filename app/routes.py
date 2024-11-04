@@ -1,11 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from markupsafe import Markup
-from .scraper import (
-    get_cached_menus, 
-    restaurant_locations, 
-    clear_cache,
-    restaurant_name_modifications
-)
+from .restaurant_data import LOCATIONS, restaurant_locations
+from .scraper import get_cached_menus, clear_cache
 import logging
 
 # Create a Blueprint for our main routes
@@ -17,54 +13,52 @@ def home():
     # Main route handler for the homepage
     # Handles both GET and POST requests for menu filtering
     
-    # Handle POST request (form submission)
-    if request.method == 'POST':
-        selected_food_type = request.form.get('food_type')
-        selected_search_term = request.form.get('search_term')
-        selected_restaurants = request.form.getlist('restaurants[]')
-        # Redirect to GET request with selected filters
-        return redirect(url_for('main.home', 
-                              food_type=selected_food_type, 
-                              search_term=selected_search_term, 
-                              restaurants=selected_restaurants))
-    
-    # Handle GET request (page load or redirect from POST)
+    # Get selected filters
+    selected_location = request.args.get('location', '')  # Default to empty string instead of 'Lindholmen'
     selected_food_type = request.args.get('food_type')
     selected_search_term = request.args.get('search_term')
-    selected_restaurants = request.args.getlist('restaurants')
     
     # Get menus and apply filters
     menus = get_cached_menus()
-    food_types = get_food_types(menus)
-    filtered_menus = filter_menus_by_food_type(menus, selected_food_type)
+    
+    # Filter by location if one is selected
+    if selected_location:
+        location_filtered_menus = {
+            restaurant: menu 
+            for restaurant, menu in menus.items() 
+            if restaurant_locations.get(restaurant, {}).get('area') == selected_location
+        }
+    else:
+        location_filtered_menus = menus  # Show all locations if none selected
+    
+    # Then apply other filters
+    food_types = get_food_types(location_filtered_menus)
+    filtered_menus = filter_menus_by_food_type(location_filtered_menus, selected_food_type)
     filtered_menus = filter_menus_by_search_term(filtered_menus, selected_search_term)
     
-    # Format the menu items to make food types bold
-    filtered_menus = format_menu_items(filtered_menus)
+    # Format the menus to make food types bold
+    formatted_menus = format_menu_items(filtered_menus)
     
-    # Add debug logging
-    logging.debug(f"Available restaurants: {list(filtered_menus.keys())}")
-    logging.debug(f"Restaurant locations: {list(restaurant_locations.keys())}")
-    
-    # Create linked_restaurants dictionary
+    # Create linked_restaurants with filtered menus
     linked_restaurants = {
         restaurant: {
             "menu": menu,
             "maps_link": restaurant_locations.get(restaurant, {}).get("maps"),
             "website": restaurant_locations.get(restaurant, {}).get("website"),
-            "review_score": restaurant_locations.get(restaurant, {}).get("review_score")
+            "instagram": restaurant_locations.get(restaurant, {}).get("instagram"),
+            "review_score": restaurant_locations.get(restaurant, {}).get("review_score"),
+            "area": restaurant_locations.get(restaurant, {}).get("area")
         }
-        for restaurant, menu in filtered_menus.items()
+        for restaurant, menu in formatted_menus.items()
     }
     
-    logging.debug(f"Linked restaurants: {list(linked_restaurants.keys())}")
-    
     return render_template('index.html',
-                         menus=filtered_menus,
+                         menus=formatted_menus,
                          food_types=food_types,
+                         locations=list(LOCATIONS.keys()),
+                         selected_location=selected_location,
                          selected_food_type=selected_food_type,
                          selected_search_term=selected_search_term,
-                         selected_restaurants=selected_restaurants,
                          linked_restaurants=linked_restaurants)
 
 def get_food_types(menus):
