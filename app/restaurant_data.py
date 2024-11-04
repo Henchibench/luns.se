@@ -45,8 +45,8 @@ restaurant_locations = {
     },
     "District One": {
         "maps": "https://maps.app.goo.gl/RwHPDeykZvKpaTL26",
-        "website": "https://www.facebook.com/DistrictOneGBG/",
-        "instagram": "https://www.instagram.com/districtonegbg/",
+        "website": "https://www.districtone.se/",
+        "instagram": "https://www.instagram.com/districtone.se/",
         "area": "Lindholmen"
     },
     "Gourmetkorv": {
