@@ -21,4 +21,4 @@ ENV FLASK_APP=app
 ENV FLASK_ENV=production
 
 # Command to run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wsgi:application"]

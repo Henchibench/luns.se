@@ -17,4 +17,5 @@ jobs:
         script: |
           cd /var/www/luns.se
           git pull
-          sudo supervisorctl restart luns
+          docker-compose down
+          docker-compose up --build -d
