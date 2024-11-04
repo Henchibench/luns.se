@@ -1,4 +1,4 @@
-# Lunch på Lindis
+# luns.se
 
 A web application that displays and filters lunch menus from restaurants around Lindholmen Science Park in Gothenburg, Sweden.
 
@@ -75,7 +75,7 @@ gunicorn wsgi:application
 
 ## Caching
 
-The application implements a caching system with a 30-minute timeout to reduce load on the source website. Cache can be manually cleared through the API endpoint `/clear-cache`.
+The application implements a caching system with a 30-minute timeout to reduce load on the source website.
 
 ## API Reference
 
@@ -83,7 +83,6 @@ The application implements a caching system with a 30-minute timeout to reduce l
 
 - `GET /` - Main page displaying all menus
 - `POST /` - Filter menus based on form submission
-- `GET /clear-cache` - Clear the menu cache and fetch fresh data
 
 ## Contributing
 
@@ -99,5 +98,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Data source: [Lindholmen.se](https://lindholmen.uit.se/)
+- Data source: [Lindholmen.se](https://lindholmen.se/)
 - Restaurant information and locations
