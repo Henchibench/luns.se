@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=production
+    restart: unless-stopped
+
+  # If you need a database later:
+  # db:
+  #   image: postgres:13
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_DB=luns
+  #     - POSTGRES_USER=luns
+  #     - POSTGRES_PASSWORD=your_password
+
+volumes:
+  postgres_data:
