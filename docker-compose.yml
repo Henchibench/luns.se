@@ -3,10 +3,12 @@ version: '3.8'
 services:
   web:
     build: .
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes:
       - .:/app
+    networks:
+      - web_network
     environment:
       - FLASK_APP=app
       - FLASK_ENV=production
@@ -21,6 +23,10 @@ services:
   #     - POSTGRES_DB=luns
   #     - POSTGRES_USER=luns
   #     - POSTGRES_PASSWORD=your_password
+
+networks:
+  web_network:
+    driver: bridge
 
 volumes:
   postgres_data:
