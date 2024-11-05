@@ -10,90 +10,117 @@
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍴</text></svg>">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <script>
-        function resetForm() {
-            document.getElementById("food_type").value = "";
-            document.getElementById("search_term").value = "";
-            var checkboxes = document.querySelectorAll('input[name="restaurants[]"]');
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-            document.getElementById("filterForm").submit();
-        }
-        function submitForm() {
-            document.getElementById("filterForm").submit();
-        }
-        function clearCache() {
-            fetch('/clear-cache')
-                .then(response => {
-                    if (!response.ok) {
-                        alert('Failed to refresh data');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to refresh data');
-                });
-        }
-    </script>
 </head>
 <body>
+    <!-- Sliding Filter Sidebar -->
+    <div class="filter-sidebar">
+        <div class="filter-sidebar-content">
+            <form method="GET" action="{{ url_for('main.home') }}" class="filter-list">
+                <!-- Location Filter -->
+                <div class="filter-group">
+                    <h3>Områden</h3>
+                    <div class="filter-options">
+                        {% for location in locations %}
+                        <div class="filter-option">
+                            <input type="checkbox" id="location-{{ location }}" name="locations[]" 
+                                   value="{{ location }}" 
+                                   {% if location in selected_locations %}checked{% endif %}>
+                            <label for="location-{{ location }}">{{ location }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Food Type Filter -->
+                <div class="filter-group">
+                    <h3>Maträtter</h3>
+                    <div class="filter-options">
+                        {% for food_type in food_types %}
+                        <div class="filter-option">
+                            <input type="checkbox" id="food-{{ food_type }}" name="food_types[]" 
+                                   value="{{ food_type }}" 
+                                   {% if food_type in selected_food_types %}checked{% endif %}>
+                            <label for="food-{{ food_type }}">{{ food_type }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Restaurant Filter -->
+                <div class="filter-group restaurant-group">
+                    <h3>Restauranger</h3>
+                    <div class="filter-options">
+                        <div class="toggle-buttons mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="toggleAllRestaurants(false)">
+                                Avmarkera alla
+                            </button>
+                        </div>
+                        <div class="restaurant-list">
+                            {% for restaurant in all_restaurants|sort %}
+                            <div class="filter-option">
+                                <input type="checkbox" id="restaurant-{{ restaurant }}" name="restaurants[]" 
+                                       value="{{ restaurant }}" 
+                                       {% if not filtered_restaurants or restaurant in filtered_restaurants %}checked{% endif %}>
+                                <label for="restaurant-{{ restaurant }}">{{ restaurant }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Terms Filter -->
+                <div class="filter-group">
+                    <h3>Cravings 😋</h3>
+                    <div class="filter-options">
+                        <div class="filter-option">
+                            <input type="checkbox" id="craving-burgare" name="search_terms[]" value="burgare" 
+                                   {% if 'burgare' in selected_search_terms %}checked{% endif %}>
+                            <label for="craving-burgare">Hamburgare</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="craving-mos" name="search_terms[]" value="mos" 
+                                   {% if 'mos' in selected_search_terms %}checked{% endif %}>
+                            <label for="craving-mos">Potatismos</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="craving-korv" name="search_terms[]" value="körv" 
+                                   {% if 'körv' in selected_search_terms %}checked{% endif %}>
+                            <label for="craving-korv">Korv</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="filter-group filter-buttons">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">Använd Filter</button>
+                    <a href="{{ url_for('main.home') }}" class="btn btn-secondary w-100">Återställ Filter</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Toggle Button -->
+    <button id="filterToggle" class="filter-toggle-btn">
+        ☰
+    </button>
+
+    <!-- Main Content Container -->
     <div class="container">
         <h1 class="my-4">
             <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Lunch på Lindis" style="max-width: 100%; height: auto;">
         </h1>
-        <div class="frame mb-4">
-            <form method="GET" action="{{ url_for('main.home') }}" class="filter-row row justify-content-between">
-                <!-- Location Dropdown -->
-                <div class="filter-item col-md-3 pb-1">
-                    <select name="location" id="location" class="form-select" onchange="this.form.submit()">
-                        <option value="">Alla Områden</option>
-                        {% for location in locations %}
-                        <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
-                            {{ location }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
 
-                <!-- Food Type Dropdown -->
-                <div class="filter-item col-md-3 pb-1">
-                    <select name="food_type" id="food_type" class="form-select" onchange="this.form.submit()">
-                        <option value="">Alla Maträtter</option>
-                        {% for food_type in food_types %}
-                        <option value="{{ food_type }}" {% if food_type == selected_food_type %}selected{% endif %}>
-                            {{ food_type }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- Search Terms Dropdown -->
-                <div class="filter-item col-md-3 pb-1">
-                    <select name="search_term" id="search_term" class="form-select" onchange="this.form.submit()">
-                        <option value="">Cravings 😋</option>
-                        <option value="burgare" {% if selected_search_term == 'burgare' %}selected{% endif %}>Hamburgare</option>
-                        <option value="mos" {% if selected_search_term == 'mos' %}selected{% endif %}>Potatismos</option>
-                        <option value="körv" {% if selected_search_term == 'körv' %}selected{% endif %}>Korv</option>
-                    </select>
-                </div>
-
-                <!-- Reset Button -->
-                <div class="filter-item col-md-3 pb-1">
-                    <a href="{{ url_for('main.home') }}" class="btn btn-secondary reset-button">Återställ Filter</a>
-                </div>
-            </form>
-        </div>
+        <!-- Restaurant Cards -->
         {% for restaurant, menu in menus.items() %}
             {% if not selected_restaurants or restaurant in selected_restaurants %}
                 <div class="restaurant card my-4">
                     <div class="card-body">
                         <h2 class="card-title">{{ restaurant }}
-                            {% if linked_restaurants[restaurant].maps_link %}
+                            {% if linked_restaurants[restaurant].maps %}
                                 <button class="btn btn-primary btn-sm ml-2" 
                                         type="button" 
-                                        data-toggle="collapse" 
-                                        data-target="#map-{{ loop.index }}" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#map-{{ loop.index }}" 
                                         aria-expanded="false">
                                     Hitta hit! 🗺️
                                 </button>
@@ -112,19 +139,16 @@
                                    📸
                                 </a>
                             {% endif %}
-                            {% if linked_restaurants[restaurant].review_score %}
-                                <span class="badge badge-info ml-2">Rating: {{ linked_restaurants[restaurant].review_score }}</span>
-                            {% endif %}
                         </h2>
-                        
-                        <!-- Collapsible map section -->
-                        {% if linked_restaurants[restaurant].maps_link %}
+
+                        <!-- Map container -->
+                        {% if linked_restaurants[restaurant].maps %}
                             <div class="collapse map-container" id="map-{{ loop.index }}">
                                 <iframe class="map-iframe"
-                                    src="https://maps.google.com/maps?q=lindholmen+{{ restaurant|urlencode }}{{ linked_restaurants[restaurant].search_addition }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                                    src="https://maps.google.com/maps?q=lindholmen+{{ restaurant|urlencode }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                                     allowfullscreen>
                                 </iframe>
-                                <a href="{{ linked_restaurants[restaurant].maps_link }}" 
+                                <a href="{{ linked_restaurants[restaurant].maps }}" 
                                    target="_blank" 
                                    class="btn btn-outline-primary btn-sm mt-2">
                                     Öppna i Google Maps
@@ -132,19 +156,46 @@
                             </div>
                         {% endif %}
 
-                        <ul class="list-group list-group-flush">
-                            {% for dish in menu %}
-                                <li class="list-group-item">{{ dish | safe }}</li>
+                        <!-- Menu items -->
+                        <div class="menu-items">
+                            {% for item in menu %}
+                                <div class="menu-item">{{ item }}</div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    
+    <!-- Filter Toggle Script -->
+    <script>
+        document.getElementById('filterToggle').addEventListener('click', function() {
+            document.querySelector('.filter-sidebar').classList.toggle('active');
+            document.querySelector('.container').classList.toggle('filter-active');
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(e) {
+            const sidebar = document.querySelector('.filter-sidebar');
+            const toggleBtn = document.getElementById('filterToggle');
+            
+            if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
+                sidebar.classList.remove('active');
+                document.querySelector('.container').classList.remove('filter-active');
+            }
+        });
+
+        function toggleAllRestaurants(select) {
+            const checkboxes = document.querySelectorAll('input[name="restaurants[]"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = select;
+            });
+        }
+    </script>
 </body>
 </html>

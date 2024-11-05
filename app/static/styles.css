@@ -134,23 +134,28 @@ h1 {
     height: 400px;  /* Made taller */
     border: none;
     border-radius: 4px;
+    margin-bottom: 10px;  /* Add space between iframe and button */
 }
 
 .map-container {
     margin-top: 10px;
-    transition: all 0.3s ease-in-out;  /* Smooth transition */
-    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
 }
 
 /* Animation for collapse */
 .collapse {
-    transition: all 0.3s ease-in-out;
+    transition: height 0.35s ease;
 }
 
 .collapse:not(.show) {
-    display: block;
+    display: none;
+}
+
+.collapsing {
     height: 0;
-    opacity: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
 }
 
 .collapse.show {
@@ -354,6 +359,542 @@ h1 img {
 
 .form-select {
     height: 45px;
+}
+
+/* Modern Filter Styles */
+.filter-container {
+    background: var(--box-color);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.modern-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    background-color: var(--text-box-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modern-select:hover {
+    border-color: var(--button-hover-border-color);
+}
+
+.food-type-container,
+.restaurant-filter-container,
+.search-terms-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.food-type-checkbox,
+.restaurant-checkbox,
+.search-term-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--text-box-color);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.food-type-checkbox:hover,
+.restaurant-checkbox:hover,
+.search-term-checkbox:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.food-type-checkbox input[type="checkbox"],
+.restaurant-checkbox input[type="checkbox"],
+.search-term-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.food-type-checkbox label,
+.restaurant-checkbox label,
+.search-term-checkbox label {
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--button-border-color);
+}
+
+.modern-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.apply-filters {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: 1px solid var(--button-border-color);
+}
+
+.reset-filters {
+    background-color: transparent;
+    color: var(--button-text-color);
+    border: 1px solid var(--button-border-color);
+}
+
+.modern-button:hover {
+    transform: translateY(-1px);
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-border-color);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+}
+
+.filter-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.filter-dropdown.show {
+    max-height: 500px; /* or whatever height is needed */
+    overflow-y: auto;
+}
+
+.filter-dropdown:not(.show) {
+    display: none;
+}
+
+.search-box {
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    background: var(--box-color);
+    z-index: 1;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--button-border-color);
+    border-radius: 4px;
+    background: var(--text-box-color);
+}
+
+.restaurant-filter-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 0 0 8px 8px;
+    margin-top: 5px;
+}
+
+.restaurant-checkbox {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.restaurant-checkbox:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+}
+
+.filter-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.food-type-container,
+.search-terms-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 0 0 8px 8px;
+    margin-top: 5px;
+}
+
+.location-container {
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 0 0 8px 8px;
+    margin-top: 5px;
+}
+
+.location-container .modern-select {
+    width: 100%;
+    background: var(--text-box-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.location-container {
+    padding: 10px;
+    background: var(--text-box-color);
+    border-radius: 0 0 8px 8px;
+    margin-top: 5px;
+}
+
+.location-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--text-box-color);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.location-checkbox:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.location-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.location-checkbox label {
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Add specific margin for the "Open in Google Maps" button */
+.map-container .btn-outline-primary {
+    margin-bottom: 15px;
+    position: relative;  /* Add position relative */
+    z-index: 2;  /* Make button appear above other elements */
+    display: inline-block;  /* Changed from block to inline-block */
+    clear: both;  /* Ensure it clears any floating elements */
+}
+
+.menu-items {
+    position: relative;
+    margin-top: 10px;  /* Add space between map container and menu items */
+}
+
+/* Sliding Filter Panel */
+.filter-toggle-btn {
+    position: fixed;
+    left: 0;
+    top: 180px;
+    z-index: 1000;
+    background: var(--box-color);
+    border: 1px solid var(--button-border-color);
+    border-left: none;
+    color: var(--button-text-color);
+    padding: 15px 10px;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.filter-toggle-btn:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.filter-sidebar {
+    position: fixed;
+    left: -320px;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--box-color);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+}
+
+.filter-sidebar.active {
+    left: 0;
+}
+
+.filter-sidebar.active + .filter-toggle-btn {
+    left: 320px;
+}
+
+.filter-sidebar-content {
+    padding: 20px;
+    padding-top: 70px;
+}
+
+/* Adjust main content */
+.container {
+    transition: margin-left 0.3s ease;
+}
+
+.container.filter-active {
+    margin-left: 320px;
+}
+
+/* Filter Sidebar Styles */
+.filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.filter-group {
+    border-bottom: 1px solid var(--button-border-color);
+    padding-bottom: 20px;
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+}
+
+.filter-group h3 {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-option input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.filter-option label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+.filter-option:hover label {
+    color: var(--button-hover-color);
+}
+
+/* Restaurant search input */
+.search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--button-border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.restaurant-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.filter-option label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    user-select: none;
+}
+
+.toggle-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.toggle-buttons .btn {
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+}
+
+.filter-buttons {
+    position: sticky;
+    bottom: 0;
+    background: var(--box-color);
+    padding-top: 15px;
+    margin-top: auto;
+    border-top: 1px solid var(--button-border-color);
+}
+
+.filter-buttons .btn {
+    padding: 10px;
+}
+
+.restaurant-group {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.restaurant-group .filter-options {
+    flex-grow: 1;
+    overflow: visible;  /* Remove the inner scroll */
+}
+
+.restaurant-list {
+    overflow: visible;  /* Remove the inner scroll */
+}
+
+.filter-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;  /* For absolute positioning of buttons */
+}
+
+.filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    overflow-y: auto;
+    padding: 20px;
+    padding-bottom: 100px;  /* Space for the buttons */
+    height: 100%;
+}
+
+/* Filter groups */
+.filter-group {
+    border-bottom: 1px solid var(--button-border-color);
+    padding-bottom: 20px;
+}
+
+/* Button container */
+.filter-buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--box-color);
+    padding: 20px;
+    border-top: 1px solid var(--button-border-color);
+}
+
+.filter-buttons .btn {
+    padding: 10px;
+}
+
+/* Consistent checkbox styling */
+.filter-option input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 16px;  /* Fixed width */
+    height: 16px;  /* Fixed height */
+    min-width: 16px;  /* Ensure minimum width */
+    min-height: 16px;  /* Ensure minimum height */
+}
+
+/* Space after last craving option */
+.filter-options:last-child {
+    margin-bottom: 20px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.filter-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.filter-list {
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+.filter-list {
+    -ms-overflow-style: none;
+}
+
+/* Restaurant group styling */
+.restaurant-group {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.restaurant-list {
+    margin-bottom: 5px;  /* Space after restaurant list */
+    padding-bottom: 5px;  /* Space before divider */
+}
+
+/* Space after last craving option */
+.filter-options:last-child {
+    margin-bottom: 20px;
 }
 
 
