@@ -1,17 +1,19 @@
+/* Root Variables */
 :root {
-    --body-color: #002836;    /* Light sky blue background */
-    --secondary-color: #e3f2fd;  /* Turquoise */
-    --box-color: #f3f3f3;      
-    --text-color: #2c3e50;       /* Dark blue-gray for text */
+    --body-color: #002836;
+    --secondary-color: #e3f2fd;
+    --box-color: #f3f3f3;
+    --text-color: #2c3e50;
     --text-box-color: #ffffff;
-    --button-hover-color: #5d8f88; /* Darker version for button hover */
-    --button-bg-color: white; /* White background for buttons */
-    --button-border-color: #d1d1d1; /* Subtle light gray border */
-    --button-hover-bg-color: #f0f0f0; /* Slightly darker gray on hover */
-    --button-hover-border-color: #b0b0b0; /* Darker border on hover */
-    --button-text-color: #002836; /* Dark teal text color */
+    --button-hover-color: #5d8f88;
+    --button-bg-color: white;
+    --button-border-color: #d1d1d1;
+    --button-hover-bg-color: #f0f0f0;
+    --button-hover-border-color: #b0b0b0;
+    --button-text-color: #002836;
 }
 
+/* Base Styles */
 body {
     background-color: var(--body-color);
     color: var(--text-color);
@@ -19,6 +21,7 @@ body {
     margin: 20px;
 }
 
+/* Frame and Container Styles */
 .frame {
     background-color: var(--box-color);
     padding: 20px;
@@ -27,6 +30,12 @@ body {
     border: 2px solid #e3f2fd;
 }
 
+.container.filter-active {
+    margin-left: 320px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Restaurant Card Styles */
 .restaurant {
     margin-bottom: 20px;
     background-color: var(--box-color);
@@ -37,14 +46,14 @@ body {
 }
 
 .restaurant .list-group {
-    background-color: var(--text-box-color) !important; /* Light gray background for food items */
-    padding: 10px; /* Optional: Add padding for better spacing */
-    border-radius: 8px; /* Optional: Round the corners */
+    background-color: var(--text-box-color);
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .restaurant .list-group-item {
     background-color: transparent;
-    border-bottom: 1px dotted #ccc; /* Dotted border between items */
+    border-bottom: 1px dotted #ccc;
     padding: 10px 0;
 }
 
@@ -52,89 +61,50 @@ body {
     border-bottom: none;
 }
 
-/*.restaurant:hover {
-    background-color: var(--hover-color);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-}
-
-/* Buttons stylin */
-.btn-primary {
-    background-color: var(--button-bg-color); /* Use variable for background */
-    border: 1px solid var(--button-border-color); /* Use variable for border */
-    color: var(--button-text-color); /* Use variable for text color */
-}
-
-.btn-primary:hover {
-    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
-    border-color: var(--button-hover-border-color); /* Use variable for hover border */
-    color: var(--button-text-color); /* Keep text color */
-    transform: translateY(-1px); /* Subtle lift effect */
-}
-
-.btn-info {
-    background-color: var(--button-bg-color); /* Use variable for background */
-    border: 1px solid var(--button-border-color); /* Use variable for border */
-    color: var(--button-text-color); /* Use variable for text color */
-}
-
-.btn-info:hover {
-    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
-    border-color: var(--button-hover-border-color); /* Use variable for hover border */
-    color: var(--button-text-color); /* Keep text color */
-    transform: translateY(-1px); /* Subtle lift effect */
-}
-
-.btn-secondary {
-    background-color: var(--button-bg-color); /* Use variable for background */
-    border: 1px solid var(--button-border-color); /* Use variable for border */
-    color: var(--button-text-color); /* Use variable for text color */
-}
-
-.btn-secondary:hover {
-    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
-    border-color: var(--button-hover-border-color); /* Use variable for hover border */
-    color: var(--button-text-color); /* Keep text color */
-    transform: translateY(-1px);
-}
-
-/* Badge styling */
-.badge-info {
-    background-color: var(--secondary-color) !important;
-}
-
-h1 {
-    text-align: center;
-    color: var(--accent-color);
-    font-weight: bold;
-    margin-bottom: 30px;
-}
-
 .restaurant h2 {
     color: var(--text-color);
     margin-bottom: 15px;
 }
 
-/* Checkbox group */
-.checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 5px;
+/* Button Styles */
+.btn {
+    height: 38px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: var(--button-bg-color);
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+    margin-left: 8px;
 }
 
-.form-check-input:checked {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
+.btn:hover {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-border-color);
+    transform: translateY(-1px);
+    color: var(--button-text-color);
 }
 
-/* Map related styles */
+.btn-primary, .btn-secondary, .btn-info {
+    background-color: var(--button-bg-color);
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+}
+
+.btn-outline-primary {
+    background-color: transparent;
+    border: 1px solid var(--button-border-color);
+    color: var(--button-text-color);
+}
+
+/* Map Styles */
 .map-iframe {
     width: 100%;
-    height: 400px;  /* Made taller */
+    height: 400px;
     border: none;
     border-radius: 4px;
-    margin-bottom: 10px;  /* Add space between iframe and button */
+    margin-bottom: 10px;
 }
 
 .map-container {
@@ -143,527 +113,15 @@ h1 {
     position: relative;
 }
 
-/* Animation for collapse */
-.collapse {
-    transition: height 0.35s ease;
-}
-
-.collapse:not(.show) {
-    display: none;
-}
-
-.collapsing {
-    height: 0;
-    overflow: hidden;
-    transition: height 0.35s ease;
-}
-
-.collapse.show {
-    height: 450px;  /* Height for map + button */
-    opacity: 1;
-}
-
-/* Optional: Smooth rotation for the button arrow */
-.map-btn-icon {
-    display: inline-block;
-    transition: transform 0.3s ease;
-}
-
-[aria-expanded="true"] .map-btn-icon {
-    transform: rotate(180deg);
-}
-
-h1 img {
-    max-width: 100px; /* Set a maximum width for the logo */
-    height: auto; /* Maintain aspect ratio */
-    margin: 0 auto; /* Center the logo */
-    display: block; /* Centering with margin auto */
-}
-
-.form-group .form-control {
-    background-color: var(--text-box-color); /* Light gray background for the dropdown */
-    color: #002836; /* Dark teal text color */
-    border: 1px solid #d1d1d1; /* Subtle light gray border */
-    border-radius: 4px; /* Rounded corners */
-    padding: 10px; /* Padding for better spacing */
-}
-
-.form-group .form-control:focus {
-    border-color: var(--text-box-color); /* Change border color on focus */
-    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25); /* Add shadow on focus */
-}
-
-.restaurant .list-group-item strong {
-    font-weight: 700; /* Make the bold text more prominent */
-    color: #002836; /* Optional: different color for the food type */
-}
-
-/* Add or update filter styles */
-.form-select {
-    background-color: var(--text-box-color) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--button-border-color) !important;
-    border-radius: 8px !important;
-    padding: 10px 15px !important;
-    height: 45px !important;
-    font-size: 0.95rem !important;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.form-select:hover {
-    border-color: var(--button-hover-border-color) !important;
-    background-color: #f8f9fa !important;
-}
-
-.form-select:focus {
-    border-color: var(--button-hover-border-color) !important;
-    box-shadow: 0 0 0 3px rgba(0, 40, 54, 0.1) !important;
-    outline: none !important;
-}
-
-.form-label {
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-/* Updated dropdown and filter section styling */
-.frame {
-    background-color: var(--box-color);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    border: 2px solid #e3f2fd;
-}
-
-.filter-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;  /* Even spacing between all elements */
-}
-
-.filter-item {
-    flex: 1;  /* Make dropdowns take equal space */
-}
-
-.filter-item:last-child {
-    flex: 0 0 auto;  /* Don't expand the button container */
-}
-
-.form-select {
-    width: 100%;
-    height: 45px;
-}
-
-.reset-button {
-    height: 45px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    min-width: 120px;
-}
-
-/* Style for the clear filters button */
-.btn-secondary {
-    height: 45px;  /* Match height with dropdowns */
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    background-color: var(--button-bg-color);
-    border: 1px solid var(--button-border-color);
-    color: var(--button-text-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--button-hover-bg-color);
-    border-color: var(--button-hover-border-color);
-    transform: translateY(-1px);
-}
-
-/* Updated button styling for all buttons */
-.btn {
-    height: 38px;  /* Slightly smaller than filters but consistent with each other */
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    background-color: var(--button-bg-color);
-    border: 1px solid var(--button-border-color);
-    color: var(--button-text-color);
-    margin-left: 8px;  /* Consistent spacing between buttons */
-}
-
-.btn:hover {
-    background-color: var(--button-hover-bg-color);
-    border-color: var(--button-hover-border-color);
-    transform: translateY(-1px);
-    color: var(--button-text-color);  /* Maintain text color on hover */
-}
-
-/* Specific styles for primary buttons (maps, website, instagram) */
-.btn-primary {
-    background-color: var(--button-bg-color); /* Use variable for background */
-    border: 1px solid var(--button-border-color); /* Use variable for border */
-    color: var(--button-text-color); /* Use variable for text color */
-}
-
-.btn-primary:hover {
-    background-color: var(--button-hover-bg-color); /* Use variable for hover background */
-    border-color: var(--button-hover-border-color); /* Use variable for hover border */
-    color: var(--button-text-color); /* Keep text color */
-    transform: translateY(-1px); /* Subtle lift effect */
-}
-
-/* Style for the clear filters button */
-.btn-secondary {
-    height: 45px;  /* Match height with dropdowns */
-    padding: 10px 20px;
-    width: 100%;
-}
-
-/* Badge styling update to match new design */
-.badge-info {
-    background-color: var(--text-box-color) !important;
-    color: var(--button-text-color);
-    border: 1px solid var(--button-border-color);
-    padding: 8px 12px;
-    font-weight: normal;
-    font-size: 0.9rem;
-}
-
-/* Update map button specific styling */
-.btn-outline-primary {
-    background-color: transparent;
-    border: 1px solid var(--button-border-color);
-    color: var(--button-text-color);
-}
-
-.btn-outline-primary:hover {
-    background-color: var(--button-hover-bg-color);
-    border-color: var(--button-hover-border-color);
-    color: var(--button-text-color);
-}
-
-.reset-button {
-    height: 45px;  /* Same height as dropdowns */
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;  /* Let the button width be determined by content */
-    min-width: 120px;  /* Minimum width to look good */
-}
-
-.form-select {
-    height: 45px;
-}
-
-/* Modern Filter Styles */
-.filter-container {
-    background: var(--box-color);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.filter-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.filter-label {
-    font-weight: 600;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    margin-bottom: 5px;
-}
-
-.modern-select {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid var(--button-border-color);
-    border-radius: 8px;
-    background-color: var(--text-box-color);
-    color: var(--text-color);
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.modern-select:hover {
-    border-color: var(--button-hover-border-color);
-}
-
-.food-type-container,
-.restaurant-filter-container,
-.search-terms-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 150px;
-    overflow-y: auto;
-    padding: 5px;
-}
-
-.food-type-checkbox,
-.restaurant-checkbox,
-.search-term-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: var(--text-box-color);
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.food-type-checkbox:hover,
-.restaurant-checkbox:hover,
-.search-term-checkbox:hover {
-    background: var(--button-hover-bg-color);
-}
-
-.food-type-checkbox input[type="checkbox"],
-.restaurant-checkbox input[type="checkbox"],
-.search-term-checkbox input[type="checkbox"] {
-    margin: 0;
-    cursor: pointer;
-}
-
-.food-type-checkbox label,
-.restaurant-checkbox label,
-.search-term-checkbox label {
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin: 0;
-}
-
-.filter-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--button-border-color);
-}
-
-.modern-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.apply-filters {
-    background-color: var(--button-bg-color);
-    color: var(--button-text-color);
-    border: 1px solid var(--button-border-color);
-}
-
-.reset-filters {
-    background-color: transparent;
-    color: var(--button-text-color);
-    border: 1px solid var(--button-border-color);
-}
-
-.modern-button:hover {
-    transform: translateY(-1px);
-    background-color: var(--button-hover-bg-color);
-    border-color: var(--button-hover-border-color);
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 8px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.dropdown-arrow {
-    transition: transform 0.3s ease;
-}
-
-.filter-dropdown {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
-}
-
-.filter-dropdown.show {
-    max-height: 500px; /* or whatever height is needed */
-    overflow-y: auto;
-}
-
-.filter-dropdown:not(.show) {
-    display: none;
-}
-
-.search-box {
-    padding: 10px;
-    position: sticky;
-    top: 0;
-    background: var(--box-color);
-    z-index: 1;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--button-border-color);
-    border-radius: 4px;
-    background: var(--text-box-color);
-}
-
-.restaurant-filter-container {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 0 0 8px 8px;
-    margin-top: 5px;
-}
-
-.restaurant-checkbox {
-    padding: 8px;
-    border-radius: 4px;
-}
-
-.restaurant-checkbox:hover {
-    background: var(--button-hover-bg-color);
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 8px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.dropdown-arrow {
-    transition: transform 0.3s ease;
-}
-
-.filter-dropdown {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
-}
-
-.food-type-container,
-.search-terms-container {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 0 0 8px 8px;
-    margin-top: 5px;
-}
-
-.location-container {
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 0 0 8px 8px;
-    margin-top: 5px;
-}
-
-.location-container .modern-select {
-    width: 100%;
-    background: var(--text-box-color);
-    border: 1px solid var(--button-border-color);
-    border-radius: 4px;
-    padding: 8px;
-}
-
-.location-container {
-    padding: 10px;
-    background: var(--text-box-color);
-    border-radius: 0 0 8px 8px;
-    margin-top: 5px;
-}
-
-.location-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: var(--text-box-color);
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.location-checkbox:hover {
-    background: var(--button-hover-bg-color);
-}
-
-.location-checkbox input[type="checkbox"] {
-    margin: 0;
-    cursor: pointer;
-}
-
-.location-checkbox label {
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin: 0;
-}
-
-/* Add specific margin for the "Open in Google Maps" button */
 .map-container .btn-outline-primary {
     margin-bottom: 15px;
-    position: relative;  /* Add position relative */
-    z-index: 2;  /* Make button appear above other elements */
-    display: inline-block;  /* Changed from block to inline-block */
-    clear: both;  /* Ensure it clears any floating elements */
-}
-
-.menu-items {
     position: relative;
-    margin-top: 10px;  /* Add space between map container and menu items */
+    z-index: 2;
+    display: inline-block;
+    clear: both;
 }
 
-/* Sliding Filter Panel */
-.filter-toggle-btn {
-    position: fixed;
-    left: 0;
-    top: 180px;
-    z-index: 1000;
-    background: var(--box-color);
-    border: 1px solid var(--button-border-color);
-    border-left: none;
-    color: var(--button-text-color);
-    padding: 15px 10px;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-}
-
-.filter-toggle-btn:hover {
-    background: var(--button-hover-bg-color);
-}
-
+/* Filter Sidebar Styles */
 .filter-sidebar {
     position: fixed;
     left: -320px;
@@ -681,29 +139,51 @@ h1 img {
     left: 0;
 }
 
-.filter-sidebar.active + .filter-toggle-btn {
-    left: 320px;
-}
-
 .filter-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
     padding: 20px;
     padding-top: 70px;
 }
 
-/* Adjust main content */
-.container {
-    transition: margin-left 0.3s ease;
+.filter-toggle-btn {
+    position: fixed;
+    left: 0;
+    top: 180px;
+    z-index: 1000;
+    background: var(--box-color);
+    border: 1px solid var(--button-border-color);
+    border-left: none;
+    color: var(--button-text-color);
+    padding: 15px 10px;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
-.container.filter-active {
-    margin-left: 320px;
+.filter-sidebar.active + .filter-toggle-btn {
+    left: 320px;
 }
 
-/* Filter Sidebar Styles */
+/* Filter List and Options */
 .filter-list {
     display: flex;
     flex-direction: column;
     gap: 25px;
+    overflow-y: auto;
+    padding: 20px;
+    padding-bottom: 100px;
+    height: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.filter-list::-webkit-scrollbar {
+    display: none;
 }
 
 .filter-group {
@@ -733,35 +213,13 @@ h1 img {
     gap: 10px;
 }
 
-.filter-option input[type="radio"] {
+.filter-option input[type="checkbox"] {
     margin: 0;
     cursor: pointer;
-}
-
-.filter-option label {
-    margin: 0;
-    cursor: pointer;
-    font-size: 0.95rem;
-    color: var(--text-color);
-}
-
-.filter-option:hover label {
-    color: var(--button-hover-color);
-}
-
-/* Restaurant search input */
-.search-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid var(--button-border-color);
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.restaurant-list {
-    max-height: 300px;
-    overflow-y: auto;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
 }
 
 .filter-option label {
@@ -772,70 +230,7 @@ h1 img {
     user-select: none;
 }
 
-.toggle-buttons {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.toggle-buttons .btn {
-    flex: 1;
-    font-size: 0.9rem;
-    padding: 4px 8px;
-}
-
-.filter-buttons {
-    position: sticky;
-    bottom: 0;
-    background: var(--box-color);
-    padding-top: 15px;
-    margin-top: auto;
-    border-top: 1px solid var(--button-border-color);
-}
-
-.filter-buttons .btn {
-    padding: 10px;
-}
-
-.restaurant-group {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.restaurant-group .filter-options {
-    flex-grow: 1;
-    overflow: visible;  /* Remove the inner scroll */
-}
-
-.restaurant-list {
-    overflow: visible;  /* Remove the inner scroll */
-}
-
-.filter-sidebar-content {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative;  /* For absolute positioning of buttons */
-}
-
-.filter-list {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    overflow-y: auto;
-    padding: 20px;
-    padding-bottom: 100px;  /* Space for the buttons */
-    height: 100%;
-}
-
-/* Filter groups */
-.filter-group {
-    border-bottom: 1px solid var(--button-border-color);
-    padding-bottom: 20px;
-}
-
-/* Button container */
+/* Filter Buttons */
 .filter-buttons {
     position: absolute;
     bottom: 0;
@@ -850,37 +245,7 @@ h1 img {
     padding: 10px;
 }
 
-/* Consistent checkbox styling */
-.filter-option input[type="checkbox"] {
-    margin: 0;
-    cursor: pointer;
-    width: 16px;  /* Fixed width */
-    height: 16px;  /* Fixed height */
-    min-width: 16px;  /* Ensure minimum width */
-    min-height: 16px;  /* Ensure minimum height */
-}
-
-/* Space after last craving option */
-.filter-options:last-child {
-    margin-bottom: 20px;
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.filter-list::-webkit-scrollbar {
-    display: none;
-}
-
-/* Hide scrollbar for Firefox */
-.filter-list {
-    scrollbar-width: none;
-}
-
-/* Hide scrollbar for IE and Edge */
-.filter-list {
-    -ms-overflow-style: none;
-}
-
-/* Restaurant group styling */
+/* Restaurant Group */
 .restaurant-group {
     flex-grow: 1;
     display: flex;
@@ -888,13 +253,29 @@ h1 img {
 }
 
 .restaurant-list {
-    margin-bottom: 5px;  /* Space after restaurant list */
-    padding-bottom: 5px;  /* Space before divider */
+    margin-bottom: 5px;
+    padding-bottom: 5px;
 }
 
-/* Space after last craving option */
-.filter-options:last-child {
-    margin-bottom: 20px;
+/* Toggle Buttons */
+.toggle-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.toggle-buttons .btn {
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+}
+
+/* Header Styles */
+h1 img {
+    max-width: 100px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
 }
 
 
