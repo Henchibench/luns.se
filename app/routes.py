@@ -49,7 +49,9 @@ def home():
         for restaurant, menu in menus.items():
             filtered_menu = []
             for dish in menu:
-                if any(dish.startswith(food_type) for food_type in selected_food_types):
+                # Extract food type from the HTML string
+                food_type = dish.split('</strong>')[0].split('>')[-1] if '<strong>' in dish else dish.split(':')[0]
+                if food_type in selected_food_types:
                     filtered_menu.append(dish)
             if filtered_menu:
                 filtered_menus[restaurant] = filtered_menu
@@ -74,12 +76,13 @@ def home():
                          linked_restaurants=get_linked_restaurants(formatted_menus))
 
 def get_food_types(menus):
-    # Extract and sort unique food types from all menus
     food_types = set()
     for menu in menus.values():
-        for dish in menu:
-            food_type = dish.split(':')[0]
-            food_types.add(food_type)
+        for item in menu:
+            if ': ' in item:
+                # Extract just the text between <strong> tags, or before the first colon
+                food_type = item.split('</strong>')[0].split('>')[-1] if '<strong>' in item else item.split(':')[0]
+                food_types.add(food_type)
     return sorted(food_types)
 
 def filter_menus_by_food_type(menus, food_type):
@@ -127,13 +130,7 @@ def format_menu_items(menus):
     for restaurant, menu in menus.items():
         formatted_menu = []
         for item in menu:
-            if ': ' in item:
-                food_type, rest = item.split(': ', 1)
-                # Use Markup to prevent escaping
-                formatted_item = Markup(f"<strong>{food_type}</strong>: {rest}")
-                formatted_menu.append(formatted_item)
-            else:
-                formatted_menu.append(item)
+            formatted_menu.append(Markup(item))
         formatted_menus[restaurant] = formatted_menu
     return formatted_menus
 

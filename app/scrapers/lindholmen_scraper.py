@@ -47,7 +47,12 @@ class LindholmenScraper(BaseScraper):
                     price = price_div.text.strip() if price_div else "Unknown"
                     
                     # Format the menu item
-                    lunch_menus[display_name].append(f"{food_type}: {dish_name} - {price}")
+                    dish_parts = dish_name.split(',', 1)  # Split at first comma
+                    main_dish = dish_parts[0].strip()
+                    extras = f", {dish_parts[1].strip()}" if len(dish_parts) > 1 else ""
+                    lunch_menus[display_name].append(
+                        f"<strong>{food_type}</strong>: <span class='dish-description'>{main_dish}</span>{extras} - {price}"
+                    )
                     menu_items = menu_items.find_next_sibling('div', class_='table-list__row')
         
         if not lunch_menus:
