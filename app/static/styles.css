@@ -30,9 +30,35 @@ body {
     border: 2px solid #e3f2fd;
 }
 
-.container.filter-active {
-    margin-left: 320px;
-    transition: margin-left 0.3s ease;
+/* Container styles */
+.container {
+    position: relative;
+    z-index: 1;
+    transition: none;
+}
+
+/* Filter sidebar adjustments */
+.filter-sidebar {
+    position: fixed;
+    left: -320px;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--box-color);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;  /* Increased z-index to ensure it appears above content */
+    overflow-y: auto;
+}
+
+.filter-sidebar.active {
+    left: 0;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+/* Adjust the toggle button */
+.filter-toggle-btn {
+    z-index: 1001;  /* Make sure toggle button stays above sidebar */
 }
 
 /* Restaurant Card Styles */
