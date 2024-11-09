@@ -44,7 +44,13 @@ class LilleGrisenScraper(BaseScraper):
                     # Pair each dish with its type
                     for dish_type, item in zip(dish_types, items):
                         if item.text.strip():
-                            todays_menu.append(f"{dish_type}: {item.text.strip()}")
+                            dish_text = item.text.strip()
+                            dish_parts = dish_text.split(',', 1)  # Split at first comma
+                            main_dish = dish_parts[0].strip()
+                            extras = f", {dish_parts[1].strip()}" if len(dish_parts) > 1 else ""
+                            todays_menu.append(
+                                f"<strong>{dish_type}</strong>: <span class='dish-description'>{main_dish}</span>{extras}"
+                            )
                 break
         
         return {self.name: todays_menu if todays_menu else ["No menu available for today"]}
