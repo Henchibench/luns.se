@@ -2,7 +2,7 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]  # or 'master' depending on your default branch
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -11,9 +11,10 @@ jobs:
     - name: Deploy to server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.SERVER_HOST }}
+        host: ssh.luns.se
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
         script: |
           cd /var/www/luns.se
           git pull
