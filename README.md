@@ -1,4 +1,4 @@
-# luns.se
+## luns.se
 
 A web application that displays and filters lunch menus from restaurants around Lindholmen Science Park in Gothenburg, Sweden.
 
