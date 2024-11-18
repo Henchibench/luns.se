@@ -13,38 +13,22 @@ jobs:
         wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
         sudo dpkg -i cloudflared-linux-amd64.deb
 
-    - name: Debug SSH Key
+    - name: Setup SSH
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        echo "Creating .ssh directory..."
         mkdir -p ~/.ssh
-        
-        echo "Writing SSH key..."
-        echo "$SSH_PRIVATE_KEY" | sed 's/./*/g'  # This will show the length without exposing the key
-        
-        echo "Setting up SSH key..."
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        
-        echo "Setting permissions..."
         chmod 600 ~/.ssh/id_rsa
-        ls -la ~/.ssh/id_rsa
-        
-        echo "Testing SSH key format..."
-        ssh-keygen -l -f ~/.ssh/id_rsa || echo "Invalid key format"
-
-    - name: Setup known_hosts
-      run: |
-        echo "Adding ssh.luns.se to known_hosts..."
-        ssh-keyscan ssh.luns.se >> ~/.ssh/known_hosts
-        cat ~/.ssh/known_hosts
+        echo "StrictHostKeyChecking no" > ~/.ssh/config
+        chmod 600 ~/.ssh/config
 
     - name: Deploy
       env:
         CF_SERVICE_TOKEN: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN }}
       run: |
         echo "$CF_SERVICE_TOKEN" | cloudflared access login ssh.luns.se
-        ssh -v ${{ secrets.SERVER_USERNAME }}@ssh.luns.se '
+        ssh ${{ secrets.SERVER_USERNAME }}@ssh.luns.se '
           cd /var/www/luns.se &&
           git pull &&
           docker-compose down &&
