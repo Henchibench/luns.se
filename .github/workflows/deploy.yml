@@ -8,13 +8,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Install cloudflared
+      run: |
+        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+        sudo dpkg -i cloudflared-linux-amd64.deb
+
+    - name: Authenticate with Cloudflare
+      env:
+        CF_SERVICE_TOKEN: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN }}
+      run: |
+        echo "$CF_SERVICE_TOKEN" | cloudflared access login https://ssh.luns.se
+
     - name: Deploy to server
       uses: appleboy/ssh-action@master
       with:
         host: ssh.luns.se
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22
         script: |
           cd /var/www/luns.se
           git pull
