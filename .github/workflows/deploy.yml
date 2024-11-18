@@ -17,7 +17,7 @@ jobs:
       env:
         CF_SERVICE_TOKEN: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN }}
       run: |
-        echo "$CF_SERVICE_TOKEN" | cloudflared access login https://ssh.luns.se
+        echo "$CF_SERVICE_TOKEN" | cloudflared access login ssh.luns.se
 
     - name: Deploy to server
       uses: appleboy/ssh-action@master
