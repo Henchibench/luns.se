@@ -18,14 +18,13 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - URL=luns.luns.se
-      - SUBDOMAINS=
+      - URL=luns.se
       - VALIDATION=dns
       - DNSPLUGIN=cloudflare
-      - STAGING=true
+      - SUBDOMAINS=wildcard
       - EMAIL=henrik.soderstrom@outlook.com
     volumes:
-      - ./swag:/config
+      - ./config:/config
     ports:
       - "443:443"
       - "80:80"

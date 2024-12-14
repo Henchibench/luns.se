@@ -9,3 +9,6 @@ venv/
 
 # Environment variables
 .env
+
+# DNS configuration
+config/dns-conf/
