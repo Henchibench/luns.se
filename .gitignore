@@ -6,3 +6,9 @@ __pycache__/
 
 # Virtual environment
 venv/
+
+# Environment variables
+.env
+
+# DNS configuration
+config/dns-conf/
