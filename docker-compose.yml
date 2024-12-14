@@ -18,7 +18,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - URL=contaboluns.luns.se
+      - URL=luns.luns.se
       - SUBDOMAINS=
       - VALIDATION=dns
       - DNSPLUGIN=cloudflare
