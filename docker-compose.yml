@@ -14,13 +14,17 @@ services:
     container_name: swag
     cap_add:
       - NET_ADMIN
+    env_file:
+      - .env
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
       - URL=luns.se
       - SUBDOMAINS=contaboluns
-      - VALIDATION=http
+      - VALIDATION=dns
+      - DNSPLUGIN=cloudflare
+      - STAGING=true
       - EMAIL=henrik.soderstrom@outlook.com
     volumes:
       - ./swag:/config
