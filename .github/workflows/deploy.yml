@@ -15,10 +15,10 @@ jobs:
           key: ${{ secrets.CONTABO_SSH_PRIVATE_KEY }}
           known_hosts: '38.242.237.58'
           
-      - name: Execute remote command
+      - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no hench@38.242.237.58 '
-            cd ~/app &&
+            cd ~/luns.se &&
             git pull &&
             docker-compose down &&
             docker-compose up -d --build
