@@ -53,4 +53,4 @@ class LilleGrisenScraper(BaseScraper):
                             )
                 break
         
-        return {self.name: todays_menu if todays_menu else ["No menu available for today"]}
+        return {self.name: todays_menu if todays_menu else []}
