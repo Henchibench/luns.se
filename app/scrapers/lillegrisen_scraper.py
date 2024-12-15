@@ -26,7 +26,7 @@ class LilleGrisenScraper(BaseScraper):
         
         # Check if it's weekend
         if current_day >= 5:
-            return {self.name: ["No lunch menu on weekends"]}
+            return {self.name: []}
 
         current_day_name = self.day_names[current_day]
         self.log_info(f"Looking for day: {current_day_name}")
