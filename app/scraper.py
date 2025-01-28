@@ -4,7 +4,7 @@ import logging
 from .scrapers.lindholmen_scraper import LindholmenScraper
 from .scrapers.lillegrisen_scraper import LilleGrisenScraper
 
-# Global cache instance
+# Global cache instance.
 cache = None
 CACHE_TIMEOUT = 1800
 
