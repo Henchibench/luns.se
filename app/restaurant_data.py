@@ -108,5 +108,11 @@ restaurant_locations = {
         "website": "https://lillegrisen.se/",
         "instagram": "https://www.instagram.com/lille_grisen/",
         "area": "Partille"
+    },
+    "Caffé la Torre": {
+        "maps": "YOUR_GOOGLE_MAPS_LINK",
+        "website": "RESTAURANT_WEBSITE",
+        "instagram": "INSTAGRAM_LINK",
+        "area": "Lindholmen"
     }
 }

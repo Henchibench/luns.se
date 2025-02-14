@@ -116,7 +116,7 @@
                 <div class="restaurant card my-4">
                     <div class="card-body">
                         <h2 class="card-title">{{ restaurant }}
-                            {% if linked_restaurants[restaurant].maps %}
+                            {% if restaurant in linked_restaurants and linked_restaurants[restaurant].maps %}
                                 <button class="btn btn-primary btn-sm ml-2" 
                                         type="button" 
                                         data-bs-toggle="collapse" 
@@ -125,14 +125,14 @@
                                     Hitta hit! 🗺️
                                 </button>
                             {% endif %}
-                            {% if linked_restaurants[restaurant].website %}
+                            {% if restaurant in linked_restaurants and linked_restaurants[restaurant].website %}
                                 <a href="{{ linked_restaurants[restaurant].website }}" 
                                    target="_blank" 
                                    class="btn btn-primary btn-sm ml-2">
                                    🏠  
                                 </a>
                             {% endif %}
-                            {% if linked_restaurants[restaurant].instagram %}
+                            {% if restaurant in linked_restaurants and linked_restaurants[restaurant].instagram %}
                                 <a href="{{ linked_restaurants[restaurant].instagram }}" 
                                    target="_blank" 
                                    class="btn btn-primary btn-sm ml-2">
@@ -142,7 +142,7 @@
                         </h2>
 
                         <!-- Map container -->
-                        {% if linked_restaurants[restaurant].maps %}
+                        {% if restaurant in linked_restaurants and linked_restaurants[restaurant].maps %}
                             <div class="collapse map-container" id="map-{{ loop.index }}">
                                 <iframe class="map-iframe"
                                     src="https://maps.google.com/maps?q=lindholmen+{{ restaurant|urlencode }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
