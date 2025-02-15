@@ -52,7 +52,7 @@ def get_cached_menus():
     # List of scraper instances
     scrapers = [
         LindholmenScraper(),
-        LilleGrisenScraper()
+        # LilleGrisenScraper()  # Temporarily disabled
     ]
     
     # Execute all scrapers

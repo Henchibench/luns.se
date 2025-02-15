@@ -20,7 +20,7 @@ LOCATIONS = {
         "Piren", 
         "Uni3 – World of Food"
     ],
-    "Partille": ["Lille Grisen"]
+    # "Partille": ["Lille Grisen"]  # Temporarily disabled
 }
 
 # Restaurant locations dictionary
