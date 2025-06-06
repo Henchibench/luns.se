@@ -197,15 +197,17 @@
                             {% if restaurant in linked_restaurants and linked_restaurants[restaurant].website %}
                                 <a href="{{ linked_restaurants[restaurant].website }}" 
                                    target="_blank" 
-                                   class="btn btn-primary btn-sm ml-2">
+                                   class="btn btn-primary btn-sm ml-2" 
+                                   style="display: inline-flex; align-items: center; justify-content: center; padding: 6px;">
                                    🏠  
                                 </a>
                             {% endif %}
                             {% if restaurant in linked_restaurants and linked_restaurants[restaurant].instagram %}
                                 <a href="{{ linked_restaurants[restaurant].instagram }}" 
                                    target="_blank" 
-                                   class="btn btn-primary btn-sm ml-2">
-                                   📸
+                                   class="btn btn-primary btn-sm ml-2" 
+                                   style="display: inline-flex; align-items: center; justify-content: center; padding: 6px;">
+                                   <img src="{{ url_for('static', filename='icons/instagram.svg') }}" alt="Instagram" width="20" height="20">
                                 </a>
                             {% endif %}
                         </h2>
