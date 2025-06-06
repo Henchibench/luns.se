@@ -57,7 +57,7 @@ restaurant_locations = {
     },
     "Kooperativet": {
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
-        "website": "https://www.kooperativet.com/",
+        "website": "https://www.kooperativet.se/",
         "instagram": "https://www.instagram.com/kooperativetlindholmen/",
         "area": "Lindholmen"
     },
