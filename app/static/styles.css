@@ -379,7 +379,7 @@ strong {  /* Food type */
 .day-selector-btn {
     flex: 1;
     min-width: 0;
-    background: rgba(255,255,255,0.1);
+    background: var(--button-bg-color);
     border: 1px solid var(--button-border-color);
     color: var(--text-color);
     padding: 6px 4px;
@@ -435,6 +435,47 @@ strong {  /* Food type */
     font-weight: normal;
 }
 
+/* Filter indicator styles */
+.day-selector-btn .filter-indicator {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #dc3545;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--box-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.day-selector-btn.has-filtered-content .filter-indicator {
+    opacity: 1;
+}
+
+.day-selector-btn .filter-counter {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1;
+    border: 2px solid var(--box-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.day-selector-btn.has-filtered-content .filter-counter {
+    opacity: 1;
+}
+
 .day-content {
     display: none;
     margin-top: 15px;
@@ -452,6 +493,26 @@ strong {  /* Food type */
     padding: 24px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     margin-top: 8px;
+}
+
+.day-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--button-border-color);
+    display: none; /* Hidden by default */
+}
+
+.day-header.show-when-filtered {
+    display: block;
+}
+
+.day-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: center;
+    letter-spacing: 0.5px;
 }
 
 @keyframes fadeIn {

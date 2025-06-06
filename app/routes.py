@@ -56,13 +56,24 @@ def home():
         filtered_menus = {}
         for restaurant, menu in menus.items():
             filtered_menu = []
+            info_items = []
+            has_matching_dishes = False
+            
             for dish in menu:
-                # Extract food type from the HTML string
-                food_type = dish.split('</strong>')[0].split('>')[-1] if '<strong>' in dish else dish.split(':')[0]
-                if food_type in selected_food_types:
-                    filtered_menu.append(dish)
-            if filtered_menu:
-                filtered_menus[restaurant] = filtered_menu
+                # Collect INFO items separately
+                if dish.startswith('INFO:'):
+                    info_items.append(dish)
+                else:
+                    # Extract food type from the HTML string
+                    food_type = dish.split('</strong>')[0].split('>')[-1] if '<strong>' in dish else dish.split(':')[0]
+                    if food_type in selected_food_types:
+                        filtered_menu.append(dish)
+                        has_matching_dishes = True
+            
+            # Only include restaurant if it has matching dishes (not just INFO items)
+            if has_matching_dishes:
+                # Add INFO items first, then matching dishes
+                filtered_menus[restaurant] = info_items + filtered_menu
         menus = filtered_menus
     
     # Filter by search terms
@@ -85,14 +96,34 @@ def home():
                          current_day_index=get_current_day_index())
 
 def get_food_types(menus):
-    food_types = set()
+    """Return predefined main food categories instead of extracting from individual dishes"""
+    # Define the main food categories we want to filter by
+    # Focus on broad categories, not specific dishes
+    main_categories = [
+        'Kött',
+        'Fisk', 
+        'Vegetarisk',
+        'Sallad',
+        'Veckans',
+        'Veckans Special',  # Alternative naming
+        'Thai',
+        'Indisk',
+        'Asiatisk',  # Includes ramen, pho, poke bowls etc.
+        'Dagens',
+        'Dagens Rätt'
+    ]
+    
+    # Only return categories that actually exist in the current menus
+    available_categories = set()
     for menu in menus.values():
         for item in menu:
-            if ': ' in item:
-                # Extract just the text between <strong> tags, or before the first colon
-                food_type = item.split('</strong>')[0].split('>')[-1] if '<strong>' in item else item.split(':')[0]
-                food_types.add(food_type)
-    return sorted(food_types)
+            if '<strong>' in item:
+                # Extract the category from between <strong> tags
+                food_type = item.split('</strong>')[0].split('>')[-1]
+                if food_type in main_categories:
+                    available_categories.add(food_type)
+    
+    return sorted(available_categories)
 
 def filter_menus_by_food_type(menus, food_type):
     # Filter menus to show only dishes of a specific food type
@@ -124,12 +155,22 @@ def filter_menus_by_search_terms(menus, search_terms):
     
     filtered_menus = {}
     for restaurant, menu in menus.items():
-        filtered_menu = [
-            dish for dish in menu 
-            if any(term in dish.lower() for term in all_terms)
-        ]
-        if filtered_menu:
-            filtered_menus[restaurant] = filtered_menu
+        filtered_menu = []
+        info_items = []
+        has_matching_dishes = False
+        
+        for dish in menu:
+            # Collect INFO items separately
+            if dish.startswith('INFO:'):
+                info_items.append(dish)
+            elif any(term in dish.lower() for term in all_terms):
+                filtered_menu.append(dish)
+                has_matching_dishes = True
+        
+        # Only include restaurant if it has matching dishes (not just INFO items)
+        if has_matching_dishes:
+            # Add INFO items first, then matching dishes
+            filtered_menus[restaurant] = info_items + filtered_menu
     
     return filtered_menus
 

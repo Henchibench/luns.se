@@ -129,16 +129,17 @@ class DistrictOneScraper(BaseScraper):
                 category_found = False
                 
                 # Check if this line is a category header
+                # Map specific dish types to broader categories for consistent filtering
                 categories = {
-                    'Ramen': 'Ramen',
+                    'Ramen': 'Asiatisk',           # Ramen is Asian cuisine
+                    'Pho': 'Asiatisk',             # Pho is Asian cuisine  
+                    'Poke bowl': 'Asiatisk',       # Poke is Asian cuisine
+                    'Vegetarisk Poke bowl': 'Vegetarisk',  # Vegetarian category takes priority
                     'Fisk': 'Fisk', 
                     'Kött': 'Kött',
                     'Sallad': 'Sallad',
                     'Asiatisk': 'Asiatisk',
-                    'Vegetarisk': 'Vegetarisk',
-                    'Poke bowl': 'Poke Bowl',
-                    'Vegetarisk Poke bowl': 'Vegetarisk Poke Bowl',
-                    'Pho': 'Pho'
+                    'Vegetarisk': 'Vegetarisk'
                 }
                 
                 for cat_key, cat_display in categories.items():
@@ -167,6 +168,9 @@ class DistrictOneScraper(BaseScraper):
                         # Create menu item if we found a description
                         if description_parts:
                             description = ' '.join(description_parts)
+                            # If we're mapping to a broader category, include the specific dish type
+                            if cat_key != cat_display and cat_key in ['Ramen', 'Pho', 'Poke bowl']:
+                                description = f"{cat_key}: {description}"
                             formatted_item = self.format_menu_item(cat_display, description)
                             menu_items.append(f"{current_day}|{formatted_item}")
                         

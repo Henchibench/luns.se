@@ -66,11 +66,16 @@
                 <div class="filter-group">
                     <h3>Maträtter</h3>
                     <div class="filter-options">
+                        <div class="toggle-buttons mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="toggleAllFoodTypes(false)">
+                                Avmarkera alla
+                            </button>
+                        </div>
                         {% for food_type in food_types %}
                         <div class="filter-option">
                             <input type="checkbox" id="food-{{ food_type }}" name="food_types[]" 
                                    value="{{ food_type }}" 
-                                   {% if food_type in selected_food_types %}checked{% endif %}>
+                                   {% if not selected_food_types or food_type in selected_food_types %}checked{% endif %}>
                             <label for="food-{{ food_type }}">{{ food_type }}</label>
                         </div>
                         {% endfor %}
@@ -255,6 +260,8 @@
                                         {% if loop.index0 == current_day_index %}
                                             <span class="day-badge">Idag</span>
                                         {% endif %}
+                                        <span class="filter-indicator"></span>
+                                        <span class="filter-counter">0</span>
                                     </button>
                                 {% endfor %}
                             </div>
@@ -275,6 +282,9 @@
                                     {% endfor %}
                                     
                                     <div class="day-content-body">
+                                        <div class="day-header">
+                                            <h4 class="day-title">{{ day }}</h4>
+                                        </div>
                                         {% if day_items %}
                                             {% for item in day_items %}
                                                 <div class="menu-item">{{ item|safe }}</div>
@@ -557,6 +567,156 @@
                 checkbox.checked = select;
             });
         }
+
+        function toggleAllFoodTypes(select) {
+            const checkboxes = document.querySelectorAll('input[name="food_types[]"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = select;
+            });
+        }
+
+        // Smart filter functionality
+        function updateDayFilterIndicators() {
+            // Get active filters
+            const selectedFoodTypes = Array.from(document.querySelectorAll('input[name="food_types[]"]:checked')).map(cb => cb.value);
+            const selectedSearchTerms = Array.from(document.querySelectorAll('input[name="search_terms[]"]:checked')).map(cb => cb.value);
+            const allFoodTypes = Array.from(document.querySelectorAll('input[name="food_types[]"]')).map(cb => cb.value);
+            
+            // Check if filters are applied (not all food types selected OR search terms selected)
+            const filtersApplied = selectedFoodTypes.length !== allFoodTypes.length || selectedSearchTerms.length > 0;
+            
+            // Process each restaurant
+            document.querySelectorAll('.compact-menu').forEach(menu => {
+                const restaurantIndex = menu.getAttribute('data-restaurant');
+                
+                // Process each day for this restaurant
+                const dayButtons = menu.querySelectorAll('.day-selector-btn');
+                const dayContents = menu.querySelectorAll('.day-content');
+                
+                dayButtons.forEach(button => {
+                    const day = button.getAttribute('data-day');
+                    const dayContent = menu.querySelector(`.day-content[data-day="${day}"]`);
+                    
+                    if (dayContent) {
+                        const menuItems = dayContent.querySelectorAll('.menu-item');
+                        let matchingItemsCount = 0;
+                        
+                        // Count matching items for this day
+                        menuItems.forEach(item => {
+                            const itemText = item.textContent.toLowerCase();
+                            const itemHTML = item.innerHTML;
+                            
+                            // Skip "no menu" messages
+                            if (itemText.includes('ingen meny tillgänglig')) {
+                                return;
+                            }
+                            
+                            let matches = false;
+                            
+                            if (filtersApplied) {
+                                // Check food type filters
+                                if (selectedFoodTypes.length > 0) {
+                                    const foodTypeMatch = selectedFoodTypes.some(foodType => {
+                                        // Extract category from <strong> tags
+                                        const strongMatch = itemHTML.match(/<strong>([^<]+)<\/strong>/);
+                                        if (strongMatch) {
+                                            const category = strongMatch[1];
+                                            return category === foodType;
+                                        }
+                                        return false;
+                                    });
+                                    
+                                    if (foodTypeMatch) matches = true;
+                                }
+                                
+                                // Check search term filters
+                                if (selectedSearchTerms.length > 0) {
+                                    const searchVariations = {
+                                        'burgare': ['burger', 'högrevsburgare', 'hamburgare', 'cheeseburger', 'veggieburger', 'veganburger', 'halloumiburger'],
+                                        'mos': ['potatismos', 'mos', 'potatispure', 'potatispuré', 'smashed potatoes'],
+                                        'körv': ['korv', 'falukorv', 'wienerkorv', 'prinskorv', 'chorizo', 'grillkorv', 'braadwurst']
+                                    };
+                                    
+                                    const searchTermMatch = selectedSearchTerms.some(searchTerm => {
+                                        const terms = searchVariations[searchTerm] || [];
+                                        return terms.some(term => itemText.includes(term));
+                                    });
+                                    
+                                    if (searchTermMatch) matches = true;
+                                }
+                            } else {
+                                // No filters applied, all items match
+                                matches = true;
+                            }
+                            
+                            if (matches) {
+                                matchingItemsCount++;
+                            }
+                        });
+                        
+                        // Update button appearance and counter
+                        const counter = button.querySelector('.filter-counter');
+                        const indicator = button.querySelector('.filter-indicator');
+                        
+                        // Update day header visibility
+                        const dayHeader = dayContent.querySelector('.day-header');
+                        
+                        if (filtersApplied && matchingItemsCount > 0) {
+                            button.classList.add('has-filtered-content');
+                            counter.textContent = matchingItemsCount;
+                            
+                            // Auto-expand days with matching content
+                            dayContent.classList.add('show');
+                            button.classList.add('active');
+                            
+                            // Show day header when filters are applied
+                            if (dayHeader) dayHeader.classList.add('show-when-filtered');
+                        } else if (filtersApplied && matchingItemsCount === 0) {
+                            button.classList.remove('has-filtered-content');
+                            counter.textContent = '0';
+                            
+                            // Hide days with no matching content
+                            dayContent.classList.remove('show');
+                            button.classList.remove('active');
+                            
+                            // Hide day header
+                            if (dayHeader) dayHeader.classList.remove('show-when-filtered');
+                        } else {
+                            // No filters applied - reset to default state
+                            button.classList.remove('has-filtered-content');
+                            counter.textContent = '0';
+                            
+                            // Show only current day by default
+                            const dayIndex = parseInt(button.getAttribute('data-day-index'));
+                            const currentDayIndex = {{ current_day_index }};
+                            
+                            if (dayIndex === currentDayIndex) {
+                                dayContent.classList.add('show');
+                                button.classList.add('active');
+                            } else {
+                                dayContent.classList.remove('show');
+                                button.classList.remove('active');
+                            }
+                            
+                            // Always hide day header when no filters
+                            if (dayHeader) dayHeader.classList.remove('show-when-filtered');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Monitor filter changes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to all filter checkboxes
+            const filterCheckboxes = document.querySelectorAll('input[name="food_types[]"], input[name="search_terms[]"]');
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateDayFilterIndicators);
+            });
+            
+            // Initial update
+            updateDayFilterIndicators();
+        });
     </script>
 </body>
 </html>
