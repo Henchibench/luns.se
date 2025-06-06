@@ -3,9 +3,17 @@ from markupsafe import Markup
 from .restaurant_data import LOCATIONS, restaurant_locations
 from .scraper import get_cached_menus, clear_cache
 import logging
+from datetime import datetime
 
 # Create a Blueprint for our main routes
 main = Blueprint('main', __name__)
+
+def get_current_day_index():
+    """Get current day index (0=Monday, 4=Friday)"""
+    today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+    if today > 4:  # Weekend (Saturday=5, Sunday=6)
+        return 0  # Default to Monday
+    return today
 
 def get_linked_restaurants(menus):
     """Get restaurant information for the restaurants in the menu"""
@@ -73,7 +81,8 @@ def home():
                          selected_food_types=selected_food_types,
                          selected_search_terms=selected_search_terms,
                          filtered_restaurants=filtered_restaurants,
-                         linked_restaurants=get_linked_restaurants(formatted_menus))
+                         linked_restaurants=get_linked_restaurants(formatted_menus),
+                         current_day_index=get_current_day_index())
 
 def get_food_types(menus):
     food_types = set()
