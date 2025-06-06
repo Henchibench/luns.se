@@ -1,12 +1,15 @@
 from flask_caching import Cache
 from functools import wraps
 import logging
-from .scrapers.lindholmen_scraper import LindholmenScraper
-from .scrapers.lillegrisen_scraper import LilleGrisenScraper
+from .scrapers.restaurants.bistrot_scraper import BistrotScraper
+from .scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from .scrapers.restaurants.pier11_scraper import Pier11Scraper
+from .scrapers.restaurants.district_one_scraper import DistrictOneScraper
+# Import other restaurant scrapers as they are created
 
-# Global cache instance.
+# Global cache instance
 cache = None
-CACHE_TIMEOUT = 1800
+CACHE_TIMEOUT = 1800  # 30 minutes
 
 def init_scraper(app_cache):
     global cache
@@ -16,7 +19,6 @@ def init_scraper(app_cache):
         logging.info("[CACHE] Cleared existing cache on startup")
 
 def clear_cache():
-    # Manually clear the cache
     if cache:
         cache.delete('menus')
         logging.info("[CACHE] Cache manually cleared")
@@ -24,21 +26,17 @@ def clear_cache():
     return False
 
 def cached_menu(f):
-    # Custom decorator to handle caching of menu data
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Check if cache is initialized
         if cache is None:
             logging.warning("[WARNING] Cache not initialized, fetching fresh data...")
             return f(*args, **kwargs)
         
-        # Try to get data from cache first
         cached_data = cache.get('menus')
         if cached_data is not None:
             logging.info("[CACHE] Using cached lunch menu data")
             return cached_data
         
-        # If no cached data found, fetch fresh data
         logging.info("[FRESH] Cache miss - fetching fresh lunch menu data...")
         result = cache.cached(timeout=CACHE_TIMEOUT, key_prefix='menus')(f)(*args, **kwargs)
         return result
@@ -51,8 +49,11 @@ def get_cached_menus():
     
     # List of scraper instances
     scrapers = [
-        LindholmenScraper(),
-        # LilleGrisenScraper()  # Temporarily disabled
+        BistrotScraper(),
+        KooperativetScraper(),
+        Pier11Scraper(),
+        DistrictOneScraper(),
+        # Add other restaurant scrapers here as they are created
     ]
     
     # Execute all scrapers

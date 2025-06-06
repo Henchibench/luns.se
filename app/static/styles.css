@@ -64,12 +64,12 @@ body {
 
 /* Restaurant Card Styles */
 .restaurant {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     background-color: var(--box-color);
-    border-radius: 12px;
+    border-radius: 16px;
     border: 2px solid var(--secondary-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 24px;
 }
 
 .restaurant .list-group {
@@ -100,17 +100,20 @@ body {
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.2s ease;
-    background-color: var(--button-bg-color);
+    background: rgba(255,255,255,0.1);
     border: 1px solid var(--button-border-color);
     color: var(--button-text-color);
     margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
 }
 
 .btn:hover {
     background-color: var(--button-hover-bg-color);
     border-color: var(--button-hover-border-color);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     color: var(--button-text-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .btn-primary, .btn-secondary, .btn-info {
@@ -185,11 +188,11 @@ body {
     border-left: none;
     color: var(--button-text-color);
     padding: 15px 10px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 10px 10px 0;
     cursor: pointer;
     font-size: 1.2rem;
     transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 15px rgba(0,0,0,0.12);
 }
 
 .filter-sidebar.active + .filter-toggle-btn {
@@ -356,6 +359,236 @@ strong {  /* Food type */
 
 .filter-overlay.active {
     display: block;
+}
+
+/* Compact Menu Styles */
+.compact-menu {
+    margin-top: 15px;
+}
+
+
+
+.day-selector-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.day-selector-btn {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--button-border-color);
+    color: var(--text-color);
+    padding: 6px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-weight: 500;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
+}
+
+.day-selector-btn:hover {
+    background: var(--button-bg-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.day-selector-btn.active {
+    background: var(--button-bg-color);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    font-weight: bold;
+    position: relative;
+}
+
+.day-selector-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--primary-color);
+}
+
+.day-selector-btn .day-name {
+    display: block;
+    font-size: 0.8rem;
+}
+
+.day-selector-btn .day-badge {
+    display: block;
+    font-size: 0.6rem;
+    margin-top: 1px;
+    opacity: 0.9;
+    font-weight: normal;
+}
+
+.day-content {
+    display: none;
+    margin-top: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.day-content.show {
+    display: block;
+}
+
+.day-content-body {
+    background: var(--box-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-top: 8px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile responsiveness for day selector */
+@media (max-width: 768px) {
+    .day-selector-btn {
+        padding: 5px 3px;
+        font-size: 0.75rem;
+    }
+    
+    .day-selector-btn .day-name {
+        font-size: 0.75rem;
+    }
+    
+    .day-selector-btn .day-badge {
+        font-size: 0.55rem;
+    }
+    
+    .day-selector-row {
+        gap: 4px;
+    }
+}
+
+/* Information Banner Styles */
+.info-banner {
+    background: linear-gradient(135deg, var(--box-color) 0%, var(--button-bg-color) 100%);
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.info-banner-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    align-items: center;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    transition: transform 0.2s ease;
+}
+
+.info-item-centered {
+    justify-content: center;
+    text-align: center;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.info-icon {
+    font-size: 1.2rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item-centered .info-text {
+    text-align: center;
+}
+
+.info-label {
+    font-size: 0.7rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-weight: 500;
+    margin-bottom: 1px;
+}
+
+.info-value {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+/* Mobile responsiveness for info banner */
+@media (max-width: 768px) {
+    .info-banner {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .info-banner-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .info-item {
+        padding: 5px;
+        gap: 6px;
+    }
+    
+    .info-icon {
+        font-size: 1rem;
+        min-width: 20px;
+    }
+    
+    .info-label {
+        font-size: 0.65rem;
+    }
+    
+    .info-value {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-banner-content {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
 }
 
 

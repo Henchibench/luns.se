@@ -16,7 +16,7 @@ LOCATIONS = {
         "L's Resto", 
         "Matminnen", 
         "Miss F", 
-        "Restaurant Pier 11 - Ericsson by Nordrest", 
+        "Restaurant Pier 11", 
         "Piren", 
         "Uni3 – World of Food"
     ],
@@ -58,7 +58,7 @@ restaurant_locations = {
     "Kooperativet": {
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
         "website": "https://www.kooperativet.com/",
-        "instagram": "https://www.instagram.com/kooperativet/",
+        "instagram": "https://www.instagram.com/kooperativetlindholmen/",
         "area": "Lindholmen"
     },
     "L's Kitchen": {
@@ -85,10 +85,10 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/missfgbg/",
         "area": "Lindholmen"
     },
-    "Restaurant Pier 11 - Ericsson by Nordrest": {
+    "Restaurant Pier 11": {
         "maps": "https://maps.app.goo.gl/VMJKfEYDJ6QFrtfn6",
-        "website": "https://nordrest.se/",
-        "instagram": "https://www.instagram.com/nordrestab/",
+        "website": "https://ericssonbynordrest.se/restaurang/restaurant-pier-11/",
+        "instagram": "https://www.instagram.com/pier11lindholmen/",
         "area": "Lindholmen"
     },
     "Piren": {
