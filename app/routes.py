@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from markupsafe import Markup
 from .restaurant_data import LOCATIONS, restaurant_locations
 from .scraper import get_cached_menus, clear_cache
@@ -183,4 +183,42 @@ def format_menu_items(menus):
             formatted_menu.append(Markup(item))
         formatted_menus[restaurant] = formatted_menu
     return formatted_menus
+
+@main.route('/cache/status')
+def cache_status():
+    """Show cache status for debugging"""
+    from .scraper import cache, get_next_refresh_time
+    if cache is None:
+        return jsonify({"status": "Cache not initialized"})
+    
+    cached_data = cache.get('menus')
+    last_refresh = cache.get('last_refresh_time')
+    next_refresh = get_next_refresh_time()
+    
+    if cached_data is not None:
+        status_info = {
+            "status": "Cache HIT",
+            "restaurants": len(cached_data),
+            "restaurant_names": list(cached_data.keys()),
+            "last_refresh": last_refresh.strftime('%Y-%m-%d %H:%M:%S') if last_refresh else "Never",
+            "next_scheduled_refresh": next_refresh.strftime('%Y-%m-%d %H:%M:%S'),
+            "scheduled_times": ["07:00", "08:00", "10:00"]
+        }
+        return jsonify(status_info)
+    else:
+        return jsonify({
+            "status": "Cache MISS",
+            "last_refresh": last_refresh.strftime('%Y-%m-%d %H:%M:%S') if last_refresh else "Never",
+            "next_scheduled_refresh": next_refresh.strftime('%Y-%m-%d %H:%M:%S'),
+            "scheduled_times": ["07:00", "08:00", "10:00"]
+        })
+
+@main.route('/cache/clear')
+def clear_cache_endpoint():
+    """Clear cache manually"""
+    result = clear_cache()
+    if result:
+        return jsonify({"status": "Cache cleared successfully"})
+    else:
+        return jsonify({"status": "Cache not available"})
 
