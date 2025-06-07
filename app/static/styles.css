@@ -526,6 +526,40 @@ strong {  /* Food type */
     }
 }
 
+/* Weekend Message Styles */
+.weekend-message {
+    display: none;
+    margin-top: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.weekend-message.show {
+    display: block;
+}
+
+.weekend-info {
+    text-align: center;
+    padding: 20px;
+}
+
+.weekend-title {
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.weekend-text {
+    margin: 8px 0;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.weekend-text.text-muted {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
 /* Mobile responsiveness for day selector */
 @media (max-width: 768px) {
     .day-selector-btn {

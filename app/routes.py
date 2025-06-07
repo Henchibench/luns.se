@@ -9,11 +9,25 @@ from datetime import datetime
 main = Blueprint('main', __name__)
 
 def get_current_day_index():
-    """Get current day index (0=Monday, 4=Friday)"""
+    """Get current day index (0=Monday, 4=Friday)
+    
+    Returns:
+        int: Day index where 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday
+             Weekends (Saturday/Sunday) default to Monday (0)
+    """
     today = datetime.now().weekday()  # 0=Monday, 6=Sunday
     if today > 4:  # Weekend (Saturday=5, Sunday=6)
-        return 0  # Default to Monday
+        return 0  # Default to Monday for weekends
     return today
+
+def is_weekend():
+    """Check if today is a weekend (Saturday or Sunday)
+    
+    Returns:
+        bool: True if today is Saturday or Sunday, False otherwise
+    """
+    today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+    return today > 4  # Weekend (Saturday=5, Sunday=6)
 
 def get_linked_restaurants(menus):
     """Get restaurant information for the restaurants in the menu"""
@@ -93,7 +107,8 @@ def home():
                          selected_search_terms=selected_search_terms,
                          filtered_restaurants=filtered_restaurants,
                          linked_restaurants=get_linked_restaurants(formatted_menus),
-                         current_day_index=get_current_day_index())
+                         current_day_index=get_current_day_index(),
+                         is_weekend=is_weekend())
 
 def get_food_types(menus):
     """Return predefined main food categories instead of extracting from individual dishes"""
