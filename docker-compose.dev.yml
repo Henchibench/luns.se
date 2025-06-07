@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  # Current Flask app (legacy) - accessible at localhost:5000
-  app-legacy:
-    build: .
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=development
-    container_name: luns-legacy-dev
-    ports:
-      - "5000:8000"  # Map to localhost:5000
-    networks:
-      - app-network
-
   # New modern app (Next.js frontend) - accessible at localhost:3000
   app-modern:
     build: 
