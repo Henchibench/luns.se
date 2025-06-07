@@ -4,11 +4,34 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environment
+# Virtual environment (legacy)
 venv/
+
+# Node.js dependencies
+node_modules/
+.next/
 
 # Environment variables
 .env
+.env.local
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage/
 
 # DNS configuration
 config/dns-conf/
+
+# Legacy backup files
+*.backup
+legacy-backup.tar
+config-backup-*/

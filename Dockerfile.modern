@@ -1,0 +1,25 @@
+# Simplified Next.js development setup
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache libc6-compat
+
+# Copy package files
+COPY nextjs-luns-se/package*.json ./
+RUN npm install
+
+# Copy source code
+COPY nextjs-luns-se/ .
+
+# Expose port
+EXPOSE 3000
+
+# Set environment
+ENV NODE_ENV=development
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Run in development mode
+CMD ["npm", "run", "dev"] 

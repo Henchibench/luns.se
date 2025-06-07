@@ -308,7 +308,7 @@ class BistrotScraper(BaseScraper):
             display_name = dish_name
         
         # Add to appropriate days - format without day prefix and without duplication
-        formatted_dish = f"<strong>{dish_type}: {display_name}</strong> - {ingredients}"
+        formatted_dish = f"<strong>{dish_type}</strong> - {display_name} {ingredients}"
         for day in days:
             menu_items.append(f"{day}|{formatted_dish}")
     
@@ -323,5 +323,5 @@ class BistrotScraper(BaseScraper):
             dish_type = "Kött"
         
         # Format the dish
-        formatted_dish = f"<strong>{dish_type}: {dish_name}</strong> - {ingredients}"
+        formatted_dish = f"<strong>{dish_type}</strong> - {dish_name} {ingredients}"
         menu_items.append(f"{day}|{formatted_dish}") 
