@@ -11,14 +11,6 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional packages for modern API
-RUN pip install --no-cache-dir \
-    fastapi \
-    redis \
-    python-dotenv \
-    pydantic \
-    uvicorn
-
 # Copy application code
 COPY app/ ./app/
 COPY api_main.py .

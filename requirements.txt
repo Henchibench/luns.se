@@ -1,0 +1,10 @@
+# Modern API dependencies
+flask-caching
+beautifulsoup4
+requests
+lxml
+redis
+fastapi
+uvicorn
+python-dotenv
+pydantic 
