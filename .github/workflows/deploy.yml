@@ -19,7 +19,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no hench@38.242.237.58 '
             cd ~/luns.se &&
-            git pull origin main &&
-            docker-compose down &&
-            docker-compose up -d --build --remove-orphans
+            echo "=== Cleaning up any local changes ===" &&
+            git fetch origin &&
+            git reset --hard origin/main &&
+            git clean -fd &&
+            echo "=== Stopping old containers ===" &&
+            docker-compose down --remove-orphans &&
+            echo "=== Starting modern containers ===" &&
+            docker-compose up -d --build --remove-orphans &&
+            echo "=== Deployment complete! ===" &&
+            docker-compose ps
           '
