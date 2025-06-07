@@ -580,10 +580,7 @@ strong {  /* Food type */
     text-align: center;
 }
 
-.info-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+
 
 .info-icon {
     font-size: 1.2rem;
@@ -601,7 +598,7 @@ strong {  /* Food type */
 }
 
 .info-label {
-    font-size: 0.7rem;
+    font-size: 0.95rem;
     color: var(--text-color);
     opacity: 0.7;
     font-weight: 500;
@@ -609,7 +606,7 @@ strong {  /* Food type */
 }
 
 .info-value {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: var(--text-color);
     font-weight: bold;
 }
@@ -637,11 +634,11 @@ strong {  /* Food type */
     }
     
     .info-label {
-        font-size: 0.65rem;
+        font-size: 0.85rem;
     }
     
     .info-value {
-        font-size: 0.8rem;
+        font-size: 0.95rem;
     }
 }
 
