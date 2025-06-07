@@ -254,12 +254,12 @@
                             <!-- Day Selector Row -->
                             <div class="day-selector-row">
                                 {% for day in days %}
-                                    <button class="day-selector-btn {% if loop.index0 == current_day_index %}active{% endif %}" 
+                                    <button class="day-selector-btn {% if loop.index0 == current_day_index and not is_weekend %}active{% endif %}" 
                                             data-day="{{ day }}" 
                                             data-restaurant="{{ outer_loop.index }}"
                                             data-day-index="{{ loop.index0 }}">
                                         <span class="day-name">{{ day }}</span>
-                                        {% if loop.index0 == current_day_index %}
+                                        {% if loop.index0 == current_day_index and not is_weekend %}
                                             <span class="day-badge">Idag</span>
                                         {% endif %}
                                         <span class="filter-indicator"></span>
@@ -268,9 +268,22 @@
                                 {% endfor %}
                             </div>
                             
+                            <!-- Weekend Message -->
+                            {% if is_weekend %}
+                                <div class="weekend-message show" data-restaurant="{{ outer_loop.index }}">
+                                    <div class="day-content-body">
+                                        <div class="weekend-info">
+                                            <h4 class="weekend-title">🍽️ Helginformation</h4>
+                                            <p class="weekend-text">Det serveras ingen lunch på helger.</p>
+                                            <p class="weekend-text text-muted">Klicka på en dag ovan för att se veckans lunch.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
                             <!-- Expandable Content -->
                             {% for day in days %}
-                                <div class="day-content {% if loop.index0 == current_day_index %}show{% endif %}" 
+                                <div class="day-content {% if loop.index0 == current_day_index and not is_weekend %}show{% endif %}" 
                                      data-day="{{ day }}" 
                                      data-restaurant="{{ outer_loop.index }}">
                                     {% set day_items = [] %}
@@ -429,33 +442,63 @@
             "Vad heter det när katten bajsar utanför kattlådan? Kissemiss."
         ];
 
-        // Get current week number
+        // Get current week number (ISO week date)
         function getWeekNumber() {
             const date = new Date();
-            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+            // Copy date so we don't modify the original
+            const target = new Date(date.valueOf());
+            const dayNr = (date.getDay() + 6) % 7; // Make Monday = 0, Sunday = 6
+            target.setDate(target.getDate() - dayNr + 3); // Set to Thursday (ISO week date algorithm)
+            const jan4 = new Date(target.getFullYear(), 0, 4);
+            const dayDiff = (target - jan4) / 86400000;
+            return Math.ceil(dayDiff / 7) + 1;
         }
 
         // Update lunch countdown
         function updateLunchCountdown() {
             const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 30, 0);
+            const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ... 6 = Saturday
             
-            // If it's already past 11:30 today, calculate for tomorrow
+            // Find next weekday lunch time (Monday-Friday)
             let targetTime;
-            if (now > today) {
-                targetTime = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-            } else {
-                targetTime = today;
+            let daysToAdd = 0;
+            
+            if (currentDay === 0) { // Sunday
+                daysToAdd = 1; // Next Monday
+            } else if (currentDay === 6) { // Saturday
+                daysToAdd = 2; // Next Monday
+            } else { // Monday-Friday (1-5)
+                const todayLunchTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 30, 0);
+                if (now <= todayLunchTime) {
+                    // Before lunch today, use today
+                    targetTime = todayLunchTime;
+                } else {
+                    // After lunch today
+                    if (currentDay === 5) { // Friday
+                        daysToAdd = 3; // Next Monday
+                    } else {
+                        daysToAdd = 1; // Tomorrow
+                    }
+                }
+            }
+            
+            if (daysToAdd > 0) {
+                targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysToAdd, 11, 30, 0);
             }
             
             const diff = targetTime - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             
             let countdownText;
-            if (hours > 0) {
+            if (days > 0) {
+                if (days === 1) {
+                    countdownText = `Nu har du 1 dag, ${hours} timmar och ${minutes} minuter på dig att bestämma luns`;
+                } else {
+                    countdownText = `Nu har du ${days} dagar, ${hours} timmar och ${minutes} minuter på dig att bestämma luns`;
+                }
+            } else if (hours > 0) {
                 countdownText = `Nu har du ${hours} timmar och ${minutes} minuter på dig att bestämma luns`;
             } else if (minutes > 0) {
                 countdownText = `Nu har du ${minutes} minuter på dig att bestämma luns`;
@@ -534,6 +577,12 @@
                     menuContainer.querySelectorAll('.day-content').forEach(function(content) {
                         content.classList.remove('show');
                     });
+                    
+                    // Hide weekend message if visible
+                    const weekendMessage = menuContainer.querySelector('.weekend-message');
+                    if (weekendMessage) {
+                        weekendMessage.classList.remove('show');
+                    }
                     
                     // Show the selected day content
                     const targetContent = menuContainer.querySelector('.day-content[data-day="' + day + '"]');
@@ -688,11 +737,12 @@
                             button.classList.remove('has-filtered-content');
                             counter.textContent = '0';
                             
-                            // Show only current day by default
+                            // Show only current day by default (but not on weekends)
                             const dayIndex = parseInt(button.getAttribute('data-day-index'));
                             const currentDayIndex = {{ current_day_index }};
+                            const isWeekend = {{ is_weekend|lower }};
                             
-                            if (dayIndex === currentDayIndex) {
+                            if (dayIndex === currentDayIndex && !isWeekend) {
                                 dayContent.classList.add('show');
                                 button.classList.add('active');
                             } else {
