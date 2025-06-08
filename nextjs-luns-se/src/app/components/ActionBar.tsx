@@ -24,7 +24,6 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [showViewDropdown, setShowViewDropdown] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // Filter panel state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -35,33 +34,7 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
     todayOnly: false
   });
 
-  // Load dark mode preference from localStorage
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode) {
-      const isDark = JSON.parse(savedDarkMode);
-      setIsDarkMode(isDark);
-      // Apply to document
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, []);
 
-  // Toggle dark mode
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   // Update parent when filters change
   React.useEffect(() => {
@@ -197,14 +170,7 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
           </div>
         </div>
 
-        {/* Right Side - Dark Mode Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5"
-        >
-          <span className="text-lg">{isDarkMode ? '☀️' : '🌙'}</span>
-          <span>{isDarkMode ? 'Ljust' : 'Mörkt'}</span>
-        </button>
+
       </div>
 
       {/* Filter Panel - Full width card below buttons with roller blind animation */}
