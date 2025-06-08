@@ -2,6 +2,293 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom animations for epic background effects */
+@keyframes slow-zoom {
+  0% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-delay {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  30% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Portrait image animations */
+@keyframes slow-zoom-portrait {
+  0% {
+    transform: scale(1.0);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1.0);
+  }
+}
+
+@keyframes slow-zoom-rotate {
+  0% {
+    transform: scale(1.0) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.03) rotate(0.5deg);
+  }
+  50% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  75% {
+    transform: scale(1.03) rotate(0.5deg);
+  }
+  100% {
+    transform: scale(1.0) rotate(0deg);
+  }
+}
+
+@keyframes gentle-drift {
+  0% {
+    transform: scale(1.0) translateX(0px);
+  }
+  25% {
+    transform: scale(1.02) translateX(-10px);
+  }
+  50% {
+    transform: scale(1.04) translateX(0px);
+  }
+  75% {
+    transform: scale(1.02) translateX(10px);
+  }
+  100% {
+    transform: scale(1.0) translateX(0px);
+  }
+}
+
+/* Dramatic content fade-in - shows background first, then content */
+@keyframes fade-in-content {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  60% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Camera focus effect - background blurs as content comes into focus */
+@keyframes focus-blur {
+  0% {
+    filter: blur(0px);
+  }
+  60% {
+    filter: blur(0px);
+  }
+  100% {
+    filter: blur(3px);
+  }
+}
+
+/* Movie title effect - starts center screen, gets pushed up and shrinks */
+@keyframes title-to-top {
+  0% {
+    transform: translateY(40vh) scale(1.8);
+  }
+  60% {
+    transform: translateY(40vh) scale(1.8);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Content scrolls up synchronized with title + fade in */
+@keyframes scroll-up-content {
+  0% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Smooth slide in animation for filter buttons */
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Checkbox selection bounce */
+@keyframes checkboxBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Restaurant card filtering animations */
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeOutScale {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-height: 1000px;
+    margin-bottom: 16px;
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.98) translateY(-5px);
+    max-height: 1000px;
+    margin-bottom: 16px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+    max-height: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* Menu item filtering animations */
+@keyframes menuItemFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(5px);
+    max-height: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-height: 200px;
+  }
+}
+
+@keyframes menuItemFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-height: 200px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98) translateY(-5px);
+    max-height: 0;
+  }
+}
+
+.animate-slow-zoom {
+  animation: slow-zoom 20s ease-in-out infinite;
+}
+
+.animate-slow-zoom-portrait {
+  animation: slow-zoom-portrait 25s ease-in-out infinite;
+}
+
+.animate-slow-zoom-rotate {
+  animation: slow-zoom-rotate 30s ease-in-out infinite;
+}
+
+.animate-gentle-drift {
+  animation: gentle-drift 35s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
+
+.animate-fade-in-delay {
+  animation: fade-in-delay 1.5s ease-out;
+}
+
+.animate-fade-in-content {
+  animation: fade-in-content 2.5s ease-out;
+}
+
+.animate-focus-blur {
+  animation: focus-blur 2.5s ease-out forwards;
+}
+
+.animate-title-to-top {
+  animation: title-to-top 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-scroll-up-content {
+  animation: scroll-up-content 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s ease-out forwards;
+}
+
+.animate-fade-out-scale {
+  animation: fadeOutScale 0.4s ease-in forwards;
+}
+
+.animate-menu-item-fade-in {
+  animation: menuItemFadeIn 0.3s ease-out forwards;
+}
+
+.animate-menu-item-fade-out {
+  animation: menuItemFadeOut 0.2s ease-in forwards;
+}
+
 /* Custom styles to ensure everything looks good */
 body {
   margin: 0;

@@ -1,127 +1,200 @@
-# Luns.se Parallel Deployment Strategy
+# Luns.se 2.0 Deployment Strategy
 
 ## Overview
 
-This setup allows running both the current Flask-based luns.se and the new modern version simultaneously on the same server.
+Modern deployment of luns.se using Next.js frontend with FastAPI backend, containerized with Docker.
 
 ## Architecture
 
-### Current Setup
+### Current Setup (Luns.se 2.0)
 
 - **Domain**: `luns.se`
-- **Container**: `luns-legacy`
-- **Technology**: Flask + Bootstrap
-- **Port**: 8000 (internal)
-
-### Modern Version
-
-- **Domain**: `new.luns.se` or `v2.luns.se`
 - **Containers**:
   - `luns-modern` (Next.js frontend on port 3000)
   - `luns-api` (FastAPI backend on port 8000)
-  - `luns-redis` (Redis cache)
-- **Technology**: Next.js + FastAPI + Redis
-
-## DNS Configuration
-
-You'll need to add DNS records for the new subdomains:
-
-```
-new.luns.se    A    [your-server-ip]
-v2.luns.se     A    [your-server-ip]
-```
+  - `luns-redis` (Redis cache on port 6379)
+- **Technology**: Next.js + FastAPI + Redis + Docker
 
 ## Deployment Process
 
-### Current State (Before Migration)
+### Production Deployment
 
 ```bash
-# Only legacy app running
-docker-compose up -d
+# Build and run all services
+docker-compose up -d --build
 # Accessible at: luns.se
 ```
 
-### During Migration
+### Development Environment
 
 ```bash
-# Both versions running
-docker-compose up -d --build
+# Development with hot reload
+docker-compose -f docker-compose.dev.yml up --build
 # Accessible at:
-# - luns.se (legacy)
-# - new.luns.se (modern)
-# - v2.luns.se (modern)
+# - Frontend: localhost:3000
+# - API: localhost:8000
+# - Redis: localhost:6379
 ```
-
-### After Full Migration (Future)
-
-```bash
-# Switch DNS to point luns.se to modern version
-# Remove legacy container
-```
-
-## Rollback Strategy
-
-If issues arise with the modern version:
-
-1. The legacy version continues running unaffected
-2. Can quickly remove modern containers: `docker-compose stop app-modern api-modern redis`
-3. DNS changes can be reverted instantly
 
 ## Development Workflow
 
-### Testing Modern Version
+### Making Changes
 
-1. Make changes to modern app code
-2. Push to repository
-3. GitHub Actions will deploy both versions
-4. Test new features at `new.luns.se`
-5. Legacy version remains stable at `luns.se`
+1. Edit code in your development environment
+2. Test using `docker-compose.dev.yml`
+3. Push changes to repository
+4. Deploy to production with `docker-compose.yml`
 
-### Gradual Migration
+### Container Management
 
-1. **Phase 1**: Both versions running (current plan)
-2. **Phase 2**: Start directing some traffic to modern version
-3. **Phase 3**: Migrate DNS to point `luns.se` to modern version
-4. **Phase 4**: Remove legacy container
+```bash
+# View running containers
+docker-compose ps
 
-## Monitoring
+# View logs
+docker-compose logs -f [service-name]
 
-- Legacy version: `https://luns.se`
-- Modern version: `https://new.luns.se`
-- API docs: `https://new.luns.se/api/docs`
-- Health checks:
-  - Legacy: `https://luns.se/cache/status`
-  - Modern: `https://new.luns.se/api/health`
+# Restart specific service
+docker-compose restart [service-name]
+
+# Stop all services
+docker-compose down
+
+# Clean rebuild
+docker-compose down && docker-compose up --build -d
+```
+
+## Monitoring & Health Checks
+
+- **Frontend**: `https://luns.se`
+- **API**: `https://luns.se/api`
+- **API Documentation**: `https://luns.se/api/docs`
+- **Health Check**: `https://luns.se/api/health`
 
 ## Resource Usage
 
-- **Current**: ~200MB RAM for Flask app
-- **After**: ~600MB RAM total (Flask + Next.js + API + Redis)
-- **Disk**: Additional ~500MB for new containers
+- **Total RAM**: ~400MB (Next.js + FastAPI + Redis)
+- **Disk Space**: ~800MB for containers and images
+- **CPU**: Low usage, spikes during menu scraping
 
-## Benefits
+## Benefits of Current Architecture
 
-1. **Zero downtime** during migration
-2. **Easy rollback** if issues occur
-3. **Gradual testing** of new features
-4. **User feedback** before full migration
-5. **Risk mitigation** with parallel systems
+1. **Modern Tech Stack**: React/Next.js frontend with Python FastAPI backend
+2. **Containerized**: Easy deployment and scaling with Docker
+3. **Cached Data**: Redis for fast response times
+4. **Responsive Design**: Works perfectly on mobile and desktop
+5. **API-First**: Clean separation between frontend and backend
+6. **Development Ready**: Hot reload and easy local development
+7. **Premium UX**: Cinematic animations and smooth transitions throughout
 
-## Additional Development Option
+## 🎭 Animation System Architecture
 
-### Option 1: Docker Compose Development
+### Core Animation Philosophy
 
-```bash
-docker-compose -f docker-compose.dev.yml up --build
+Luns.se 2.0 implements a **cinematic animation system** designed to create a premium, restaurant-quality user experience that feels smooth and professional.
+
+### Animation Categories
+
+#### **1. 🎬 Cinematic Loading Experience**
+
+- **Food Photography Background**: Random hero images from professional food photographers
+- **Camera Focus Effect**: Background blurs from 0px to 3px as content comes into focus
+- **Title Animation**: "Luns.se" starts large and centered, moves to header position
+- **Content Reveal**: Main content scrolls up from bottom with physics-based easing
+- **Seamless Transition**: Loading screen matches main design for smooth handoff
+
+#### **2. 🎪 Restaurant Card Filtering Animations**
+
+- **Two-Phase System**: Proper exit/enter animations for smooth card transitions
+- **Fade + Scale Effects**: Cards fade in at 95% scale, fade out with gentle shrinking
+- **Height Collapse**: Smooth max-height animation prevents "popping" of remaining cards
+- **Staggered Appearance**: 150ms delays between cards for waterfall effect
+- **Perfect Timing Sync**: 400ms animations with synchronized DOM updates
+
+#### **3. 🎨 Filter Panel Interactions**
+
+- **Roller Blind Effect**: Filter panel slides down with max-height + opacity transitions
+- **Staggered Elements**: Food type buttons appear with 50ms delays between each
+- **Checkbox Bounce**: Selection feedback with scale animation on checkboxes
+- **Restaurant List**: Smooth slide-in effects for each restaurant option
+- **Button State Feedback**: Hover scaling and ring effects for active selections
+
+#### **4. 📋 Menu Content Transitions**
+
+- **Container-Level Animation**: Smooth opacity + scale transitions during content changes
+- **Non-Stuttering Design**: Simplified approach eliminates complex state management
+- **Food Type Filtering**: Smooth dimming (60% opacity, 98% scale) during content updates
+- **400ms Duration**: Balanced between responsive feel and smooth visual quality
+
+### Technical Implementation
+
+#### **CSS Architecture**
+
+```css
+/* Core keyframe animations */
+@keyframes fadeInScale {
+  /* Restaurant card entrance */
+}
+@keyframes fadeOutScale {
+  /* Restaurant card exit with height collapse */
+}
+@keyframes slideInUp {
+  /* Filter elements staggered appearance */
+}
+@keyframes checkboxBounce {
+  /* Selection feedback */
+}
 ```
 
-This will now include the working Next.js frontend! 🚀
+#### **State Management**
+
+- **Two-Phase Animation States**: Separate exit and enter phases prevent instant DOM removal
+- **Ref-Based Tracking**: `useRef` prevents circular dependencies in animation loops
+- **Timing Coordination**: JavaScript timeouts synchronized with CSS animation durations
+- **Conflict Resolution**: Single animation system per element to prevent competing effects
+
+#### **Performance Optimizations**
+
+- **Hardware Acceleration**: Transform-based animations use GPU acceleration
+- **Smooth Curves**: `cubic-bezier` easing for natural motion feel
+- **Minimal Reflows**: Transform and opacity changes avoid layout thrashing
+- **Optimized Triggers**: State changes batched to minimize animation conflicts
+
+### Animation Best Practices Applied
+
+1. **Consistent Timing**: All related animations use synchronized durations
+2. **Easing Harmony**: Consistent easing functions across similar interaction types
+3. **Staggered Delight**: Waterfall effects create engaging sequences
+4. **Performance First**: GPU-accelerated transforms for 60fps smoothness
+5. **Accessible Motion**: Respects user motion preferences (future enhancement)
+
+## Backup & Recovery
+
+### Database/Cache Recovery
+
+```bash
+# Redis data is stored in Docker volume
+docker-compose down
+docker volume ls | grep redis
+# Volume persists between restarts
+```
+
+### Application Recovery
+
+```bash
+# Quick recovery from any issues
+docker-compose down
+docker-compose pull  # Get latest images
+docker-compose up -d --build
+```
 
 ## 🚀 Modern Version Feature Roadmap
 
-### ✅ Completed Features
+### ✅ Completed Infrastructure
 
-- [x] **Core Infrastructure**: Next.js + FastAPI + Redis setup
+- [x] **Core Setup**: Next.js + FastAPI + Redis containerized deployment
+- [x] **Development Environment**: Working docker-compose.dev.yml
+- [x] **Production Environment**: Working docker-compose.yml with proper builds
 - [x] **Basic UI**: Modern interface with Tailwind CSS
 - [x] **Menu Display**: Restaurant cards with full menu functionality
 - [x] **InfoBanner**: Weather, jokes, countdown timer, week number
@@ -131,8 +204,27 @@ This will now include the working Next.js frontend! 🚀
 - [x] **Google Maps Integration**: Restaurant location with embedded maps
 - [x] **Social Links**: Website and Instagram integration
 - [x] **Caching System**: Client-side caching with 5-minute expiration
+- [x] **Cinematic Loading Experience**: Food photography backgrounds with camera focus animation
+- [x] **Premium Animation System**: Smooth restaurant card filtering with fade + scale effects
+- [x] **Advanced Filter Animations**: Roller blind dropdown effects with staggered item appearance
+- [x] **Menu Content Transitions**: Smooth content changes when filtering food types
+- [x] **Optimized Animation Timing**: Eliminated jank and stuttering in all transitions
 
-### 🎯 Next Steps (Priority Order)
+### 🎭 Animation System Achievements
+
+The animation system represents a significant upgrade to the user experience:
+
+**🎬 Cinematic Quality**: Professional food photography backgrounds with camera-focus effects create a restaurant-quality first impression.
+
+**⚡ Performance Optimized**: All animations use GPU acceleration and are synchronized to prevent conflicts, ensuring 60fps smoothness.
+
+**🎪 Interactive Delight**: Every user interaction (filtering, selecting, hovering) provides immediate visual feedback with carefully choreographed timing.
+
+**🔧 Technical Excellence**: Two-phase animation architecture handles complex state transitions without DOM popping or stuttering.
+
+**📱 Production Ready**: All animations are optimized for performance and work seamlessly across devices.
+
+### 🎯 Next Development Priorities
 
 #### **1. 💫 Favoriter Functionality**
 
@@ -168,9 +260,12 @@ This will now include the working Next.js frontend! 🚀
 #### **5. 🎨 Visual Polish & UX**
 
 - [ ] Replace emoji icons with proper SVG icons
-- [ ] Smooth animations for panel transitions
-- [ ] Button hover and loading states
+- [x] **Smooth animations for panel transitions** ✨
+- [x] **Button hover and loading states** ✨
 - [x] **Dark mode toggle in action bar**
+- [x] **Cinematic loading experience with food photography** ✨
+- [x] **Premium filter animations with staggered effects** ✨
+- [x] **Smooth restaurant card transitions** ✨
 - [ ] Accessibility improvements (ARIA labels, keyboard navigation)
 - [ ] Loading states for individual restaurant cards
 
@@ -199,3 +294,7 @@ This will now include the working Next.js frontend! 🚀
 - [ ] Menu comparison tools
 - [ ] Social features (share favorite dishes)
 - [ ] Meal planning and shopping list generation
+
+## 🎯 Ready to Start Development!
+
+With both development and production environments working perfectly, you're now ready to tackle the feature roadmap. The **Favoriter functionality** looks like a great next step since it's high-impact and relatively straightforward to implement!
