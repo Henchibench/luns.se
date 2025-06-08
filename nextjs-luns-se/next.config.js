@@ -2,8 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    // Enables hot reloading for Docker
-    isrMemoryCacheSize: 0,
+    // Experimental features for Next.js 15+
   },
   env: {
     API_URL: process.env.API_URL || 'http://localhost:8000',
