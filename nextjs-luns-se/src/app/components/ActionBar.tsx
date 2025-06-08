@@ -118,11 +118,11 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
           {/* Filter Button */}
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className={`backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md active:scale-95 active:shadow-sm border transform hover:-translate-y-0.5 ${
+            className={`backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 hover:shadow-md active:scale-95 active:shadow-sm border transform hover:-translate-y-0.5 ${
               hasActiveFilters 
                 ? 'bg-blue-600 text-white border-blue-600' 
                 : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
-            }`}
+            } ${isFilterOpen ? 'ring-2 ring-blue-300 dark:ring-blue-600 shadow-lg' : ''}`}
           >
             <span>🔍</span>
             <span>Filter</span>
@@ -207,9 +207,15 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
         </button>
       </div>
 
-      {/* Filter Panel - Full width card below buttons */}
-      {isFilterOpen && (
-        <div className="mt-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 p-6 max-h-[600px] overflow-y-auto">
+      {/* Filter Panel - Full width card below buttons with roller blind animation */}
+      <div 
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isFilterOpen ? 'max-h-[640px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className={`mt-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 p-6 max-h-[600px] overflow-y-auto transform transition-all duration-300 ease-in-out ${
+          isFilterOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
+        }`}>
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">Filter menyer</h3>
@@ -233,7 +239,11 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
                 placeholder="t.ex. kyckling, pasta..."
                 value={filters.searchTerm}
                 onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-all duration-300 focus:shadow-lg focus:scale-102 transform"
+                style={{
+                  animationDelay: '150ms',
+                  animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                }}
               />
             </div>
 
@@ -244,11 +254,15 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
               </label>
               <button
                 onClick={() => setFilters(prev => ({ ...prev, todayOnly: !prev.todayOnly }))}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   filters.todayOnly
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-600'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-600 scale-105 ring-2 ring-blue-200 dark:ring-blue-700'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-102'
                 }`}
+                style={{
+                  animationDelay: '200ms',
+                  animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                }}
               >
                 📅 Endast idag
               </button>
@@ -261,15 +275,19 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
               Matyp
             </label>
             <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
-              {FOOD_TYPES.map(foodType => (
+              {FOOD_TYPES.map((foodType, index) => (
                 <button
                   key={foodType.id}
                   onClick={() => toggleFoodType(foodType.id)}
-                  className={`px-3 py-3 rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center space-y-1 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                  className={`px-3 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-out flex flex-col items-center space-y-1 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                     filters.selectedFoodTypes.includes(foodType.id)
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-600 shadow-blue-200 dark:shadow-blue-900'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-gray-200 dark:shadow-gray-900'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-600 shadow-blue-200 dark:shadow-blue-900 scale-105 ring-2 ring-blue-200 dark:ring-blue-700'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-gray-200 dark:shadow-gray-900 hover:scale-102'
                   }`}
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                    animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                  }}
                 >
                   <span className="text-lg">{foodType.emoji}</span>
                   <span className="text-xs text-center">{foodType.label}</span>
@@ -300,19 +318,26 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-              {restaurants.map(restaurant => {
+              {restaurants.map((restaurant, index) => {
                 const isSelected = filters.selectedRestaurants.includes(restaurant);
                 return (
                   <div 
                     key={restaurant} 
-                    className="flex items-center space-x-2 cursor-pointer hover:bg-white dark:hover:bg-gray-600 rounded p-2 transition-colors"
+                    className="flex items-center space-x-2 cursor-pointer hover:bg-white dark:hover:bg-gray-600 rounded p-2 transition-all duration-300 hover:shadow-sm transform hover:scale-102"
                     onClick={() => toggleRestaurant(restaurant)}
+                    style={{
+                      animationDelay: `${index * 30}ms`,
+                      animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                    }}
                   >
-                    <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
+                    <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all duration-200 ${
                       isSelected 
-                        ? 'bg-blue-600 border-blue-600' 
+                        ? 'bg-blue-600 border-blue-600 animate-bounce-checkbox' 
                         : 'border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700'
-                    }`}>
+                    }`}
+                    style={{
+                      animation: isSelected ? 'checkboxBounce 0.3s ease-out' : 'none'
+                    }}>
                       {isSelected && (
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -344,7 +369,7 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
             </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 } 
