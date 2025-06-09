@@ -35,3 +35,6 @@ config/dns-conf/
 *.backup
 legacy-backup.tar
 config-backup-*/
+
+# DevOps Dashboard (separate project)
+devops-dashboard/

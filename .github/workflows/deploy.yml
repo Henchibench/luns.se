@@ -7,7 +7,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -22,11 +22,27 @@ jobs:
             echo "=== Cleaning up any local changes ===" &&
             git fetch origin &&
             git reset --hard origin/main &&
-            git clean -fd &&
-            echo "=== Stopping old containers ===" &&
-            docker-compose down --remove-orphans &&
-            echo "=== Starting modern containers ===" &&
-            docker-compose up -d --build --remove-orphans &&
+            git clean -fd -e "config/etc/letsencrypt/" -e "config/dns-conf/" &&
+            echo "=== Checking SSL certificates ===" &&
+            if [ -f "config/etc/letsencrypt/live/luns.se/fullchain.pem" ]; then
+              echo "✅ SSL certificates found - preserving SWAG container"
+              echo "=== Stopping application containers only ===" &&
+              docker-compose stop app-modern api-modern redis &&
+              echo "=== Starting updated containers ===" &&
+              docker-compose up -d --build app-modern api-modern redis
+            else
+              echo "⚠️  No SSL certificates found - full restart needed"
+              echo "=== Stopping all containers ===" &&
+              docker-compose down --remove-orphans &&
+              echo "=== Starting all containers ===" &&
+              docker-compose up -d --build --remove-orphans
+            fi &&
             echo "=== Deployment complete! ===" &&
-            docker-compose ps
+            docker-compose ps &&
+            echo "=== SSL Status ===" &&
+            if [ -f "config/etc/letsencrypt/live/luns.se/fullchain.pem" ]; then
+              echo "✅ SSL certificates are present"
+            else
+              echo "⚠️  SSL certificates missing - check SWAG logs"
+            fi
           '

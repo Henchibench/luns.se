@@ -15,6 +15,85 @@ Modern deployment of luns.se using Next.js frontend with FastAPI backend, contai
   - `luns-redis` (Redis cache on port 6379)
 - **Technology**: Next.js + FastAPI + Redis + Docker
 
+## SSL Certificate Management
+
+### Current Status (June 2025)
+
+- **Rate Limited**: Hit Let's Encrypt 5 certificates/week limit
+- **Reset Time**: 2025-06-09 09:45 AM Swedish time (07:45 UTC)
+- **Cloudflare Credentials**: ✅ Already configured in `/config/dns-conf/cloudflare.ini`
+
+### Sunday Morning Action Plan (June 9, 2025)
+
+**⏰ After 9:45 AM Swedish time:**
+
+```bash
+# Restart SWAG to request new certificates
+ssh hench@38.242.237.58 'cd /home/hench/luns.se && docker-compose restart swag'
+
+# Monitor the certificate generation
+ssh hench@38.242.237.58 'cd /home/hench/luns.se && docker-compose logs swag -f'
+
+# Verify site is working
+curl -I https://luns.se
+```
+
+**Expected Result:** ✅ Site back online with valid SSL certificates
+
+### SSL Troubleshooting
+
+#### Rate Limit Error
+
+```
+too many certificates (5) already issued for this exact set of domains in the last 168h0m0s
+```
+
+**Solution:** Wait for the 7-day window to reset, then restart SWAG.
+
+#### Missing Cloudflare Credentials
+
+```
+ERROR: Cert does not exist! Please see the validation error above. Make sure you entered correct credentials
+```
+
+**Solution:**
+
+```bash
+# Check if credentials exist
+ssh hench@38.242.237.58 'ls -la /home/hench/luns.se/config/dns-conf/cloudflare.ini'
+
+# If missing, recreate (get token from Cloudflare Dashboard > API Tokens)
+ssh hench@38.242.237.58 'echo "dns_cloudflare_api_token = YOUR_TOKEN_HERE" > /home/hench/luns.se/config/dns-conf/cloudflare.ini'
+ssh hench@38.242.237.58 'chmod 600 /home/hench/luns.se/config/dns-conf/cloudflare.ini'
+```
+
+#### Cloudflare 521 Error
+
+**Meaning:** Cloudflare can't connect to your origin server
+**Common Causes:**
+
+- SSL certificates not generated yet
+- NGINX not serving on port 443
+- SWAG container not running
+
+**Solution:** Check SWAG logs and restart if needed.
+
+### Deployment Fixes Applied
+
+#### Certificate Preservation (Fixed Dec 2024)
+
+- **Problem:** `git clean -fd` removed SSL certificates on every deployment
+- **Solution:** Modified GitHub Action to exclude certificates:
+
+```bash
+git clean -fd -e "config/etc/letsencrypt/" -e "config/dns-conf/"
+```
+
+#### Next.js 15 Compatibility (Fixed June 2025)
+
+- **Problem:** `isrMemoryCacheSize` deprecated in Next.js 15
+- **Solution:** Removed from `next.config.js` experimental section
+
 ## Deployment Process
 
 ### Production Deployment

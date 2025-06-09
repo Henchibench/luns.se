@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Modern Next.js frontend
   app-modern:
