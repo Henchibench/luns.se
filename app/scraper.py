@@ -3,6 +3,7 @@ from functools import wraps
 import logging
 from datetime import datetime, time
 from .scrapers.restaurants.bistrot_scraper import BistrotScraper
+from .scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
 from .scrapers.restaurants.kooperativet_scraper import KooperativetScraper
 from .scrapers.restaurants.pier11_scraper import Pier11Scraper
 from .scrapers.restaurants.district_one_scraper import DistrictOneScraper
@@ -113,6 +114,7 @@ def get_cached_menus():
     # List of scraper instances
     scrapers = [
         BistrotScraper(),
+        BombayBistroScraper(),
         KooperativetScraper(),
         Pier11Scraper(),
         DistrictOneScraper(),

@@ -6,7 +6,6 @@ import { FilterState } from './FilterPanel';
 interface ActionBarProps {
   restaurants: string[];
   onFiltersChange: (filters: FilterState) => void;
-  abTestToggle?: React.ReactNode;
   viewMode: 'cards' | 'list';
   onViewModeChange: (mode: 'cards' | 'list') => void;
 }
@@ -50,7 +49,7 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, viewMode, onViewModeChange }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange }: ActionBarProps) {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   
@@ -226,10 +225,7 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
           </div>
         </div>
 
-        {/* Right Side - A/B Test Toggle */}
-        <div className="flex items-center">
-          {abTestToggle && abTestToggle}
-        </div>
+
       </div>
 
       {/* Filter Panel - Normal flow below action bar */}
@@ -243,58 +239,46 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
         } transform transition-all duration-300 ease-in-out ${
           isFilterOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
         }`}>
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">Filter menyer</h3>
-            <button
-              onClick={() => setIsFilterOpen(false)}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xl"
-            >
-              ×
-            </button>
+
+
+          {/* Search */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sök rätter
+            </label>
+            <input
+              type="text"
+              placeholder="t.ex. kyckling, pasta..."
+              value={filters.searchTerm}
+              onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-all duration-300 focus:shadow-lg focus:scale-102 transform"
+              style={{
+                animationDelay: '150ms',
+                animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+              }}
+            />
           </div>
 
-          {/* Top Row: Search and Quick Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Search */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Sök rätter
-              </label>
-              <input
-                type="text"
-                placeholder="t.ex. kyckling, pasta..."
-                value={filters.searchTerm}
-                onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-all duration-300 focus:shadow-lg focus:scale-102 transform"
-                style={{
-                  animationDelay: '150ms',
-                  animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
-                }}
-              />
-            </div>
-
-            {/* Cravings */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Cravings
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {CRAVINGS.map((craving, index) => (
-                  <button
-                    key={craving.id}
-                    onClick={() => handleCravingSearch(craving)}
-                    className="px-3 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-out flex flex-col items-center space-y-1 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-gray-200 dark:shadow-gray-900 hover:scale-102"
-                    style={{
-                      animationDelay: `${200 + index * 50}ms`,
-                      animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
-                    }}
-                  >
-                    <span className="text-lg">{craving.emoji}</span>
-                    <span className="text-xs text-center">{craving.label}</span>
-                  </button>
-                ))}
-              </div>
+          {/* Cravings */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Cravings
+            </label>
+            <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              {CRAVINGS.map((craving, index) => (
+                <button
+                  key={craving.id}
+                  onClick={() => handleCravingSearch(craving)}
+                  className="px-3 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-out flex flex-col items-center space-y-1 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-gray-200 dark:shadow-gray-900 hover:scale-102"
+                  style={{
+                    animationDelay: `${200 + index * 50}ms`,
+                    animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                  }}
+                >
+                  <span className="text-lg">{craving.emoji}</span>
+                  <span className="text-xs text-center">{craving.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
