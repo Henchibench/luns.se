@@ -131,6 +131,61 @@ function parseMenuItem(item: string): MenuItem | null {
   };
 }
 
+function recategorizePier11Items(restaurants: Restaurant[]): Restaurant[] {
+  return restaurants.map(restaurant => {
+    // Only apply to Pier 11 and restaurants with "Dagens" category
+    if (!restaurant.name.includes('Pier 11')) {
+      return restaurant;
+    }
+    
+    // Group items by day to process each day separately
+    const itemsByDay: Record<string, MenuItem[]> = {};
+    restaurant.items.forEach(item => {
+      if (!itemsByDay[item.day]) {
+        itemsByDay[item.day] = [];
+      }
+      itemsByDay[item.day].push(item);
+    });
+    
+    const recategorizedItems: MenuItem[] = [];
+    
+    Object.entries(itemsByDay).forEach(([day, dayItems]) => {
+      const dagensItems = dayItems.filter(item => item.category === 'Dagens');
+      const otherItems = dayItems.filter(item => item.category !== 'Dagens');
+      
+      if (dagensItems.length > 0) {
+        // Split Dagens items into 3 groups based on typical order: Vegetarisk, Fisk, Kött
+        const itemsPerCategory = Math.ceil(dagensItems.length / 3);
+        
+        dagensItems.forEach((item, index) => {
+          let newCategory = 'Dagens'; // fallback
+          
+          if (index < itemsPerCategory) {
+            newCategory = 'Vegetarisk';
+          } else if (index < itemsPerCategory * 2) {
+            newCategory = 'Fisk';
+          } else {
+            newCategory = 'Kött';
+          }
+          
+          recategorizedItems.push({
+            ...item,
+            category: newCategory
+          });
+        });
+      }
+      
+      // Add other items as-is
+      recategorizedItems.push(...otherItems);
+    });
+    
+    return {
+      ...restaurant,
+      items: recategorizedItems
+    };
+  });
+}
+
 function parseRestaurantInfo(items: string[], day: string): string[] {
   return items
     .filter(item => item.startsWith(`INFO:${day}`))
@@ -138,7 +193,123 @@ function parseRestaurantInfo(items: string[], day: string): string[] {
     .map(item => item.trim());
 }
 
+function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string): Record<string, Array<MenuItem & { restaurantName: string }>> {
+  const groupedItems: Record<string, Array<MenuItem & { restaurantName: string }>> = {};
+  
+  restaurants.forEach(restaurant => {
+    const dayItems = restaurant.items.filter(item => item.day === selectedDay);
+    
+    dayItems.forEach(item => {
+      if (!groupedItems[item.category]) {
+        groupedItems[item.category] = [];
+      }
+      groupedItems[item.category].push({
+        ...item,
+        restaurantName: restaurant.name
+      });
+    });
+  });
+  
+  return groupedItems;
+}
 
+function CompactListView({ restaurants, isOldVersion }: { 
+  restaurants: Restaurant[]; 
+  isOldVersion: boolean;
+}) {
+  const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
+  const groupedItems = groupMenuItemsByCategory(restaurants, selectedDay);
+  const categories = Object.keys(groupedItems).sort();
+
+  const containerClasses = isOldVersion 
+    ? "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm"
+    : "bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-blue-200 dark:border-blue-700";
+
+  const headerClasses = isOldVersion
+    ? "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300"
+    : "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-6 text-black dark:text-white rounded-t-xl";
+
+  if (categories.length === 0) {
+    return (
+      <div className={containerClasses}>
+        <div className={headerClasses}>
+          <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>Kompakt lista - {selectedDay}</h2>
+        </div>
+        <div className="p-6 text-center">
+          <div className="text-4xl mb-2">🍽️</div>
+          <p className={`font-medium mb-1 ${isOldVersion ? 'text-gray-700' : 'text-gray-600 dark:text-gray-400'}`}>
+            Inga rätter för {selectedDay.toLowerCase()}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={containerClasses}>
+      <div className={headerClasses}>
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>Kompakt lista - {selectedDay}</h2>
+            <p className={`text-sm mt-1 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
+              Alla rätter från alla restauranger grupperade efter typ
+            </p>
+          </div>
+        </div>
+        
+        {/* Day Selector */}
+        <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
+          {DAYS.map((day) => (
+            <button
+              key={day}
+              onClick={() => setSelectedDay(day)}
+              className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                selectedDay === day
+                  ? isOldVersion
+                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
+                    : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
+                  : isOldVersion
+                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
+              }`}
+            >
+              {day}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div className="p-6 space-y-4">
+        {categories.map(category => (
+          <div key={category}>
+            <h3 className={`font-semibold mb-2 pb-1 border-b ${isOldVersion ? 'text-base text-gray-800 border-gray-300' : 'text-base text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600'}`}>
+              {category}
+            </h3>
+            <div className="space-y-2">
+              {groupedItems[category].map((item, idx) => (
+                <div
+                  key={`${item.restaurantName}-${idx}`}
+                  className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                >
+                  <div className="flex-1">
+                    <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}>
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="ml-4 flex-shrink-0">
+                    <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
+                      {item.restaurantName}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion }: { 
   restaurant: Restaurant; 
@@ -305,7 +476,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
 
       {/* Menu Content */}
       <div className={`p-6 ${isOldVersion ? 'bg-white text-gray-800' : 'bg-white dark:bg-gray-800'}`}>
-        <div className={`space-y-6 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
+        <div className={`space-y-4 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
           {Object.entries(groupedItems).length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">🍽️</div>
@@ -318,8 +489,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
             </div>
           ) : (
             Object.entries(groupedItems).map(([category, items]) => (
-              <div key={category} className="space-y-3">
-                <h3 className={`font-semibold ${isOldVersion ? 'text-lg text-gray-800 border-b border-gray-300 pb-1' : 'text-lg text-gray-900 dark:text-gray-100'}`}>
+              <div key={category} className="space-y-2">
+                <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-800 border-b border-gray-300 pb-1' : 'text-base text-gray-900 dark:text-gray-100'}`}>
                   {category}
                 </h3>
                 <div className="space-y-2">
@@ -365,6 +536,7 @@ export default function MenuPage() {
     searchTerm: '',
     todayOnly: false
   });
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
   // Animation state for restaurant cards
   const [displayedRestaurants, setDisplayedRestaurants] = useState<Restaurant[]>([]);
@@ -468,8 +640,11 @@ export default function MenuPage() {
           location: restaurantsData.restaurants[name]
         }));
         
+        // Apply Pier 11 recategorization
+        const recategorizedRestaurants = recategorizePier11Items(parsedRestaurants);
+        
         setRawMenus(menusData.menus);
-        setRestaurants(parsedRestaurants);
+        setRestaurants(recategorizedRestaurants);
         setFilters(prev => ({
           ...prev,
           selectedRestaurants: parsedRestaurants.map(r => r.name)
@@ -587,7 +762,7 @@ export default function MenuPage() {
         </div> */}
 
                  {/* Dashboard Section - Info Banner with Controls */}
-         <div className="max-w-4xl mx-auto px-4 py-2">
+         <div className="max-w-4xl mx-auto px-4 py-2 relative z-50">
            <div className={`backdrop-blur-sm rounded-xl shadow-lg border p-6 ${
              isOldVersion 
                ? 'bg-white/95 border-gray-300' 
@@ -597,16 +772,18 @@ export default function MenuPage() {
              
              {/* Action Bar with integrated toggle */}
              <div className="mt-6">
-               <ActionBar 
-                 restaurants={restaurants.map(r => r.name)}
-                 onFiltersChange={handleFiltersChange}
-                 abTestToggle={<ABTestToggle isOldVersion={isOldVersion} onToggle={setIsOldVersion} />}
-               />
+                            <ActionBar 
+               restaurants={restaurants.map(r => r.name)}
+               onFiltersChange={handleFiltersChange}
+               viewMode={viewMode}
+               onViewModeChange={setViewMode}
+               abTestToggle={<ABTestToggle isOldVersion={isOldVersion} onToggle={setIsOldVersion} />}
+             />
              </div>
            </div>
          </div>
 
-        {/* Restaurant Cards */}
+        {/* Restaurant Cards or List View */}
         <div className="max-w-4xl mx-auto px-4 py-4">
           {filteredRestaurants.length === 0 && !isFiltering ? (
             <div className={`text-center py-16 rounded-xl shadow-lg border ${
@@ -633,6 +810,11 @@ export default function MenuPage() {
                 Rensa alla filter
               </button>
             </div>
+          ) : viewMode === 'list' ? (
+            <CompactListView 
+              restaurants={displayedRestaurants}
+              isOldVersion={isOldVersion}
+            />
           ) : (
             <div className="space-y-4">
               {displayedRestaurants.map((restaurant, index) => {

@@ -7,6 +7,8 @@ interface ActionBarProps {
   restaurants: string[];
   onFiltersChange: (filters: FilterState) => void;
   abTestToggle?: React.ReactNode;
+  viewMode: 'cards' | 'list';
+  onViewModeChange: (mode: 'cards' | 'list') => void;
 }
 
 const FOOD_TYPES = [
@@ -21,8 +23,7 @@ const FOOD_TYPES = [
   { id: 'Världen', label: 'Världens Kök', emoji: '🌍' }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }: ActionBarProps) {
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, viewMode, onViewModeChange }: ActionBarProps) {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   
@@ -107,8 +108,8 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
             )}
           </button>
           
-          {/* Favoriter Button */}
-          <button className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5">
+          {/* Favoriter Button - Hidden until functionality is implemented */}
+          {/* <button className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5">
             <span>⭐</span>
             <span>Favoriter</span>
             {favoritesCount > 0 && (
@@ -116,7 +117,7 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
                 {favoritesCount}
               </span>
             )}
-          </button>
+          </button> */}
           
           {/* View Toggle Dropdown */}
           <div className="relative">
@@ -124,17 +125,17 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
               onClick={() => setShowViewDropdown(!showViewDropdown)}
               className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5"
             >
-              <span>📋</span>
+              <span>{viewMode === 'cards' ? '📋' : '📄'}</span>
               <span>{viewMode === 'cards' ? 'Kort' : 'Lista'}</span>
               <span className="text-xs">▼</span>
             </button>
             
             {/* Dropdown Menu */}
             {showViewDropdown && (
-              <div className="absolute top-12 left-0 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 min-w-[120px]">
+              <div className="absolute top-12 left-0 z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 min-w-[140px]">
                 <button
                   onClick={() => {
-                    setViewMode('cards');
+                    onViewModeChange('cards');
                     setShowViewDropdown(false);
                   }}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 ${
@@ -142,12 +143,12 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
                   } first:rounded-t-lg`}
                 >
                   <span>📋</span>
-                  <span>Kort</span>
+                  <span>Restaurangkort</span>
                   {viewMode === 'cards' && <span className="ml-auto">✓</span>}
                 </button>
                 <button
                   onClick={() => {
-                    setViewMode('list');
+                    onViewModeChange('list');
                     setShowViewDropdown(false);
                   }}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 ${
@@ -155,7 +156,7 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
                   } last:rounded-b-lg`}
                 >
                   <span>📄</span>
-                  <span>Lista</span>
+                  <span>Kompakt lista</span>
                   {viewMode === 'list' && <span className="ml-auto">✓</span>}
                 </button>
               </div>
@@ -164,7 +165,7 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }
             {/* Backdrop for dropdown */}
             {showViewDropdown && (
               <div
-                className="fixed inset-0 z-40"
+                className="fixed inset-0 z-[9998]"
                 onClick={() => setShowViewDropdown(false)}
               />
             )}

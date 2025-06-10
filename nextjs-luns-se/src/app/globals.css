@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar but keep scroll functionality */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
 /* Custom animations for epic background effects */
 @keyframes slow-zoom {
   0% {
