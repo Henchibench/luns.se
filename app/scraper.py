@@ -6,6 +6,7 @@ from .scrapers.restaurants.bistrot_scraper import BistrotScraper
 from .scrapers.restaurants.kooperativet_scraper import KooperativetScraper
 from .scrapers.restaurants.pier11_scraper import Pier11Scraper
 from .scrapers.restaurants.district_one_scraper import DistrictOneScraper
+from .scrapers.restaurants.uni3_scraper import Uni3Scraper
 # Import other restaurant scrapers as they are created
 
 # Global cache instance
@@ -115,6 +116,7 @@ def get_cached_menus():
         KooperativetScraper(),
         Pier11Scraper(),
         DistrictOneScraper(),
+        Uni3Scraper(),
         # Add other restaurant scrapers here as they are created
     ]
     
