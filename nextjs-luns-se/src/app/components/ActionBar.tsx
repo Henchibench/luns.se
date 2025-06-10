@@ -6,6 +6,7 @@ import { FilterState } from './FilterPanel';
 interface ActionBarProps {
   restaurants: string[];
   onFiltersChange: (filters: FilterState) => void;
+  abTestToggle?: React.ReactNode;
 }
 
 const FOOD_TYPES = [
@@ -20,7 +21,7 @@ const FOOD_TYPES = [
   { id: 'Världen', label: 'Världens Kök', emoji: '🌍' }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, abTestToggle }: ActionBarProps) {
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [showViewDropdown, setShowViewDropdown] = useState(false);
@@ -83,7 +84,7 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
                           filters.todayOnly;
 
   return (
-    <div>
+    <div className="relative">
       {/* Action Buttons Row */}
       <div className="flex items-center justify-between">
         {/* Left Side Buttons */}
@@ -170,10 +171,13 @@ export default function ActionBar({ restaurants, onFiltersChange }: ActionBarPro
           </div>
         </div>
 
-
+        {/* Right Side - A/B Test Toggle */}
+        <div className="flex items-center">
+          {abTestToggle && abTestToggle}
+        </div>
       </div>
 
-      {/* Filter Panel - Full width card below buttons with roller blind animation */}
+      {/* Filter Panel - Normal flow below action bar */}
       <div 
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
           isFilterOpen ? 'max-h-[640px] opacity-100' : 'max-h-0 opacity-0'

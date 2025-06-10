@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=development
-      - API_URL=http://localhost:8000
+      - API_URL=http://api-modern:8000
     container_name: luns-modern-dev
     ports:
       - "3000:3000"  # Map to localhost:3000

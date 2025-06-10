@@ -138,6 +138,8 @@ function parseRestaurantInfo(items: string[], day: string): string[] {
     .map(item => item.trim());
 }
 
+
+
 function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion }: { 
   restaurant: Restaurant; 
   allItems: string[]; 
@@ -266,19 +268,38 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
         </div>
       </div>
 
-      {/* Map Section - Same for both versions */}
-      {showMap && restaurant.location?.maps && (
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <iframe
-            src={restaurant.location.maps}
-            width="100%"
-            height="300"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full"
-          />
+      {/* Map Section - Animated slide down */}
+      {restaurant.location?.maps && (
+        <div 
+          className={`overflow-hidden transition-all duration-300 ease-in-out border-b border-gray-200 dark:border-gray-700 ${
+            showMap ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className={`p-6 bg-gray-50 dark:bg-gray-700 border-b border-blue-200 dark:border-blue-600 transform transition-all duration-300 ease-in-out ${
+            showMap ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
+          }`}>
+            <iframe
+              src={`https://maps.google.com/maps?q=lindholmen+${encodeURIComponent(restaurant.name)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              className="w-full h-96 border-none rounded-lg mb-3"
+              allowFullScreen
+              style={{
+                animationDelay: '150ms',
+                animation: showMap ? 'slideInUp 0.3s ease-out forwards' : 'none'
+              }}
+            />
+            <a
+              href={restaurant.location.maps}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5"
+              style={{
+                animationDelay: '200ms',
+                animation: showMap ? 'slideInUp 0.3s ease-out forwards' : 'none'
+              }}
+            >
+              Öppna i Google Maps
+            </a>
+          </div>
         </div>
       )}
 
@@ -531,6 +552,8 @@ export default function MenuPage() {
         </>
       )}
       
+
+      
              {/* Brand Title - Different for each version */}
        <div className="relative z-10">
          <div className="max-w-7xl mx-auto px-4 py-12">
@@ -572,17 +595,13 @@ export default function MenuPage() {
            }`}>
              <InfoBanner />
              
-             {/* Action Bar and Version Toggle */}
-             <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-               <div className="flex-1">
-                 <ActionBar 
-                   restaurants={restaurants.map(r => r.name)}
-                   onFiltersChange={handleFiltersChange}
-                 />
-               </div>
-               <div className="flex-shrink-0">
-                 <ABTestToggle isOldVersion={isOldVersion} onToggle={setIsOldVersion} />
-               </div>
+             {/* Action Bar with integrated toggle */}
+             <div className="mt-6">
+               <ActionBar 
+                 restaurants={restaurants.map(r => r.name)}
+                 onFiltersChange={handleFiltersChange}
+                 abTestToggle={<ABTestToggle isOldVersion={isOldVersion} onToggle={setIsOldVersion} />}
+               />
              </div>
            </div>
          </div>
