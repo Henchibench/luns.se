@@ -7,14 +7,15 @@ const nextConfig = {
   env: {
     API_URL: process.env.API_URL || 'http://localhost:8000',
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://api-modern:8000/:path*',
-      },
-    ];
-  },
+  // COMMENTED OUT: API rewrite conflicts with NGINX routing
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'http://api-modern:8000/:path*',
+  //     },
+  //   ];
+  // },
 }
 
 module.exports = nextConfig 
