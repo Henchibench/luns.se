@@ -49,12 +49,6 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/districtone.se/",
         "area": "Lindholmen"
     },
-    "Gourmetkorv": {
-        "maps": "https://maps.app.goo.gl/jVNY4Jxve1wNLsfXA",
-        "website": "https://www.gourmetkorv.se/",
-        "instagram": "https://www.instagram.com/gourmetkorv/",
-        "area": "Lindholmen"
-    },
     "Kooperativet": {
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
         "website": "https://www.kooperativet.se/",
@@ -99,7 +93,7 @@ restaurant_locations = {
     },
     "Uni3 – World of Food": {
         "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
-        "website": "https://www.facebook.com/uni3worldoffood/",
+        "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/uni3-world-of-food/",
         "instagram": "https://www.instagram.com/uni3worldoffood/",
         "area": "Lindholmen"
     },

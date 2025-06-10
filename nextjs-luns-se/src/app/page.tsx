@@ -41,7 +41,27 @@ interface ApiResponse {
 }
 
 const DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag'];
-const CURRENT_DAY = DAYS[0]; // Monday for now
+
+// Get current day index (0=Monday, 4=Friday)
+// Weekends (Saturday/Sunday) default to Monday (0)
+function getCurrentDayIndex(): number {
+  const today = new Date().getDay(); // 0=Sunday, 6=Saturday
+  const mondayBasedDay = today === 0 ? 6 : today - 1; // Convert to Monday=0, Sunday=6
+  if (mondayBasedDay > 4) { // Weekend (Saturday=5, Sunday=6)
+    return 0; // Default to Monday for weekends
+  }
+  return mondayBasedDay;
+}
+
+const CURRENT_DAY = DAYS[getCurrentDayIndex()];
+
+// Craving search variations to match ActionBar.tsx
+const CRAVING_VARIATIONS: Record<string, string[]> = {
+  'hamburgare': ['burger', 'hamburgare', 'högrevsburgare', 'cheeseburger', 'veggieburger', 'veganburger', 'halloumiburger', 'kycklingburgare', 'smashed burger'],
+  'pasta': ['pasta', 'spaghetti', 'penne', 'carbonara', 'bolognese', 'marinara', 'nudlar'],
+  'pommes': ['pommes', 'fries', 'wedges', 'pommes frites', 'pommes frite'],
+  'mos': ['mos', 'potatismos', 'potatispure', 'potatispuré', 'smashed potatoes', 'krossad potatis']
+};
 
 // Food hero images with photographer credits
 const foodHeroImages = [
@@ -213,13 +233,36 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
   return groupedItems;
 }
 
-function CompactListView({ restaurants, isOldVersion }: { 
+function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: { 
   restaurants: Restaurant[]; 
   isOldVersion: boolean;
+  hasActiveSearch?: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
-  const groupedItems = groupMenuItemsByCategory(restaurants, selectedDay);
-  const categories = Object.keys(groupedItems).sort();
+  
+  // When searching, group all items from all restaurants by day first, then category
+  // When not searching, use the existing selectedDay logic
+  const groupedItems = hasActiveSearch 
+    ? restaurants.reduce((acc, restaurant) => {
+        restaurant.items.forEach(item => {
+          if (!acc[item.day]) {
+            acc[item.day] = {};
+          }
+          if (!acc[item.day][item.category]) {
+            acc[item.day][item.category] = [];
+          }
+          acc[item.day][item.category].push({
+            ...item,
+            restaurantName: restaurant.name
+          });
+        });
+        return acc;
+      }, {} as Record<string, Record<string, Array<MenuItem & { restaurantName: string }>>>)
+    : groupMenuItemsByCategory(restaurants, selectedDay);
+    
+  const isEmpty = hasActiveSearch 
+    ? Object.keys(groupedItems).length === 0
+    : Object.keys(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).length === 0;
 
   const containerClasses = isOldVersion 
     ? "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm"
@@ -229,16 +272,18 @@ function CompactListView({ restaurants, isOldVersion }: {
     ? "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300"
     : "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-6 text-black dark:text-white rounded-t-xl";
 
-  if (categories.length === 0) {
+  if (isEmpty) {
     return (
       <div className={containerClasses}>
         <div className={headerClasses}>
-          <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>Kompakt lista - {selectedDay}</h2>
+          <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>
+            Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
+          </h2>
         </div>
         <div className="p-6 text-center">
           <div className="text-4xl mb-2">🍽️</div>
           <p className={`font-medium mb-1 ${isOldVersion ? 'text-gray-700' : 'text-gray-600 dark:text-gray-400'}`}>
-            Inga rätter för {selectedDay.toLowerCase()}
+            {hasActiveSearch ? 'Inga sökresultat' : `Inga rätter för ${selectedDay.toLowerCase()}`}
           </p>
         </div>
       </div>
@@ -250,89 +295,161 @@ function CompactListView({ restaurants, isOldVersion }: {
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>Kompakt lista - {selectedDay}</h2>
+            <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>
+              Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
+            </h2>
             <p className={`text-sm mt-1 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
-              Alla rätter från alla restauranger grupperade efter typ
+              {hasActiveSearch 
+                ? 'Alla rätter från alla restauranger grupperade efter dag och typ'
+                : 'Alla rätter från alla restauranger grupperade efter typ'
+              }
             </p>
           </div>
         </div>
         
-        {/* Day Selector */}
-        <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
-          {DAYS.map((day) => (
-            <button
-              key={day}
-              onClick={() => setSelectedDay(day)}
-              className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                selectedDay === day
-                  ? isOldVersion
-                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                    : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
-                  : isOldVersion
-                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
-              }`}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
+        {/* Day Selector - Hidden when showing search results */}
+        {!hasActiveSearch && (
+          <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
+            {DAYS.map((day) => (
+              <button
+                key={day}
+                onClick={() => setSelectedDay(day)}
+                className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                  selectedDay === day
+                    ? isOldVersion
+                      ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
+                      : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
+                    : isOldVersion
+                      ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
+                }`}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Search Results Indicator */}
+        {hasActiveSearch && (
+          <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
+            isOldVersion 
+              ? 'bg-gray-200 text-gray-700' 
+              : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+          }`}>
+            🔍 Sökresultat - visar alla dagar
+          </div>
+        )}
       </div>
       
       <div className="p-6 space-y-4">
-        {categories.map(category => (
-          <div key={category}>
-            <h3 className={`font-semibold mb-2 pb-1 border-b ${isOldVersion ? 'text-base text-gray-800 border-gray-300' : 'text-base text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600'}`}>
-              {category}
-            </h3>
-            <div className="space-y-2">
-              {groupedItems[category].map((item, idx) => (
-                <div
-                  key={`${item.restaurantName}-${idx}`}
-                  className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-                >
-                  <div className="flex-1">
-                    <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}>
-                      {item.description}
-                    </p>
+        {hasActiveSearch ? (
+          // Search results: Group by Day → Category → Items
+          Object.entries(groupedItems as Record<string, Record<string, Array<MenuItem & { restaurantName: string }>>>).map(([day, categories]) => (
+            <div key={day} className="space-y-3">
+              <h2 className={`font-bold text-lg ${isOldVersion ? 'text-gray-800 border-b border-gray-300 pb-2' : 'text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600 pb-2'}`}>
+                {day}
+              </h2>
+              <div className="space-y-3 ml-2">
+                {Object.entries(categories).map(([category, items]) => (
+                  <div key={category} className="space-y-2">
+                    <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-700' : 'text-base text-gray-800 dark:text-gray-200'}`}>
+                      {category}
+                    </h3>
+                    <div className="space-y-2 ml-2">
+                      {items.map((item, idx) => (
+                        <div
+                          key={`${item.restaurantName}-${idx}`}
+                          className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        >
+                          <div className="flex-1">
+                            <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}>
+                              {item.description}
+                            </p>
+                          </div>
+                          <div className="ml-4 flex-shrink-0">
+                            <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
+                              {item.restaurantName}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
-                      {item.restaurantName}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          // Normal view: Group by Category → Items
+          Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).map(([category, items]) => (
+            <div key={category}>
+              <h3 className={`font-semibold mb-2 pb-1 border-b ${isOldVersion ? 'text-base text-gray-800 border-gray-300' : 'text-base text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600'}`}>
+                {category}
+              </h3>
+              <div className="space-y-2">
+                {items.map((item, idx) => (
+                  <div
+                    key={`${item.restaurantName}-${idx}`}
+                    className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                  >
+                    <div className="flex-1">
+                      <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}>
+                        {item.description}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
+                        {item.restaurantName}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion }: { 
+function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion, hasActiveSearch }: { 
   restaurant: Restaurant; 
   allItems: string[]; 
   originalRestaurant?: Restaurant;
   isOldVersion: boolean;
+  hasActiveSearch?: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
   const [isContentChanging, setIsContentChanging] = useState(false);
   const [contentKey, setContentKey] = useState('');
   
-  const todaysItems = restaurant.items.filter(item => item.day === selectedDay);
+  // When there's an active search, show all items from restaurant.items (which are already filtered by search)
+  // Otherwise, filter by the selected day as before
+  const displayedItems = hasActiveSearch ? restaurant.items : restaurant.items.filter(item => item.day === selectedDay);
   const todaysInfo = parseRestaurantInfo(allItems, selectedDay);
   
-  // Group items by category
-  const groupedItems = todaysItems.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, MenuItem[]>);
+  // Group items by category normally, or by day first when searching
+  const groupedItems = hasActiveSearch 
+    ? displayedItems.reduce((acc, item) => {
+        if (!acc[item.day]) {
+          acc[item.day] = {};
+        }
+        if (!acc[item.day][item.category]) {
+          acc[item.day][item.category] = [];
+        }
+        acc[item.day][item.category].push(item);
+        return acc;
+      }, {} as Record<string, Record<string, MenuItem[]>>)
+    : displayedItems.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = [];
+        }
+        acc[item.category].push(item);
+        return acc;
+      }, {} as Record<string, MenuItem[]>);
 
   // Simplified content change detection
   useEffect(() => {
@@ -417,26 +534,39 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
           ))}
         </div>
         
-        {/* Day Selector in Header */}
-        <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
-          {DAYS.map((day) => (
-            <button
-              key={day}
-              onClick={() => setSelectedDay(day)}
-              className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                selectedDay === day
-                  ? isOldVersion
-                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                    : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
-                  : isOldVersion
-                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
-              }`}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
+        {/* Day Selector in Header - Hidden when showing search results */}
+        {!hasActiveSearch && (
+          <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
+            {DAYS.map((day) => (
+              <button
+                key={day}
+                onClick={() => setSelectedDay(day)}
+                className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                  selectedDay === day
+                    ? isOldVersion
+                      ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
+                      : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
+                    : isOldVersion
+                      ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
+                }`}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+        )}
+        
+        {/* Search Results Indicator */}
+        {hasActiveSearch && (
+          <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
+            isOldVersion 
+              ? 'bg-gray-200 text-gray-700' 
+              : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+          }`}>
+            🔍 Sökresultat - visar alla dagar
+          </div>
+        )}
       </div>
 
       {/* Map Section - Animated slide down */}
@@ -487,8 +617,37 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
                 Välj en annan dag eller kolla direkt med restaurangen
               </p>
             </div>
+          ) : hasActiveSearch ? (
+            // Search results: Group by Day → Category → Items
+            Object.entries(groupedItems as Record<string, Record<string, MenuItem[]>>).map(([day, categories]) => (
+              <div key={day} className="space-y-3">
+                <h2 className={`font-bold text-lg ${isOldVersion ? 'text-gray-800 border-b border-gray-300 pb-2' : 'text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600 pb-2'}`}>
+                  {day}
+                </h2>
+                <div className="space-y-3 ml-2">
+                  {Object.entries(categories).map(([category, items]) => (
+                    <div key={category} className="space-y-2">
+                      <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-700' : 'text-base text-gray-800 dark:text-gray-200'}`}>
+                        {category}
+                      </h3>
+                      <div className="space-y-2 ml-2">
+                        {items.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}
+                          >
+                            {item.description}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
           ) : (
-            Object.entries(groupedItems).map(([category, items]) => (
+            // Normal view: Group by Category → Items
+            Object.entries(groupedItems as Record<string, MenuItem[]>).map(([category, items]) => (
               <div key={category} className="space-y-2">
                 <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-800 border-b border-gray-300 pb-1' : 'text-base text-gray-900 dark:text-gray-100'}`}>
                   {category}
@@ -538,6 +697,11 @@ export default function MenuPage() {
   });
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
+  // Back to top button state
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isNearFooter, setIsNearFooter] = useState(false);
+
   // Animation state for restaurant cards
   const [displayedRestaurants, setDisplayedRestaurants] = useState<Restaurant[]>([]);
   const [exitingRestaurants, setExitingRestaurants] = useState<Set<string>>(new Set());
@@ -548,6 +712,37 @@ export default function MenuPage() {
   const handleFiltersChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
   }, []);
+
+  // Scroll detection for back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const windowHeight = window.innerHeight;
+      
+      // Show button after scrolling past 400px (roughly past the filter section)
+      setShowBackToTop(scrollTop > 400);
+      
+      // Calculate scroll progress (0-100%)
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setScrollProgress(Math.min(progress, 100));
+      
+      // Check if we're near the footer (within 200px of bottom)
+      const distanceFromBottom = docHeight - scrollTop;
+      setIsNearFooter(distanceFromBottom < 200);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   // Apply filters with proper enter/exit animations
   useEffect(() => {
@@ -571,9 +766,19 @@ export default function MenuPage() {
     newFiltered = newFiltered.map(restaurant => {
       let filteredItems = restaurant.items;
 
-      // Filter by today only
-      if (filters.todayOnly) {
-        filteredItems = filteredItems.filter(item => item.day === CURRENT_DAY);
+      // If there's a search term, search across ALL days and ignore todayOnly filter
+      if (filters.searchTerm.trim()) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        
+        // Check if the search term matches a craving, if so use all variations
+        const searchTerms = CRAVING_VARIATIONS[searchLower] || [searchLower];
+        
+        filteredItems = filteredItems.filter(item =>
+          searchTerms.some(term =>
+            item.description.toLowerCase().includes(term) ||
+            item.category.toLowerCase().includes(term)
+          )
+        );
       }
 
       // Filter by food types
@@ -582,15 +787,6 @@ export default function MenuPage() {
           filters.selectedFoodTypes.some(foodType => 
             item.category.includes(foodType) || item.description.includes(foodType)
           )
-        );
-      }
-
-      // Filter by search term
-      if (filters.searchTerm.trim()) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        filteredItems = filteredItems.filter(item =>
-          item.description.toLowerCase().includes(searchLower) ||
-          item.category.toLowerCase().includes(searchLower)
         );
       }
 
@@ -814,6 +1010,7 @@ export default function MenuPage() {
             <CompactListView 
               restaurants={displayedRestaurants}
               isOldVersion={isOldVersion}
+              hasActiveSearch={!!filters.searchTerm.trim()}
             />
           ) : (
             <div className="space-y-4">
@@ -838,6 +1035,7 @@ export default function MenuPage() {
                       allItems={rawMenus[restaurant.name] || []}
                       originalRestaurant={restaurants.find(r => r.name === restaurant.name)}
                       isOldVersion={isOldVersion}
+                      hasActiveSearch={!!filters.searchTerm.trim()}
                     />
                   </div>
                 );
@@ -866,7 +1064,7 @@ export default function MenuPage() {
               </div>
               <div className="text-center md:text-right">
                 <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
-                  Byggd av Henkebus med ❤️ för Lindholmens Restauranger
+                  Vibe kådad av Henkebus ❤️
                 </p>
                 <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
                   Frågor eller förbättringsförslag? Hör av dig på{' '}
@@ -894,6 +1092,65 @@ export default function MenuPage() {
           </div>
         </footer>
       </div>
+
+      {/* Smart Contextual Back to Top Button */}
+      {showBackToTop && (
+        <div className={`fixed ${isNearFooter ? 'bottom-32' : 'bottom-6'} right-6 xl:right-[calc(50%-40rem+1rem)] z-50 transition-all duration-500 transform ${
+          showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}>
+          <button
+            onClick={scrollToTop}
+            className={`relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border ${
+              isOldVersion 
+                ? 'bg-white/90 text-gray-700 border-gray-300 hover:bg-white'
+                : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
+            }`}
+          >
+            {/* Scroll Progress Ring with SVG Arrow */}
+            <div className="relative w-8 h-8">
+              {/* Progress Ring */}
+              <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+                <circle
+                  cx="16"
+                  cy="16"
+                  r="14"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  className="opacity-20"
+                />
+                <circle
+                  cx="16"
+                  cy="16"
+                  r="14"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 14}`}
+                  strokeDashoffset={`${2 * Math.PI * 14 * (1 - scrollProgress / 100)}`}
+                  className="transition-all duration-150 ease-out text-blue-600 dark:text-blue-400"
+                />
+              </svg>
+              {/* SVG Arrow */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg 
+                  className="w-4 h-4 text-current" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2.5} 
+                    d="M5 15l7-7 7 7" 
+                  />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 } 

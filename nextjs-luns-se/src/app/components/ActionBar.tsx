@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FilterState } from './FilterPanel';
 
 interface ActionBarProps {
@@ -23,6 +23,33 @@ const FOOD_TYPES = [
   { id: 'Världen', label: 'Världens Kök', emoji: '🌍' }
 ];
 
+const CRAVINGS = [
+  { 
+    id: 'hamburgare', 
+    label: 'Hamburgare', 
+    emoji: '🍔',
+    searchTerms: ['burger', 'hamburgare', 'högrevsburgare', 'cheeseburger', 'veggieburger', 'veganburger', 'halloumiburger', 'kyckling', 'beef']
+  },
+  { 
+    id: 'pasta', 
+    label: 'Pasta', 
+    emoji: '🍝',
+    searchTerms: ['pasta', 'spaghetti', 'penne', 'carbonara', 'bolognese', 'marinara', 'pesto', 'nudlar']
+  },
+  { 
+    id: 'pommes', 
+    label: 'Pommes', 
+    emoji: '🍟',
+    searchTerms: ['pommes', 'potatis', 'fries', 'klyftpotatis', 'potatisklyftorr', 'rostade potatisar', 'wedges']
+  },
+  { 
+    id: 'mos', 
+    label: 'Mos', 
+    emoji: '🥔',
+    searchTerms: ['mos', 'potatismos', 'potatispure', 'potatispuré', 'smashed potatoes', 'krossad potatis']
+  }
+];
+
 export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, viewMode, onViewModeChange }: ActionBarProps) {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [showViewDropdown, setShowViewDropdown] = useState(false);
@@ -36,14 +63,42 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
     todayOnly: false
   });
 
-
+  // Ref for the filter panel container
+  const filterPanelRef = useRef<HTMLDivElement>(null);
 
   // Update parent when filters change
   React.useEffect(() => {
     onFiltersChange(filters);
   }, [filters, onFiltersChange]);
 
+  // Click outside to close filter panel
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filterPanelRef.current && !filterPanelRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
 
+    // Only add listener when filter panel is open
+    if (isFilterOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isFilterOpen]);
+
+  // Handle craving search
+  const handleCravingSearch = (craving: typeof CRAVINGS[0]) => {
+    // Set the search term to the main craving term
+    // The backend will handle the variations
+    setFilters(prev => ({
+      ...prev,
+      searchTerm: craving.label.toLowerCase()
+    }));
+    // Close the filter panel to show results
+    setIsFilterOpen(false);
+  };
 
   const toggleFoodType = (foodType: string) => {
     setFilters(prev => ({
@@ -81,11 +136,10 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
 
   const hasActiveFilters = filters.selectedFoodTypes.length > 0 || 
                           filters.selectedRestaurants.length < restaurants.length || 
-                          filters.searchTerm.length > 0 || 
-                          filters.todayOnly;
+                          filters.searchTerm.length > 0;
 
   return (
-    <div className="relative">
+    <div className="relative" ref={filterPanelRef}>
       {/* Action Buttons Row */}
       <div className="flex items-center justify-between">
         {/* Left Side Buttons */}
@@ -103,7 +157,7 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
             <span>Filter</span>
             {hasActiveFilters && (
               <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-sm">
-                {filters.selectedFoodTypes.length + (filters.searchTerm ? 1 : 0) + (filters.todayOnly ? 1 : 0)}
+                {filters.selectedFoodTypes.length + (filters.searchTerm ? 1 : 0)}
               </span>
             )}
           </button>
@@ -220,25 +274,27 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
               />
             </div>
 
-            {/* Quick Filters */}
+            {/* Cravings */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Snabbfilter
+                Cravings
               </label>
-              <button
-                onClick={() => setFilters(prev => ({ ...prev, todayOnly: !prev.todayOnly }))}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  filters.todayOnly
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-600 scale-105 ring-2 ring-blue-200 dark:ring-blue-700'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-102'
-                }`}
-                style={{
-                  animationDelay: '200ms',
-                  animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
-                }}
-              >
-                📅 Endast idag
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                {CRAVINGS.map((craving, index) => (
+                  <button
+                    key={craving.id}
+                    onClick={() => handleCravingSearch(craving)}
+                    className="px-3 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-out flex flex-col items-center space-y-1 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-gray-200 dark:shadow-gray-900 hover:scale-102"
+                    style={{
+                      animationDelay: `${200 + index * 50}ms`,
+                      animation: isFilterOpen ? 'slideInUp 0.3s ease-out forwards' : 'none'
+                    }}
+                  >
+                    <span className="text-lg">{craving.emoji}</span>
+                    <span className="text-xs text-center">{craving.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
