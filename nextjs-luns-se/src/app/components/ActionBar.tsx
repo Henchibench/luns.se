@@ -181,10 +181,12 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
       {/* Filter Panel - Normal flow below action bar */}
       <div 
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isFilterOpen ? 'max-h-[640px] opacity-100' : 'max-h-0 opacity-0'
+          isFilterOpen ? `${restaurants.length > 8 ? 'max-h-[640px]' : 'max-h-max'} opacity-100` : 'max-h-0 opacity-0'
         }`}
       >
-        <div className={`mt-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 p-6 max-h-[600px] overflow-y-auto transform transition-all duration-300 ease-in-out ${
+        <div className={`mt-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 p-6 ${
+          restaurants.length > 8 ? 'max-h-[600px] overflow-y-auto' : ''
+        } transform transition-all duration-300 ease-in-out ${
           isFilterOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
         }`}>
           {/* Header */}
@@ -288,7 +290,9 @@ export default function ActionBar({ restaurants, onFiltersChange, abTestToggle, 
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-2 ${
+              restaurants.length > 8 ? 'max-h-48 overflow-y-auto' : 'max-h-fit'
+            } bg-gray-50 dark:bg-gray-700 rounded-lg p-3`}>
               {restaurants.map((restaurant, index) => {
                 const isSelected = filters.selectedRestaurants.includes(restaurant);
                 return (
