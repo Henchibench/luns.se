@@ -866,7 +866,16 @@ export default function MenuPage() {
               </div>
               <div className="text-center md:text-right">
                 <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
-                  Byggd med ❤️ för Lindholmen Science Park
+                  Byggd av Henkebus med ❤️ för Lindholmens Restauranger
+                </p>
+                <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
+                  Frågor eller förbättringsförslag? Hör av dig på{' '}
+                  <a 
+                    href="mailto:luns.se@outlook.com" 
+                    className={`underline transition-colors ${isOldVersion ? 'hover:text-gray-800' : 'hover:text-gray-800 dark:hover:text-gray-100'}`}
+                  >
+                    luns.se@outlook.com
+                  </a>
                 </p>
                 {!isOldVersion && (
                   <p className="text-xs text-gray-500 dark:text-gray-400">
