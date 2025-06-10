@@ -8,6 +8,7 @@ LOCATIONS = {
     "Lindholmen": [
         "Alkemisten Kaffebar & Kafé", 
         "Bistrot", 
+        "Bombay Bistro",
         "Cuckoo's Nest", 
         "District One", 
         "Gourmetkorv", 
@@ -35,6 +36,12 @@ restaurant_locations = {
         "maps": "https://maps.app.goo.gl/avRsfzoVuwcrawUK7",
         "website": "https://www.bistrot.se/",
         "instagram": "https://www.instagram.com/bistrotlindholmen/",
+        "area": "Lindholmen"
+    },
+    "Bombay Bistro": {
+        "maps": "https://maps.app.goo.gl/XS7Lj6ZrKdRQYJem7",
+        "website": "https://www.bombaybistro.se/",
+        "instagram": "https://www.instagram.com/bombaybistrogbg/",
         "area": "Lindholmen"
     },
     "Cuckoo's Nest": {

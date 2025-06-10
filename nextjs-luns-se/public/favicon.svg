@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#2E5266"/>
+  
+  <!-- Large "L" letter -->
+  <text x="12" y="23" font-family="Arial Black, sans-serif" font-size="18" font-weight="900" 
+        fill="white" letter-spacing="0">L</text>
+  
+  <!-- Small burger icon accent -->
+  <circle cx="22" cy="10" r="3" fill="#F39C12"/>
+  <rect x="20" y="9" width="4" height="0.8" fill="#E74C3C" opacity="0.9"/>
+  <rect x="20.5" y="10.2" width="3" height="0.6" fill="#58D68D" opacity="0.9"/>
+</svg> 
