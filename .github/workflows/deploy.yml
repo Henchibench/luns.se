@@ -19,30 +19,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no hench@38.242.237.58 '
             cd ~/luns.se &&
-            echo "=== Cleaning up any local changes ===" &&
-            git fetch origin &&
-            git reset --hard origin/main &&
-            git clean -fd -e "config/etc/letsencrypt/" -e "config/dns-conf/" &&
-            echo "=== Checking SSL certificates ===" &&
-            if [ -f "config/etc/letsencrypt/live/luns.se/fullchain.pem" ]; then
-              echo "✅ SSL certificates found - preserving SWAG container"
-              echo "=== Stopping application containers only ===" &&
-              docker-compose stop app-modern api-modern redis &&
-              echo "=== Starting updated containers ===" &&
-              docker-compose up -d --build app-modern api-modern redis
-            else
-              echo "⚠️  No SSL certificates found - full restart needed"
-              echo "=== Stopping all containers ===" &&
-              docker-compose down --remove-orphans &&
-              echo "=== Starting all containers ===" &&
-              docker-compose up -d --build --remove-orphans
-            fi &&
-            echo "=== Deployment complete! ===" &&
-            docker-compose ps &&
-            echo "=== SSL Status ===" &&
-            if [ -f "config/etc/letsencrypt/live/luns.se/fullchain.pem" ]; then
-              echo "✅ SSL certificates are present"
-            else
-              echo "⚠️  SSL certificates missing - check SWAG logs"
-            fi
+            git pull origin main &&
+            docker-compose down &&
+            docker-compose up -d --build --remove-orphans
           '
