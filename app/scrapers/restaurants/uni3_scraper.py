@@ -107,32 +107,47 @@ class Uni3Scraper(BaseScraper):
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(description, 'html.parser')
         
-        # Find all paragraphs with menu items
+        # Find all paragraphs
         paragraphs = soup.find_all('p')
         
         for p in paragraphs:
-            text = p.get_text()
-            if not text.strip():
+            # Skip empty paragraphs
+            if not p.get_text().strip():
+                continue
+            
+            # Find the strong tag that contains the category
+            category_tag = p.find('strong')
+            if not category_tag:
                 continue
                 
-            # Look for category patterns (Water:, Fire:, Wood:, Metal:)
-            category_match = re.match(r'^(Water|Fire|Wood|Metal):\s*(.+?)(?:\s*Baked|\s*Taco|\s*Bulgur|\s*Marinated|\s*Cabbage|\s*Grilled|\s*Bao|$)', text, re.DOTALL)
+            # Extract category and clean it
+            category_text = category_tag.get_text().strip()
+            category_match = re.match(r'(Water|Fire|Wood|Metal)\s*:', category_text, re.IGNORECASE)
             
             if category_match:
-                raw_category = category_match.group(1)
-                dish_text = category_match.group(2).strip()
+                raw_category = category_match.group(1).title()
                 
-                # Clean up the dish text - remove trailing dashes and extra whitespace
-                dish_text = re.sub(r'\s*[-–]\s*$', '', dish_text)
-                dish_text = self.clean_text(dish_text)
+                # Get the text after the strong tag, but before the em tag (Swedish description)
+                dish_text = ''
+                next_elem = category_tag.next_sibling
+                while next_elem and not (hasattr(next_elem, 'name') and next_elem.name == 'em'):
+                    if isinstance(next_elem, str):
+                        dish_text += next_elem
+                    next_elem = next_elem.next_sibling if hasattr(next_elem, 'next_sibling') else None
                 
-                # Map categories to Swedish standard format
+                # Clean up the dish text
+                dish_text = dish_text.strip()
+                dish_text = re.sub(r'\s*[-–]\s*$', '', dish_text)  # Remove trailing dashes
+                dish_text = re.sub(r'\s+', ' ', dish_text)  # Normalize whitespace
+                dish_text = dish_text.strip(' -–')  # Remove leading/trailing dashes and spaces
+                
+                # Map category and create menu item
                 category = self.map_uni3_category(raw_category)
                 
-                # Format: Day|<strong>Category</strong> - Description
                 if dish_text:
                     formatted_item = f"{day}|<strong>{category}</strong> - {dish_text}"
                     menu_items.append(formatted_item)
+                    self.log_info(f"Found {category} dish for {day}: {dish_text}")
         
         return menu_items
 
