@@ -81,74 +81,96 @@ class BombayBistroScraper(BaseScraper):
         all_menu_items = []
         
         try:
-            # First, try to detect which lunch menu is currently active
-            active_lunch = self._detect_active_lunch_menu(soup)
-            
+            # Get the page text
             page_text = soup.get_text(separator='\n', strip=True)
             
-            if active_lunch:
-                self.log_info(f"Detected active lunch menu: {active_lunch}")
-                # Extract only the active menu
-                menu_data = self._parse_specific_lunch_section(page_text, active_lunch)
-                self.log_info(f"Active menu extracted: {len(menu_data)} days with {sum(len(dishes) for dishes in menu_data.values())} total dishes")
+            # Find the active menu section by looking for sections without elementor-hidden-desktop class
+            active_section = None
+            for section in soup.find_all('section', class_='elementor-section'):
+                # Check if this section contains a lunch menu and is not hidden
+                if ('elementor-hidden-desktop' not in section.get('class', []) and
+                    'elementor-hidden-tablet' not in section.get('class', []) and
+                    'elementor-hidden-mobile' not in section.get('class', [])):
+                    
+                    # Look for LUNCH X in this section
+                    lunch_header = section.find('h2', string=re.compile(r'^LUNCH\s+\d+$', re.IGNORECASE))
+                    if lunch_header:
+                        active_section = section
+                        current_menu = lunch_header.get_text(strip=True)
+                        self.log_info(f"Found active menu section: {current_menu}")
+                        break
+            
+            if not active_section:
+                self.log_error("Could not detect active menu section")
+                return ["Kunde inte hitta den aktuella lunchmenyn"]
+            
+            # Extract dishes from the active section
+            current_dishes = []
+            current_day = None
+            
+            # Get all text elements in the active section
+            section_lines = [line.strip() for line in active_section.get_text(separator='\n').split('\n') if line.strip()]
+            
+            for line in section_lines:
+                # Check for day headers
+                if line.upper() in ['MÅNDAG', 'TISDAG', 'ONSDAG', 'TORSDAG', 'FREDAG']:
+                    day_mapping = {
+                        'MÅNDAG': 'Måndag', 'TISDAG': 'Tisdag', 'ONSDAG': 'Onsdag',
+                        'TORSDAG': 'Torsdag', 'FREDAG': 'Fredag'
+                    }
+                    current_day = day_mapping.get(line.upper())
+                    continue
+                
+                # Check for dish names (all caps, 2-6 words)
+                if (current_day and 
+                    re.match(r'^[A-Z][A-Z\s&\-\']+[A-Z]$', line) and 
+                    2 <= len(line.split()) <= 6 and
+                    any(keyword in line.upper() for keyword in ['CHICKEN', 'BEEF', 'LAMB', 'CURRY', 'MASALA', 'TIKKA', 'BUTTER', 'PALAK', 'LAMM', 'GHOST', 'MALAI', 'VINDALOO', 'ACHARI', 'CHILI', 'GARLIC', 'BAINGAN', 'METHI'])):
+                    
+                    dish_name = line.strip()
+                    dish_description = ""
+                    
+                    # Look for description on next line
+                    next_line_index = section_lines.index(line) + 1
+                    if next_line_index < len(section_lines):
+                        next_line = section_lines[next_line_index]
+                        if (len(next_line) > 10 and
+                            any(keyword in next_line.lower() for keyword in ['tillagad', 'gjord', 'marinerad', 'gryta', 'curry', 'sås', 'med', 'av', 'kött', 'serveras', 'består'])):
+                            dish_description = next_line
+                    
+                    current_dishes.append({
+                        'day': current_day,
+                        'name': dish_name,
+                        'description': dish_description
+                    })
+            
+            # Extract standing dishes (DAGENS VEG and ANDRA ALTERNATIV) from the active section
+            standing_dishes = self._extract_standing_dishes(active_section.get_text(separator='\n'))
+            
+            # Format menu items for the current menu
+            if current_dishes:
+                for dish in current_dishes:
+                    category = self._categorize_dish(dish['name'], dish['description'])
+                    formatted_name = self._format_dish_name(dish['name'])
+                    formatted_item = f"<strong>{category}</strong> - {formatted_name}: {dish['description']}"
+                    all_menu_items.append(f"{dish['day']}|{formatted_item}")
             else:
-                self.log_warning("Could not detect active lunch menu, using fallback method")
-                # Fall back to parsing all menus and choosing one
-                menu_data = self._parse_menu_from_text(page_text)
-                self.log_info(f"Fallback menu extracted: {len(menu_data)} days with {sum(len(dishes) for dishes in menu_data.values())} total dishes")
+                self.log_error(f"Could not find dishes for menu {current_menu}")
+                return ["Kunde inte hitta rätterna för den aktuella lunchmenyn"]
             
-            # Extract standing weekly dishes (available every day)
-            standing_dishes = self._extract_standing_dishes(page_text)
+            # Add standing dishes for each day
+            for day in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']:
+                for dish in standing_dishes:
+                    category = self._categorize_dish(dish['name'], dish['description'])
+                    formatted_name = self._format_dish_name(dish['name'])
+                    formatted_item = f"<strong>{category}</strong> - {formatted_name}: {dish['description']}"
+                    all_menu_items.append(f"{day}|{formatted_item}")
             
-            # Combine active menu with standing dishes
-            if menu_data or standing_dishes:
-                self.log_info(f"Combining menus: active_menu has {len(menu_data)} days, standing has {len(standing_dishes)} dishes")
-                
-                # Get all weekdays that have dishes (either from active menu or just add all weekdays)
-                all_days = set(menu_data.keys()) if menu_data else set()
-                if standing_dishes:
-                    # Add all weekdays since standing dishes are available every day
-                    all_days.update(['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag'])
-                
-                self.log_info(f"Processing {len(all_days)} days: {sorted(all_days)}")
-                
-                for day in all_days:
-                    day_dishes_added = 0
-                    
-                    # Add active menu dishes for this day
-                    if menu_data and day in menu_data:
-                        for dish in menu_data[day]:
-                            category = self._categorize_dish(dish['name'], dish['description'])
-                            formatted_name = self._format_dish_name(dish['name'])
-                            formatted_item = f"<strong>{category}</strong> - {formatted_name}: {dish['description']}"
-                            all_menu_items.append(f"{day}|{formatted_item}")
-                            day_dishes_added += 1
-                        self.log_info(f"Added {len(menu_data[day])} active menu dishes for {day}")
-                    
-                    # Add standing dishes for this day (available every day)
-                    for dish in standing_dishes:
-                        category = self._categorize_dish(dish['name'], dish['description'])
-                        formatted_name = self._format_dish_name(dish['name'])
-                        formatted_item = f"<strong>{category}</strong> - {formatted_name}: {dish['description']}"
-                        all_menu_items.append(f"{day}|{formatted_item}")
-                        day_dishes_added += 1
-                    
-                    self.log_info(f"Total dishes added for {day}: {day_dishes_added}")
+            self.log_info(f"Extracted current menu: {current_menu}")
             
-            # Strategy 2: If strategy 1 fails, try extracting from specific elements
-            if not all_menu_items:
-                self.log_info("Primary extraction failed, trying alternative method...")
-                all_menu_items = self._extract_from_elements(soup)
-            
-            # Strategy 3: If both fail, add the daily alternatives that are always available
-            if not all_menu_items:
-                self.log_warning("Could not extract dynamic menu, adding static alternatives")
-                all_menu_items = self._get_fallback_items()
-        
         except Exception as e:
             self.log_error(f"Error extracting all lunch menus: {str(e)}")
-            # Return fallback items in case of error
-            all_menu_items = self._get_fallback_items()
+            return ["Ett fel uppstod vid hämtning av lunchmenyn"]
         
         return all_menu_items
     
