@@ -6,7 +6,7 @@ A web application that displays and filters lunch menus from restaurants around 
 
 - Real-time lunch menu scraping from the restaurants' official websites
 - Filter menus by:
-  - Food type
+  -  type
   - Specific items (burgare, mos, körv)
   - Restaurant selection
 - Restaurant information including:
