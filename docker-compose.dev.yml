@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # New modern app (Next.js frontend) - accessible at localhost:3000
   app-modern:
