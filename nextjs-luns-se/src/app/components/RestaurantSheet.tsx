@@ -154,7 +154,7 @@ export default function RestaurantSheet({
         {/* Map */}
         {restaurant.location?.maps && (
           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showMap ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
-            <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
+            <div style={{ backgroundColor: 'var(--bg)' }}>
               <iframe
                 src={`https://maps.google.com/maps?q=lindholmen+${encodeURIComponent(restaurant.name)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                 className="w-full h-72 border-none"

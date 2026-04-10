@@ -6,7 +6,7 @@ import StickyControlBar from './components/StickyControlBar';
 import FilterDrawer, { FilterState } from './components/FilterDrawer';
 import RestaurantSheet from './components/RestaurantSheet';
 import CompactListView from './components/CompactListView';
-import { useStackingScroll } from './hooks/useStackingScroll';
+
 
 interface MenuItem {
   day: string;
@@ -131,7 +131,7 @@ export default function MenuPage() {
   const [isNearFooter, setIsNearFooter] = useState(false);
 
   const heroRef = useRef<HTMLDivElement>(null);
-  const { setSheetRef, getSheetStyle, getSheetClassName } = useStackingScroll(filteredRestaurants.length);
+
 
   // Apply filters
   useEffect(() => {
@@ -330,10 +330,7 @@ export default function MenuPage() {
             {filteredRestaurants.map((restaurant, index) => (
               <div
                 key={restaurant.name}
-                ref={(el) => setSheetRef(index, el)}
-                data-sheet-index={index}
-                className={getSheetClassName(index)}
-                style={getSheetStyle(index)}
+                className="restaurant-sheet"
               >
                 <RestaurantSheet
                   restaurant={restaurant}
