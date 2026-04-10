@@ -1,0 +1,55 @@
+name: Scrape and Deploy
+
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'   # 07:00 CET on weekdays
+    - cron: '0 6 * * 1-5'   # 08:00 CET on weekdays
+    - cron: '0 8 * * 1-5'   # 10:00 CET on weekdays
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
+jobs:
+  scrape-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Run scrapers
+        run: python scripts/scrape_menus.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: nextjs-luns-se/package-lock.json
+
+      - name: Install and build
+        working-directory: nextjs-luns-se
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: nextjs-luns-se/out
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

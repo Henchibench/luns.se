@@ -1,118 +1,47 @@
 # Local Development Setup for Luns.se
 
-## Quick Start for Local Testing
+## Quick Start
 
-### Option 1: Docker Development Setup (Recommended)
+### 1. Run the scrapers
 
-Use the special development docker-compose file that bypasses SWAG:
-
-```bash
-# Build and start all services for development
-docker-compose -f docker-compose.dev.yml up --build
-
-# Or run in detached mode
-docker-compose -f docker-compose.dev.yml up -d --build
-```
-
-**Access points:**
-
-- **Legacy Flask app**: http://localhost:5000
-- **Modern Next.js app**: http://localhost:3000 (when ready)
-- **Modern API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Redis**: localhost:6379
-
-### Option 2: Individual Service Testing
-
-If you want to test services individually:
+Generate the static menu data that the frontend reads:
 
 ```bash
-# Test only the legacy Flask app
-docker-compose -f docker-compose.dev.yml up app-legacy
+# Install Python dependencies
+pip install -r requirements.txt
 
-# Test only the modern API
-docker-compose -f docker-compose.dev.yml up api-modern redis
-
-# Stop all services
-docker-compose -f docker-compose.dev.yml down
+# Run scrapers — writes JSON to nextjs-luns-se/public/data/
+python scripts/scrape_menus.py
 ```
 
-## Development vs Production
-
-| Environment     | Config File              | Ports          | HTTPS            | Subdomains     |
-| --------------- | ------------------------ | -------------- | ---------------- | -------------- |
-| **Development** | `docker-compose.dev.yml` | Direct mapping | ❌ HTTP only     | ❌ None        |
-| **Production**  | `docker-compose.yml`     | Through SWAG   | ✅ HTTPS + Certs | ✅ new.luns.se |
-
-## Next Steps for Modern Frontend
-
-Once you're ready to work on the Next.js frontend:
-
-1. **Initialize Next.js project:**
-
-   ```bash
-   cd nextjs-luns-se
-   npm install
-   npm run dev  # Development server at localhost:3000
-   ```
-
-2. **Or build Docker image:**
-   ```bash
-   docker-compose -f docker-compose.dev.yml up app-modern
-   ```
-
-## Testing the Setup
-
-1. **Start development stack:**
-
-   ```bash
-   docker-compose -f docker-compose.dev.yml up --build
-   ```
-
-2. **Verify each service:**
-
-   - Legacy app: http://localhost:5000 (should show current luns.se)
-   - API health: http://localhost:8000/health (should return JSON)
-   - API docs: http://localhost:8000/docs (should show interactive API docs)
-
-3. **Test API endpoints:**
-   ```bash
-   curl http://localhost:8000/menus
-   curl http://localhost:8000/restaurants
-   curl http://localhost:8000/food-types
-   ```
-
-## Cleanup
+### 2. Start the frontend
 
 ```bash
-# Stop all development containers
-docker-compose -f docker-compose.dev.yml down
-
-# Remove volumes (if needed)
-docker-compose -f docker-compose.dev.yml down -v
-
-# Remove images (if needed)
-docker-compose -f docker-compose.dev.yml down --rmi all
+cd nextjs-luns-se
+npm install
+npm run dev  # Development server at http://localhost:3000
 ```
 
-## Benefits of This Setup
+### 3. Build a static export (optional)
 
-✅ **No certificate issues** - Plain HTTP for local testing  
-✅ **Direct port access** - Easy debugging and testing  
-✅ **Isolated from production** - Different container names and volumes  
-✅ **Same codebase** - Uses identical Dockerfiles as production  
-✅ **Fast iteration** - Quick rebuilds and testing
+To test the production build locally:
+
+```bash
+cd nextjs-luns-se
+npm run build     # Produces the out/ directory
+npx serve out     # Serve it locally
+```
+
+## How It Works
+
+- **Scrapers** (`scripts/scrape_menus.py`) fetch lunch menus from ~6 restaurant websites and write static JSON files to `nextjs-luns-se/public/data/`
+- **Frontend** (Next.js) is exported as a static site that reads those JSON files at runtime
+- **GitHub Actions** (`.github/workflows/scrape-and-deploy.yml`) runs the scrapers and deploys the static site to GitHub Pages on weekdays at 07:00, 08:00, and 10:00 CET
 
 ## Production Deployment
 
-When ready for production, use the original setup:
+Deployment is fully automated via GitHub Actions — no manual steps needed.
 
-```bash
-# On your server
-docker-compose up -d --build
-```
+To trigger a deploy manually, go to Actions > "Scrape and Deploy" > Run workflow.
 
-This will deploy:
-
-- Legacy: https://luns.se
-- Modern: https://new.luns.se (when DNS is configured)
+The site is hosted on GitHub Pages at https://luns.se.

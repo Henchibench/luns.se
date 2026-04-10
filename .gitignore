@@ -4,12 +4,13 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environment (legacy)
+# Virtual environment
 venv/
 
-# Node.js dependencies
+# Node.js
 node_modules/
 .next/
+nextjs-luns-se/out/
 
 # Environment variables
 .env
@@ -20,21 +21,5 @@ node_modules/
 *.log
 npm-debug.log*
 
-# Runtime data
-pids/
-*.pid
-*.seed
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# DNS configuration
-config/dns-conf/
-
-# Legacy backup files
-*.backup
-legacy-backup.tar
-config-backup-*/
-
-# DevOps Dashboard (separate project)
-devops-dashboard/
+# Generated scraper data (built in CI)
+nextjs-luns-se/public/data/

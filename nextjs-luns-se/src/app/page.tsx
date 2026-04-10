@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import InfoBanner from './components/InfoBanner';
-import ActionBar from './components/ActionBar';
-import { FilterState } from './components/FilterPanel';
-import { cachedFetch } from './utils/cache';
-import { InfoBannerSkeleton, FilterPanelSkeleton, RestaurantCardSkeleton } from './components/LoadingSkeleton';
+import ActionBar, { FilterState } from './components/ActionBar';
 
 interface MenuItem {
   day: string;
@@ -69,54 +66,24 @@ const CRAVING_VARIATIONS: Record<string, string[]> = {
   'mos': ['mos', 'potatismos', 'potatispure', 'potatispuré', 'smashed potatoes', 'krossad potatis']
 };
 
-// Food hero images with photographer credits
-const foodHeroImages = [
-  {
-    src: '/food-hero-1.jpg',
-    photographer: 'Eiliv Aceron',
-    photographerUrl: 'https://unsplash.com/@shootdelicious?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash',
-    imageUrl: 'https://unsplash.com/photos/cooked-food-on-black-bowl-ZuIDLSz3XLg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'
-  },
-  {
-    src: '/food-hero-2.jpg',
-    photographer: 'Casey Lee',
-    photographerUrl: 'https://unsplash.com/@simplethemes?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash',
-    imageUrl: 'https://unsplash.com/photos/cooked-food-awj7sRviVXo?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'
-  },
-  {
-    src: '/food-hero-3.jpg',
-    photographer: 'Victoria Shes',
-    photographerUrl: 'https://unsplash.com/@victoriakosmo?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash',
-    imageUrl: 'https://unsplash.com/photos/grilled-meat-and-vegetable-on-the-table-UC0HZdUitWY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'
-  },
-  {
-    src: '/food-hero-4.jpg',
-    photographer: 'Chad Montano',
-    photographerUrl: 'https://unsplash.com/@briewilly?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash',
-    imageUrl: 'https://unsplash.com/photos/pizza-on-chopping-board-MqT0asuoIcU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'
-  }
-]
-
-
-
 function parseMenuItem(item: string): MenuItem | null {
   if (item.startsWith('INFO:')) {
     return null; // Handle info separately
   }
-  
+
   const parts = item.split('|');
   if (parts.length < 2) return null;
-  
+
   const day = parts[0];
   const content = parts[1];
-  
+
   // Extract category from <strong> tags
   const strongMatch = content.match(/<strong>(.*?)<\/strong>/);
   const category = strongMatch ? strongMatch[1] : 'Okänd';
-  
+
   // Extract description (everything after the category)
   const description = content.replace(/<strong>.*?<\/strong>\s*-?\s*/, '').trim();
-  
+
   return {
     day,
     category,
@@ -131,7 +98,7 @@ function recategorizePier11Items(restaurants: Restaurant[]): Restaurant[] {
     if (!restaurant.name.includes('Pier 11')) {
       return restaurant;
     }
-    
+
     // Group items by day to process each day separately
     const itemsByDay: Record<string, MenuItem[]> = {};
     restaurant.items.forEach(item => {
@@ -140,20 +107,20 @@ function recategorizePier11Items(restaurants: Restaurant[]): Restaurant[] {
       }
       itemsByDay[item.day].push(item);
     });
-    
+
     const recategorizedItems: MenuItem[] = [];
-    
+
     Object.entries(itemsByDay).forEach(([day, dayItems]) => {
       const dagensItems = dayItems.filter(item => item.category === 'Dagens');
       const otherItems = dayItems.filter(item => item.category !== 'Dagens');
-      
+
       if (dagensItems.length > 0) {
         // Split Dagens items into 3 groups based on typical order: Vegetarisk, Fisk, Kött
         const itemsPerCategory = Math.ceil(dagensItems.length / 3);
-        
+
         dagensItems.forEach((item, index) => {
           let newCategory = 'Dagens'; // fallback
-          
+
           if (index < itemsPerCategory) {
             newCategory = 'Vegetarisk';
           } else if (index < itemsPerCategory * 2) {
@@ -161,18 +128,18 @@ function recategorizePier11Items(restaurants: Restaurant[]): Restaurant[] {
           } else {
             newCategory = 'Kött';
           }
-          
+
           recategorizedItems.push({
             ...item,
             category: newCategory
           });
         });
       }
-      
+
       // Add other items as-is
       recategorizedItems.push(...otherItems);
     });
-    
+
     return {
       ...restaurant,
       items: recategorizedItems
@@ -189,10 +156,10 @@ function parseRestaurantInfo(items: string[], day: string): string[] {
 
 function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string): Record<string, Array<MenuItem & { restaurantName: string }>> {
   const groupedItems: Record<string, Array<MenuItem & { restaurantName: string }>> = {};
-  
+
   restaurants.forEach(restaurant => {
     const dayItems = restaurant.items.filter(item => item.day === selectedDay);
-    
+
     dayItems.forEach(item => {
       if (!groupedItems[item.category]) {
         groupedItems[item.category] = [];
@@ -203,21 +170,20 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
       });
     });
   });
-  
+
   return groupedItems;
 }
 
-function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: { 
-  restaurants: Restaurant[]; 
-  isOldVersion: boolean;
+function CompactListView({ restaurants, hasActiveSearch }: {
+  restaurants: Restaurant[];
   hasActiveSearch?: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const availableDays = getAvailableDays();
-  
+
   // When searching, group all items from all restaurants by day first, then category
   // When not searching, use the existing selectedDay logic
-  const groupedItems = hasActiveSearch 
+  const groupedItems = hasActiveSearch
     ? restaurants.reduce((acc, restaurant) => {
         restaurant.items.forEach(item => {
           if (!acc[item.day]) {
@@ -234,30 +200,25 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
         return acc;
       }, {} as Record<string, Record<string, Array<MenuItem & { restaurantName: string }>>>)
     : groupMenuItemsByCategory(restaurants, selectedDay);
-    
-  const isEmpty = hasActiveSearch 
+
+  const isEmpty = hasActiveSearch
     ? Object.keys(groupedItems).length === 0
     : Object.keys(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).length === 0;
 
-  const containerClasses = isOldVersion 
-    ? "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm"
-    : "bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-blue-200 dark:border-blue-700";
-
-  const headerClasses = isOldVersion
-    ? "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300"
-    : "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-6 text-black dark:text-white rounded-t-xl";
+  const containerClasses = "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm";
+  const headerClasses = "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300";
 
   if (isEmpty) {
     return (
       <div className={containerClasses}>
         <div className={headerClasses}>
-          <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>
+          <h2 className="font-bold text-xl">
             Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
           </h2>
         </div>
         <div className="p-6 text-center">
           <div className="text-4xl mb-2">🍽️</div>
-          <p className={`font-medium mb-1 ${isOldVersion ? 'text-gray-700' : 'text-gray-600 dark:text-gray-400'}`}>
+          <p className="font-medium mb-1 text-gray-700">
             {hasActiveSearch ? 'Inga sökresultat' : `Inga rätter för ${selectedDay.toLowerCase()}`}
           </p>
         </div>
@@ -270,18 +231,18 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>
+            <h2 className="font-bold text-xl">
               Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
             </h2>
-            <p className={`text-sm mt-1 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
-              {hasActiveSearch 
+            <p className="text-sm mt-1 text-gray-600">
+              {hasActiveSearch
                 ? 'Alla rätter från alla restauranger grupperade efter dag och typ'
                 : 'Alla rätter från alla restauranger grupperade efter typ'
               }
             </p>
           </div>
         </div>
-        
+
         {/* Day Selector - Hidden when showing search results */}
         {!hasActiveSearch && (
           <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
@@ -291,12 +252,8 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
                 onClick={() => setSelectedDay(day)}
                 className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
-                    ? isOldVersion
-                      ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                      : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
-                    : isOldVersion
-                      ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
+                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
                 }`}
               >
                 {day}
@@ -307,16 +264,12 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
 
         {/* Search Results Indicator */}
         {hasActiveSearch && (
-          <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
-            isOldVersion 
-              ? 'bg-gray-200 text-gray-700' 
-              : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-          }`}>
+          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">
             🔍 Sökresultat - visar alla dagar
           </div>
         )}
       </div>
-      
+
       <div className="p-6 space-y-4">
         {hasActiveSearch ? (
           // Search results: Group by Day → Category → Items
@@ -330,28 +283,28 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
             })
             .map(([day, categories]) => (
             <div key={day} className="space-y-3">
-              <h2 className={`font-bold text-lg ${isOldVersion ? 'text-gray-800 border-b border-gray-300 pb-2' : 'text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600 pb-2'}`}>
+              <h2 className="font-bold text-lg text-gray-800 border-b border-gray-300 pb-2">
                 {day}
               </h2>
               <div className="space-y-3 ml-2">
                 {Object.entries(categories).map(([category, items]) => (
                   <div key={category} className="space-y-2">
-                    <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-700' : 'text-base text-gray-800 dark:text-gray-200'}`}>
+                    <h3 className="font-semibold text-base text-gray-700">
                       {category}
                     </h3>
                     <div className="space-y-2 ml-2">
                       {items.map((item, idx) => (
                         <div
                           key={`${item.restaurantName}-${idx}`}
-                          className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                          className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50"
                         >
                           <div className="flex-1">
-                            <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}>
+                            <p className="text-sm leading-relaxed text-gray-600">
                               {item.description}
                             </p>
                           </div>
                           <div className="ml-4 flex-shrink-0">
-                            <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
+                            <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">
                               {item.restaurantName}
                             </span>
                           </div>
@@ -367,22 +320,22 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
           // Normal view: Group by Category → Items
           Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).map(([category, items]) => (
             <div key={category}>
-              <h3 className={`font-semibold mb-2 pb-1 border-b ${isOldVersion ? 'text-base text-gray-800 border-gray-300' : 'text-base text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600'}`}>
+              <h3 className="font-semibold mb-2 pb-1 border-b text-base text-gray-800 border-gray-300">
                 {category}
               </h3>
               <div className="space-y-2">
                 {items.map((item, idx) => (
                   <div
                     key={`${item.restaurantName}-${idx}`}
-                    className={`flex justify-between items-start py-2 px-3 rounded-lg transition-colors ${isOldVersion ? 'hover:bg-gray-50' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                    className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50"
                   >
                     <div className="flex-1">
-                      <p className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}>
+                      <p className="text-sm leading-relaxed text-gray-700">
                         {item.description}
                       </p>
                     </div>
                     <div className="ml-4 flex-shrink-0">
-                      <span className={`text-xs px-2 py-1 rounded-full ${isOldVersion ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'}`}>
+                      <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">
                         {item.restaurantName}
                       </span>
                     </div>
@@ -397,11 +350,10 @@ function CompactListView({ restaurants, isOldVersion, hasActiveSearch }: {
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion, hasActiveSearch }: { 
-  restaurant: Restaurant; 
-  allItems: string[]; 
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch }: {
+  restaurant: Restaurant;
+  allItems: string[];
   originalRestaurant?: Restaurant;
-  isOldVersion: boolean;
   hasActiveSearch?: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
@@ -409,14 +361,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
   const [isContentChanging, setIsContentChanging] = useState(false);
   const [contentKey, setContentKey] = useState('');
   const availableDays = getAvailableDays();
-  
+
   // When there's an active search, show all items from restaurant.items (which are already filtered by search)
   // Otherwise, filter by the selected day as before
   const displayedItems = hasActiveSearch ? restaurant.items : restaurant.items.filter(item => item.day === selectedDay);
   const todaysInfo = parseRestaurantInfo(allItems, selectedDay);
-  
+
   // Group items by category normally, or by day first when searching
-  const groupedItems = hasActiveSearch 
+  const groupedItems = hasActiveSearch
     ? displayedItems.reduce((acc, item) => {
         if (!acc[item.day]) {
           acc[item.day] = {};
@@ -447,77 +399,60 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
     setContentKey(newContentKey);
   }, [groupedItems, contentKey]);
 
-  const cardClasses = isOldVersion 
-    ? "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm overflow-visible"
-    : "bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-blue-200 dark:border-blue-700 overflow-visible";
-
-  const headerClasses = isOldVersion
-    ? "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300"
-    : "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-6 text-black dark:text-white rounded-t-xl";
+  const cardClasses = "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm overflow-visible";
+  const headerClasses = "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300";
 
   return (
     <div className={cardClasses}>
       {/* Restaurant Header */}
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
-          <h2 className={`font-bold ${isOldVersion ? 'text-xl' : 'text-2xl'}`}>{restaurant.name}</h2>
-          
+          <h2 className="font-bold text-xl">{restaurant.name}</h2>
+
           {/* Action Buttons */}
           <div className="flex space-x-2 ml-4">
             {restaurant.location?.maps && (
               <button
                 onClick={() => setShowMap(!showMap)}
-                className={`backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  isOldVersion 
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 rounded'
-                    : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-white dark:hover:bg-gray-800'
-                }`}
+                className="backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300"
               >
                 <span>🗺️</span>
                 <span>Hitta hit!</span>
               </button>
             )}
-            
+
             {restaurant.location?.website && (
               <a
                 href={restaurant.location.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  isOldVersion 
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 rounded'
-                    : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-white dark:hover:bg-gray-800'
-                }`}
+                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded"
               >
                 🏠
               </a>
             )}
-            
+
             {restaurant.location?.instagram && (
               <a
                 href={restaurant.location.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  isOldVersion 
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 rounded'
-                    : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-white dark:hover:bg-gray-800'
-                }`}
+                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded"
               >
                 <img src="/instagram.svg" alt="Instagram" className="w-4 h-4" />
               </a>
             )}
           </div>
         </div>
-        
-        <div className={`space-y-1 mb-4 ${isOldVersion ? 'text-gray-700' : 'text-gray-800 dark:text-gray-200'}`}>
+
+        <div className="space-y-1 mb-4 text-gray-700">
           {todaysInfo.map((info, index) => (
             <div key={index} className="text-sm">
               {info}
             </div>
           ))}
         </div>
-        
+
         {/* Day Selector in Header - Hidden when showing search results */}
         {!hasActiveSearch && (
           <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
@@ -527,12 +462,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
                 onClick={() => setSelectedDay(day)}
                 className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
-                    ? isOldVersion
-                      ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                      : 'bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 border-2 border-white dark:border-gray-600 rounded-lg'
-                    : isOldVersion
-                      ? 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg'
+                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
                 }`}
               >
                 {day}
@@ -540,14 +471,10 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
             ))}
           </div>
         )}
-        
+
         {/* Search Results Indicator */}
         {hasActiveSearch && (
-          <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
-            isOldVersion 
-              ? 'bg-gray-200 text-gray-700' 
-              : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-          }`}>
+          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">
             🔍 Sökresultat - visar alla dagar
           </div>
         )}
@@ -555,7 +482,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
 
       {/* Map Section - Animated slide down */}
       {restaurant.location?.maps && (
-        <div 
+        <div
           className={`overflow-hidden transition-all duration-300 ease-in-out border-b border-gray-200 dark:border-gray-700 ${
             showMap ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           }`}
@@ -589,15 +516,15 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
       )}
 
       {/* Menu Content */}
-      <div className={`p-6 ${isOldVersion ? 'bg-white text-gray-800' : 'bg-white dark:bg-gray-800'}`}>
+      <div className="p-6 bg-white text-gray-800">
         <div className={`space-y-4 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
           {Object.entries(groupedItems).length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">🍽️</div>
-              <p className={`font-medium mb-1 ${isOldVersion ? 'text-gray-700' : 'text-gray-600 dark:text-gray-400'}`}>
+              <p className="font-medium mb-1 text-gray-700">
                 Ingen meny för {selectedDay.toLowerCase()}
               </p>
-              <p className={`text-sm ${isOldVersion ? 'text-gray-600' : 'text-gray-500 dark:text-gray-500'}`}>
+              <p className="text-sm text-gray-600">
                 Välj en annan dag eller kolla direkt med restaurangen
               </p>
             </div>
@@ -607,20 +534,20 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
               .filter(([day]) => availableDays.includes(day))
               .map(([day, categories]) => (
               <div key={day} className="space-y-3">
-                <h2 className={`font-bold text-lg ${isOldVersion ? 'text-gray-800 border-b border-gray-300 pb-2' : 'text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600 pb-2'}`}>
+                <h2 className="font-bold text-lg text-gray-800 border-b border-gray-300 pb-2">
                   {day}
                 </h2>
                 <div className="space-y-3 ml-2">
                   {Object.entries(categories).map(([category, items]) => (
                     <div key={category} className="space-y-2">
-                      <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-700' : 'text-base text-gray-800 dark:text-gray-200'}`}>
+                      <h3 className="font-semibold text-base text-gray-700">
                         {category}
                       </h3>
                       <div className="space-y-2 ml-2">
                         {items.map((item, idx) => (
                           <div
                             key={idx}
-                            className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}
+                            className="text-sm leading-relaxed text-gray-600"
                           >
                             {item.description}
                           </div>
@@ -635,14 +562,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, isOldVersion
             // Normal view: Group by Category → Items
             Object.entries(groupedItems as Record<string, MenuItem[]>).map(([category, items]) => (
               <div key={category} className="space-y-2">
-                <h3 className={`font-semibold ${isOldVersion ? 'text-base text-gray-800 border-b border-gray-300 pb-1' : 'text-base text-gray-900 dark:text-gray-100'}`}>
+                <h3 className="font-semibold text-base text-gray-800 border-b border-gray-300 pb-1">
                   {category}
                 </h3>
                 <div className="space-y-2">
                   {items.map((item, idx) => (
                     <div
                       key={idx}
-                      className={`text-sm leading-relaxed ${isOldVersion ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}
+                      className="text-sm leading-relaxed text-gray-700"
                     >
                       {item.description}
                     </div>
@@ -664,8 +591,6 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
-  const [currentImageIndex] = useState(() => Math.floor(Math.random() * foodHeroImages.length));
-  const isOldVersion = true; // Always use classic version
 
   const [filters, setFilters] = useState<FilterState>({
     selectedFoodTypes: [],
@@ -697,14 +622,14 @@ export default function MenuPage() {
       const scrollTop = window.pageYOffset;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const windowHeight = window.innerHeight;
-      
+
       // Show button after scrolling past 400px (roughly past the filter section)
       setShowBackToTop(scrollTop > 400);
-      
+
       // Calculate scroll progress (0-100%)
       const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       setScrollProgress(Math.min(progress, 100));
-      
+
       // Check if we're near the footer (within 200px of bottom)
       const distanceFromBottom = docHeight - scrollTop;
       setIsNearFooter(distanceFromBottom < 200);
@@ -731,12 +656,12 @@ export default function MenuPage() {
       currentDisplayedRef.current = restaurants;
       return;
     }
-    
+
     // Calculate what the new filtered results should be
     let newFiltered = restaurants;
 
     // Filter by selected restaurants (only show selected ones)
-    newFiltered = newFiltered.filter(restaurant => 
+    newFiltered = newFiltered.filter(restaurant =>
       filters.selectedRestaurants.includes(restaurant.name)
     );
 
@@ -747,10 +672,10 @@ export default function MenuPage() {
       // If there's a search term, search across ALL days and ignore todayOnly filter
       if (filters.searchTerm.trim()) {
         const searchLower = filters.searchTerm.toLowerCase();
-        
+
         // Check if the search term matches a craving, if so use all variations
         const searchTerms = CRAVING_VARIATIONS[searchLower] || [searchLower];
-        
+
         filteredItems = filteredItems.filter(item =>
           searchTerms.some(term =>
             item.description.toLowerCase().includes(term) ||
@@ -764,7 +689,7 @@ export default function MenuPage() {
         filteredItems = filteredItems.filter(item =>
           // Only include items for the current day when filtering by food type
           item.day === CURRENT_DAY &&
-          filters.selectedFoodTypes.some(foodType => 
+          filters.selectedFoodTypes.some(foodType =>
             item.category.includes(foodType) || item.description.includes(foodType)
           )
         );
@@ -805,8 +730,8 @@ export default function MenuPage() {
 
   useEffect(() => {
     Promise.all([
-      cachedFetch('/api/menus'),
-      cachedFetch('/api/restaurants')
+      fetch('/data/menus.json').then(r => r.json()),
+      fetch('/data/restaurants.json').then(r => r.json())
     ])
       .then(([menusData, restaurantsData]: [ApiResponse, any]) => {
         const parsedRestaurants: Restaurant[] = Object.entries(menusData.menus).map(([name, items]) => ({
@@ -815,10 +740,10 @@ export default function MenuPage() {
           info: [], // Will be computed per day
           location: restaurantsData.restaurants[name]
         }));
-        
+
         // Apply Pier 11 recategorization
         const recategorizedRestaurants = recategorizePier11Items(parsedRestaurants);
-        
+
         setRawMenus(menusData.menus);
         setRestaurants(recategorizedRestaurants);
         setFilters(prev => ({
@@ -836,7 +761,7 @@ export default function MenuPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isOldVersion ? 'bg-[#002933]' : 'bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800'}`}>
+      <div className="min-h-screen flex items-center justify-center bg-[#002933]">
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/80"></div>
@@ -849,11 +774,11 @@ export default function MenuPage() {
 
   if (error) {
     return (
-      <div className={`min-h-screen transition-colors duration-300 flex items-center justify-center ${isOldVersion ? 'bg-[#002933]' : 'bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800'}`}>
-        <div className={`text-center p-8 rounded-lg shadow-lg border ${isOldVersion ? 'bg-white border-gray-300' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}`}>
+      <div className="min-h-screen transition-colors duration-300 flex items-center justify-center bg-[#002933]">
+        <div className="text-center p-8 rounded-lg shadow-lg border bg-white border-gray-300">
           <div className="text-4xl mb-4">❌</div>
-          <h2 className={`text-xl font-semibold mb-2 ${isOldVersion ? 'text-gray-800' : 'text-gray-800 dark:text-gray-200'}`}>Något gick fel</h2>
-          <p className={`${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-400'}`}>{error}</p>
+          <h2 className="text-xl font-semibold mb-2 text-gray-800">Något gick fel</h2>
+          <p className="text-gray-600">{error}</p>
         </div>
       </div>
     );
@@ -862,16 +787,13 @@ export default function MenuPage() {
       return (
       <div className="min-h-screen relative bg-[#002933]">
 
-      
-
-      
-             {/* Brand Title - Different for each version */}
+      {/* Brand Title */}
        <div className="relative z-10">
          <div className="max-w-7xl mx-auto px-4 py-12">
            <div className="text-center">
-             <img 
-               src="/luns-logo-transparent.png" 
-               alt="Luns.se" 
+             <img
+               src="/luns-logo-transparent.png"
+               alt="Luns.se"
                className="h-64 mx-auto mb-0"
              />
            </div>
@@ -880,29 +802,14 @@ export default function MenuPage() {
 
       {/* Content Container */}
       <div className="relative z-10">
-        {/* Header Section */}
-        {/* <div className="relative">
-          <div className="max-w-7xl mx-auto px-4 pb-6">
-            <div className="text-center">
-              <p className={`text-xl font-medium drop-shadow-lg opacity-90 animate-fade-in-delay -mt-1 ${isOldVersion ? 'text-white' : 'text-white'}`}>
-                Lunch menyer för Lindholmen Science Park
-              </p>
-            </div>
-          </div>
-        </div> */}
-
                  {/* Dashboard Section - Info Banner with Controls */}
          <div className="max-w-4xl mx-auto px-4 py-2 relative z-50">
-           <div className={`backdrop-blur-sm rounded-xl shadow-lg border p-6 ${
-             isOldVersion 
-               ? 'bg-white/95 border-gray-300' 
-               : 'bg-gradient-to-br from-blue-50/95 to-indigo-100/95 dark:from-blue-900/95 dark:to-indigo-900/95 border-blue-200 dark:border-blue-700'
-           }`}>
+           <div className="backdrop-blur-sm rounded-xl shadow-lg border p-6 bg-white/95 border-gray-300">
              <InfoBanner />
-             
+
              {/* Action Bar */}
              <div className="mt-6">
-               <ActionBar 
+               <ActionBar
                  restaurants={restaurants.map(r => r.name)}
                  onFiltersChange={handleFiltersChange}
                  viewMode={viewMode}
@@ -915,34 +822,25 @@ export default function MenuPage() {
         {/* Restaurant Cards or List View */}
         <div className="max-w-4xl mx-auto px-4 py-4">
           {filteredRestaurants.length === 0 && !isFiltering ? (
-            <div className={`text-center py-16 rounded-xl shadow-lg border ${
-              isOldVersion 
-                ? 'bg-white border-gray-300' 
-                : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'
-            }`}>
+            <div className="text-center py-16 rounded-xl shadow-lg border bg-white border-gray-300">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className={`text-xl font-semibold mb-2 ${isOldVersion ? 'text-gray-800' : 'text-gray-800 dark:text-gray-200'}`}>Inga resultat</h3>
-              <p className={`mb-4 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-400'}`}>Prova att justera dina filter för att se fler alternativ.</p>
-              <button 
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Inga resultat</h3>
+              <p className="mb-4 text-gray-600">Prova att justera dina filter för att se fler alternativ.</p>
+              <button
                 onClick={() => setFilters({
                   selectedFoodTypes: [],
                   selectedRestaurants: restaurants.map(r => r.name),
                   searchTerm: '',
                   todayOnly: false
                 })}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  isOldVersion 
-                    ? 'bg-teal-600 text-white hover:bg-teal-700' 
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+                className="px-4 py-2 rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
               >
                 Rensa alla filter
               </button>
             </div>
           ) : viewMode === 'list' ? (
-            <CompactListView 
+            <CompactListView
               restaurants={displayedRestaurants}
-              isOldVersion={isOldVersion}
               hasActiveSearch={!!filters.searchTerm.trim()}
             />
           ) : (
@@ -950,24 +848,23 @@ export default function MenuPage() {
               {displayedRestaurants.map((restaurant, index) => {
                 const isExiting = exitingRestaurants.has(restaurant.name);
                 const isNew = !exitingRestaurants.has(restaurant.name) && !isFiltering;
-                
+
                 return (
-                  <div 
+                  <div
                     key={restaurant.name}
                     className={`overflow-hidden ${
-                      isExiting 
-                        ? 'animate-fade-out-scale' 
+                      isExiting
+                        ? 'animate-fade-out-scale'
                         : 'animate-fade-in-scale'
                     }`}
                     style={{
                       animationDelay: isNew ? `${index * 150}ms` : '0ms'
                     }}
                   >
-                    <RestaurantCard 
-                      restaurant={restaurant} 
+                    <RestaurantCard
+                      restaurant={restaurant}
                       allItems={rawMenus[restaurant.name] || []}
                       originalRestaurant={restaurants.find(r => r.name === restaurant.name)}
-                      isOldVersion={isOldVersion}
                       hasActiveSearch={!!filters.searchTerm.trim()}
                     />
                   </div>
@@ -978,14 +875,10 @@ export default function MenuPage() {
         </div>
 
         {/* Footer with Status */}
-        <footer className={`relative z-50 backdrop-blur-sm border-t py-6 mt-16 ${
-          isOldVersion 
-            ? 'bg-white/90 border-gray-300' 
-            : 'bg-white/90 dark:bg-gray-800/90 border-gray-200 dark:border-gray-700'
-        }`}>
+        <footer className="relative z-50 backdrop-blur-sm border-t py-6 mt-16 bg-white/90 border-gray-300">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className={`flex items-center space-x-6 text-sm mb-4 md:mb-0 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-400'}`}>
+              <div className="flex items-center space-x-6 text-sm mb-4 md:mb-0 text-gray-600">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span>Aktiv</span>
@@ -996,14 +889,14 @@ export default function MenuPage() {
                 </div>
               </div>
               <div className="text-center md:text-right">
-                <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
+                <p className="text-sm mb-2 text-gray-600">
                   Vibe kodad av Henkebus ❤️
                 </p>
-                <p className={`text-sm mb-2 ${isOldVersion ? 'text-gray-600' : 'text-gray-600 dark:text-gray-300'}`}>
+                <p className="text-sm mb-2 text-gray-600">
                   Frågor eller förbättringsförslag? Hör av dig på{' '}
-                  <a 
-                    href="mailto:luns.se@outlook.com" 
-                    className={`underline transition-colors ${isOldVersion ? 'hover:text-gray-800' : 'hover:text-gray-800 dark:hover:text-gray-100'}`}
+                  <a
+                    href="mailto:luns.se@outlook.com"
+                    className="underline transition-colors hover:text-gray-800"
                   >
                     luns.se@outlook.com
                   </a>
@@ -1022,11 +915,7 @@ export default function MenuPage() {
         }`}>
           <button
             onClick={scrollToTop}
-            className={`relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border ${
-              isOldVersion 
-                ? 'bg-white/90 text-gray-700 border-gray-300 hover:bg-white'
-                : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
-            }`}
+            className="relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border bg-white/90 text-gray-700 border-gray-300 hover:bg-white"
           >
             {/* Scroll Progress Ring with SVG Arrow */}
             <div className="relative w-8 h-8">
@@ -1055,17 +944,17 @@ export default function MenuPage() {
               </svg>
               {/* SVG Arrow */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg 
-                  className="w-4 h-4 text-current" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className="w-4 h-4 text-current"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2.5} 
-                    d="M5 15l7-7 7 7" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 15l7-7 7 7"
                   />
                 </svg>
               </div>
@@ -1075,4 +964,4 @@ export default function MenuPage() {
       )}
     </div>
   );
-} 
+}

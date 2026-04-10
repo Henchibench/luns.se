@@ -21,7 +21,6 @@ LOCATIONS = {
         "Piren", 
         "Uni3 – World of Food"
     ],
-    # "Partille": ["Lille Grisen"]  # Temporarily disabled
 }
 
 # Restaurant locations dictionary
@@ -104,16 +103,4 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/uni3worldoffood/",
         "area": "Lindholmen"
     },
-    "Lille Grisen": {
-        "maps": "https://maps.app.goo.gl/UKyyo6Z9YMFy2SUV6",
-        "website": "https://lillegrisen.se/",
-        "instagram": "https://www.instagram.com/lille_grisen/",
-        "area": "Partille"
-    },
-    "Caffé la Torre": {
-        "maps": "YOUR_GOOGLE_MAPS_LINK",
-        "website": "RESTAURANT_WEBSITE",
-        "instagram": "INSTAGRAM_LINK",
-        "area": "Lindholmen"
-    }
 }

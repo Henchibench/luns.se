@@ -1,10 +1,4 @@
-# Modern API dependencies
-flask-caching
+# Scraper dependencies
 beautifulsoup4
 requests
 lxml
-redis
-fastapi
-uvicorn
-python-dotenv
-pydantic 
