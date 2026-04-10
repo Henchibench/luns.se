@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { trackEvent } from '../utils/analytics';
 
 interface MenuItem {
   day: string;
@@ -94,7 +95,10 @@ export default function RestaurantSheet({
           <div className="flex gap-1.5 ml-4">
             {restaurant.location?.maps && (
               <button
-                onClick={() => setShowMap(!showMap)}
+                onClick={() => {
+                  setShowMap(!showMap);
+                  if (!showMap) trackEvent('map-open', { restaurant: restaurant.name });
+                }}
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}
                 title="Visa karta"
@@ -110,6 +114,7 @@ export default function RestaurantSheet({
                 href={restaurant.location.website}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'website' })}
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}
                 title="Hemsida"
@@ -124,6 +129,7 @@ export default function RestaurantSheet({
                 href={restaurant.location.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'instagram' })}
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}
                 title="Instagram"
