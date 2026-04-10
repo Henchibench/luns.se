@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FilterState } from './FilterPanel';
+
+export interface FilterState {
+  selectedFoodTypes: string[];
+  selectedRestaurants: string[];
+  searchTerm: string;
+  todayOnly: boolean;
+}
 
 interface ActionBarProps {
   restaurants: string[];
