@@ -6,6 +6,7 @@ import StickyControlBar from './components/StickyControlBar';
 import FilterDrawer, { FilterState } from './components/FilterDrawer';
 import RestaurantSheet from './components/RestaurantSheet';
 import CompactListView from './components/CompactListView';
+import ThemeToggle from './components/ThemeToggle';
 
 
 interface MenuItem {
@@ -244,6 +245,7 @@ export default function MenuPage() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
+      <ThemeToggle />
       {/* Hero Section */}
       <div ref={heroRef} className="relative z-10">
         <div className="max-w-[750px] mx-auto px-5 pt-12 pb-8">
