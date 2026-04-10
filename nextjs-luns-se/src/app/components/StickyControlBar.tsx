@@ -130,7 +130,7 @@ export default function StickyControlBar({
   return (
     <>
       {/* Static version in hero — invisible when sticky takes over (keeps layout space) */}
-      <div ref={controlStripRef} className={isSticky ? 'invisible' : ''}>
+      <div ref={controlStripRef as React.Ref<HTMLDivElement>} className={isSticky ? 'invisible' : ''}>
         <div className="max-w-[750px] mx-auto" style={{ height: '56px' }}>
           {barContent}
         </div>
