@@ -2,13 +2,18 @@
 
 Runs all restaurant scrapers and writes static JSON files
 that the Next.js frontend reads at runtime.
+
+If a scraper fails, falls back to the previous data from the live site.
 """
 
 import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime
+
+import requests
 
 # Add project root to path so we can import the scraper modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,8 +34,57 @@ OUTPUT_DIR = os.path.join(
     "nextjs-luns-se", "public", "data"
 )
 
+LIVE_MENUS_URL = "https://luns.se/data/menus.json"
 
-def scrape_all_menus():
+MAX_RETRIES = 2
+RETRY_DELAY = 3  # seconds
+
+
+def load_previous_menus():
+    """Fetch the currently live menu data as fallback."""
+    try:
+        resp = requests.get(LIVE_MENUS_URL, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        logger.info(f"[FALLBACK] Loaded previous data with {len(data.get('menus', {}))} restaurants")
+        return data.get("menus", {})
+    except Exception as e:
+        logger.warning(f"[FALLBACK] Could not load previous data: {e}")
+        return {}
+
+
+def is_scrape_failure(items):
+    """Check if scraper returned an error/fallback message instead of real data."""
+    if len(items) == 1:
+        msg = items[0]
+        return (msg.startswith("Kunde inte") or msg.startswith("Ett fel")
+                or msg.startswith("Ingen lunch") or msg.startswith("Error:"))
+    return False
+
+
+def scrape_with_retry(scraper):
+    """Run a scraper with retries and backoff."""
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            result = scraper.scrape()
+            items = result.get(scraper.name, [])
+            if is_scrape_failure(items) and attempt < MAX_RETRIES:
+                delay = RETRY_DELAY + attempt
+                logger.warning(f"[RETRY] {scraper.name}: got fallback message, retrying in {delay}s (attempt {attempt + 1}/{MAX_RETRIES})...")
+                time.sleep(delay)
+                continue
+            return result
+        except Exception as e:
+            if attempt < MAX_RETRIES:
+                delay = RETRY_DELAY + attempt
+                logger.warning(f"[RETRY] {scraper.name}: {e}, retrying in {delay}s (attempt {attempt + 1}/{MAX_RETRIES})...")
+                time.sleep(delay)
+            else:
+                raise
+    return scraper.scrape()
+
+
+def scrape_all_menus(previous_menus):
     """Run all scrapers and return the combined menus dict."""
     scrapers = [
         BistrotScraper(),
@@ -44,12 +98,22 @@ def scrape_all_menus():
     menus = {}
     for scraper in scrapers:
         try:
-            result = scraper.scrape()
-            menus.update(result)
-            logger.info(f"[OK] {scraper.name}: {len(result.get(scraper.name, []))} items")
+            result = scrape_with_retry(scraper)
+            items = result.get(scraper.name, [])
+
+            if is_scrape_failure(items) and scraper.name in previous_menus:
+                logger.warning(f"[FALLBACK] {scraper.name}: using previous data")
+                menus[scraper.name] = previous_menus[scraper.name]
+            else:
+                menus.update(result)
+                logger.info(f"[OK] {scraper.name}: {len(items)} items")
         except Exception as e:
-            logger.error(f"[FAIL] {scraper.name}: {e}")
-            menus[scraper.name] = [f"Error: {e}"]
+            if scraper.name in previous_menus:
+                logger.warning(f"[FALLBACK] {scraper.name}: {e} — using previous data")
+                menus[scraper.name] = previous_menus[scraper.name]
+            else:
+                logger.error(f"[FAIL] {scraper.name}: {e}")
+                menus[scraper.name] = [f"Error: {e}"]
 
     return menus
 
@@ -95,8 +159,10 @@ def build_menus_response(menus):
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+    previous_menus = load_previous_menus()
+
     logger.info("Starting menu scrape...")
-    menus = scrape_all_menus()
+    menus = scrape_all_menus(previous_menus)
 
     menus_data = build_menus_response(menus)
     restaurants_data = build_restaurants_response(menus)

@@ -41,7 +41,7 @@ class BaseScraper(ABC):
             response = session.get(
                 url or self.menu_url,
                 headers=self.headers,
-                timeout=15,
+                timeout=30,
             )
             response.raise_for_status()
             return BeautifulSoup(response.text, 'html.parser')
