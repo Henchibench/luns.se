@@ -1,9 +1,18 @@
 from abc import ABC, abstractmethod
 import logging
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from typing import Dict, List, Optional
 import re
+import socket
+
+# Force IPv4 to avoid connectivity issues in CI environments (GitHub Actions)
+_original_getaddrinfo = socket.getaddrinfo
+def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_getaddrinfo
 
 class BaseScraper(ABC):
     def __init__(self, restaurant_info: dict):
@@ -24,7 +33,16 @@ class BaseScraper(ABC):
     def get_page_content(self, url: Optional[str] = None) -> Optional[BeautifulSoup]:
         """Get the page content and return a BeautifulSoup object"""
         try:
-            response = requests.get(url or self.menu_url, headers=self.headers)
+            session = requests.Session()
+            retry = Retry(total=2, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+            adapter = HTTPAdapter(max_retries=retry)
+            session.mount('https://', adapter)
+            session.mount('http://', adapter)
+            response = session.get(
+                url or self.menu_url,
+                headers=self.headers,
+                timeout=15,
+            )
             response.raise_for_status()
             return BeautifulSoup(response.text, 'html.parser')
         except requests.RequestException as e:
