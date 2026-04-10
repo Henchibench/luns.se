@@ -2,9 +2,9 @@ name: Scrape and Deploy
 
 on:
   schedule:
-    - cron: '0 5 * * 1-5'   # 07:00 CET on weekdays
-    - cron: '0 6 * * 1-5'   # 08:00 CET on weekdays
-    - cron: '0 8 * * 1-5'   # 10:00 CET on weekdays
+    - cron: '0 5 * * 1'     # Monday 07:00 CET
+    - cron: '0 7 * * 1'     # Monday 09:00 CET (retry)
+    - cron: '0 5 * * 2'     # Tuesday 07:00 CET (catch late uploads)
   workflow_dispatch:
 
 permissions:
