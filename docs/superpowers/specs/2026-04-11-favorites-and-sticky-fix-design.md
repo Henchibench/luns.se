@@ -32,6 +32,8 @@ On mount, reads from localStorage with SSR guard (`typeof window !== 'undefined'
 
 Fires `trackEvent('favorite-toggle', { restaurant, favorited: boolean })` on each toggle.
 
+On mount, if the user has favorites, fires `trackEvent('favorites-loaded', { favorites: string[], count: number })` so aggregate favorite distributions can be tracked in Umami.
+
 ### Sorting
 
 In `page.tsx`, after the existing filter logic computes `filteredRestaurants`, sort the array so that favorited restaurants appear first. Relative order within the favorites group and non-favorites group is preserved (stable sort).
@@ -81,6 +83,7 @@ Debug in browser during implementation, identify actual cause, fix. This is an i
 | Event | Data | Trigger |
 |-------|------|---------|
 | `favorite-toggle` | `{ restaurant: string, favorited: boolean }` | Heart icon tap |
+| `favorites-loaded` | `{ favorites: string[], count: number }` | Page load, when user has favorites |
 
 ## Files to Create
 
