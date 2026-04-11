@@ -33,15 +33,14 @@ export function useFavorites() {
   );
 
   const toggleFavorite = useCallback((name: string) => {
-    setFavorites(prev => {
-      const favorited = !prev.includes(name);
-      const next = favorited
-        ? [...prev, name]
-        : prev.filter(n => n !== name);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      trackEvent('favorite-toggle', { restaurant: name, favorited });
-      return next;
-    });
+    const current = readFavorites();
+    const favorited = !current.includes(name);
+    const next = favorited
+      ? [...current, name]
+      : current.filter(n => n !== name);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    trackEvent('favorite-toggle', { restaurant: name, favorited });
+    setFavorites(next);
   }, []);
 
   return { favorites, isFavorite, toggleFavorite };
