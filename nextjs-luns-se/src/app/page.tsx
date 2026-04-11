@@ -8,6 +8,7 @@ import RestaurantSheet from './components/RestaurantSheet';
 import CompactListView from './components/CompactListView';
 import ThemeToggle from './components/ThemeToggle';
 import { trackEvent } from './utils/analytics';
+import { useFavorites } from './hooks/useFavorites';
 
 
 interface MenuItem {
@@ -135,6 +136,7 @@ export default function MenuPage() {
   const controlStripRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
+  const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
   // Apply filters
   useEffect(() => {
@@ -171,8 +173,15 @@ export default function MenuPage() {
       return { ...restaurant, items: filteredItems };
     }).filter(restaurant => restaurant.items.length > 0);
 
+    // Sort favorites to top (stable sort preserves relative order within groups)
+    result.sort((a, b) => {
+      const aFav = favorites.includes(a.name) ? 0 : 1;
+      const bFav = favorites.includes(b.name) ? 0 : 1;
+      return aFav - bFav;
+    });
+
     setFilteredRestaurants(result);
-  }, [restaurants, filters]);
+  }, [restaurants, filters, favorites]);
 
   // Scroll detection
   useEffect(() => {
@@ -345,6 +354,8 @@ export default function MenuPage() {
               selectedDay={selectedDay}
               availableDays={availableDays}
               hasActiveSearch={!!filters.searchTerm.trim()}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
             />
           </div>
         ) : (
@@ -361,6 +372,8 @@ export default function MenuPage() {
                   isEven={index % 2 === 0}
                   hasActiveSearch={!!filters.searchTerm.trim()}
                   availableDays={availableDays}
+                  isFavorite={isFavorite(restaurant.name)}
+                  onToggleFavorite={() => toggleFavorite(restaurant.name)}
                 />
               </div>
             ))}
