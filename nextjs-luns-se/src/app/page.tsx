@@ -209,7 +209,7 @@ export default function MenuPage() {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // Track search input with debounce
   useEffect(() => {
