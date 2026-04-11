@@ -1,0 +1,446 @@
+{
+  "standing": [
+    {
+      "name": "DAGENS THALI",
+      "description": "En härlig kombinationstallrik med dagens veg, kyckling och lamm/fisk, serveras med raita",
+      "price": "159 kr"
+    },
+    {
+      "name": "SUBZI THALI",
+      "description": "Kockens val av vegetarisk gryta med en paneerrätt och en grönsaksrätt. Serveras med linsgryta och raita. (Går bra att beställa vegansk också)",
+      "price": "139 kr"
+    },
+    {
+      "name": "PALAK PANEER",
+      "description": "Hemlagad färskost lagad i stuvad spenat, ingefära, chili och vitlök. (Går bra att beställa vegansk också)",
+      "price": "139 kr"
+    },
+    {
+      "name": "CHICKEN TANDOORI",
+      "description": "Grillad kyckling med ben marinerad i tandoorimasala, lime och yoghurt. Serveras i tandoorisås.",
+      "price": "139 kr"
+    },
+    {
+      "name": "BUTTER CHICKEN",
+      "description": "Grillad kycklingfilé i krämig cashewnötsås. Toppad med cashewnötter och russin.",
+      "price": "152 kr"
+    },
+    {
+      "name": "CHICKEN MANGO MASALA",
+      "description": "Kycklingfilé i lök-tomatsås med smak av mango, kokos, chili och lime.",
+      "price": "155 kr"
+    },
+    {
+      "name": "ROGAN JOSH",
+      "description": "Klassisk nordindisk lammrätt med smak av saffran och kardemumma, garnerad med mandel.",
+      "price": "159 kr"
+    },
+    {
+      "name": "JHINGA KORMA",
+      "description": "Mild och krämig gryta med tigerräkor, cashewnötter och kardemumma.",
+      "price": "165 kr"
+    }
+  ],
+  "sides": [
+    {
+      "name": "EXTRA SALLAD",
+      "description": "",
+      "price": "15 kr"
+    },
+    {
+      "name": "EXTRA LUNCH NAAN",
+      "description": "Nybakat indiskt bröd.",
+      "price": "15 kr"
+    },
+    {
+      "name": "PLAIN NAAN",
+      "description": "",
+      "price": "29 kr"
+    },
+    {
+      "name": "BUTTER NAAN",
+      "description": "",
+      "price": "35 kr"
+    },
+    {
+      "name": "VITLÖK & KORIANDER NAAN",
+      "description": "",
+      "price": "39 kr"
+    },
+    {
+      "name": "OST & KORIANDER NAAN",
+      "description": "",
+      "price": "39 kr"
+    },
+    {
+      "name": "CHILI NAAN",
+      "description": "",
+      "price": "39 kr"
+    },
+    {
+      "name": "MYNTASÅS",
+      "description": "",
+      "price": "15 kr"
+    },
+    {
+      "name": "MANGO CHUTNEY",
+      "description": "",
+      "price": "15 kr"
+    },
+    {
+      "name": "MANGOLASSI",
+      "description": "",
+      "price": "39 kr"
+    }
+  ],
+  "weeks": {
+    "week1": {
+      "Monday": [
+        {
+          "name": "MURG LUCKNOWI",
+          "description": "Kycklingfilé tillagad med lök, tomat, ingefära, kewra, rosenvatten och koriander",
+          "price": "119 kr"
+        },
+        {
+          "name": "ADRAKI LAMB DO PYAZA",
+          "description": "Lammrostbiff, lagas med rödlök, ingefära, chili, citron och indiska Panch phoron (fem kryddor).",
+          "price": "119 kr"
+        },
+        {
+          "name": "PUDINA CHANA MASALA",
+          "description": "Kikärtsgryta med mynta och currysås, garnerad med friterad lök.",
+          "price": "119 kr"
+        }
+      ],
+      "Tuesday": [
+        {
+          "name": "MURG HARA MASALA",
+          "description": "Örtkryddad kycklingfilégryta med färsk koriander, bockhornsklöver, basilika och grön chili kokosmjölk.",
+          "price": "119 kr"
+        },
+        {
+          "name": "GOAN FISH CURRY",
+          "description": "Laxfilé i en väldoftande kokosmjölksgryta med vitlök, svarta senapsfrön, koriander, tamarind och curryblad.",
+          "price": "119 kr"
+        },
+        {
+          "name": "PANEER MAKHANI",
+          "description": "Krämig tomatgryta, indisk färskost, smaksatt med ingefära, vitlök och garam masala.",
+          "price": "119 kr"
+        }
+      ],
+      "Wednesday": [
+        {
+          "name": "MURG VINDALOO",
+          "description": "Eldig kycklingrätt från Goa med palmvinäger, nejlikor och piri-piri masala",
+          "price": "119 kr"
+        },
+        {
+          "name": "SHAHI GOSHT",
+          "description": "Mild och krämig lammrätt med kardemumma, malda cashewnötter och pistagenötter",
+          "price": "119 kr"
+        },
+        {
+          "name": "BAINGAN BHARTA",
+          "description": "Långstekt aubergine, lök, tomat, ingefära, chili, koriander.",
+          "price": "119 kr"
+        }
+      ],
+      "Thursday": [
+        {
+          "name": "GARLIC TIKKA",
+          "description": "Kycklingfilé marinerad i vitlök, ingefära, grön chili, yoghurt och lime. Serveras med tandoorisås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB HYDERABAD",
+          "description": "Lamm med färsk koriander, mynta och grön chili i kokosmjölk.",
+          "price": "119 kr"
+        },
+        {
+          "name": "DAL TADKA",
+          "description": "Flamberade linser med traditionella indiska kryddor och koriander.",
+          "price": "119 kr"
+        }
+      ],
+      "Friday": [
+        {
+          "name": "PALAK CHICKEN",
+          "description": "Kycklingfilé med spenat, paprika, grön chili, ingefära och vitlök.",
+          "price": "119 kr"
+        },
+        {
+          "name": "MEEN MOILEE",
+          "description": "Marinerad och grillad laxfilé med senapsfrö, lök, kumminpulver och kokosmjölk.",
+          "price": "119 kr"
+        },
+        {
+          "name": "TOFU KADHAI",
+          "description": "Tofu tillagad med tomat, paprika och champinjoner, smaksatt med ingefära, koriander och lök.",
+          "price": "119 kr"
+        }
+      ]
+    },
+    "week2": {
+      "Monday": [
+        {
+          "name": "MURG MAKHNI",
+          "description": "Tandoorimarinerade kycklingfilébitar i krämig tomatsås med kardemumma",
+          "price": "119 kr"
+        },
+        {
+          "name": "ACHARI MIRCH",
+          "description": "Lammrostbiff med röd chili, limeblad, färsk ingefära, mynta och kokosmjölk",
+          "price": "119 kr"
+        },
+        {
+          "name": "DAL MAKHANI",
+          "description": "Flamberade linser i krämig tomatgryta, smaksatt med ingefära, vitlök, garam masala och kryddat indiskt smör.",
+          "price": "119 kr"
+        }
+      ],
+      "Tuesday": [
+        {
+          "name": "MURG KALI MIRCH",
+          "description": "Marinerad kycklingfilé med lök och tomat i svartpeppar- och ingefärasås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "SEEKH KABAB",
+          "description": "Lammfärsrullar smaksatta med ingefära, vitlök, ägg, koriander och garam masala. Serveras med tandoorisås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "PANEER JODHPURI",
+          "description": "Indisk färskost i en mild currysås med cashewnötskräm toppad med papadom.",
+          "price": "119 kr"
+        }
+      ],
+      "Wednesday": [
+        {
+          "name": "CHICKEN KADHAI",
+          "description": "Kycklingfilé med tomat, paprika och champinjoner, smaksatt med ingefära, koriander och chili.",
+          "price": "119 kr"
+        },
+        {
+          "name": "KASHMIRI LAMB",
+          "description": "Lammrostbiff med tomat, lök, saffran, ingefära, koriander och röd chili.",
+          "price": "119 kr"
+        },
+        {
+          "name": "AUBERGINE MADRASI",
+          "description": "Aubergine tillagad i en kryddig tamarind- och kokossås, smaksatt med färska curryblad och koriander.",
+          "price": "119 kr"
+        }
+      ],
+      "Thursday": [
+        {
+          "name": "HYDERABADI MURG",
+          "description": "Örtkryddad kycklingfilégryta med färsk koriander, mynta och grön chili i kokosmjölk.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB BADAMI",
+          "description": "Mild och krämig lammgryta med kardemumma och mandel.",
+          "price": "119 kr"
+        },
+        {
+          "name": "MUTTER MUSHROOM",
+          "description": "Champinjoner, gröna ärtor, majs, paprika, tillagade med tomat och lök",
+          "price": "119 kr"
+        }
+      ],
+      "Friday": [
+        {
+          "name": "MURG METHI MALAI",
+          "description": "Kycklingfilé med bockhornsklöver, lök, ingefära, finmald cashewnötter, vitpeppar och tomatgräddsås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "MACHILI BENGALI",
+          "description": "Laxfilé med grön chili och tamarind, tillagad med färsk koriander och indiska Panch phoron (fem kryddor)",
+          "price": "119 kr"
+        },
+        {
+          "name": "ALOO GHOBI MASALA",
+          "description": "Potatis- och blomkålsgryta med lök, tomat och färsk ingefära.",
+          "price": "119 kr"
+        }
+      ]
+    },
+    "week3": {
+      "Monday": [
+        {
+          "name": "CHICKEN PATIALA",
+          "description": "Tandoorigrillad kycklingfilé med lök, tomat, ingefära och mandel- och cashewnötsås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB VINDALOO",
+          "description": "Eldig lammrätt från Goa med palmvinäger, nejlikor och piri-piri masala.",
+          "price": "119 kr"
+        },
+        {
+          "name": "VEG KADHAI",
+          "description": "Nordindisk vegetarisk rätt med zucchini, potatis, lök, ingefära, peppar, chili och koriander.",
+          "price": "119 kr"
+        }
+      ],
+      "Tuesday": [
+        {
+          "name": "CHICKEN SHAHI KORMA",
+          "description": "Krämig kycklingfilégryta med malda pistage och cashewnötter.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB CHANA BOTI",
+          "description": "Lammrätt med kikärtor, tomat, färsk koriander, mynta och lime",
+          "price": "119 kr"
+        },
+        {
+          "name": "RAMA ALOO",
+          "description": "Kidneybönor och potatis i indisk currysås. Garnerad med friterad lök.",
+          "price": "119 kr"
+        }
+      ],
+      "Wednesday": [
+        {
+          "name": "MURG ZAFFRANI",
+          "description": "Saffransmarinerad grillad kyckling, garam masala i en krämig cashewnötsås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAHSUNI MACHILI NIMBU",
+          "description": "Laxfilé, tillagad i en krämig masalasås med smak av lime.",
+          "price": "119 kr"
+        },
+        {
+          "name": "AVIAL CURRY",
+          "description": "Blandade grönsaker med senap, kummin, koriander och fänkål i kokossås",
+          "price": "119 kr"
+        }
+      ],
+      "Thursday": [
+        {
+          "name": "CHICKEN CHAMBA",
+          "description": "Klassisk kycklingrätt från Himalaya med smak av lök och tomat i en yoghurt-masalasås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB COCONUT CURRY",
+          "description": "Lammrostbiff med lök, tomat, senap, fänkål, curryblad, lime, chili, koriander.",
+          "price": "119 kr"
+        },
+        {
+          "name": "PANEER ACHARI",
+          "description": "Indisk färskost med röd chili, färsk ingefära, mynta och kokosmjölk.",
+          "price": "119 kr"
+        }
+      ],
+      "Friday": [
+        {
+          "name": "MURG DO PYAZA",
+          "description": "Kycklingrätt från Hyderabad smaksatt med lök, tomat och husets egen kryddblandning.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB LAAL MAAS",
+          "description": "Traditionell lammcurry med smak av paprika, spiskummin och ingefära.",
+          "price": "119 kr"
+        },
+        {
+          "name": "PALAK CHANA MASALA",
+          "description": "Spenat med kikärtor, lök, tomat, garam masala, chili och ingefära.",
+          "price": "119 kr"
+        }
+      ]
+    },
+    "week4": {
+      "Monday": [
+        {
+          "name": "CHICKEN MURG MANGO",
+          "description": "Kycklingfilé med färsk koriander, mynta, grön chili, kokosmjölk och mangopuré.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB PUNJABI CURRY",
+          "description": "En populär lammrätt i en sås av lök, tomat, paprika, ingefära, koriander och grön chili.",
+          "price": "119 kr"
+        },
+        {
+          "name": "BAINGAN MIRCH MASALA",
+          "description": "En traditionell maträtt med aubergine, paprika, tomat, kryddor, örter och koriander.",
+          "price": "119 kr"
+        }
+      ],
+      "Tuesday": [
+        {
+          "name": "JARDALO MURG",
+          "description": "Kycklingfilé med aprikos, kanel, chili, lök, ingefära och currysås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "LAMB KADHAI",
+          "description": "Lammrostbiff lagad med lök, ingefära, peppar, chili och koriander.",
+          "price": "119 kr"
+        },
+        {
+          "name": "MUTTER PANEER",
+          "description": "Hemlagad indisk färskost i krämig sås av lök, tomat och gröna ärtor.",
+          "price": "119 kr"
+        }
+      ],
+      "Wednesday": [
+        {
+          "name": "CHICKEN CHETTINAD",
+          "description": "En populär sydindisk kycklinggryta, tillagad i en pepprig kryddblandning från Chettinad, spetsad med kokos.",
+          "price": "119 kr"
+        },
+        {
+          "name": "CHUTNEY SEEKH KEBAB",
+          "description": "Lammfärskebab med mango chutney, mynta, vitlök, garam masala och rödvinsås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "SAMOSA CURRY",
+          "description": "Friterade små piroger med vegetarisk fyllning, serveras i yoghurt- och currysås.",
+          "price": "119 kr"
+        }
+      ],
+      "Thursday": [
+        {
+          "name": "TANDOORI CHICKEN TIKKA",
+          "description": "Kycklingfilé marinerad i lime, yoghurt och tandoori masala. Serveras med tandoorisås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "KOLHAPURI GOSHT",
+          "description": "Het lammrätt med svartpeppar, kokosmjölk och koriander.",
+          "price": "119 kr"
+        },
+        {
+          "name": "PANCHRATNA DAL",
+          "description": "Linsgryta med fem sorters linser. Ordet panchratna betyder fem juveler.",
+          "price": "119 kr"
+        }
+      ],
+      "Friday": [
+        {
+          "name": "MALVANI CHICKEN",
+          "description": "Kycklingfilé i en sås av kokoskräm, röd chili och Malvani masala.",
+          "price": "119 kr"
+        },
+        {
+          "name": "FISH TIKKA",
+          "description": "Marinerad, grillad lax i husets kryddor. Serveras med tandoorisås.",
+          "price": "119 kr"
+        },
+        {
+          "name": "CHANA PUMPA CURRY",
+          "description": "Kikärtsgryta med pumpa tillagad med senap, kokos, curry, fänkål och chili",
+          "price": "119 kr"
+        }
+      ]
+    }
+  }
+}

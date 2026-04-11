@@ -154,7 +154,6 @@ body::after {
   left: 0;
   right: 0;
   z-index: 40;
-  height: 56px;
   background-color: var(--control-bar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
