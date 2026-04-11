@@ -13,6 +13,21 @@
   --text-muted: #5E524A;
   --border: #D4CBC1;
   --footer-bg: #1E1915;
+  --control-bar-bg: rgba(235, 229, 222, 0.9);
+}
+
+[data-theme="dark"] {
+  --bg: #1A1714;
+  --surface: #242019;
+  --surface-alt: #2A2520;
+  --accent: #B5532E;
+  --accent-hover: #984526;
+  --secondary: #6B8060;
+  --text: #E8E0D8;
+  --text-muted: #A89A8E;
+  --border: #3D352D;
+  --footer-bg: #0F0D0B;
+  --control-bar-bg: rgba(26, 23, 20, 0.9);
 }
 
 /* Hide scrollbar but keep scroll functionality */
@@ -139,8 +154,7 @@ body::after {
   left: 0;
   right: 0;
   z-index: 40;
-  height: 56px;
-  background-color: rgba(235, 229, 222, 0.9);
+  background-color: var(--control-bar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);

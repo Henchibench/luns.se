@@ -6,6 +6,8 @@ import StickyControlBar from './components/StickyControlBar';
 import FilterDrawer, { FilterState } from './components/FilterDrawer';
 import RestaurantSheet from './components/RestaurantSheet';
 import CompactListView from './components/CompactListView';
+import ThemeToggle from './components/ThemeToggle';
+import { trackEvent } from './utils/analytics';
 
 
 interface MenuItem {
@@ -130,7 +132,8 @@ export default function MenuPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isNearFooter, setIsNearFooter] = useState(false);
 
-  const heroRef = useRef<HTMLDivElement>(null);
+  const controlStripRef = useRef<HTMLDivElement>(null);
+  const [isSticky, setIsSticky] = useState(false);
 
 
   // Apply filters
@@ -183,8 +186,38 @@ export default function MenuPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Sticky control strip detection
+  useEffect(() => {
+    const el = controlStripRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSticky(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Track search input with debounce
+  useEffect(() => {
+    if (!filters.searchTerm.trim()) return;
+    const timer = setTimeout(() => {
+      trackEvent('search-input', { term: filters.searchTerm.trim() });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filters.searchTerm]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    trackEvent('back-to-top');
+  };
+
+  const handleSearchChange = (term: string) => {
+    setFilters(prev => ({ ...prev, searchTerm: term }));
   };
 
   // Fetch data
@@ -244,9 +277,10 @@ export default function MenuPage() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
+      <ThemeToggle />
       {/* Hero Section */}
-      <div ref={heroRef} className="relative z-10">
-        <div className="max-w-[750px] mx-auto px-5 pt-12 pb-8">
+      <div className="relative z-10">
+        <div className="max-w-[750px] mx-auto px-5 pt-12 pb-4">
           <div className="text-center mb-6">
             <img
               src="/luns-logo-transparent.png"
@@ -255,37 +289,25 @@ export default function MenuPage() {
             />
           </div>
           <InfoBanner />
-
-          {/* Inline day picker for hero (visible before sticky bar takes over) */}
-          <div className="flex items-center gap-2 mt-6 justify-center">
-            {availableDays.map((day) => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className="px-4 py-2 text-sm font-medium rounded-full transition-colors"
-                style={{
-                  backgroundColor: selectedDay === day ? 'var(--accent)' : 'var(--surface)',
-                  color: selectedDay === day ? 'white' : 'var(--text-muted)',
-                }}
-              >
-                {day}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* Sticky Control Bar */}
-      <StickyControlBar
-        heroRef={heroRef}
-        selectedDay={selectedDay}
-        availableDays={availableDays}
-        onDayChange={setSelectedDay}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onFilterOpen={() => setIsFilterOpen(true)}
-        activeFilterCount={activeFilterCount}
-      />
+      {/* Unified Control Strip */}
+      <div className="relative z-10 mt-4 mb-2">
+        <StickyControlBar
+          controlStripRef={controlStripRef}
+          isSticky={isSticky}
+          selectedDay={selectedDay}
+          availableDays={availableDays}
+          onDayChange={setSelectedDay}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onFilterOpen={() => setIsFilterOpen(true)}
+          activeFilterCount={activeFilterCount}
+          searchTerm={filters.searchTerm}
+          onSearchChange={handleSearchChange}
+        />
+      </div>
 
       {/* Filter Drawer */}
       <FilterDrawer

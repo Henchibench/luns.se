@@ -1,159 +1,134 @@
-# Luns.se UI Redesign — Design Spec
+# Luns.se UI/UX Redesign — Design Spec (v2)
 
 ## Overview
 
-Redesign the luns.se lunch menu aggregator from a card-based layout to a full-bleed "paper stack" design with subtle parallax stacking, a slide-in filter drawer, a global day picker, and a uniformly darkened warm color palette. All existing functionality is preserved.
+Three changes to luns.se: (1) move filter/search controls into the hero so they're accessible immediately on page load, (2) add dark/light mode with a persistent toggle, (3) add comprehensive Umami analytics across all interactive elements.
 
-## Layout & Scroll Behavior
+## 1. Hero & Unified Control Strip
 
-### Structure (top to bottom)
+### Current Hero Layout
+1. Logo
+2. InfoBanner (week, weather, joke, countdown)
+3. Day picker pills
 
-1. **Hero section** — Logo, InfoBanner (week number, weather, joke, countdown). Not sticky, scrolls away naturally. Future home of a location/area picker when the site expands beyond Lindholmen.
-2. **Sticky control bar** — Pins to top once hero scrolls out of view. Contains global day picker (Mon–Fri pill buttons), view toggle (sheets/list), and filter button.
-3. **Restaurant sheets** — Full-bleed sections, each representing one restaurant's menu.
+### New Hero Layout
+1. Logo
+2. InfoBanner (week, weather, countdown — **joke removed**)
+3. **Unified control strip** — day picker | search input | view toggle | filter button
 
-### Stacking Mechanic
+### Control Strip Behavior
 
-- The first 3 visible restaurant sheets use `position: sticky` with incremental `top` offsets (e.g. `top: 56px`, `top: 64px`, `top: 72px`) to create overlapping layers.
-- Each sheet has a subtle top shadow (`box-shadow: 0 -4px 20px rgba(0,0,0,0.06)`) for depth.
-- As the 4th sheet arrives, the 1st sheet releases from sticky and scrolls away normally. An `IntersectionObserver` manages which 3 are currently sticky.
-- Stacked sheets get a very slight scale reduction (e.g. `scale(0.995)`) to sell perspective.
+The control strip is a single component rendered statically at the bottom of the hero. It contains:
 
-### Width
+- **Day picker pills** (left) — Mon–Fri, same styling as current
+- **Search input** (center) — compact inline text field, filters menus in real-time as user types
+- **View toggle** (right) — sheets/list pill toggle, same as current sticky bar
+- **Filter button** (right) — opens existing FilterDrawer, same badge count behavior
 
-- Sheets stretch to full viewport width (with ~20px margin on each side on desktop for breathing room).
-- Text content inside each sheet is constrained to a readable max-width (~700–750px), centered.
+When the control strip scrolls out of view, it transitions to `position: fixed` at the top with backdrop blur (same `rgba` background + `backdrop-filter: blur(12px)` as the current sticky bar). When scrolling back up, it returns to its static position in the hero.
 
-## Color Palette
+This replaces the current `StickyControlBar` show/hide behavior — the bar is always visible, it just changes from static to sticky.
 
-Uniformly darkened from the current palette. Subtle shift — reduces eye strain while keeping the warm, earthy character.
+### Search State Sharing
 
-| Token | Current | New | Description |
-|-------|---------|-----|-------------|
-| `--bg` | `#F5F0EB` | `#EBE5DE` | Warm sand, slightly deeper |
-| `--surface` | `#FEFCFA` | `#F5F0EB` | Sheets/panels |
-| `--accent` | `#C4613A` | `#B5532E` | Terracotta, richer |
-| `--accent-hover` | `#A8512F` | `#984526` | Darker hover state |
-| `--secondary` | `#7A8F6D` | `#6B8060` | Sage green, slightly deeper |
-| `--text` | `#2C2520` | `#241E1A` | Near-black brown |
-| `--text-muted` | `#6B5E54` | `#5E524A` | Muted brown, richer |
-| `--border` | `#E0D8CF` | `#D4CBC1` | Warm gray border, deeper |
-| `--footer-bg` | `#2C2520` | `#1E1915` | Footer, darker |
+The search input in the control strip and the search field in the FilterDrawer share the same `searchTerm` state in `FilterState`. Typing in the control strip updates the filter state directly (real-time filtering). Opening the drawer shows the current search term. Editing the term in the drawer updates it there; clicking "Tillämpa" syncs it back. This is the same state, not two separate search fields.
 
-Stacked sheets use `--surface`. The contrast against `--bg` (visible in gaps/overlap areas) reinforces the layered paper effect.
+### InfoBanner Changes
 
-## Sticky Control Bar
+- Remove the entire joke array and joke rendering
+- Keep: week number, weather (temperature + condition), lunch countdown
 
-### Appearance
+## 2. Dark/Light Mode
 
-- Background: `--bg` at ~90% opacity with `backdrop-filter: blur(12px)` for a frosted-glass effect.
-- Height: ~56px.
-- Subtle bottom border using `--border`.
+### Toggle
 
-### Contents (left to right)
+A small fixed-position button in the top-right corner of the viewport (`position: fixed`). Always visible regardless of scroll. Circular button with sun/moon icon, styled similarly to the existing back-to-top button (bottom-right). Subtle, not attention-grabbing.
 
-- **Day picker pills** — Mon through Fri. Active day: `--accent` background with white text. Inactive: `--bg` with `--text-muted`.
-- **Spacer**
-- **View toggle** — Small pill toggle for sheets/list view. Tracks user choice via Umami custom event for analytics (not visible to users).
-- **Filter button** — Icon + "Filter" label. Badge count when filters active. Opens slide-in drawer.
+### Theme Implementation
 
-### Behavior
+CSS custom properties are already used everywhere. Add a `[data-theme="dark"]` selector on `<html>` that overrides `:root` variables.
 
-- Hidden while hero is visible. Fades in with a slight slide-down once hero scrolls out of viewport, using `IntersectionObserver`.
+**Dark palette:**
 
-## Filter Drawer
+| Token | Light (current) | Dark |
+|-------|-----------------|------|
+| `--bg` | `#EBE5DE` | `#1A1714` |
+| `--surface` | `#F5F0EB` | `#242019` |
+| `--surface-alt` | `#F8F4EF` | `#2A2520` |
+| `--accent` | `#B5532E` | `#B5532E` (unchanged) |
+| `--accent-hover` | `#984526` | `#984526` (unchanged) |
+| `--secondary` | `#6B8060` | `#6B8060` (unchanged) |
+| `--text` | `#241E1A` | `#E8E0D8` |
+| `--text-muted` | `#5E524A` | `#A89A8E` |
+| `--border` | `#D4CBC1` | `#3D352D` |
+| `--footer-bg` | `#1E1915` | `#0F0D0B` |
 
-### Appearance
+### Sticky Bar Backdrop
 
-- Slides in from the right.
-- Width: ~360px on desktop, full-width on mobile.
-- Background: `--surface` with backdrop-blur.
-- Transition: ~300ms ease-out slide. Semi-transparent overlay dims content behind.
-- Close via: X button, clicking overlay, or pressing Escape.
+Currently hardcoded as `rgba(235, 229, 222, 0.9)` in CSS. Must change to a CSS variable so it adapts to the active theme. Add `--control-bar-bg` (light: `rgba(235, 229, 222, 0.9)`, dark: `rgba(26, 23, 20, 0.9)`).
 
-### Contents (top to bottom)
+### Theme Priority Chain
 
-1. **Header** — "Filter" title + close button.
-2. **Search field** — Free-text dish search.
-3. **Cravings** — Quick-pick pill buttons (Hamburgare, Pasta, Pommes, Mos).
-4. **Food type pills** — Kött, Fisk, Vegetarisk, Sallad, etc. Multi-select.
-5. **Restaurant checkboxes** — Select/deselect individual restaurants. "Välj alla" / "Välj inga" links.
-6. **Footer** — "Rensa alla" and "Tillämpa" buttons, sticky at bottom of drawer.
+1. **localStorage** — user explicitly toggled (highest priority)
+2. **`prefers-color-scheme`** — browser/OS setting (used on first visit)
+3. **Light mode** — fallback
 
-Same filter functionality as today, rehoused in a drawer.
+### Flash Prevention
 
-## Restaurant Sheets
+Theme initialization must happen in a blocking `<script>` in `<head>` (before React hydrates) to avoid a flash of wrong theme on load. This script reads localStorage and prefers-color-scheme, then sets `data-theme` on `<html>`.
 
-### Each sheet contains
+## 3. Umami Analytics Events
 
-**Header area:**
-- Restaurant name in `DM Serif Display`, left-aligned.
-- Small accent underline bar.
-- Action icons (map, website, Instagram) — right-aligned icon buttons, restyled for new palette.
-- Restaurant info text (if any) below the name.
+Extend the existing `window.umami.track()` pattern. All events fire through a small `trackEvent(name, data?)` helper that wraps `window.umami?.track()`.
 
-**Menu content:**
-- Grouped by category (Kött, Fisk, Vegetarisk, etc.) with category name as a subtle heading.
-- Each dish: single line of text, clean, no decoration.
-- Categories separated by light dividers or whitespace.
+| Event Name | Payload | Trigger |
+|---|---|---|
+| `day-select` | `{ day }` | Day picker pill clicked |
+| `search-input` | `{ term }` | Search debounced (~500ms after typing stops) |
+| `filter-open` | — | Filter drawer opened |
+| `filter-apply` | `{ foodTypes, cravings, restaurantCount }` | "Tillämpa" clicked |
+| `filter-clear` | — | "Rensa alla" clicked |
+| `view-mode-switch` | `{ mode }` | Already exists, keep as-is |
+| `restaurant-toggle` | `{ restaurant, selected }` | Restaurant checkbox toggled |
+| `theme-toggle` | `{ theme }` | Dark/light toggled |
+| `map-open` | `{ restaurant }` | Map button clicked |
+| `external-link` | `{ restaurant, type }` | Website/Instagram clicked (`type`: "website" or "instagram") |
+| `back-to-top` | — | Back-to-top button clicked |
 
-**Sheet differentiation:**
-- Alternating sheets get a very slight background variation — odd sheets use `--surface` (`#F5F0EB`), even sheets use `#F8F4EF` (midpoint between old `--surface` and new `--surface`). Distinguishes layers when overlapping.
+## 4. Component Changes
 
-**Empty state:**
-- Restaurant has no menu for selected day: shows "Ingen meny för [day]" rather than hiding the sheet. Keeps scroll position stable.
+### Modified
 
-**Map embed:**
-- Same expand/collapse behavior as current. Map icon reveals Google Maps iframe within the sheet.
+- **`page.tsx`** — Remove hero day picker. Replace with unified control strip at bottom of hero. Wire search input state.
+- **`StickyControlBar.tsx`** — Refactor to dual-mode: static in hero, fixed on scroll. Add inline search input. Replace show/hide with static-to-sticky transition via IntersectionObserver.
+- **`InfoBanner.tsx`** — Remove joke array and joke rendering. Keep week, weather, countdown.
+- **`FilterDrawer.tsx`** — No structural changes. Add Umami events to apply, clear, and toggle actions.
+- **`RestaurantSheet.tsx`** — Add Umami events to map, website, and Instagram clicks.
+- **`globals.css`** — Add `[data-theme="dark"]` variable overrides. Add `--control-bar-bg` variable. Change sticky bar background to use the variable.
+- **`layout.tsx`** — Add blocking theme init script in `<head>`.
 
-## Hero Section
+### New
 
-- Logo centered, with generous vertical padding.
-- InfoBanner below: week number, weather, Gothenburg joke, lunch countdown — same content, restyled with new palette.
-- Space reserved below InfoBanner for future location/area picker (not implemented now).
+- **`ThemeToggle.tsx`** — Fixed-position sun/moon toggle button. Reads/writes localStorage, listens to prefers-color-scheme, fires `theme-toggle` analytics event.
+- **`analytics.ts`** — `trackEvent(name, data?)` utility wrapping `window.umami?.track()`.
 
-## Footer
-
-- Same content: credit ("Vibe kodad av Henkebus") + contact email.
-- Background: `--footer-bg: #1E1915`.
-- No structural changes.
-
-## Animations & Transitions
-
-All CSS-only — no animation library required.
-
-- **Sheet entrance:** Fade-in + `translateY(15px)` → `0`, `opacity: 0` → `1`, ~400ms. Triggered by `IntersectionObserver`.
-- **Sticky transition:** Shadow slightly intensifies when a sheet becomes sticky.
-- **Sticky release:** Shadow fades back, sheet scrolls away normally.
-- **Filter drawer:** Slide-in from right ~300ms ease-out, overlay fades in.
-- **Day picker switch:** Menu content crossfades ~200ms.
-- **Back-to-top button:** Same behavior, restyled to match new accent color.
-- **Control bar appearance:** Fade-in + slight slide-down when hero exits viewport.
-
-## List View
-
-The compact list view (grouped by category) is retained as an alternative. Restyled to match the new palette and typography but structurally unchanged. View toggle in the sticky bar switches between sheet view and list view.
-
-## Analytics
-
-- Umami custom event fired when user switches view mode (sheets vs list). Lets the site owner track which layout is preferred to inform future design decisions.
-
-## Existing Functionality Preserved
+## 5. Existing Functionality Preserved
 
 - All filter types (food type, restaurant, search, cravings)
-- Day selection (now global instead of per-card)
+- Day selection
 - Map embeds per restaurant
 - External links (website, Instagram, Google Maps)
-- InfoBanner (week, weather, joke, countdown)
+- InfoBanner (week, weather, countdown)
 - Back-to-top button
 - Loading and error states
 - Search across all days
 - Pier 11 recategorization logic
-- Fade in/out animations for filtered restaurants
+- Sheet/list view toggle
+- Alternating sheet backgrounds
 
 ## Out of Scope
 
-- Location/area picker (future feature, space reserved in hero)
+- Location/area picker (future feature)
 - Backend/scraper changes
 - New restaurants or data sources
-- Dark mode
+- Stacking parallax effect (removed in previous iteration)

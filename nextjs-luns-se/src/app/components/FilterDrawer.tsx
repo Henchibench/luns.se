@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { trackEvent } from '../utils/analytics';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -78,6 +79,11 @@ export default function FilterDrawer({ isOpen, onClose, restaurants, filters, on
 
   const handleApply = () => {
     onFiltersChange(localFilters);
+    trackEvent('filter-apply', {
+      foodTypes: localFilters.selectedFoodTypes,
+      cravings: localFilters.searchTerm || undefined,
+      restaurantCount: localFilters.selectedRestaurants.length,
+    });
     handleClose();
   };
 
@@ -101,9 +107,14 @@ export default function FilterDrawer({ isOpen, onClose, restaurants, filters, on
         ? prev.selectedRestaurants.filter(r => r !== restaurant)
         : [...prev.selectedRestaurants, restaurant],
     }));
+    trackEvent('restaurant-toggle', {
+      restaurant,
+      selected: !localFilters.selectedRestaurants.includes(restaurant),
+    });
   };
 
   const clearAll = () => {
+    trackEvent('filter-clear');
     setLocalFilters({
       selectedFoodTypes: [],
       selectedRestaurants: restaurants,
