@@ -136,7 +136,7 @@ export default function MenuPage() {
   const controlStripRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
   // Apply filters
   useEffect(() => {
@@ -173,15 +173,12 @@ export default function MenuPage() {
       return { ...restaurant, items: filteredItems };
     }).filter(restaurant => restaurant.items.length > 0);
 
-    // Sort favorites to top (stable sort preserves relative order within groups)
-    result.sort((a, b) => {
-      const aFav = favorites.includes(a.name) ? 0 : 1;
-      const bFav = favorites.includes(b.name) ? 0 : 1;
-      return aFav - bFav;
-    });
+    if (showOnlyFavorites) {
+      result = result.filter(r => favorites.includes(r.name));
+    }
 
     setFilteredRestaurants(result);
-  }, [restaurants, filters, favorites]);
+  }, [restaurants, filters, favorites, showOnlyFavorites]);
 
   // Scroll detection
   useEffect(() => {
@@ -302,7 +299,7 @@ export default function MenuPage() {
       </div>
 
       {/* Unified Control Strip */}
-      <div className="relative z-10 mt-4 mb-2">
+      <div className="relative z-50 mt-4 mb-2">
         <StickyControlBar
           controlStripRef={controlStripRef}
           isSticky={isSticky}
@@ -315,6 +312,8 @@ export default function MenuPage() {
           activeFilterCount={activeFilterCount}
           searchTerm={filters.searchTerm}
           onSearchChange={handleSearchChange}
+          showOnlyFavorites={showOnlyFavorites}
+          onToggleShowOnlyFavorites={() => setShowOnlyFavorites(!showOnlyFavorites)}
         />
       </div>
 

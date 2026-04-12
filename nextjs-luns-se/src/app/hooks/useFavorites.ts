@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { trackEvent } from '../utils/analytics';
 
 const STORAGE_KEY = 'luns-favorites';
+const FILTER_STORAGE_KEY = 'luns-show-only-favorites';
 
 function readFavorites(): string[] {
   if (typeof window === 'undefined') return [];
@@ -15,16 +16,29 @@ function readFavorites(): string[] {
   }
 }
 
+function readShowOnlyFavorites(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(FILTER_STORAGE_KEY) === 'true';
+}
+
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [showOnlyFavorites, setShowOnlyFavoritesState] = useState<boolean>(false);
 
   // Read from localStorage on mount + fire analytics
   useEffect(() => {
     const stored = readFavorites();
     setFavorites(stored);
+    setShowOnlyFavoritesState(readShowOnlyFavorites());
     if (stored.length > 0) {
       trackEvent('favorites-loaded', { favorites: stored, count: stored.length });
     }
+  }, []);
+
+  const setShowOnlyFavorites = useCallback((value: boolean) => {
+    localStorage.setItem(FILTER_STORAGE_KEY, value ? 'true' : 'false');
+    trackEvent('favorites-filter-toggle', { enabled: value });
+    setShowOnlyFavoritesState(value);
   }, []);
 
   const isFavorite = useCallback(
@@ -43,5 +57,5 @@ export function useFavorites() {
     setFavorites(next);
   }, []);
 
-  return { favorites, isFavorite, toggleFavorite };
+  return { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites };
 }
