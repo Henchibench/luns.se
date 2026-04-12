@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../utils/analytics';
+import ThemeToggle from './ThemeToggle';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -273,6 +274,13 @@ export default function FilterDrawer({ isOpen, onClose, restaurants, filters, on
                 );
               })}
             </div>
+          </div>
+          {/* Theme */}
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
+              Tema
+            </label>
+            <ThemeToggle />
           </div>
         </div>
 

@@ -6,8 +6,8 @@ import StickyControlBar from './components/StickyControlBar';
 import FilterDrawer, { FilterState } from './components/FilterDrawer';
 import RestaurantSheet from './components/RestaurantSheet';
 import CompactListView from './components/CompactListView';
-import ThemeToggle from './components/ThemeToggle';
 import { trackEvent } from './utils/analytics';
+import { useFavorites } from './hooks/useFavorites';
 
 
 interface MenuItem {
@@ -135,6 +135,7 @@ export default function MenuPage() {
   const controlStripRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
+  const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
   // Apply filters
   useEffect(() => {
@@ -171,8 +172,12 @@ export default function MenuPage() {
       return { ...restaurant, items: filteredItems };
     }).filter(restaurant => restaurant.items.length > 0);
 
+    if (showOnlyFavorites) {
+      result = result.filter(r => favorites.includes(r.name));
+    }
+
     setFilteredRestaurants(result);
-  }, [restaurants, filters]);
+  }, [restaurants, filters, favorites, showOnlyFavorites]);
 
   // Scroll detection
   useEffect(() => {
@@ -200,7 +205,7 @@ export default function MenuPage() {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   // Track search input with debounce
   useEffect(() => {
@@ -277,7 +282,6 @@ export default function MenuPage() {
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
-      <ThemeToggle />
       {/* Hero Section */}
       <div className="relative z-10">
         <div className="max-w-[750px] mx-auto px-5 pt-12 pb-4">
@@ -293,7 +297,7 @@ export default function MenuPage() {
       </div>
 
       {/* Unified Control Strip */}
-      <div className="relative z-10 mt-4 mb-2">
+      <div className="relative z-50 mt-4 mb-2">
         <StickyControlBar
           controlStripRef={controlStripRef}
           isSticky={isSticky}
@@ -306,6 +310,8 @@ export default function MenuPage() {
           activeFilterCount={activeFilterCount}
           searchTerm={filters.searchTerm}
           onSearchChange={handleSearchChange}
+          showOnlyFavorites={showOnlyFavorites}
+          onToggleShowOnlyFavorites={() => setShowOnlyFavorites(!showOnlyFavorites)}
         />
       </div>
 
@@ -345,6 +351,8 @@ export default function MenuPage() {
               selectedDay={selectedDay}
               availableDays={availableDays}
               hasActiveSearch={!!filters.searchTerm.trim()}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
             />
           </div>
         ) : (
@@ -361,6 +369,8 @@ export default function MenuPage() {
                   isEven={index % 2 === 0}
                   hasActiveSearch={!!filters.searchTerm.trim()}
                   availableDays={availableDays}
+                  isFavorite={isFavorite(restaurant.name)}
+                  onToggleFavorite={() => toggleFavorite(restaurant.name)}
                 />
               </div>
             ))}

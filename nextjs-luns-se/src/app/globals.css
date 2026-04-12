@@ -131,6 +131,21 @@ body::after {
   animation: controlBarIn 0.3s ease-out forwards;
 }
 
+.favorite-heart {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.favorite-heart:active {
+  animation: heartPulse 0.25s ease;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
 .animate-content-fade {
   animation: contentFade 0.2s ease-out forwards;
 }

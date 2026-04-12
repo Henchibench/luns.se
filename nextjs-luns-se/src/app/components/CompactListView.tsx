@@ -28,6 +28,8 @@ interface CompactListViewProps {
   selectedDay: string;
   availableDays: string[];
   hasActiveSearch: boolean;
+  isFavorite: (name: string) => boolean;
+  onToggleFavorite: (name: string) => void;
 }
 
 const DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag'];
@@ -48,7 +50,7 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
   return groupedItems;
 }
 
-export default function CompactListView({ restaurants, selectedDay, availableDays, hasActiveSearch }: CompactListViewProps) {
+export default function CompactListView({ restaurants, selectedDay, availableDays, hasActiveSearch, isFavorite, onToggleFavorite }: CompactListViewProps) {
   const groupedItems = hasActiveSearch
     ? restaurants.reduce((acc, restaurant) => {
         restaurant.items.forEach(item => {
@@ -108,9 +110,26 @@ export default function CompactListView({ restaurants, selectedDay, availableDay
                             {items.map((item, idx) => (
                               <div key={`${item.restaurantName}-${idx}`} className="flex justify-between items-start py-2 px-3 rounded-lg">
                                 <p className="flex-1 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
-                                <span className="ml-4 flex-shrink-0 text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}>
-                                  {item.restaurantName}
-                                </span>
+                                <div className="ml-4 flex-shrink-0 flex items-center gap-1">
+                                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}>
+                                    {item.restaurantName}
+                                  </span>
+                                  <button
+                                    onClick={() => onToggleFavorite(item.restaurantName)}
+                                    className="favorite-heart"
+                                    style={{ color: isFavorite(item.restaurantName) ? 'var(--accent)' : 'var(--text-muted)' }}
+                                  >
+                                    {isFavorite(item.restaurantName) ? (
+                                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                      </svg>
+                                    )}
+                                  </button>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -129,9 +148,26 @@ export default function CompactListView({ restaurants, selectedDay, availableDay
                     {items.map((item, idx) => (
                       <div key={`${item.restaurantName}-${idx}`} className="flex justify-between items-start py-2 px-3 rounded-lg">
                         <p className="flex-1 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
-                        <span className="ml-4 flex-shrink-0 text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}>
-                          {item.restaurantName}
-                        </span>
+                        <div className="ml-4 flex-shrink-0 flex items-center gap-1">
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-muted)' }}>
+                            {item.restaurantName}
+                          </span>
+                          <button
+                            onClick={() => onToggleFavorite(item.restaurantName)}
+                            className="favorite-heart"
+                            style={{ color: isFavorite(item.restaurantName) ? 'var(--accent)' : 'var(--text-muted)' }}
+                          >
+                            {isFavorite(item.restaurantName) ? (
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
