@@ -6,19 +6,26 @@ restaurant_name_modifications = {
 # Locations dictionary
 LOCATIONS = {
     "Lindholmen": [
-        "Alkemisten Kaffebar & Kafé", 
-        "Bistrot", 
+        "Alkemisten Kaffebar & Kafé",
+        "Benne Pastabar",
+        "Bistrot",
         "Bombay Bistro",
-        "Cuckoo's Nest", 
-        "District One", 
-        "Gourmetkorv", 
-        "Kooperativet", 
-        "L's Kitchen", 
-        "L's Resto", 
-        "Matminnen", 
-        "Miss F", 
-        "Restaurant Pier 11", 
-        "Piren", 
+        "Cuckoo's Nest",
+        "District One",
+        "Encounter Asian",
+        "Gansu Köket",
+        "Gourmetkorv",
+        "Kooperativet",
+        "L's Kitchen",
+        "L's Resto",
+        "Masala Kitchen",
+        "Matminnen",
+        "Mimolett",
+        "Miss F",
+        "Oishii",
+        "Restaurant Pier 11",
+        "Piren",
+        "The Social",
         "Uni3 – World of Food"
     ],
 }
@@ -29,6 +36,12 @@ restaurant_locations = {
         "maps": "https://maps.app.goo.gl/HrvVSYgfaqzw7ARf8",
         "website": "https://www.alkemistenkaffebar.se/",
         "instagram": "https://www.instagram.com/alkemistenkaffebar/",
+        "area": "Lindholmen"
+    },
+    "Benne Pastabar": {
+        "maps": "https://maps.app.goo.gl/7sGxXMU8q4wW3LBWA",
+        "website": "https://bennepastabar.se/",
+        "instagram": "https://www.instagram.com/bennepastabar/",
         "area": "Lindholmen"
     },
     "Bistrot": {
@@ -49,10 +62,20 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/cuckoosnest_restaurant",
         "area": "Lindholmen"
     },
+    "Encounter Asian": {
+        "maps": "https://maps.app.goo.gl/encounter-asian-lindholmen",
+        "website": "https://tamed.se/take-away-meny/encounter-sushi",
+        "area": "Lindholmen"
+    },
     "District One": {
         "maps": "https://maps.app.goo.gl/RwHPDeykZvKpaTL26",
         "website": "https://www.districtone.se/",
         "instagram": "https://www.instagram.com/districtone.se/",
+        "area": "Lindholmen"
+    },
+    "Gansu Köket": {
+        "maps": "https://maps.app.goo.gl/gansu-koket-lindholmen",
+        "website": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/",
         "area": "Lindholmen"
     },
     "Kooperativet": {
@@ -67,6 +90,11 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/lskitchengbg/",
         "area": "Lindholmen"
     },
+    "Masala Kitchen": {
+        "maps": "https://maps.app.goo.gl/masala-kitchen-lindholmen",
+        "website": "https://masalakitchen.se/lunch/",
+        "area": "Lindholmen"
+    },
     "L's Resto": {
         "maps": "https://maps.app.goo.gl/RtVkeYh96g2zebqd7",
         "website": "https://www.lsresto.se/",
@@ -79,10 +107,22 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/matminnen/",
         "area": "Lindholmen"
     },
+    "Mimolett": {
+        "maps": "https://maps.app.goo.gl/mimolett-lindholmen",
+        "website": "https://restaurangmimolett.se/",
+        "instagram": "https://www.instagram.com/restaurangmimolett/",
+        "area": "Lindholmen"
+    },
     "Miss F": {
         "maps": "https://maps.app.goo.gl/bQFos82i7oNAazfv5",
         "website": "https://www.facebook.com/missfgbg/",
         "instagram": "https://www.instagram.com/missfgbg/",
+        "area": "Lindholmen"
+    },
+    "Oishii": {
+        "maps": "https://maps.app.goo.gl/oishii-lindholmen",
+        "website": "https://oishii.se/",
+        "instagram": "https://www.instagram.com/oishii_gbg/",
         "area": "Lindholmen"
     },
     "Restaurant Pier 11": {
@@ -95,6 +135,11 @@ restaurant_locations = {
         "maps": "https://maps.app.goo.gl/25UAJZWyC2wp5myh8",
         "website": "https://www.pirengbg.se/",
         "instagram": "https://www.instagram.com/pirenlindholmen/",
+        "area": "Lindholmen"
+    },
+    "The Social": {
+        "maps": "https://maps.app.goo.gl/the-social-eriksberg",
+        "website": "https://www.strawberryhotels.com/restaurant/sweden/gothenburg/the-social-eriksberg/",
         "area": "Lindholmen"
     },
     "Uni3 – World of Food": {

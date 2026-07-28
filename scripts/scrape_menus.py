@@ -18,11 +18,22 @@ import requests
 # Add project root to path so we can import the scraper modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.scrapers.restaurants.alkemisten_scraper import AlkemistenScraper
+from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
-from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
-from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.cuckoos_nest_scraper import CuckoosNestScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
+from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
+from app.scrapers.restaurants.gansu_scraper import GansuScraper
+from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from app.scrapers.restaurants.ls_kitchen_scraper import LsKitchenScraper
+from app.scrapers.restaurants.masala_scraper import MasalaScraper
+from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
+from app.scrapers.restaurants.miss_f_scraper import MissFScraper
+from app.scrapers.restaurants.oishii_scraper import OishiiScraper
+from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.the_social_scraper import TheSocialScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
 from app.restaurant_data import restaurant_locations
 
@@ -87,11 +98,22 @@ def scrape_with_retry(scraper):
 def scrape_all_menus(previous_menus):
     """Run all scrapers and return the combined menus dict."""
     scrapers = [
+        AlkemistenScraper(),
+        BennePastabarScraper(),
         BistrotScraper(),
         BombayBistroScraper(),
-        KooperativetScraper(),
-        Pier11Scraper(),
+        CuckoosNestScraper(),
         DistrictOneScraper(),
+        EncounterAsianScraper(),
+        GansuScraper(),
+        KooperativetScraper(),
+        LsKitchenScraper(),
+        MasalaScraper(),
+        MimolettScraper(),
+        MissFScraper(),
+        OishiiScraper(),
+        Pier11Scraper(),
+        TheSocialScraper(),
         Uni3Scraper(),
     ]
 
