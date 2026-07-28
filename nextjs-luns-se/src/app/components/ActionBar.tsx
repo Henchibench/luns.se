@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { trackEvent } from '../utils/analytics';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -14,6 +15,9 @@ interface ActionBarProps {
   onFiltersChange: (filters: FilterState) => void;
   viewMode: 'cards' | 'list';
   onViewModeChange: (mode: 'cards' | 'list') => void;
+  favoritesCount: number;
+  showOnlyFavorites: boolean;
+  onShowOnlyFavoritesChange: (value: boolean) => void;
 }
 
 const FOOD_TYPES = [
@@ -55,8 +59,7 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange }: ActionBarProps) {
-  const [favoritesCount, setFavoritesCount] = useState(0);
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange }: ActionBarProps) {
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   
   // Filter panel state
@@ -101,8 +104,20 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
       ...prev,
       searchTerm: craving.label.toLowerCase()
     }));
+    trackEvent('craving-search', { craving: craving.id });
     // Close the filter panel to show results
     setIsFilterOpen(false);
+  };
+
+  const toggleFilterPanel = () => {
+    if (!isFilterOpen) trackEvent('filter-open');
+    setIsFilterOpen(!isFilterOpen);
+  };
+
+  const handleViewModeChange = (mode: 'cards' | 'list') => {
+    trackEvent('view-mode-switch', { mode });
+    onViewModeChange(mode);
+    setShowViewDropdown(false);
   };
 
   const toggleFoodType = (foodType: string) => {
@@ -115,6 +130,8 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
   };
 
   const toggleRestaurant = (restaurant: string) => {
+    const wasSelected = filters.selectedRestaurants.includes(restaurant);
+    trackEvent('restaurant-toggle', { restaurant, selected: !wasSelected });
     setFilters(prev => ({
       ...prev,
       selectedRestaurants: prev.selectedRestaurants.includes(restaurant)
@@ -124,6 +141,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
   };
 
   const clearAllFilters = () => {
+    trackEvent('filter-clear');
     setFilters({
       selectedFoodTypes: [],
       selectedRestaurants: restaurants,
@@ -151,7 +169,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
         <div className="flex items-center space-x-3">
           {/* Filter Button */}
           <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            onClick={toggleFilterPanel}
             className={`backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 hover:shadow-md active:scale-95 active:shadow-sm border transform hover:-translate-y-0.5 ${
               hasActiveFilters 
                 ? 'bg-blue-600 text-white border-blue-600' 
@@ -167,16 +185,27 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
             )}
           </button>
           
-          {/* Favoriter Button - Hidden until functionality is implemented */}
-          {/* <button className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5">
-            <span>⭐</span>
+          {/* Favoriter Button */}
+          <button
+            onClick={() => onShowOnlyFavoritesChange(!showOnlyFavorites)}
+            aria-pressed={showOnlyFavorites}
+            title={showOnlyFavorites ? 'Visa alla restauranger' : 'Visa endast favoriter'}
+            className={`backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md active:scale-95 active:shadow-sm border transform hover:-translate-y-0.5 ${
+              showOnlyFavorites
+                ? 'bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600'
+                : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800'
+            }`}
+          >
+            <span>{showOnlyFavorites ? '⭐' : '☆'}</span>
             <span>Favoriter</span>
             {favoritesCount > 0 && (
-              <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full shadow-sm">
+              <span className={`text-xs px-2 py-1 rounded-full shadow-sm ${
+                showOnlyFavorites ? 'bg-white/25 text-white' : 'bg-yellow-500 text-white'
+              }`}>
                 {favoritesCount}
               </span>
             )}
-          </button> */}
+          </button>
           
           {/* View Toggle Dropdown */}
           <div className="relative">
@@ -193,10 +222,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
             {showViewDropdown && (
               <div className="absolute top-12 left-0 z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 min-w-[140px]">
                 <button
-                  onClick={() => {
-                    onViewModeChange('cards');
-                    setShowViewDropdown(false);
-                  }}
+                  onClick={() => handleViewModeChange('cards')}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 ${
                     viewMode === 'cards' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200'
                   } first:rounded-t-lg`}
@@ -206,10 +232,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
                   {viewMode === 'cards' && <span className="ml-auto">✓</span>}
                 </button>
                 <button
-                  onClick={() => {
-                    onViewModeChange('list');
-                    setShowViewDropdown(false);
-                  }}
+                  onClick={() => handleViewModeChange('list')}
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 ${
                     viewMode === 'list' ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200'
                   } last:rounded-b-lg`}
@@ -383,7 +406,14 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
               Rensa alla
             </button>
             <button
-              onClick={() => setIsFilterOpen(false)}
+              onClick={() => {
+                trackEvent('filter-apply', {
+                  foodTypes: filters.selectedFoodTypes,
+                  restaurantCount: filters.selectedRestaurants.length,
+                  hasSearch: !!filters.searchTerm.trim(),
+                });
+                setIsFilterOpen(false);
+              }}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all duration-150 shadow-lg hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 shadow-blue-200 dark:shadow-blue-900"
             >
               Tillämpa

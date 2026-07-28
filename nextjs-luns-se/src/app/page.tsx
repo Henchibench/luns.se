@@ -3,6 +3,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import InfoBanner from './components/InfoBanner';
 import ActionBar, { FilterState } from './components/ActionBar';
+import ThemeToggle from './components/ThemeToggle';
+import FavoriteHeart from './components/FavoriteHeart';
+import { useFavorites } from './hooks/useFavorites';
+import { trackEvent } from './utils/analytics';
 
 interface MenuItem {
   day: string;
@@ -174,9 +178,11 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
   return groupedItems;
 }
 
-function CompactListView({ restaurants, hasActiveSearch }: {
+function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite }: {
   restaurants: Restaurant[];
   hasActiveSearch?: boolean;
+  isFavorite: (name: string) => boolean;
+  onToggleFavorite: (name: string) => void;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const availableDays = getAvailableDays();
@@ -205,8 +211,8 @@ function CompactListView({ restaurants, hasActiveSearch }: {
     ? Object.keys(groupedItems).length === 0
     : Object.keys(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).length === 0;
 
-  const containerClasses = "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm";
-  const headerClasses = "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300";
+  const containerClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm";
+  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
 
   if (isEmpty) {
     return (
@@ -218,7 +224,7 @@ function CompactListView({ restaurants, hasActiveSearch }: {
         </div>
         <div className="p-6 text-center">
           <div className="text-4xl mb-2">🍽️</div>
-          <p className="font-medium mb-1 text-gray-700">
+          <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
             {hasActiveSearch ? 'Inga sökresultat' : `Inga rätter för ${selectedDay.toLowerCase()}`}
           </p>
         </div>
@@ -234,7 +240,7 @@ function CompactListView({ restaurants, hasActiveSearch }: {
             <h2 className="font-bold text-xl">
               Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
             </h2>
-            <p className="text-sm mt-1 text-gray-600">
+            <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">
               {hasActiveSearch
                 ? 'Alla rätter från alla restauranger grupperade efter dag och typ'
                 : 'Alla rätter från alla restauranger grupperade efter typ'
@@ -252,8 +258,8 @@ function CompactListView({ restaurants, hasActiveSearch }: {
                 onClick={() => setSelectedDay(day)}
                 className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
-                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
+                    ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
                 }`}
               >
                 {day}
@@ -264,7 +270,7 @@ function CompactListView({ restaurants, hasActiveSearch }: {
 
         {/* Search Results Indicator */}
         {hasActiveSearch && (
-          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">
+          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
             🔍 Sökresultat - visar alla dagar
           </div>
         )}
@@ -283,30 +289,35 @@ function CompactListView({ restaurants, hasActiveSearch }: {
             })
             .map(([day, categories]) => (
             <div key={day} className="space-y-3">
-              <h2 className="font-bold text-lg text-gray-800 border-b border-gray-300 pb-2">
+              <h2 className="font-bold text-lg text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-2">
                 {day}
               </h2>
               <div className="space-y-3 ml-2">
                 {Object.entries(categories).map(([category, items]) => (
                   <div key={category} className="space-y-2">
-                    <h3 className="font-semibold text-base text-gray-700">
+                    <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
                       {category}
                     </h3>
                     <div className="space-y-2 ml-2">
                       {items.map((item, idx) => (
                         <div
                           key={`${item.restaurantName}-${idx}`}
-                          className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50"
+                          className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                           <div className="flex-1">
-                            <p className="text-sm leading-relaxed text-gray-600">
+                            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                               {item.description}
                             </p>
                           </div>
-                          <div className="ml-4 flex-shrink-0">
-                            <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">
+                          <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
+                            <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
                               {item.restaurantName}
                             </span>
+                            <FavoriteHeart
+                              variant="inline"
+                              isFavorite={isFavorite(item.restaurantName)}
+                              onToggle={() => onToggleFavorite(item.restaurantName)}
+                            />
                           </div>
                         </div>
                       ))}
@@ -320,24 +331,29 @@ function CompactListView({ restaurants, hasActiveSearch }: {
           // Normal view: Group by Category → Items
           Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).map(([category, items]) => (
             <div key={category}>
-              <h3 className="font-semibold mb-2 pb-1 border-b text-base text-gray-800 border-gray-300">
+              <h3 className="font-semibold mb-2 pb-1 border-b text-base text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600">
                 {category}
               </h3>
               <div className="space-y-2">
                 {items.map((item, idx) => (
                   <div
                     key={`${item.restaurantName}-${idx}`}
-                    className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50"
+                    className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <div className="flex-1">
-                      <p className="text-sm leading-relaxed text-gray-700">
+                      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
                         {item.description}
                       </p>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">
+                    <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
+                      <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
                         {item.restaurantName}
                       </span>
+                      <FavoriteHeart
+                        variant="inline"
+                        isFavorite={isFavorite(item.restaurantName)}
+                        onToggle={() => onToggleFavorite(item.restaurantName)}
+                      />
                     </div>
                   </div>
                 ))}
@@ -350,11 +366,13 @@ function CompactListView({ restaurants, hasActiveSearch }: {
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch }: {
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite }: {
   restaurant: Restaurant;
   allItems: string[];
   originalRestaurant?: Restaurant;
   hasActiveSearch?: boolean;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
@@ -399,8 +417,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
     setContentKey(newContentKey);
   }, [groupedItems, contentKey]);
 
-  const cardClasses = "bg-white dark:bg-gray-200 rounded border border-gray-300 shadow-sm overflow-visible";
-  const headerClasses = "bg-gray-100 dark:bg-gray-300 p-4 text-black rounded-t border-b border-gray-300";
+  const cardClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm overflow-visible";
+  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
 
   return (
     <div className={cardClasses}>
@@ -411,10 +429,15 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
 
           {/* Action Buttons */}
           <div className="flex space-x-2 ml-4">
+            <FavoriteHeart isFavorite={isFavorite} onToggle={onToggleFavorite} />
+
             {restaurant.location?.maps && (
               <button
-                onClick={() => setShowMap(!showMap)}
-                className="backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300"
+                onClick={() => {
+                  if (!showMap) trackEvent('map-open', { restaurant: restaurant.name });
+                  setShowMap(!showMap);
+                }}
+                className="backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 <span>🗺️</span>
                 <span>Hitta hit!</span>
@@ -426,7 +449,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 href={restaurant.location.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded"
+                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'website' })}
+                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
               >
                 🏠
               </a>
@@ -437,7 +461,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 href={restaurant.location.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded"
+                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'instagram' })}
+                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
               >
                 <img src="/instagram.svg" alt="Instagram" className="w-4 h-4" />
               </a>
@@ -445,7 +470,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
           </div>
         </div>
 
-        <div className="space-y-1 mb-4 text-gray-700">
+        <div className="space-y-1 mb-4 text-gray-700 dark:text-gray-200">
           {todaysInfo.map((info, index) => (
             <div key={index} className="text-sm">
               {info}
@@ -462,8 +487,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 onClick={() => setSelectedDay(day)}
                 className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
-                    ? 'bg-white text-gray-800 border-2 border-gray-400 rounded'
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 rounded'
+                    ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
                 }`}
               >
                 {day}
@@ -474,7 +499,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
 
         {/* Search Results Indicator */}
         {hasActiveSearch && (
-          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">
+          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
             🔍 Sökresultat - visar alla dagar
           </div>
         )}
@@ -516,15 +541,15 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
       )}
 
       {/* Menu Content */}
-      <div className="p-6 bg-white text-gray-800">
+      <div className="p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
         <div className={`space-y-4 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
           {Object.entries(groupedItems).length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">🍽️</div>
-              <p className="font-medium mb-1 text-gray-700">
+              <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
                 Ingen meny för {selectedDay.toLowerCase()}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Välj en annan dag eller kolla direkt med restaurangen
               </p>
             </div>
@@ -534,20 +559,20 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
               .filter(([day]) => availableDays.includes(day))
               .map(([day, categories]) => (
               <div key={day} className="space-y-3">
-                <h2 className="font-bold text-lg text-gray-800 border-b border-gray-300 pb-2">
+                <h2 className="font-bold text-lg text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-2">
                   {day}
                 </h2>
                 <div className="space-y-3 ml-2">
                   {Object.entries(categories).map(([category, items]) => (
                     <div key={category} className="space-y-2">
-                      <h3 className="font-semibold text-base text-gray-700">
+                      <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
                         {category}
                       </h3>
                       <div className="space-y-2 ml-2">
                         {items.map((item, idx) => (
                           <div
                             key={idx}
-                            className="text-sm leading-relaxed text-gray-600"
+                            className="text-sm leading-relaxed text-gray-600 dark:text-gray-300"
                           >
                             {item.description}
                           </div>
@@ -562,14 +587,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
             // Normal view: Group by Category → Items
             Object.entries(groupedItems as Record<string, MenuItem[]>).map(([category, items]) => (
               <div key={category} className="space-y-2">
-                <h3 className="font-semibold text-base text-gray-800 border-b border-gray-300 pb-1">
+                <h3 className="font-semibold text-base text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-1">
                   {category}
                 </h3>
                 <div className="space-y-2">
                   {items.map((item, idx) => (
                     <div
                       key={idx}
-                      className="text-sm leading-relaxed text-gray-700"
+                      className="text-sm leading-relaxed text-gray-700 dark:text-gray-200"
                     >
                       {item.description}
                     </div>
@@ -599,6 +624,8 @@ export default function MenuPage() {
     todayOnly: false
   });
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+
+  const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
   // Back to top button state
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -641,11 +668,22 @@ export default function MenuPage() {
 
   // Smooth scroll to top function
   const scrollToTop = () => {
+    trackEvent('back-to-top');
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
+
+  // Track search input, debounced so we don't fire on every keystroke
+  useEffect(() => {
+    const term = filters.searchTerm.trim();
+    if (!term) return;
+    const timer = setTimeout(() => {
+      trackEvent('search-input', { term });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [filters.searchTerm]);
 
   // Apply filters with proper enter/exit animations
   useEffect(() => {
@@ -664,6 +702,11 @@ export default function MenuPage() {
     newFiltered = newFiltered.filter(restaurant =>
       filters.selectedRestaurants.includes(restaurant.name)
     );
+
+    // Show only favorites when the favorites toggle is active
+    if (showOnlyFavorites) {
+      newFiltered = newFiltered.filter(restaurant => favorites.includes(restaurant.name));
+    }
 
     // Apply filtering to each restaurant's items
     newFiltered = newFiltered.map(restaurant => {
@@ -726,7 +769,7 @@ export default function MenuPage() {
       currentDisplayedRef.current = newFiltered;
       setIsFiltering(false);
     }
-  }, [restaurants, filters]);
+  }, [restaurants, filters, showOnlyFavorites, favorites]);
 
   useEffect(() => {
     Promise.all([
@@ -775,17 +818,19 @@ export default function MenuPage() {
   if (error) {
     return (
       <div className="min-h-screen transition-colors duration-300 flex items-center justify-center bg-[#002933]">
-        <div className="text-center p-8 rounded-lg shadow-lg border bg-white border-gray-300">
+        <div className="text-center p-8 rounded-lg shadow-lg border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
           <div className="text-4xl mb-4">❌</div>
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">Något gick fel</h2>
-          <p className="text-gray-600">{error}</p>
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Något gick fel</h2>
+          <p className="text-gray-600 dark:text-gray-300">{error}</p>
         </div>
       </div>
     );
   }
 
       return (
-      <div className="min-h-screen relative bg-[#002933]">
+      <div className="min-h-screen relative bg-[#002933] dark:bg-[#00171d]">
+
+      <ThemeToggle />
 
       {/* Brand Title */}
        <div className="relative z-10">
@@ -804,7 +849,7 @@ export default function MenuPage() {
       <div className="relative z-10">
                  {/* Dashboard Section - Info Banner with Controls */}
          <div className="max-w-4xl mx-auto px-4 py-2 relative z-50">
-           <div className="backdrop-blur-sm rounded-xl shadow-lg border p-6 bg-white/95 border-gray-300">
+           <div className="backdrop-blur-sm rounded-xl shadow-lg border p-6 bg-white/95 dark:bg-gray-800/95 border-gray-300 dark:border-gray-600">
              <InfoBanner />
 
              {/* Action Bar */}
@@ -814,6 +859,9 @@ export default function MenuPage() {
                  onFiltersChange={handleFiltersChange}
                  viewMode={viewMode}
                  onViewModeChange={setViewMode}
+                 favoritesCount={favorites.length}
+                 showOnlyFavorites={showOnlyFavorites}
+                 onShowOnlyFavoritesChange={setShowOnlyFavorites}
                />
              </div>
            </div>
@@ -822,17 +870,26 @@ export default function MenuPage() {
         {/* Restaurant Cards or List View */}
         <div className="max-w-4xl mx-auto px-4 py-4">
           {filteredRestaurants.length === 0 && !isFiltering ? (
-            <div className="text-center py-16 rounded-xl shadow-lg border bg-white border-gray-300">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Inga resultat</h3>
-              <p className="mb-4 text-gray-600">Prova att justera dina filter för att se fler alternativ.</p>
+            <div className="text-center py-16 rounded-xl shadow-lg border bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-600">
+              <div className="text-6xl mb-4">{showOnlyFavorites && favorites.length === 0 ? '⭐' : '🔍'}</div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+                {showOnlyFavorites && favorites.length === 0 ? 'Inga favoriter än' : 'Inga resultat'}
+              </h3>
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
+                {showOnlyFavorites && favorites.length === 0
+                  ? 'Klicka på hjärtat på en restaurang för att spara den som favorit.'
+                  : 'Prova att justera dina filter för att se fler alternativ.'}
+              </p>
               <button
-                onClick={() => setFilters({
-                  selectedFoodTypes: [],
-                  selectedRestaurants: restaurants.map(r => r.name),
-                  searchTerm: '',
-                  todayOnly: false
-                })}
+                onClick={() => {
+                  setShowOnlyFavorites(false);
+                  setFilters({
+                    selectedFoodTypes: [],
+                    selectedRestaurants: restaurants.map(r => r.name),
+                    searchTerm: '',
+                    todayOnly: false
+                  });
+                }}
                 className="px-4 py-2 rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
               >
                 Rensa alla filter
@@ -842,6 +899,8 @@ export default function MenuPage() {
             <CompactListView
               restaurants={displayedRestaurants}
               hasActiveSearch={!!filters.searchTerm.trim()}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
             />
           ) : (
             <div className="space-y-4">
@@ -866,6 +925,8 @@ export default function MenuPage() {
                       allItems={rawMenus[restaurant.name] || []}
                       originalRestaurant={restaurants.find(r => r.name === restaurant.name)}
                       hasActiveSearch={!!filters.searchTerm.trim()}
+                      isFavorite={isFavorite(restaurant.name)}
+                      onToggleFavorite={() => toggleFavorite(restaurant.name)}
                     />
                   </div>
                 );
@@ -875,10 +936,10 @@ export default function MenuPage() {
         </div>
 
         {/* Footer with Status */}
-        <footer className="relative z-50 backdrop-blur-sm border-t py-6 mt-16 bg-white/90 border-gray-300">
+        <footer className="relative z-50 backdrop-blur-sm border-t py-6 mt-16 bg-white/90 dark:bg-gray-900/90 border-gray-300 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="flex items-center space-x-6 text-sm mb-4 md:mb-0 text-gray-600">
+              <div className="flex items-center space-x-6 text-sm mb-4 md:mb-0 text-gray-600 dark:text-gray-300">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span>Aktiv</span>
@@ -889,14 +950,14 @@ export default function MenuPage() {
                 </div>
               </div>
               <div className="text-center md:text-right">
-                <p className="text-sm mb-2 text-gray-600">
+                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
                   Vibe kodad av Henkebus ❤️
                 </p>
-                <p className="text-sm mb-2 text-gray-600">
+                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
                   Frågor eller förbättringsförslag? Hör av dig på{' '}
                   <a
                     href="mailto:luns.se@outlook.com"
-                    className="underline transition-colors hover:text-gray-800"
+                    className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-100"
                   >
                     luns.se@outlook.com
                   </a>
@@ -915,7 +976,7 @@ export default function MenuPage() {
         }`}>
           <button
             onClick={scrollToTop}
-            className="relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border bg-white/90 text-gray-700 border-gray-300 hover:bg-white"
+            className="relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
           >
             {/* Scroll Progress Ring with SVG Arrow */}
             <div className="relative w-8 h-8">
