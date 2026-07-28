@@ -21,6 +21,22 @@ body::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
 
+/* Favorite heart */
+.favorite-heart {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.favorite-heart:active {
+  animation: heartPulse 0.25s ease;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
 /* Smooth slide in animation for filter buttons */
 @keyframes slideInUp {
   0% {
