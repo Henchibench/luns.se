@@ -159,4 +159,10 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Skyline": {
+        "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
+        "website": "http://restaurangskyline.se",
+        "area": "Tannefors",
+        "lunch_hours": "Vardagar 11.00–13.00"
+    },
 }
