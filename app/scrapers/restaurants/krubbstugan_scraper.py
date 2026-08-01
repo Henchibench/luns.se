@@ -7,32 +7,29 @@ from ..base_scraper import BaseScraper
 class KrubbstuganScraper(BaseScraper):
     """Krubbstugan, Gelbgjutaregatan 2 — Tannefors, Linköping.
 
-    A WordPress page with no menu markup to speak of: the week is a flat run of
-    sibling <p> blocks where a day is a paragraph whose only content is a bolded
-    weekday, and every paragraph after it is a dish until the next day or the
-    trailing shop talk. So we walk the paragraphs in document order and switch
-    day as we pass each heading.
+    A WordPress page with no menu markup to speak of: one flat run of sibling
+    <p> blocks. A day is a paragraph whose only content is a bolded weekday and
+    every paragraph after it is a dish, then below the week come the standing
+    dishes and finally the pricing. Nothing marks those transitions
+    structurally, so we walk the paragraphs in document order and move through
+    three phases by matching the prose that introduces each one.
+
+    Phrase matching is the fragile part. If the page is reworded this is what
+    breaks, so a run that finds no dishes fails loudly rather than quietly
+    publishing an empty menu.
     """
 
     SWEDISH_DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
 
-    # Paragraphs after the last day that are prose, not food. Matching any of
-    # these ends the menu — everything below is opening hours and pricing.
-    STOP_PATTERNS = [
-        r'vi bjuder',
-        r'välkommen',
-        r'varje\s*$',
-        r'dag kan du njuta',
-        r'som veckans special',
-        r'servering',
-        r'avhämtning',
-        r'häfte',
-        r'valfri dricka',
-        r'@',
-    ]
+    # Ends the weekday listing — prose, not food.
+    WEEK_END_PATTERNS = [r'vi bjuder', r'välkommen']
 
-    # Paragraphs worth surfacing as restaurant info rather than dropping.
+    # Introduces the dishes served every day regardless of weekday.
+    STANDING_START = r'varje\s+dag kan du njuta'
+
+    # Introduces the pricing block, which ends the menu proper.
     INFO_PATTERNS = [r'^\s*servering\b', r'^\s*avhämtning\b']
+    INFO_START_PATTERNS = INFO_PATTERNS + [r'häfte', r'valfri dricka', r'@']
 
     def __init__(self):
         restaurant_info = {
@@ -50,9 +47,10 @@ class KrubbstuganScraper(BaseScraper):
         text = self.clean_text(emphasis.get_text(strip=True))
         return next((d for d in self.SWEDISH_DAYS if text.lower() == d.lower()), '')
 
-    def _is_stop(self, text: str) -> bool:
+    @staticmethod
+    def _matches(text: str, patterns: List[str]) -> bool:
         lowered = text.lower()
-        return any(re.search(p, lowered) for p in self.STOP_PATTERNS)
+        return any(re.search(p, lowered) for p in patterns)
 
     def scrape(self) -> Dict[str, List[str]]:
         try:
@@ -60,10 +58,12 @@ class KrubbstuganScraper(BaseScraper):
             if soup is None:
                 return {self.name: ["Ett fel uppstod vid hämtning av menyn"]}
 
-            items: List[str] = []
+            by_day: List[tuple] = []      # (day, category, dish)
+            standing: List[tuple] = []    # (category, dish)
             info_lines: List[str] = []
+
             current_day = ''
-            menu_done = False
+            phase = 'week'
 
             for paragraph in soup.find_all('p'):
                 text = self.clean_text(paragraph.get_text(' ', strip=True))
@@ -72,40 +72,60 @@ class KrubbstuganScraper(BaseScraper):
 
                 day = self._is_day_heading(paragraph)
                 if day:
-                    current_day = day
+                    current_day, phase = day, 'week'
                     continue
 
-                if not current_day:
+                if re.search(self.STANDING_START, text.lower()):
+                    phase = 'standing'
                     continue
 
-                if self._is_stop(text):
-                    menu_done = True
-                    if any(re.search(p, text.lower()) for p in self.INFO_PATTERNS):
+                if self._matches(text, self.INFO_START_PATTERNS):
+                    phase = 'info'
+                    if self._matches(text, self.INFO_PATTERNS):
                         info_lines.append(text)
                     continue
 
-                if menu_done:
-                    continue
+                if phase == 'week':
+                    if self._matches(text, self.WEEK_END_PATTERNS):
+                        phase = 'between'
+                        continue
+                    if not current_day:
+                        continue
+                    # "*** tacobuffé ***" is a real Friday dish, just shouted
+                    dish = text.strip('* ').strip()
+                    if dish:
+                        by_day.append((current_day, self._categorise(dish), dish))
 
-                # "*** tacobuffé ***" is a real Friday dish, just shouted
-                dish = text.strip('* ').strip()
-                if not dish:
-                    continue
+                elif phase == 'standing':
+                    dish = text.strip('* ').strip()
+                    if dish:
+                        category = 'Veckans' if 'veckans special' in dish.lower() else 'Stående rätter'
+                        standing.append((category, dish))
 
-                category = 'Vegetarisk' if re.search(r'(?i)\b(vegetarisk|vegansk|vegan)\b', dish) else 'Dagens'
-                items.append(f"{current_day}|<strong>{category}</strong> - {dish}")
-
-            if not items:
+            if not by_day:
                 self.log_error("No dishes found — page layout may have changed")
                 return {self.name: ["Ingen lunchmeny tillgänglig"]}
+
+            items = [f"{day}|<strong>{category}</strong> - {dish}" for day, category, dish in by_day]
+
+            # Standing dishes are available every day, so they repeat across the week
+            for category, dish in standing:
+                for day in self.SWEDISH_DAYS:
+                    items.append(f"{day}|<strong>{category}</strong> - {dish}")
 
             for line in info_lines:
                 for day in self.SWEDISH_DAYS:
                     items.append(f"INFO:{day} - Restaurant Info: 💰 {line}")
 
-            self.log_info(f"Found {len(items)} menu items")
+            self.log_info(
+                f"Found {len(by_day)} weekday dishes and {len(standing)} standing dishes"
+            )
             return {self.name: items}
 
         except Exception as e:
             self.log_error(f"Error scraping menu: {e}")
             return {self.name: ["Ett fel uppstod vid hämtning av menyn"]}
+
+    @staticmethod
+    def _categorise(dish: str) -> str:
+        return 'Vegetarisk' if re.search(r'(?i)\b(vegetarisk|vegansk|vegan)\b', dish) else 'Dagens'
