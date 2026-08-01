@@ -27,6 +27,7 @@ from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
 from app.scrapers.restaurants.gansu_scraper import GansuScraper
 from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
 from app.scrapers.restaurants.ls_kitchen_scraper import LsKitchenScraper
 from app.scrapers.restaurants.masala_scraper import MasalaScraper
 from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
@@ -108,6 +109,7 @@ def scrape_all_menus(previous_menus):
         EncounterAsianScraper(),
         GansuScraper(),
         KooperativetScraper(),
+        KrubbstuganScraper(),
         LsKitchenScraper(),
         MasalaScraper(),
         MimolettScraper(),

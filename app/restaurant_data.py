@@ -152,4 +152,9 @@ restaurant_locations = {
         "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/terrassen/",
         "area": "Tannefors"
     },
+    "Krubbstugan": {
+        "maps": "https://www.google.com/maps/search/?api=1&query=Gelbgjutaregatan+2%2C+581+87+Link%C3%B6ping",
+        "website": "https://krubbstugan.se",
+        "area": "Tannefors"
+    },
 }
