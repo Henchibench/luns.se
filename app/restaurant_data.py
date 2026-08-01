@@ -3,31 +3,30 @@ restaurant_name_modifications = {
     "Rollin Bistros": "Piren"
 }
 
-# Locations dictionary
+# Location metadata.
+#
+# Which restaurants belong to a location is NOT listed here — it is derived
+# from each restaurant's "area" field in restaurant_locations below, so the
+# two can never drift apart. This dict only carries what cannot be derived:
+# where to centre the weather lookup and how to phrase the Google Maps query.
+#
+# A location only reaches the frontend once at least one scraped restaurant
+# has that area, so entries can be prepared before their scrapers exist.
 LOCATIONS = {
-    "Lindholmen": [
-        "Alkemisten Kaffebar & Kafé",
-        "Benne Pastabar",
-        "Bistrot",
-        "Bombay Bistro",
-        "Cuckoo's Nest",
-        "District One",
-        "Encounter Asian",
-        "Gansu Köket",
-        "Gourmetkorv",
-        "Kooperativet",
-        "L's Kitchen",
-        "L's Resto",
-        "Masala Kitchen",
-        "Matminnen",
-        "Mimolett",
-        "Miss F",
-        "Oishii",
-        "Restaurant Pier 11",
-        "Piren",
-        "The Social",
-        "Uni3 – World of Food"
-    ],
+    "Lindholmen": {
+        "label": "Lindholmen",
+        "city": "Göteborg",
+        "map_query": "lindholmen göteborg",
+        "latitude": 57.7059,
+        "longitude": 11.9359,
+    },
+    "Tannefors": {
+        "label": "Tannefors",
+        "city": "Linköping",
+        "map_query": "tannefors linköping",
+        "latitude": 58.4108,
+        "longitude": 15.6470,
+    },
 }
 
 # Restaurant locations dictionary

@@ -35,7 +35,7 @@ from app.scrapers.restaurants.oishii_scraper import OishiiScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
 from app.scrapers.restaurants.the_social_scraper import TheSocialScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
-from app.restaurant_data import restaurant_locations
+from app.restaurant_data import restaurant_locations, LOCATIONS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -142,6 +142,32 @@ def scrape_all_menus(previous_menus):
 
 def build_restaurants_response(menus):
     """Build the restaurants JSON matching the /restaurants API shape."""
+def build_locations_response(restaurants):
+    """Build the location list for the frontend picker.
+
+    Only locations that actually have a scraped restaurant are emitted, so a
+    location can be prepared in LOCATIONS before its scrapers exist without
+    showing up as an empty choice in the picker.
+    """
+    areas = {r["area"] for r in restaurants.values()}
+    locations = []
+    for area in sorted(areas):
+        meta = LOCATIONS.get(area)
+        if not meta:
+            logger.warning(f"[LOCATION] '{area}' has restaurants but no entry in LOCATIONS — skipping")
+            continue
+        locations.append({
+            "id": area,
+            "label": meta["label"],
+            "city": meta["city"],
+            "mapQuery": meta["map_query"],
+            "latitude": meta["latitude"],
+            "longitude": meta["longitude"],
+            "restaurantCount": sum(1 for r in restaurants.values() if r["area"] == area),
+        })
+    return locations
+
+
     restaurants = {}
     for restaurant_name in menus.keys():
         info = restaurant_locations.get(restaurant_name, {})
@@ -154,7 +180,11 @@ def build_restaurants_response(menus):
             "review_score": info.get("review_score"),
             "has_menu": True,
         }
-    return {"restaurants": restaurants, "total": len(restaurants)}
+    return {
+        "restaurants": restaurants,
+        "total": len(restaurants),
+        "locations": build_locations_response(restaurants),
+    }
 
 
 def build_menus_response(menus):
