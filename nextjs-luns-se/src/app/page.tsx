@@ -5,7 +5,9 @@ import InfoBanner from './components/InfoBanner';
 import ActionBar, { FilterState } from './components/ActionBar';
 import ThemeToggle from './components/ThemeToggle';
 import FavoriteHeart from './components/FavoriteHeart';
+import { LocationWelcome } from './components/LocationPicker';
 import { useFavorites } from './hooks/useFavorites';
+import { useLocation, LunsLocation } from './hooks/useLocation';
 import { trackEvent } from './utils/analytics';
 
 interface MenuItem {
@@ -366,13 +368,14 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite }: {
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery }: {
   restaurant: Restaurant;
   allItems: string[];
   originalRestaurant?: Restaurant;
   hasActiveSearch?: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  mapQuery: string;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
@@ -516,7 +519,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
             showMap ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
           }`}>
             <iframe
-              src={`https://maps.google.com/maps?q=lindholmen+${encodeURIComponent(restaurant.name)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(`${mapQuery} ${restaurant.name}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
               className="w-full h-96 border-none rounded-lg mb-3"
               allowFullScreen
               style={{
@@ -627,6 +630,15 @@ export default function MenuPage() {
 
   const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
+  const [locations, setLocations] = useState<LunsLocation[]>([]);
+  const { selected: selectedLocation, needsChoice, selectLocation } = useLocation(locations);
+
+  // Restaurants at the selected location. Until a location is known we show
+  // none rather than every city at once.
+  const locationRestaurants = selectedLocation
+    ? restaurants.filter(r => r.location?.area === selectedLocation.id)
+    : [];
+
   // Back to top button state
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -687,16 +699,23 @@ export default function MenuPage() {
 
   // Apply filters with proper enter/exit animations
   useEffect(() => {
-    if (restaurants.length === 0) {
-      // Initial load - no animation
-      setFilteredRestaurants(restaurants);
-      setDisplayedRestaurants(restaurants);
-      currentDisplayedRef.current = restaurants;
+    // Location comes first: everything below only ever considers restaurants
+    // at the selected location. Recomputed here rather than read from the
+    // render-scope copy, which is a fresh array on every render.
+    const atLocation = selectedLocation
+      ? restaurants.filter(r => r.location?.area === selectedLocation.id)
+      : [];
+
+    if (atLocation.length === 0) {
+      // Initial load, or no location chosen yet - no animation
+      setFilteredRestaurants([]);
+      setDisplayedRestaurants([]);
+      currentDisplayedRef.current = [];
       return;
     }
 
     // Calculate what the new filtered results should be
-    let newFiltered = restaurants;
+    let newFiltered = atLocation;
 
     // Filter by selected restaurants (only show selected ones)
     newFiltered = newFiltered.filter(restaurant =>
@@ -769,7 +788,7 @@ export default function MenuPage() {
       currentDisplayedRef.current = newFiltered;
       setIsFiltering(false);
     }
-  }, [restaurants, filters, showOnlyFavorites, favorites]);
+  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation]);
 
   useEffect(() => {
     Promise.all([
@@ -787,12 +806,27 @@ export default function MenuPage() {
         // Apply Pier 11 recategorization
         const recategorizedRestaurants = recategorizePier11Items(parsedRestaurants);
 
+        // The scraper emits a locations list. Older data files predate it, so
+        // derive a usable one from the restaurants' areas rather than leaving
+        // the picker empty and the page blank.
+        const emitted: LunsLocation[] | undefined = restaurantsData.locations;
+        const resolvedLocations: LunsLocation[] = emitted?.length
+          ? emitted
+          : Array.from(new Set(parsedRestaurants.map(r => r.location?.area).filter(Boolean) as string[]))
+              .sort()
+              .map(area => ({
+                id: area,
+                label: area,
+                city: area,
+                mapQuery: area,
+                latitude: 57.7059,
+                longitude: 11.9359,
+                restaurantCount: parsedRestaurants.filter(r => r.location?.area === area).length,
+              }));
+
         setRawMenus(menusData.menus);
         setRestaurants(recategorizedRestaurants);
-        setFilters(prev => ({
-          ...prev,
-          selectedRestaurants: parsedRestaurants.map(r => r.name)
-        }));
+        setLocations(resolvedLocations);
         setLoading(false);
         setLastFetch(new Date());
       })
@@ -832,6 +866,13 @@ export default function MenuPage() {
 
       <ThemeToggle />
 
+      {needsChoice && (
+        <LocationWelcome
+          locations={locations}
+          onSelect={id => selectLocation(id, true)}
+        />
+      )}
+
       {/* Brand Title */}
        <div className="relative z-10">
          <div className="max-w-7xl mx-auto px-4 py-12">
@@ -850,18 +891,24 @@ export default function MenuPage() {
                  {/* Dashboard Section - Info Banner with Controls */}
          <div className="max-w-4xl mx-auto px-4 py-2 relative z-50">
            <div className="backdrop-blur-sm rounded-xl shadow-lg border p-6 bg-white/95 dark:bg-gray-800/95 border-gray-300 dark:border-gray-600">
-             <InfoBanner />
+             <InfoBanner
+               latitude={selectedLocation?.latitude}
+               longitude={selectedLocation?.longitude}
+             />
 
              {/* Action Bar */}
              <div className="mt-6">
                <ActionBar
-                 restaurants={restaurants.map(r => r.name)}
+                 restaurants={locationRestaurants.map(r => r.name)}
                  onFiltersChange={handleFiltersChange}
                  viewMode={viewMode}
                  onViewModeChange={setViewMode}
                  favoritesCount={favorites.length}
                  showOnlyFavorites={showOnlyFavorites}
                  onShowOnlyFavoritesChange={setShowOnlyFavorites}
+                 locations={locations}
+                 selectedLocation={selectedLocation}
+                 onLocationChange={selectLocation}
                />
              </div>
            </div>
@@ -885,7 +932,7 @@ export default function MenuPage() {
                   setShowOnlyFavorites(false);
                   setFilters({
                     selectedFoodTypes: [],
-                    selectedRestaurants: restaurants.map(r => r.name),
+                    selectedRestaurants: locationRestaurants.map(r => r.name),
                     searchTerm: '',
                     todayOnly: false
                   });
@@ -927,6 +974,7 @@ export default function MenuPage() {
                       hasActiveSearch={!!filters.searchTerm.trim()}
                       isFavorite={isFavorite(restaurant.name)}
                       onToggleFavorite={() => toggleFavorite(restaurant.name)}
+                      mapQuery={selectedLocation?.mapQuery ?? ''}
                     />
                   </div>
                 );

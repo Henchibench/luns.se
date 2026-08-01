@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../utils/analytics';
+import { LocationDropdown } from './LocationPicker';
+import type { LunsLocation } from '../hooks/useLocation';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -18,6 +20,9 @@ interface ActionBarProps {
   favoritesCount: number;
   showOnlyFavorites: boolean;
   onShowOnlyFavoritesChange: (value: boolean) => void;
+  locations: LunsLocation[];
+  selectedLocation: LunsLocation | null;
+  onLocationChange: (id: string) => void;
 }
 
 const FOOD_TYPES = [
@@ -59,7 +64,7 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange }: ActionBarProps) {
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   
   // Filter panel state
@@ -78,6 +83,16 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
   React.useEffect(() => {
     onFiltersChange(filters);
   }, [filters, onFiltersChange]);
+
+  // Keep the restaurant selection in step with the list we are given. This
+  // fires on load and whenever the location changes — selecting restaurants
+  // from a city you just left would filter everything away. Keyed on the
+  // joined names because the parent builds a fresh array on every render.
+  const restaurantKey = restaurants.join('|');
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, selectedRestaurants: restaurants }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantKey]);
 
   // Click outside to close filter panel
   useEffect(() => {
@@ -167,6 +182,13 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
       <div className="flex items-center justify-between">
         {/* Left Side Buttons */}
         <div className="flex items-center space-x-3">
+          {/* Location Picker */}
+          <LocationDropdown
+            locations={locations}
+            selected={selectedLocation}
+            onSelect={onLocationChange}
+          />
+
           {/* Filter Button */}
           <button
             onClick={toggleFilterPanel}

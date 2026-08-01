@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 
-interface InfoBannerProps {}
+interface InfoBannerProps {
+  /** Coordinates of the selected location. Falls back to Lindholmen. */
+  latitude?: number;
+  longitude?: number;
+}
+
+const FALLBACK_LATITUDE = 57.7059;
+const FALLBACK_LONGITUDE = 11.9359;
 
 const goteborgJokes = [
   "Varför kan en abborre och en mört inte få barn? För det blir abbört.",
@@ -179,7 +186,7 @@ function getLunchCountdown(): string {
   }
 }
 
-export default function InfoBanner({}: InfoBannerProps) {
+export default function InfoBanner({ latitude, longitude }: InfoBannerProps) {
   const [currentWeek, setCurrentWeek] = useState<number>(0);
   const [joke, setJoke] = useState<string>('');
   const [countdown, setCountdown] = useState<string>('');
@@ -231,11 +238,15 @@ export default function InfoBanner({}: InfoBannerProps) {
     };
   }, []);
 
-  // Lazy load weather after main content loads
+  // Lazy load weather after main content loads. Re-runs when the location
+  // changes so the temperature follows the city you are looking at.
+  const lat = latitude ?? FALLBACK_LATITUDE;
+  const lon = longitude ?? FALLBACK_LONGITUDE;
+
   useEffect(() => {
     const getWeather = async () => {
       try {
-        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=57.7059&longitude=11.9359&current_weather=true&timezone=Europe/Stockholm');
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Europe/Stockholm`);
         const data = await response.json();
         
         if (data.current_weather) {
@@ -259,7 +270,7 @@ export default function InfoBanner({}: InfoBannerProps) {
     return () => {
       clearTimeout(weatherTimer);
     };
-  }, []);
+  }, [lat, lon]);
 
   return (
     <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 border border-blue-200 dark:border-blue-700 rounded-xl p-4 mb-6 shadow-lg">
