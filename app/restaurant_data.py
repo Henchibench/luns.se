@@ -147,4 +147,9 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/uni3worldoffood/",
         "area": "Lindholmen"
     },
+    "Terrassen": {
+        "maps": "https://www.google.com/maps/search/?api=1&query=Ensbov%C3%A4gen+3%2C+582+54+Link%C3%B6ping",
+        "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/terrassen/",
+        "area": "Tannefors"
+    },
 }
