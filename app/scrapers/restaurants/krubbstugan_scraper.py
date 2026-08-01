@@ -22,14 +22,28 @@ class KrubbstuganScraper(BaseScraper):
     SWEDISH_DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
 
     # Ends the weekday listing — prose, not food.
-    WEEK_END_PATTERNS = [r'vi bjuder', r'välkommen']
+    WEEK_END_PATTERNS = [r'vi bjuder', r'välkommen', r'varje\s+dag kan du njuta']
 
-    # Introduces the dishes served every day regardless of weekday.
-    STANDING_START = r'varje\s+dag kan du njuta'
-
-    # Introduces the pricing block, which ends the menu proper.
+    # Introduces the pricing block, which ends the menu proper. Everything
+    # between the end of the week and this is treated as a standing dish.
+    #
+    # The boundary is deliberately anchored here rather than on the phrase that
+    # introduces the standing dishes ("Varje dag kan du njuta av vår"). Keying
+    # on that intro means a reworded sentence silently drops the whole block,
+    # and because the weekday dishes would still be found, nothing would look
+    # wrong. Anchoring on the price line instead fails the other way: reworded
+    # prose shows up as a stray dish, which is visible and easy to fix.
     INFO_PATTERNS = [r'^\s*servering\b', r'^\s*avhämtning\b']
     INFO_START_PATTERNS = INFO_PATTERNS + [r'häfte', r'valfri dricka', r'@']
+
+    # Prose that sits among the standing dishes without being one.
+    SKIP_PATTERNS = [
+        r'välkommen',
+        r'vi bjuder även',
+        r'vid allergi',
+        r'fråga kocken',
+        r'varje\s+dag kan du njuta',
+    ]
 
     def __init__(self):
         restaurant_info = {
@@ -75,10 +89,6 @@ class KrubbstuganScraper(BaseScraper):
                     current_day, phase = day, 'week'
                     continue
 
-                if re.search(self.STANDING_START, text.lower()):
-                    phase = 'standing'
-                    continue
-
                 if self._matches(text, self.INFO_START_PATTERNS):
                     phase = 'info'
                     if self._matches(text, self.INFO_PATTERNS):
@@ -86,8 +96,10 @@ class KrubbstuganScraper(BaseScraper):
                     continue
 
                 if phase == 'week':
+                    # Once the prose starts, the week is over and whatever
+                    # follows until the pricing is a standing dish.
                     if self._matches(text, self.WEEK_END_PATTERNS):
-                        phase = 'between'
+                        phase = 'standing'
                         continue
                     if not current_day:
                         continue
@@ -97,14 +109,21 @@ class KrubbstuganScraper(BaseScraper):
                         by_day.append((current_day, self._categorise(dish), dish))
 
                 elif phase == 'standing':
+                    if self._matches(text, self.SKIP_PATTERNS):
+                        continue
                     dish = text.strip('* ').strip()
                     if dish:
-                        category = 'Veckans' if 'veckans special' in dish.lower() else 'Stående rätter'
+                        category = 'Veckans' if 'veckans' in dish.lower() else 'Stående rätter'
                         standing.append((category, dish))
 
             if not by_day:
                 self.log_error("No dishes found — page layout may have changed")
                 return {self.name: ["Ingen lunchmeny tillgänglig"]}
+
+            if not standing:
+                # The weekday dishes carry the run, so an empty standing block
+                # would otherwise pass unnoticed. Say so.
+                self.log_error("No standing dishes found — page layout may have changed")
 
             items = [f"{day}|<strong>{category}</strong> - {dish}" for day, category, dish in by_day]
 
