@@ -23,6 +23,7 @@ interface RestaurantLocation {
   website?: string;
   maps?: string;
   instagram?: string;
+  lunch_hours?: string | null;
   has_menu: boolean;
 }
 
@@ -474,6 +475,9 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
         </div>
 
         <div className="space-y-1 mb-4 text-gray-700 dark:text-gray-200">
+          {restaurant.location?.lunch_hours && (
+            <div className="text-sm">🕐 Lunch {restaurant.location.lunch_hours}</div>
+          )}
           {todaysInfo.map((info, index) => (
             <div key={index} className="text-sm">
               {info}

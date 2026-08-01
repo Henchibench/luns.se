@@ -182,6 +182,7 @@ def build_restaurants_response(menus):
             "maps": info.get("maps"),
             "instagram": info.get("instagram"),
             "review_score": info.get("review_score"),
+            "lunch_hours": info.get("lunch_hours"),
             "has_menu": True,
         }
     return {

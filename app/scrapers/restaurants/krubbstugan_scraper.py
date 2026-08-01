@@ -127,8 +127,10 @@ class KrubbstuganScraper(BaseScraper):
 
             items = [f"{day}|<strong>{category}</strong> - {dish}" for day, category, dish in by_day]
 
-            # Standing dishes are available every day, so they repeat across the week
-            for category, dish in standing:
+            # Standing dishes are available every day, so they repeat across the
+            # week. Veckans goes first so the card reads Dagens → Veckans →
+            # Stående rätter: the frontend groups categories by first appearance.
+            for category, dish in sorted(standing, key=lambda s: s[0] != 'Veckans'):
                 for day in self.SWEDISH_DAYS:
                     items.append(f"{day}|<strong>{category}</strong> - {dish}")
 

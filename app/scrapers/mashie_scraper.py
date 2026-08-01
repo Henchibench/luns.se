@@ -30,9 +30,37 @@ class MashieScraper(BaseScraper):
         'jul': 7, 'aug': 8, 'sep': 9, 'okt': 10, 'nov': 11, 'dec': 12,
     }
 
-    def __init__(self, restaurant_info: dict, mashie_url: str):
+    def __init__(self, restaurant_info: dict, mashie_url: str, price_url: Optional[str] = None):
         super().__init__(restaurant_info)
         self.mashie_url = mashie_url
+        # Mashie carries the dishes but not what they cost. The host page often
+        # states the prices in prose; point at it to pick them up.
+        self.price_url = price_url
+
+    def _scrape_prices(self) -> List[str]:
+        """Pull the price summary off the host page, e.g.
+        "Dagens: 124:-, Dagens Soppa 99:-, Snabbt & Gott 149-169 kr".
+
+        Only paragraphs that *mention* a price are taken, not ones that *start*
+        with one — those are individual dishes from a side menu that is often
+        months out of date, and stale dishes are worse than no prices.
+        """
+        if not self.price_url:
+            return []
+        soup = self.get_page_content(self.price_url)
+        if soup is None:
+            self.log_error("Could not load the price page")
+            return []
+
+        for paragraph in soup.find_all(['p', 'h4', 'h5']):
+            text = self.clean_text(paragraph.get_text(' ', strip=True))
+            if not text or len(text) > 160 or text[0].isdigit():
+                continue
+            if re.search(r'\d{2,4}\s*(:-|kr)', text):
+                return [text]
+
+        self.log_error("No price line found — host page may have changed")
+        return []
 
     def _parse_heading(self, heading: str) -> Tuple[Optional[str], Optional[date]]:
         """Turn "03 aug Måndag" into ("Måndag", date(2026, 8, 3))."""
@@ -132,6 +160,10 @@ class MashieScraper(BaseScraper):
             for entry in self._select_current_week(days):
                 for dish in entry['dishes']:
                     items.append(f"{entry['day']}|{dish}")
+
+            for line in self._scrape_prices():
+                for day in self.SWEDISH_DAYS:
+                    items.append(f"INFO:{day} - Restaurant Info: 💰 {line}")
 
             self.log_info(f"Found {len(items)} menu items")
             return {self.name: items}

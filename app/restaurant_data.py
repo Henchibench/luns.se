@@ -150,11 +150,13 @@ restaurant_locations = {
     "Terrassen": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Ensbov%C3%A4gen+3%2C+582+54+Link%C3%B6ping",
         "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/terrassen/",
-        "area": "Tannefors"
+        "area": "Tannefors",
+        "lunch_hours": "Mån–fre 11.00–13.30"
     },
     "Krubbstugan": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Gelbgjutaregatan+2%2C+581+87+Link%C3%B6ping",
         "website": "https://krubbstugan.se",
-        "area": "Tannefors"
+        "area": "Tannefors",
+        "lunch_hours": "Mån–fre 11.00–14.00"
     },
 }
