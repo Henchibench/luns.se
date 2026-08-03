@@ -15,6 +15,7 @@ interface Props {
   typeChips: ChipSpec[];
   cravingChips: ChipSpec[];
   activeFilterCount: number;
+  foodProfile: React.ReactNode;
 }
 
 const BAR_BUTTON =
@@ -29,6 +30,7 @@ export default function MobileBar({
   typeChips,
   cravingChips,
   activeFilterCount,
+  foodProfile,
 }: Props) {
   // Escape stänger arket. Utan det är enda vägen ut att träffa exakt rätt yta.
   useEffect(() => {
@@ -107,14 +109,13 @@ export default function MobileBar({
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 px-2 pt-2">
-                  <div className="flex flex-col gap-2">
-                    <GroupLabel>FILTER</GroupLabel>
-                    <Chips chips={typeChips} size="touch" />
-                  </div>
+                  {/* Ingen FILTER-etikett här — arkets rubrik säger redan det. */}
+                  <Chips chips={typeChips} size="touch" />
                   <div className="flex flex-col gap-2">
                     <GroupLabel>SUGEN PÅ…</GroupLabel>
                     <Chips chips={cravingChips} size="touch" />
                   </div>
+                  <div className="border-t border-[var(--line)] pt-4">{foodProfile}</div>
                 </div>
               )}
             </div>

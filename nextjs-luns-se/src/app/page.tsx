@@ -6,8 +6,10 @@ import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
 import MobileBar, { SheetKind } from './components/board/MobileBar';
 import LocationWelcome from './components/board/LocationWelcome';
+import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
+import { useFoodProfile } from './hooks/useFoodProfile';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
@@ -24,6 +26,8 @@ import {
 import {
   CRAVINGS,
   TYPE_FILTERS,
+  boostByProfile,
+  hiddenByProfile,
   matchesSearch,
   matchesTypes,
   searchTerms as expandSearch,
@@ -61,7 +65,9 @@ export default function LunchBoard() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
-  const { isDishFavorite, toggleDishFavorite } = useDishFavorites();
+  const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
+    useDishFavorites();
+  const { profile, toggleBoostType, addHideKeyword, removeHideKeyword } = useFoodProfile();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
   const { theme, toggle: toggleTheme, mounted: themeMounted } = useTheme();
   const weather = useWeather(location?.latitude, location?.longitude);
@@ -114,17 +120,40 @@ export default function LunchBoard() {
     [restaurants, location]
   );
 
-  /** Rätter för vald dag som klarar sök och typfilter. */
+  /**
+   * Rätter för vald dag som klarar sök, typfilter och matprofil. Profilens
+   * valda kategorier lyfts till toppen, dess dolda ord filtreras bort.
+   */
   const visibleDishes = useCallback(
-    (restaurant: Restaurant) =>
-      restaurant.dishes.filter(
+    (restaurant: Restaurant) => {
+      const kept = restaurant.dishes.filter(
         d =>
           d.day === day &&
           matchesSearch(d, restaurant.name, search) &&
-          matchesTypes(d, activeTypes)
-      ),
-    [day, search, activeTypes]
+          matchesTypes(d, activeTypes) &&
+          !hiddenByProfile(d, profile.hideKeywords)
+      );
+      return boostByProfile(kept, profile.boostTypes);
+    },
+    [day, search, activeTypes, profile.hideKeywords, profile.boostTypes]
   );
+
+  /** Hur många rätter matprofilen tar bort idag — annars försvinner de tyst. */
+  const hiddenCount = useMemo(() => {
+    if (profile.hideKeywords.length === 0) return 0;
+    return atLocation.reduce(
+      (sum, restaurant) =>
+        sum +
+        restaurant.dishes.filter(
+          d =>
+            d.day === day &&
+            matchesSearch(d, restaurant.name, search) &&
+            matchesTypes(d, activeTypes) &&
+            hiddenByProfile(d, profile.hideKeywords)
+        ).length,
+      0
+    );
+  }, [atLocation, day, search, activeTypes, profile.hideKeywords]);
 
   const filtering = search.trim().length > 0 || activeTypes.length > 0 || showOnlyFavorites;
 
@@ -329,6 +358,15 @@ export default function LunchBoard() {
     );
   }
 
+  const foodProfileProps = {
+    profile,
+    onToggleBoostType: toggleBoostType,
+    onAddHideKeyword: addHideKeyword,
+    onRemoveHideKeyword: removeHideKeyword,
+    watchedDishes,
+    onRemoveWatched: removeDishFavorite,
+  };
+
   const heading = `${day} ${dateForDay(day).toLocaleDateString('sv-SE', {
     day: 'numeric',
     month: 'short',
@@ -373,6 +411,7 @@ export default function LunchBoard() {
           onSelect={scrollToRestaurant}
           typeChips={typeChips}
           cravingChips={cravingChips}
+          foodProfile={<FoodProfile {...foodProfileProps} />}
         />
 
         <main
@@ -396,6 +435,7 @@ export default function LunchBoard() {
             </h1>
             <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
+              {hiddenCount > 0 && ` · ${hiddenCount} DOLDA`}
             </span>
           </div>
 
@@ -448,6 +488,7 @@ export default function LunchBoard() {
         typeChips={typeChips}
         cravingChips={cravingChips}
         activeFilterCount={activeFilterCount}
+        foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
       />
 
       {toast && (
