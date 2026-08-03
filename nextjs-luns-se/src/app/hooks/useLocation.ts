@@ -6,8 +6,6 @@ import type { LunsLocation } from '../lib/menu';
 
 const STORAGE_KEY = 'luns-location';
 
-export type { LunsLocation };
-
 /**
  * When only one location exists, picking it is not a choice — gating every
  * visitor behind a single-option dialog would be pure friction. The welcome
