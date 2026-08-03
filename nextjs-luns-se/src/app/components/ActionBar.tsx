@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../utils/analytics';
 import { LocationDropdown } from './LocationPicker';
 import type { LunsLocation } from '../hooks/useLocation';
+import type { FoodProfile } from '../hooks/useFoodProfile';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -23,6 +24,11 @@ interface ActionBarProps {
   locations: LunsLocation[];
   selectedLocation: LunsLocation | null;
   onLocationChange: (id: string) => void;
+  foodProfile: FoodProfile;
+  onToggleBoostType: (type: string) => void;
+  onAddHideKeyword: (keyword: string) => void;
+  onRemoveHideKeyword: (keyword: string) => void;
+  onCopyMenu: () => void;
 }
 
 const FOOD_TYPES = [
@@ -64,8 +70,9 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange, foodProfile, onToggleBoostType, onAddHideKeyword, onRemoveHideKeyword, onCopyMenu }: ActionBarProps) {
   const [showViewDropdown, setShowViewDropdown] = useState(false);
+  const [hideKeywordInput, setHideKeywordInput] = useState('');
   
   // Filter panel state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -172,9 +179,19 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
     }));
   };
 
-  const hasActiveFilters = filters.selectedFoodTypes.length > 0 || 
-                          filters.selectedRestaurants.length < restaurants.length || 
-                          filters.searchTerm.length > 0;
+  const profileCount = foodProfile.boostTypes.length + foodProfile.hideKeywords.length;
+
+  const hasActiveFilters = filters.selectedFoodTypes.length > 0 ||
+                          filters.selectedRestaurants.length < restaurants.length ||
+                          filters.searchTerm.length > 0 ||
+                          profileCount > 0;
+
+  const submitHideKeyword = () => {
+    const kw = hideKeywordInput.trim();
+    if (!kw) return;
+    onAddHideKeyword(kw);
+    setHideKeywordInput('');
+  };
 
   return (
     <div className="relative" ref={filterPanelRef}>
@@ -202,7 +219,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
             <span>Filter</span>
             {hasActiveFilters && (
               <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-sm">
-                {filters.selectedFoodTypes.length + (filters.searchTerm ? 1 : 0)}
+                {filters.selectedFoodTypes.length + (filters.searchTerm ? 1 : 0) + profileCount}
               </span>
             )}
           </button>
@@ -274,6 +291,16 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
               />
             )}
           </div>
+
+          {/* Copy today's menu */}
+          <button
+            onClick={onCopyMenu}
+            title="Kopiera dagens meny som text — klistra in i Teams eller Slack"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5"
+          >
+            <span>📤</span>
+            <span>Kopiera dagens meny</span>
+          </button>
         </div>
 
 
@@ -358,6 +385,76 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Food profile — remembered across visits, unlike the filters above */}
+          <div className="mb-6 p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Min matprofil
+            </label>
+            <p className="text-xs mb-3 text-gray-500 dark:text-gray-400">
+              Sparas till nästa besök — tillämpas automatiskt varje gång du öppnar sidan.
+            </p>
+
+            <span className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-300">
+              Visa först
+            </span>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {FOOD_TYPES.map(foodType => (
+                <button
+                  key={foodType.id}
+                  onClick={() => onToggleBoostType(foodType.id)}
+                  aria-pressed={foodProfile.boostTypes.includes(foodType.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 flex items-center gap-1 border active:scale-95 ${
+                    foodProfile.boostTypes.includes(foodType.id)
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600'
+                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <span>{foodType.emoji}</span>
+                  <span>{foodType.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <span className="block text-xs font-medium mb-2 text-gray-600 dark:text-gray-300">
+              Dölj rätter som innehåller
+            </span>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={hideKeywordInput}
+                onChange={e => setHideKeywordInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); submitHideKeyword(); } }}
+                placeholder="t.ex. fläsk, skaldjur..."
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+              <button
+                onClick={submitHideKeyword}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors active:scale-95"
+              >
+                Lägg till
+              </button>
+            </div>
+            {foodProfile.hideKeywords.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {foodProfile.hideKeywords.map(keyword => (
+                  <span
+                    key={keyword}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700"
+                  >
+                    {keyword}
+                    <button
+                      onClick={() => onRemoveHideKeyword(keyword)}
+                      aria-label={`Ta bort ${keyword}`}
+                      className="hover:text-red-600 dark:hover:text-red-100 font-bold"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Restaurants */}

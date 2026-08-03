@@ -7,8 +7,10 @@ import ThemeToggle from './components/ThemeToggle';
 import FavoriteHeart from './components/FavoriteHeart';
 import { LocationWelcome } from './components/LocationPicker';
 import { useFavorites } from './hooks/useFavorites';
+import { useFoodProfile } from './hooks/useFoodProfile';
 import { useLocation, LunsLocation } from './hooks/useLocation';
 import { trackEvent } from './utils/analytics';
+import { buildMenuShareText, copyText } from './utils/shareMenu';
 
 interface MenuItem {
   day: string;
@@ -161,6 +163,15 @@ function parseRestaurantInfo(items: string[], day: string): string[] {
     .map(item => item.trim());
 }
 
+// Stable sort of [category, items] entries putting boosted categories first.
+// Substring match so "Vegetarisk" also catches "Vegetariskt".
+function boostSort<T>(entries: [string, T][], boostTypes: string[]): [string, T][] {
+  if (boostTypes.length === 0) return entries;
+  const isBoosted = (category: string) =>
+    boostTypes.some(t => category.toLowerCase().includes(t.toLowerCase()));
+  return [...entries].sort((a, b) => Number(isBoosted(b[0])) - Number(isBoosted(a[0])));
+}
+
 function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string): Record<string, Array<MenuItem & { restaurantName: string }>> {
   const groupedItems: Record<string, Array<MenuItem & { restaurantName: string }>> = {};
 
@@ -181,11 +192,12 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
   return groupedItems;
 }
 
-function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite }: {
+function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite, boostTypes }: {
   restaurants: Restaurant[];
   hasActiveSearch?: boolean;
   isFavorite: (name: string) => boolean;
   onToggleFavorite: (name: string) => void;
+  boostTypes: string[];
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const availableDays = getAvailableDays();
@@ -296,7 +308,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
                 {day}
               </h2>
               <div className="space-y-3 ml-2">
-                {Object.entries(categories).map(([category, items]) => (
+                {boostSort(Object.entries(categories), boostTypes).map(([category, items]) => (
                   <div key={category} className="space-y-2">
                     <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
                       {category}
@@ -332,7 +344,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
           ))
         ) : (
           // Normal view: Group by Category → Items
-          Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).map(([category, items]) => (
+          boostSort(Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>), boostTypes).map(([category, items]) => (
             <div key={category}>
               <h3 className="font-semibold mb-2 pb-1 border-b text-base text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600">
                 {category}
@@ -369,7 +381,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery }: {
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes }: {
   restaurant: Restaurant;
   allItems: string[];
   originalRestaurant?: Restaurant;
@@ -377,6 +389,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
   isFavorite: boolean;
   onToggleFavorite: () => void;
   mapQuery: string;
+  boostTypes: string[];
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
@@ -570,7 +583,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                   {day}
                 </h2>
                 <div className="space-y-3 ml-2">
-                  {Object.entries(categories).map(([category, items]) => (
+                  {boostSort(Object.entries(categories), boostTypes).map(([category, items]) => (
                     <div key={category} className="space-y-2">
                       <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
                         {category}
@@ -592,7 +605,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
             ))
           ) : (
             // Normal view: Group by Category → Items
-            Object.entries(groupedItems as Record<string, MenuItem[]>).map(([category, items]) => (
+            boostSort(Object.entries(groupedItems as Record<string, MenuItem[]>), boostTypes).map(([category, items]) => (
               <div key={category} className="space-y-2">
                 <h3 className="font-semibold text-base text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-1">
                   {category}
@@ -634,6 +647,10 @@ export default function MenuPage() {
 
   const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
+  const { profile, toggleBoostType, addHideKeyword, removeHideKeyword, isActive: profileActive } = useFoodProfile();
+  const [hiddenDishCount, setHiddenDishCount] = useState(0);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
+
   const [locations, setLocations] = useState<LunsLocation[]>([]);
   const { selected: selectedLocation, needsChoice, selectLocation } = useLocation(locations);
 
@@ -658,6 +675,27 @@ export default function MenuPage() {
   const handleFiltersChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
   }, []);
+
+  // Copy today's menu (as currently filtered) as paste-ready text
+  const handleCopyMenu = useCallback(async () => {
+    const text = buildMenuShareText(
+      currentDisplayedRef.current,
+      CURRENT_DAY,
+      selectedLocation?.label
+    );
+    if (!text) {
+      setCopyToast('Inga rätter att kopiera idag');
+    } else if (await copyText(text)) {
+      trackEvent('menu-copied', {
+        restaurants: currentDisplayedRef.current.length,
+        location: selectedLocation?.id,
+      });
+      setCopyToast('Dagens meny kopierad — klistra in i Teams eller Slack!');
+    } else {
+      setCopyToast('Kunde inte kopiera i den här webbläsaren');
+    }
+    window.setTimeout(() => setCopyToast(null), 2500);
+  }, [selectedLocation]);
 
   // Scroll detection for back to top button
   useEffect(() => {
@@ -732,8 +770,20 @@ export default function MenuPage() {
     }
 
     // Apply filtering to each restaurant's items
+    let hiddenByProfile = 0;
     newFiltered = newFiltered.map(restaurant => {
       let filteredItems = restaurant.items;
+
+      // Food profile: hide dishes containing any blocked keyword. Counted per
+      // current day only, so the indicator reflects what the visitor would
+      // actually have seen today.
+      if (profile.hideKeywords.length > 0) {
+        const before = filteredItems.filter(i => i.day === CURRENT_DAY).length;
+        filteredItems = filteredItems.filter(item =>
+          !profile.hideKeywords.some(kw => item.description.toLowerCase().includes(kw))
+        );
+        hiddenByProfile += before - filteredItems.filter(i => i.day === CURRENT_DAY).length;
+      }
 
       // If there's a search term, search across ALL days and ignore todayOnly filter
       if (filters.searchTerm.trim()) {
@@ -767,6 +817,8 @@ export default function MenuPage() {
       };
     }).filter(restaurant => restaurant.items.length > 0); // Only show restaurants with matching items
 
+    setHiddenDishCount(hiddenByProfile);
+
     // Determine which restaurants are exiting
     const currentRestaurantNames = new Set(currentDisplayedRef.current.map(r => r.name));
     const newRestaurantNames = new Set(newFiltered.map(r => r.name));
@@ -792,7 +844,7 @@ export default function MenuPage() {
       currentDisplayedRef.current = newFiltered;
       setIsFiltering(false);
     }
-  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation]);
+  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation, profile]);
 
   useEffect(() => {
     Promise.all([
@@ -877,6 +929,13 @@ export default function MenuPage() {
         />
       )}
 
+      {/* Copy-menu toast */}
+      {copyToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-lg shadow-xl border text-sm font-medium bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 animate-fade-in-scale">
+          {copyToast}
+        </div>
+      )}
+
       {/* Brand Title */}
        <div className="relative z-10">
          <div className="max-w-7xl mx-auto px-4 py-12">
@@ -913,8 +972,22 @@ export default function MenuPage() {
                  locations={locations}
                  selectedLocation={selectedLocation}
                  onLocationChange={selectLocation}
+                 foodProfile={profile}
+                 onToggleBoostType={toggleBoostType}
+                 onAddHideKeyword={addHideKeyword}
+                 onRemoveHideKeyword={removeHideKeyword}
+                 onCopyMenu={handleCopyMenu}
                />
              </div>
+
+             {/* Food profile active indicator */}
+             {profileActive && (
+               <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                 ✨ Matprofil aktiv
+                 {profile.boostTypes.length > 0 && ` — ${profile.boostTypes.join(', ')} visas först`}
+                 {hiddenDishCount > 0 && ` — ${hiddenDishCount} ${hiddenDishCount === 1 ? 'rätt dold' : 'rätter dolda'} idag`}
+               </p>
+             )}
            </div>
          </div>
 
@@ -952,6 +1025,7 @@ export default function MenuPage() {
               hasActiveSearch={!!filters.searchTerm.trim()}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
+              boostTypes={profile.boostTypes}
             />
           ) : (
             <div className="space-y-4">
@@ -979,6 +1053,7 @@ export default function MenuPage() {
                       isFavorite={isFavorite(restaurant.name)}
                       onToggleFavorite={() => toggleFavorite(restaurant.name)}
                       mapQuery={selectedLocation?.mapQuery ?? ''}
+                      boostTypes={profile.boostTypes}
                     />
                   </div>
                 );
