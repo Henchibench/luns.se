@@ -31,24 +31,31 @@ export default function ThemeToggle() {
     trackEvent('theme-toggle', { theme: newTheme });
   };
 
+  // Nothing is rendered until mounted, so the button must not be the thing that
+  // holds a layout slot open — it sits last in the control row for that reason.
   if (!mounted) return null;
+
+  const label = theme === 'light' ? 'Byt till mörkt läge' : 'Byt till ljust läge';
 
   return (
     <button
       onClick={toggle}
-      className="fixed top-4 right-4 z-[9999] w-10 h-10 rounded-lg flex items-center justify-center backdrop-blur-sm border shadow-lg transition-all duration-150 hover:shadow-md active:scale-95 transform hover:-translate-y-0.5 bg-white/90 text-gray-700 border-gray-200 hover:bg-white dark:bg-gray-800/90 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-800"
-      title={theme === 'light' ? 'Byt till mörkt läge' : 'Byt till ljust läge'}
-      aria-label={theme === 'light' ? 'Byt till mörkt läge' : 'Byt till ljust läge'}
+      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center justify-center md:justify-start space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5"
+      title={label}
+      aria-label={label}
     >
       {theme === 'light' ? (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
         </svg>
       ) : (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
         </svg>
       )}
+      {/* Icon alone in the desktop row; the label earns its place in the mobile
+          menu, where the buttons are stacked and full width anyway. */}
+      <span className="md:hidden">{theme === 'light' ? 'Mörkt läge' : 'Ljust läge'}</span>
     </button>
   );
 }

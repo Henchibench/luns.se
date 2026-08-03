@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../utils/analytics';
 import { LocationDropdown } from './LocationPicker';
+import ThemeToggle from './ThemeToggle';
 import type { LunsLocation } from '../hooks/useLocation';
 import type { FoodProfile } from '../hooks/useFoodProfile';
 import { dishDisplayName, type FavoriteDish } from '../hooks/useDishFavorites';
@@ -364,6 +365,10 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
             <span>📤</span>
             <span>Kopiera dagens meny</span>
           </button>
+
+          {/* Theme — a preference you set once, so it lives with the other
+              controls rather than floating over the page forever. */}
+          <ThemeToggle />
           </div>
         </div>
       </div>

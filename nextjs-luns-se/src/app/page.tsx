@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import InfoBanner from './components/InfoBanner';
 import ActionBar, { FilterState } from './components/ActionBar';
-import ThemeToggle from './components/ThemeToggle';
 import FavoriteHeart from './components/FavoriteHeart';
 import DishStar from './components/DishStar';
 import { LocationWelcome } from './components/LocationPicker';
@@ -195,7 +194,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: 'copy-menu',
     title: 'Dela dagens meny',
-    body: 'Kopierar hela dagens utbud som text, redo att klistra in i Teams eller Slack. Uppe till höger hittar du dessutom knappen för mörkt läge.',
+    body: 'Kopierar hela dagens utbud som text, redo att klistra in i Teams eller Slack. Bredvid den sitter knappen för mörkt läge.',
   },
 ];
 
@@ -1019,8 +1018,6 @@ export default function MenuPage() {
 
       return (
       <div className="min-h-screen relative bg-[#002933] dark:bg-[#00171d]">
-
-      <ThemeToggle />
 
       {needsChoice && (
         <LocationWelcome
