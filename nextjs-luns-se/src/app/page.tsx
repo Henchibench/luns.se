@@ -496,7 +496,10 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
       {/* Restaurant Header */}
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
-          <h2 className="font-bold text-lg md:text-xl">
+          {/* min-w-0 lets a long name wrap instead of forcing the row wider and
+              squeezing the buttons — "Alkemisten Kaffebar & Kafé" crushed the
+              Instagram icon to zero width, "Uni3 – World of Food" to 4 px. */}
+          <h2 className="font-bold text-lg md:text-xl min-w-0">
             {restaurant.name}
             {matchedByDish && (
               <span
@@ -508,8 +511,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
             )}
           </h2>
 
-          {/* Action Buttons */}
-          <div className="flex space-x-2 ml-4">
+          {/* Action Buttons — never compress: the icons carry the meaning */}
+          <div className="flex space-x-2 ml-4 flex-shrink-0">
             <FavoriteHeart
               isFavorite={isFavorite}
               onToggle={onToggleFavorite}
