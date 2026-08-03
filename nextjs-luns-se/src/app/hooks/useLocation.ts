@@ -2,18 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { trackEvent } from '../utils/analytics';
+import type { LunsLocation } from '../lib/menu';
 
 const STORAGE_KEY = 'luns-location';
 
-export interface LunsLocation {
-  id: string;
-  label: string;
-  city: string;
-  mapQuery: string;
-  latitude: number;
-  longitude: number;
-  restaurantCount: number;
-}
+export type { LunsLocation };
 
 /**
  * When only one location exists, picking it is not a choice — gating every

@@ -1,44 +1,47 @@
-interface ShareMenuItem {
-  day: string;
+interface ShareDish {
   category: string;
   description: string;
+  price: string;
 }
 
-interface ShareRestaurant {
+interface ShareSection {
   name: string;
-  items: ShareMenuItem[];
-  location?: {
-    lunch_hours?: string | null;
-  };
+  dishes: ShareDish[];
 }
 
 const SITE_URL = 'https://luns.se';
 
 /**
- * Format today's menu as plain text ready to paste into Teams or Slack.
- * Restaurants with no dishes for the day are left out.
+ * Dagens meny som ren text, redo att klistra in i Teams eller Slack.
+ * Restauranger utan rätter för dagen utelämnas.
+ *
+ * Kategorin skrivs ut utom när den är "Dagens" — då säger den ingenting som
+ * beskrivningen inte redan säger, och raden blir bara längre.
  */
 export function buildMenuShareText(
-  restaurants: ShareRestaurant[],
+  sections: ShareSection[],
   day: string,
   locationLabel?: string
 ): string {
-  const sections: string[] = [];
+  const withDishes = sections.filter(s => s.dishes.length > 0);
+  if (withDishes.length === 0) return '';
 
-  for (const restaurant of restaurants) {
-    const todays = restaurant.items.filter(item => item.day === day);
-    if (todays.length === 0) continue;
+  const heading = locationLabel
+    ? `🍽 Lunch ${day.toLowerCase()} — ${locationLabel}`
+    : `🍽 Lunch ${day.toLowerCase()}`;
 
-    const hours = restaurant.location?.lunch_hours;
-    const heading = hours ? `${restaurant.name} (lunch ${hours})` : restaurant.name;
-    const dishes = todays.map(item => `• ${item.category}: ${item.description}`);
-    sections.push([heading, ...dishes].join('\n'));
-  }
+  const blocks = withDishes.map(section =>
+    [
+      section.name.toUpperCase(),
+      ...section.dishes.map(dish => {
+        const category = dish.category.toUpperCase() === 'DAGENS' ? '' : `${dish.category}: `;
+        const price = dish.price ? ` (${dish.price})` : '';
+        return `  • ${category}${dish.description}${price}`;
+      }),
+    ].join('\n')
+  );
 
-  if (sections.length === 0) return '';
-
-  const title = locationLabel ? `🍽 Luns idag (${day}) — ${locationLabel}` : `🍽 Luns idag (${day})`;
-  return [title, '', sections.join('\n\n'), '', `Hela menyn med filter: ${SITE_URL}`].join('\n');
+  return [heading, '', blocks.join('\n\n'), '', `Hela menyn med filter: ${SITE_URL}`].join('\n');
 }
 
 /** Copy text to the clipboard, with a fallback for non-secure contexts. */

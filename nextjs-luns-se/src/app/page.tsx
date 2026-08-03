@@ -1,1287 +1,463 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import InfoBanner from './components/InfoBanner';
-import ActionBar, { FilterState } from './components/ActionBar';
-import FavoriteHeart from './components/FavoriteHeart';
-import DishStar from './components/DishStar';
-import { LocationWelcome } from './components/LocationPicker';
-import WhatsNewTour, { type TourStep } from './components/WhatsNewTour';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Header from './components/board/Header';
+import Rail, { RailItem } from './components/board/Rail';
+import MenuList, { Section } from './components/board/MenuList';
+import MobileBar, { SheetKind } from './components/board/MobileBar';
+import LocationWelcome from './components/board/LocationWelcome';
+import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
-import { useFoodProfile } from './hooks/useFoodProfile';
 import { useDishFavorites } from './hooks/useDishFavorites';
-import { useLocation, LunsLocation } from './hooks/useLocation';
-import { useWhatsNew } from './hooks/useWhatsNew';
-import { trackEvent } from './utils/analytics';
+import { useLocation } from './hooks/useLocation';
+import { useTheme } from './hooks/useTheme';
+import { useWeather } from './hooks/useWeather';
+import {
+  DAYS,
+  categoryColor,
+  currentDay,
+  dateForDay,
+  loadMenuData,
+  type LunsLocation,
+  type Restaurant,
+} from './lib/menu';
+import {
+  CRAVINGS,
+  TYPE_FILTERS,
+  matchesSearch,
+  matchesTypes,
+  searchTerms as expandSearch,
+} from './lib/filters';
 import { buildMenuShareText, copyText } from './utils/shareMenu';
+import { trackEvent } from './utils/analytics';
 
-interface MenuItem {
-  day: string;
-  category: string;
-  description: string;
-  original: string;
-}
+/** Avstånd från huvudytans topp där en sektion räknas som den aktiva. */
+const SPY_OFFSET = 70;
+/** Där en vald restaurang hamnar när man scrollar till den. */
+const SCROLL_OFFSET = 52;
+/** Hur nära toppen sista restaurangen får komma. */
+const HARD_STOP = 56;
+/** Huvudytans padding-bottom, som redan ingår i scrollHeight. */
+const MAIN_PADDING_BOTTOM = 40;
 
-interface RestaurantLocation {
-  name: string;
-  area: string;
-  website?: string;
-  maps?: string;
-  instagram?: string;
-  lunch_hours?: string | null;
-  has_menu: boolean;
-}
-
-interface Restaurant {
-  name: string;
-  items: MenuItem[];
-  info: string[];
-  location?: RestaurantLocation;
-}
-
-interface ApiResponse {
-  menus: Record<string, string[]>;
-  metadata: {
-    total_restaurants: number;
-    current_day_index: number;
-    is_weekend: boolean;
-    filters_applied: any;
-  };
-}
-
-const DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag'];
-
-// Get current day index (0=Monday, 4=Friday)
-// Weekends (Saturday/Sunday) default to Monday (0)
-function getCurrentDayIndex(): number {
-  const today = new Date().getDay(); // 0=Sunday, 6=Saturday
-  const mondayBasedDay = today === 0 ? 6 : today - 1; // Convert to Monday=0, Sunday=6
-  if (mondayBasedDay > 4) { // Weekend (Saturday=5, Sunday=6)
-    return 0; // Default to Monday for weekends
-  }
-  return mondayBasedDay;
-}
-
-const CURRENT_DAY = DAYS[getCurrentDayIndex()];
-
-// Get available days (today and future days only)
-function getAvailableDays(): string[] {
-  const currentDayIndex = getCurrentDayIndex();
-  return DAYS.slice(currentDayIndex);
-}
-
-// Craving search variations to match ActionBar.tsx
-const CRAVING_VARIATIONS: Record<string, string[]> = {
-  'hamburgare': ['burger', 'hamburgare', 'högrevsburgare', 'cheeseburger', 'veggieburger', 'veganburger', 'halloumiburger', 'kycklingburgare', 'smashed burger'],
-  'pasta': ['pasta', 'spaghetti', 'penne', 'carbonara', 'bolognese', 'marinara', 'nudlar'],
-  'pommes': ['pommes', 'fries', 'wedges', 'pommes frites', 'pommes frite'],
-  'mos': ['mos', 'potatismos', 'potatispure', 'potatispuré', 'smashed potatoes', 'krossad potatis']
-};
-
-function parseMenuItem(item: string): MenuItem | null {
-  if (item.startsWith('INFO:')) {
-    return null; // Handle info separately
-  }
-
-  const parts = item.split('|');
-  if (parts.length < 2) return null;
-
-  const day = parts[0];
-  const content = parts[1];
-
-  // Extract category from <strong> tags
-  const strongMatch = content.match(/<strong>(.*?)<\/strong>/);
-  const category = strongMatch ? strongMatch[1] : 'Okänd';
-
-  // Extract description (everything after the category)
-  const description = content.replace(/<strong>.*?<\/strong>\s*-?\s*/, '').trim();
-
-  return {
-    day,
-    category,
-    description,
-    original: item
-  };
-}
-
-function recategorizePier11Items(restaurants: Restaurant[]): Restaurant[] {
-  return restaurants.map(restaurant => {
-    // Only apply to Pier 11 and restaurants with "Dagens" category
-    if (!restaurant.name.includes('Pier 11')) {
-      return restaurant;
-    }
-
-    // Group items by day to process each day separately
-    const itemsByDay: Record<string, MenuItem[]> = {};
-    restaurant.items.forEach(item => {
-      if (!itemsByDay[item.day]) {
-        itemsByDay[item.day] = [];
-      }
-      itemsByDay[item.day].push(item);
-    });
-
-    const recategorizedItems: MenuItem[] = [];
-
-    Object.entries(itemsByDay).forEach(([day, dayItems]) => {
-      const dagensItems = dayItems.filter(item => item.category === 'Dagens');
-      const otherItems = dayItems.filter(item => item.category !== 'Dagens');
-
-      if (dagensItems.length > 0) {
-        // Split Dagens items into 3 groups based on typical order: Vegetarisk, Fisk, Kött
-        const itemsPerCategory = Math.ceil(dagensItems.length / 3);
-
-        dagensItems.forEach((item, index) => {
-          let newCategory = 'Dagens'; // fallback
-
-          if (index < itemsPerCategory) {
-            newCategory = 'Vegetarisk';
-          } else if (index < itemsPerCategory * 2) {
-            newCategory = 'Fisk';
-          } else {
-            newCategory = 'Kött';
-          }
-
-          recategorizedItems.push({
-            ...item,
-            category: newCategory
-          });
-        });
-      }
-
-      // Add other items as-is
-      recategorizedItems.push(...otherItems);
-    });
-
-    return {
-      ...restaurant,
-      items: recategorizedItems
-    };
-  });
-}
-
-function parseRestaurantInfo(items: string[], day: string): string[] {
-  return items
-    .filter(item => item.startsWith(`INFO:${day}`))
-    .map(item => item.replace(/^INFO:[^-]*-\s*Restaurant Info:\s*/, ''))
-    .map(item => item.trim());
-}
-
-const TOUR_STEPS: TourStep[] = [
-  {
-    title: 'Mycket är nytt på luns.se',
-    body: 'Du kan nu välja plats, spara favoriter, ställa in vad du vill äta och dela dagens meny. Ta trettio sekunder så visar vi var allt finns.',
-  },
-  {
-    target: 'location',
-    title: 'Välj var du äter',
-    body: 'Luns täcker inte längre bara Lindholmen — här byter du till Tannefors i Linköping. Valet sparas till nästa besök.',
-  },
-  {
-    target: 'restaurant-heart',
-    title: 'Favoritmarkera ett lunchställe',
-    body: 'Klicka på hjärtat på en restaurang du gillar. Med Favoriter-knappen i kontrollraden visar du sedan bara dina ställen.',
-  },
-  {
-    target: 'dish-star',
-    title: 'Bevaka en enskild rätt',
-    body: 'Stjärnan sparar just den rätten. Nästa gång den — eller något snarlikt — dyker upp på menyn får du veta det direkt högst upp på sidan.',
-  },
-  {
-    target: 'food-profile',
-    title: 'Ställ in din matprofil',
-    body: 'Låt vegetariskt ligga överst, eller dölj rätter med sådant du inte äter. Till skillnad från filtren sparas profilen och gäller varje gång du kommer tillbaka.',
-  },
-  {
-    target: 'copy-menu',
-    title: 'Dela dagens meny',
-    body: 'Kopierar hela dagens utbud som text, redo att klistra in i Teams eller Slack. Bredvid den sitter knappen för mörkt läge.',
-  },
-];
-
-// Stable sort of [category, items] entries putting boosted categories first.
-// Substring match so "Vegetarisk" also catches "Vegetariskt".
-function boostSort<T>(entries: [string, T][], boostTypes: string[]): [string, T][] {
-  if (boostTypes.length === 0) return entries;
-  const isBoosted = (category: string) =>
-    boostTypes.some(t => category.toLowerCase().includes(t.toLowerCase()));
-  return [...entries].sort((a, b) => Number(isBoosted(b[0])) - Number(isBoosted(a[0])));
-}
-
-function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string): Record<string, Array<MenuItem & { restaurantName: string }>> {
-  const groupedItems: Record<string, Array<MenuItem & { restaurantName: string }>> = {};
-
-  restaurants.forEach(restaurant => {
-    const dayItems = restaurant.items.filter(item => item.day === selectedDay);
-
-    dayItems.forEach(item => {
-      if (!groupedItems[item.category]) {
-        groupedItems[item.category] = [];
-      }
-      groupedItems[item.category].push({
-        ...item,
-        restaurantName: restaurant.name
-      });
-    });
-  });
-
-  return groupedItems;
-}
-
-function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite, boostTypes, isDishFavorite, onToggleDishFavorite }: {
-  restaurants: Restaurant[];
-  hasActiveSearch?: boolean;
-  isFavorite: (name: string) => boolean;
-  onToggleFavorite: (name: string) => void;
-  boostTypes: string[];
-  isDishFavorite: (restaurant: string, description: string) => boolean;
-  onToggleDishFavorite: (restaurant: string, description: string) => void;
-}) {
-  const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
-  const availableDays = getAvailableDays();
-
-  // When searching, group all items from all restaurants by day first, then category
-  // When not searching, use the existing selectedDay logic
-  const groupedItems = hasActiveSearch
-    ? restaurants.reduce((acc, restaurant) => {
-        restaurant.items.forEach(item => {
-          if (!acc[item.day]) {
-            acc[item.day] = {};
-          }
-          if (!acc[item.day][item.category]) {
-            acc[item.day][item.category] = [];
-          }
-          acc[item.day][item.category].push({
-            ...item,
-            restaurantName: restaurant.name
-          });
-        });
-        return acc;
-      }, {} as Record<string, Record<string, Array<MenuItem & { restaurantName: string }>>>)
-    : groupMenuItemsByCategory(restaurants, selectedDay);
-
-  const isEmpty = hasActiveSearch
-    ? Object.keys(groupedItems).length === 0
-    : Object.keys(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).length === 0;
-
-  const containerClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm";
-  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-3 md:p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
-
-  if (isEmpty) {
-    return (
-      <div className={containerClasses}>
-        <div className={headerClasses}>
-          <h2 className="font-bold text-xl">
-            Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
-          </h2>
-        </div>
-        <div className="p-6 text-center">
-          <div className="text-4xl mb-2">🍽️</div>
-          <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
-            {hasActiveSearch ? 'Inga sökresultat' : `Inga rätter för ${selectedDay.toLowerCase()}`}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={containerClasses}>
-      <div className={headerClasses}>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="font-bold text-xl">
-              Kompakt lista - {hasActiveSearch ? 'Sökresultat' : selectedDay}
-            </h2>
-            <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">
-              {hasActiveSearch
-                ? 'Alla rätter från alla restauranger grupperade efter dag och typ'
-                : 'Alla rätter från alla restauranger grupperade efter typ'
-              }
-            </p>
-          </div>
-        </div>
-
-        {/* Day Selector - Hidden when showing search results */}
-        {!hasActiveSearch && (
-          <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
-            {availableDays.map((day) => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`px-2 py-1.5 md:px-3 md:py-2 mt-1 mb-1 text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  selectedDay === day
-                    ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
-                    : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
-                }`}
-              >
-                {/* Mån/Tis/… on a phone: five full weekday names do not fit in
-                    311 px and turned the row into a scroller. */}
-                <span className="md:hidden">{day.slice(0, 3)}</span>
-                <span className="hidden md:inline">{day}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Search Results Indicator */}
-        {hasActiveSearch && (
-          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            🔍 Sökresultat - visar alla dagar
-          </div>
-        )}
-      </div>
-
-      <div className="p-6 space-y-4">
-        {hasActiveSearch ? (
-          // Search results: Group by Day → Category → Items
-          // Sort days in correct weekday order and filter to only available days
-          Object.entries(groupedItems as Record<string, Record<string, Array<MenuItem & { restaurantName: string }>>>)
-            .filter(([day]) => availableDays.includes(day))
-            .sort(([dayA], [dayB]) => {
-              const dayIndexA = DAYS.indexOf(dayA);
-              const dayIndexB = DAYS.indexOf(dayB);
-              return dayIndexA - dayIndexB;
-            })
-            .map(([day, categories]) => (
-            <div key={day} className="space-y-3">
-              <h2 className="font-bold text-lg text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-2">
-                {day}
-              </h2>
-              <div className="space-y-3 ml-2">
-                {boostSort(Object.entries(categories), boostTypes).map(([category, items]) => (
-                  <div key={category} className="space-y-2">
-                    <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
-                      {category}
-                    </h3>
-                    <div className="space-y-2 ml-2">
-                      {items.map((item, idx) => (
-                        <div
-                          key={`${item.restaurantName}-${idx}`}
-                          className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
-                        >
-                          <div className="flex-1">
-                            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                              {item.description}
-                            </p>
-                          </div>
-                          <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
-                            <DishStar
-                              isFavorite={isDishFavorite(item.restaurantName, item.description)}
-                              onToggle={() => onToggleDishFavorite(item.restaurantName, item.description)}
-                            />
-                            <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
-                              {item.restaurantName}
-                            </span>
-                            <FavoriteHeart
-                              variant="inline"
-                              isFavorite={isFavorite(item.restaurantName)}
-                              onToggle={() => onToggleFavorite(item.restaurantName)}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        ) : (
-          // Normal view: Group by Category → Items
-          boostSort(Object.entries(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>), boostTypes).map(([category, items]) => (
-            <div key={category}>
-              <h3 className="font-semibold mb-2 pb-1 border-b text-base text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600">
-                {category}
-              </h3>
-              <div className="space-y-2">
-                {items.map((item, idx) => (
-                  <div
-                    key={`${item.restaurantName}-${idx}`}
-                    className="flex justify-between items-start py-2 px-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <div className="flex-1">
-                      <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
-                        {item.description}
-                      </p>
-                    </div>
-                    <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
-                      <DishStar
-                        isFavorite={isDishFavorite(item.restaurantName, item.description)}
-                        onToggle={() => onToggleDishFavorite(item.restaurantName, item.description)}
-                      />
-                      <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
-                        {item.restaurantName}
-                      </span>
-                      <FavoriteHeart
-                        variant="inline"
-                        isFavorite={isFavorite(item.restaurantName)}
-                        onToggle={() => onToggleFavorite(item.restaurantName)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes, isDishFavorite, onToggleDishFavorite, matchedByDish, isTourAnchor = false }: {
-  restaurant: Restaurant;
-  allItems: string[];
-  originalRestaurant?: Restaurant;
-  hasActiveSearch?: boolean;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-  mapQuery: string;
-  boostTypes: string[];
-  isDishFavorite: (restaurant: string, description: string) => boolean;
-  onToggleDishFavorite: (restaurant: string, description: string) => void;
-  matchedByDish: boolean;
-  /** First card on the page — carries the what's-new tour's spotlight targets. */
-  isTourAnchor?: boolean;
-}) {
-  const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
-  const [showMap, setShowMap] = useState(false);
-  const [isContentChanging, setIsContentChanging] = useState(false);
-  const [contentKey, setContentKey] = useState('');
-  const availableDays = getAvailableDays();
-
-  // When there's an active search, show all items from restaurant.items (which are already filtered by search)
-  // Otherwise, filter by the selected day as before
-  const displayedItems = hasActiveSearch ? restaurant.items : restaurant.items.filter(item => item.day === selectedDay);
-  const todaysInfo = parseRestaurantInfo(allItems, selectedDay);
-
-  // Group items by category normally, or by day first when searching
-  const groupedItems = hasActiveSearch
-    ? displayedItems.reduce((acc, item) => {
-        if (!acc[item.day]) {
-          acc[item.day] = {};
-        }
-        if (!acc[item.day][item.category]) {
-          acc[item.day][item.category] = [];
-        }
-        acc[item.day][item.category].push(item);
-        return acc;
-      }, {} as Record<string, Record<string, MenuItem[]>>)
-    : displayedItems.reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = [];
-        }
-        acc[item.category].push(item);
-        return acc;
-      }, {} as Record<string, MenuItem[]>);
-
-  // Simplified content change detection
-  useEffect(() => {
-    const newContentKey = JSON.stringify(groupedItems);
-    if (contentKey && newContentKey !== contentKey) {
-      setIsContentChanging(true);
-      setTimeout(() => {
-        setIsContentChanging(false);
-      }, 400);
-    }
-    setContentKey(newContentKey);
-  }, [groupedItems, contentKey]);
-
-  const cardClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm overflow-visible";
-  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-3 md:p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
-
-  return (
-    <div className={cardClasses}>
-      {/* Restaurant Header */}
-      <div className={headerClasses}>
-        <div className="flex items-start justify-between mb-4">
-          {/* min-w-0 lets a long name wrap instead of forcing the row wider and
-              squeezing the buttons — "Alkemisten Kaffebar & Kafé" crushed the
-              Instagram icon to zero width, "Uni3 – World of Food" to 4 px. */}
-          <h2 className="font-bold text-lg md:text-xl min-w-0">
-            {restaurant.name}
-            {matchedByDish && (
-              <span
-                className="ml-2 align-middle text-xs font-medium px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
-                title="Kom med i listan för att en rätt du bevakar serveras idag"
-              >
-                ⭐ favoriträtt idag
-              </span>
-            )}
-          </h2>
-
-          {/* Action Buttons — never compress: the icons carry the meaning */}
-          <div className="flex space-x-2 ml-4 flex-shrink-0">
-            <FavoriteHeart
-              isFavorite={isFavorite}
-              onToggle={onToggleFavorite}
-              dataTour={isTourAnchor ? 'restaurant-heart' : undefined}
-            />
-
-            {restaurant.location?.maps && (
-              <button
-                onClick={() => {
-                  if (!showMap) trackEvent('map-open', { restaurant: restaurant.name });
-                  setShowMap(!showMap);
-                }}
-                title="Hitta hit!"
-                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 rounded text-sm font-medium transition-all duration-150 flex items-center md:space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              >
-                <span>🗺️</span>
-                <span className="hidden md:inline">Hitta hit!</span>
-              </button>
-            )}
-
-            {restaurant.location?.website && (
-              <a
-                href={restaurant.location.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'website' })}
-                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
-              >
-                🏠
-              </a>
-            )}
-
-            {restaurant.location?.instagram && (
-              <a
-                href={restaurant.location.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'instagram' })}
-                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
-              >
-                <img src="/instagram.svg" alt="Instagram" className="w-4 h-4" />
-              </a>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-1 mb-4 text-gray-700 dark:text-gray-200">
-          {restaurant.location?.lunch_hours && (
-            <div className="text-sm">🕐 Lunch {restaurant.location.lunch_hours}</div>
-          )}
-          {todaysInfo.map((info, index) => (
-            <div key={index} className="text-sm">
-              {info}
-            </div>
-          ))}
-        </div>
-
-        {/* Day Selector in Header - Hidden when showing search results */}
-        {!hasActiveSearch && (
-          <div className="flex space-x-2 overflow-x-auto overflow-y-visible">
-            {availableDays.map((day) => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`px-2 py-1.5 md:px-3 md:py-2 mt-1 mb-1 text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
-                  selectedDay === day
-                    ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
-                    : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
-                }`}
-              >
-                {/* Mån/Tis/… on a phone: five full weekday names do not fit in
-                    311 px and turned the row into a scroller. */}
-                <span className="md:hidden">{day.slice(0, 3)}</span>
-                <span className="hidden md:inline">{day}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Search Results Indicator */}
-        {hasActiveSearch && (
-          <div className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            🔍 Sökresultat - visar alla dagar
-          </div>
-        )}
-      </div>
-
-      {/* Map Section - Animated slide down */}
-      {restaurant.location?.maps && (
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out border-b border-gray-200 dark:border-gray-700 ${
-            showMap ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <div className={`p-6 bg-gray-50 dark:bg-gray-700 border-b border-blue-200 dark:border-blue-600 transform transition-all duration-300 ease-in-out ${
-            showMap ? 'translate-y-0 scale-100' : '-translate-y-4 scale-98'
-          }`}>
-            <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(`${mapQuery} ${restaurant.name}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-              className="w-full h-96 border-none rounded-lg mb-3"
-              allowFullScreen
-              style={{
-                animationDelay: '150ms',
-                animation: showMap ? 'slideInUp 0.3s ease-out forwards' : 'none'
-              }}
-            />
-            <a
-              href={restaurant.location.maps}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5"
-              style={{
-                animationDelay: '200ms',
-                animation: showMap ? 'slideInUp 0.3s ease-out forwards' : 'none'
-              }}
-            >
-              Öppna i Google Maps
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* Menu Content */}
-      <div className="p-4 md:p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
-        <div className={`space-y-4 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
-          {Object.entries(groupedItems).length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-2">🍽️</div>
-              <p className="font-medium mb-1 text-gray-700 dark:text-gray-200">
-                Ingen meny för {selectedDay.toLowerCase()}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Välj en annan dag eller kolla direkt med restaurangen
-              </p>
-            </div>
-          ) : hasActiveSearch ? (
-            // Search results: Group by Day → Category → Items (filtered to available days)
-            Object.entries(groupedItems as Record<string, Record<string, MenuItem[]>>)
-              .filter(([day]) => availableDays.includes(day))
-              .map(([day, categories]) => (
-              <div key={day} className="space-y-3">
-                <h2 className="font-bold text-lg text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-2">
-                  {day}
-                </h2>
-                <div className="space-y-3 ml-2">
-                  {boostSort(Object.entries(categories), boostTypes).map(([category, items]) => (
-                    <div key={category} className="space-y-2">
-                      <h3 className="font-semibold text-base text-gray-700 dark:text-gray-200">
-                        {category}
-                      </h3>
-                      <div className="space-y-2 ml-2">
-                        {items.map((item, idx) => (
-                          <div key={idx} className="flex items-start gap-2">
-                            <DishStar
-                              isFavorite={isDishFavorite(restaurant.name, item.description)}
-                              onToggle={() => onToggleDishFavorite(restaurant.name, item.description)}
-                            />
-                            <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                              {item.description}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            // Normal view: Group by Category → Items
-            boostSort(Object.entries(groupedItems as Record<string, MenuItem[]>), boostTypes).map(([category, items]) => (
-              <div key={category} className="space-y-2">
-                <h3 className="font-semibold text-base text-gray-800 dark:text-gray-100 border-b border-gray-300 dark:border-gray-600 pb-1">
-                  {category}
-                </h3>
-                <div className="space-y-2">
-                  {items.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <DishStar
-                        isFavorite={isDishFavorite(restaurant.name, item.description)}
-                        onToggle={() => onToggleDishFavorite(restaurant.name, item.description)}
-                        dataTour={isTourAnchor && idx === 0 ? 'dish-star' : undefined}
-                      />
-                      <span className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
-                        {item.description}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function MenuPage() {
+export default function LunchBoard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [rawMenus, setRawMenus] = useState<Record<string, string[]>>({});
-  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
+  const [locations, setLocations] = useState<LunsLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
-  const [filters, setFilters] = useState<FilterState>({
-    selectedFoodTypes: [],
-    selectedRestaurants: [],
-    searchTerm: '',
-    todayOnly: false
-  });
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+  const [day, setDay] = useState<string>(currentDay());
+  const [search, setSearch] = useState('');
+  const [activeTypes, setActiveTypes] = useState<string[]>([]);
+  const [activeRest, setActiveRest] = useState<string | null>(null);
+  const [view, setView] = useState<'list' | 'map'>('list');
+  const [sheet, setSheet] = useState<SheetKind>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [spacerHeight, setSpacerHeight] = useState(0);
+  const [animFlip, setAnimFlip] = useState(false);
+  const [clock, setClock] = useState('');
 
-  const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
+  const mainRef = useRef<HTMLElement | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { dishes: favoriteDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite, matchingDishesToday } = useDishFavorites();
-
-  const { profile, toggleBoostType, addHideKeyword, removeHideKeyword, isActive: profileActive } = useFoodProfile();
-  const [hiddenDishCount, setHiddenDishCount] = useState(0);
-  const [copyToast, setCopyToast] = useState<string | null>(null);
-
-  const [locations, setLocations] = useState<LunsLocation[]>([]);
-  const { selected: selectedLocation, needsChoice, selectLocation } = useLocation(locations);
-
-  // The tour waits for the location welcome and the initial load — stacking two
-  // overlays would be unusable.
-  const [tourStepId, setTourStepId] = useState<string | null>(null);
-  const { isActive: tourActive, startTour, endTour } = useWhatsNew(needsChoice || loading);
-
-  // Restaurants at the selected location. Until a location is known we show
-  // none rather than every city at once.
-  const locationRestaurants = selectedLocation
-    ? restaurants.filter(r => r.location?.area === selectedLocation.id)
-    : [];
-
-  // Watched dishes on today's menu — drives the notice and the card badge.
-  const dishMatchesToday = matchingDishesToday(locationRestaurants, CURRENT_DAY);
-  const restaurantsServingAFavoriteDish = new Set(dishMatchesToday.map(m => m.restaurant));
-
-  // Back to top button state
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isNearFooter, setIsNearFooter] = useState(false);
-
-  // Animation state for restaurant cards
-  const [displayedRestaurants, setDisplayedRestaurants] = useState<Restaurant[]>([]);
-  const [exitingRestaurants, setExitingRestaurants] = useState<Set<string>>(new Set());
-  const [isFiltering, setIsFiltering] = useState(false);
-  const currentDisplayedRef = useRef<Restaurant[]>([]);
-
-  // Filter restaurants based on current filter state
-  const handleFiltersChange = useCallback((newFilters: FilterState) => {
-    setFilters(newFilters);
-  }, []);
-
-  // Copy today's menu (as currently filtered) as paste-ready text
-  const handleCopyMenu = useCallback(async () => {
-    const text = buildMenuShareText(
-      currentDisplayedRef.current,
-      CURRENT_DAY,
-      selectedLocation?.label
-    );
-    if (!text) {
-      setCopyToast('Inga rätter att kopiera idag');
-    } else if (await copyText(text)) {
-      trackEvent('menu-copied', {
-        restaurants: currentDisplayedRef.current.length,
-        location: selectedLocation?.id,
-      });
-      setCopyToast('Dagens meny kopierad — klistra in i Teams eller Slack!');
-    } else {
-      setCopyToast('Kunde inte kopiera i den här webbläsaren');
-    }
-    window.setTimeout(() => setCopyToast(null), 2500);
-  }, [selectedLocation]);
-
-  // Scroll detection for back to top button
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const windowHeight = window.innerHeight;
-
-      // Show button after scrolling past 400px (roughly past the filter section)
-      setShowBackToTop(scrollTop > 400);
-
-      // Calculate scroll progress (0-100%)
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      setScrollProgress(Math.min(progress, 100));
-
-      // Check if we're near the footer (within 200px of bottom)
-      const distanceFromBottom = docHeight - scrollTop;
-      setIsNearFooter(distanceFromBottom < 200);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Smooth scroll to top function
-  const scrollToTop = () => {
-    trackEvent('back-to-top');
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  // Track search input, debounced so we don't fire on every keystroke
-  useEffect(() => {
-    const term = filters.searchTerm.trim();
-    if (!term) return;
-    const timer = setTimeout(() => {
-      trackEvent('search-input', { term });
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [filters.searchTerm]);
-
-  // Apply filters with proper enter/exit animations
-  useEffect(() => {
-    // Location comes first: everything below only ever considers restaurants
-    // at the selected location. Recomputed here rather than read from the
-    // render-scope copy, which is a fresh array on every render.
-    const atLocation = selectedLocation
-      ? restaurants.filter(r => r.location?.area === selectedLocation.id)
-      : [];
-
-    if (atLocation.length === 0) {
-      // Initial load, or no location chosen yet - no animation
-      setFilteredRestaurants([]);
-      setDisplayedRestaurants([]);
-      currentDisplayedRef.current = [];
-      return;
-    }
-
-    // Calculate what the new filtered results should be
-    let newFiltered = atLocation;
-
-    // Filter by selected restaurants (only show selected ones)
-    newFiltered = newFiltered.filter(restaurant =>
-      filters.selectedRestaurants.includes(restaurant.name)
-    );
-
-    // Show only favorites when the favorites toggle is active. A starred dish
-    // being served today counts too — that is the whole point of watching a
-    // dish, and it works even at a restaurant you never favorited.
-    if (showOnlyFavorites) {
-      const servingAFavoriteDish = new Set(
-        matchingDishesToday(atLocation, CURRENT_DAY).map(m => m.restaurant)
-      );
-      newFiltered = newFiltered.filter(
-        restaurant => favorites.includes(restaurant.name) || servingAFavoriteDish.has(restaurant.name)
-      );
-    }
-
-    // Apply filtering to each restaurant's items
-    let hiddenByProfile = 0;
-    newFiltered = newFiltered.map(restaurant => {
-      let filteredItems = restaurant.items;
-
-      // Food profile: hide dishes containing any blocked keyword. Counted per
-      // current day only, so the indicator reflects what the visitor would
-      // actually have seen today.
-      if (profile.hideKeywords.length > 0) {
-        const before = filteredItems.filter(i => i.day === CURRENT_DAY).length;
-        filteredItems = filteredItems.filter(item =>
-          !profile.hideKeywords.some(kw => item.description.toLowerCase().includes(kw))
-        );
-        hiddenByProfile += before - filteredItems.filter(i => i.day === CURRENT_DAY).length;
-      }
-
-      // If there's a search term, search across ALL days and ignore todayOnly filter
-      if (filters.searchTerm.trim()) {
-        const searchLower = filters.searchTerm.toLowerCase();
-
-        // Check if the search term matches a craving, if so use all variations
-        const searchTerms = CRAVING_VARIATIONS[searchLower] || [searchLower];
-
-        filteredItems = filteredItems.filter(item =>
-          searchTerms.some(term =>
-            item.description.toLowerCase().includes(term) ||
-            item.category.toLowerCase().includes(term)
-          )
-        );
-      }
-
-      // Filter by food types (only show restaurants that serve this type TODAY)
-      if (filters.selectedFoodTypes.length > 0) {
-        filteredItems = filteredItems.filter(item =>
-          // Only include items for the current day when filtering by food type
-          item.day === CURRENT_DAY &&
-          filters.selectedFoodTypes.some(foodType =>
-            item.category.includes(foodType) || item.description.includes(foodType)
-          )
-        );
-      }
-
-      return {
-        ...restaurant,
-        items: filteredItems
-      };
-    }).filter(restaurant => restaurant.items.length > 0); // Only show restaurants with matching items
-
-    setHiddenDishCount(hiddenByProfile);
-
-    // Determine which restaurants are exiting
-    const currentRestaurantNames = new Set(currentDisplayedRef.current.map(r => r.name));
-    const newRestaurantNames = new Set(newFiltered.map(r => r.name));
-    const restaurantsToExit = Array.from(currentRestaurantNames).filter(name => !newRestaurantNames.has(name));
-
-    if (restaurantsToExit.length > 0) {
-      // Phase 1: Mark restaurants for exit animation
-      setExitingRestaurants(new Set(restaurantsToExit));
-      setIsFiltering(true);
-
-      // Phase 2: After exit animation completes, update displayed restaurants
-      setTimeout(() => {
-        setDisplayedRestaurants(newFiltered);
-        setFilteredRestaurants(newFiltered);
-        currentDisplayedRef.current = newFiltered;
-        setExitingRestaurants(new Set());
-        setIsFiltering(false);
-      }, 400); // Match fade-out animation duration
-    } else {
-      // No restaurants exiting, just show new ones (entering animation)
-      setDisplayedRestaurants(newFiltered);
-      setFilteredRestaurants(newFiltered);
-      currentDisplayedRef.current = newFiltered;
-      setIsFiltering(false);
-    }
-  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation, profile, matchingDishesToday]);
+  const { isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
+  const { isDishFavorite, toggleDishFavorite } = useDishFavorites();
+  const { selected: location, needsChoice, selectLocation } = useLocation(locations);
+  const { theme, toggle: toggleTheme, mounted: themeMounted } = useTheme();
+  const weather = useWeather(location?.latitude, location?.longitude);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/data/menus.json').then(r => r.json()),
-      fetch('/data/restaurants.json').then(r => r.json())
-    ])
-      .then(([menusData, restaurantsData]: [ApiResponse, any]) => {
-        const parsedRestaurants: Restaurant[] = Object.entries(menusData.menus).map(([name, items]) => ({
-          name,
-          items: items.map(parseMenuItem).filter((item): item is MenuItem => item !== null),
-          info: [], // Will be computed per day
-          location: restaurantsData.restaurants[name]
-        }));
-
-        // Apply Pier 11 recategorization
-        const recategorizedRestaurants = recategorizePier11Items(parsedRestaurants);
-
-        // The scraper emits a locations list. Older data files predate it, so
-        // derive a usable one from the restaurants' areas rather than leaving
-        // the picker empty and the page blank.
-        const emitted: LunsLocation[] | undefined = restaurantsData.locations;
-        const resolvedLocations: LunsLocation[] = emitted?.length
-          ? emitted
-          : Array.from(new Set(parsedRestaurants.map(r => r.location?.area).filter(Boolean) as string[]))
-              .sort()
-              .map(area => ({
-                id: area,
-                label: area,
-                city: area,
-                mapQuery: area,
-                latitude: 57.7059,
-                longitude: 11.9359,
-                restaurantCount: parsedRestaurants.filter(r => r.location?.area === area).length,
-              }));
-
-        setRawMenus(menusData.menus);
-        setRestaurants(recategorizedRestaurants);
-        setLocations(resolvedLocations);
+    loadMenuData()
+      .then(({ restaurants: parsed, locations: places }) => {
+        setRestaurants(parsed);
+        setLocations(places);
         setLoading(false);
-        setLastFetch(new Date());
       })
-      .catch(err => {
+      .catch((err: Error) => {
         setError(err.message);
         setLoading(false);
       });
   }, []);
 
+  // Klockan sätts först efter montering. Renderad direkt skulle den bakas in
+  // vid bygget och visa fel tid tills React tar över.
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const weekday = now.getDay() >= 1 && now.getDay() <= 5;
+      const lunchNow = weekday && now.getHours() >= 11 && now.getHours() < 14;
+      setClock(
+        `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}${
+          lunchNow ? ' · LUNCH PÅGÅR' : ''
+        }`
+      );
+    };
+    tick();
+    const timer = setInterval(tick, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const flash = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2400);
+  }, []);
+
+  useEffect(() => () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  }, []);
+
+  const terms = useMemo(() => expandSearch(search), [search]);
+
+  const atLocation = useMemo(
+    () => (location ? restaurants.filter(r => r.area === location.id) : []),
+    [restaurants, location]
+  );
+
+  /** Rätter för vald dag som klarar sök och typfilter. */
+  const visibleDishes = useCallback(
+    (restaurant: Restaurant) =>
+      restaurant.dishes.filter(
+        d =>
+          d.day === day &&
+          matchesSearch(d, restaurant.name, search) &&
+          matchesTypes(d, activeTypes)
+      ),
+    [day, search, activeTypes]
+  );
+
+  const filtering = search.trim().length > 0 || activeTypes.length > 0 || showOnlyFavorites;
+
+  const sections: Section[] = useMemo(() => {
+    const list = showOnlyFavorites
+      ? atLocation.filter(r => isFavorite(r.name))
+      : atLocation;
+
+    return list
+      .map(restaurant => {
+        const dishes = visibleDishes(restaurant).map((dish, i) => ({
+          key: `${restaurant.name}-${i}-${dish.description}`,
+          category: dish.category,
+          categoryColor: categoryColor(dish.category),
+          description: dish.description,
+          price: dish.price,
+          starred: isDishFavorite(restaurant.name, dish.description),
+        }));
+
+        const hasDayDishes = restaurant.dishes.some(d => d.day === day);
+
+        return {
+          name: restaurant.name,
+          meta: restaurant.meta.lunch_hours ?? '',
+          info: (restaurant.info[day] ?? []).join('  ·  '),
+          // "Ingen meny idag" gäller bara när inget filter är på. Med filter
+          // på betyder tomt "inget matchade", och då är raden bara brus.
+          empty: !filtering && !hasDayDishes,
+          website: restaurant.meta.website,
+          maps: restaurant.meta.maps,
+          instagram: restaurant.meta.instagram,
+          favorite: isFavorite(restaurant.name),
+          dishes,
+        };
+      })
+      .filter(section => section.dishes.length > 0 || section.empty);
+  }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering]);
+
+  const dishTotal = sections.reduce((sum, s) => sum + s.dishes.length, 0);
+
+  const scrollToRestaurant = useCallback((name: string) => {
+    setSheet(null);
+    setView('list');
+    // Vyn kan behöva målas om innan sektionen finns i DOM:en.
+    setTimeout(() => {
+      const main = mainRef.current;
+      if (!main) return;
+      const el = main.querySelector<HTMLElement>(`[data-sec="${CSS.escape(name)}"]`);
+      if (!el) return;
+      const top =
+        el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - SCROLL_OFFSET;
+      main.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }, 60);
+  }, []);
+
+  const railItems: RailItem[] = useMemo(
+    () =>
+      atLocation.map(r => ({
+        name: r.name,
+        visibleCount: visibleDishes(r).length,
+        favorite: isFavorite(r.name),
+        active: activeRest === r.name,
+      })),
+    [atLocation, visibleDishes, isFavorite, activeRest]
+  );
+
+  // Scroll-spy: aktiv restaurang är den sista vars topp passerat SPY_OFFSET.
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+
+    let frame: number | null = null;
+    const onScroll = () => {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        const mainTop = main.getBoundingClientRect().top;
+        let found: string | null = null;
+        main.querySelectorAll<HTMLElement>('[data-sec]').forEach(el => {
+          if (el.getBoundingClientRect().top - mainTop <= SPY_OFFSET) {
+            found = el.dataset.sec ?? null;
+          }
+        });
+        setActiveRest(prev => (prev === found ? prev : found));
+      });
+    };
+
+    onScroll();
+    main.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      main.removeEventListener('scroll', onScroll);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  }, [sections, view]);
+
+  // Hard stop: tomrum efter sista sektionen så den kan nå toppen, men inte
+  // scrollas förbi. Räknas om när innehållet eller fönstret ändras.
+  useEffect(() => {
+    const measure = () => {
+      const main = mainRef.current;
+      if (!main) return;
+      const secs = main.querySelectorAll<HTMLElement>('[data-sec]');
+      if (secs.length === 0) {
+        setSpacerHeight(0);
+        return;
+      }
+      const last = secs[secs.length - 1];
+      const height = Math.max(
+        0,
+        main.clientHeight - last.offsetHeight - HARD_STOP - MAIN_PADDING_BOTTOM
+      );
+      setSpacerHeight(prev => (Math.abs(prev - height) > 1 ? height : prev));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [sections, view]);
+
+  const handleCopy = useCallback(async () => {
+    const text = buildMenuShareText(sections, day, location?.label);
+    if (!text) {
+      flash('Det finns inget att kopiera för den här dagen');
+      return;
+    }
+    const ok = await copyText(text);
+    trackEvent('copy-menu', { day, location: location?.id, restaurants: sections.length });
+    flash(ok ? 'Dagens meny kopierad — klistra in i Teams eller Slack!' : 'Kunde inte kopiera i den här webbläsaren');
+  }, [sections, day, location, flash]);
+
+  const handleToggleStar = useCallback(
+    (restaurant: string, description: string) => {
+      const wasStarred = isDishFavorite(restaurant, description);
+      toggleDishFavorite(restaurant, description);
+      flash(wasStarred ? 'Bevakning borttagen' : 'Rätten bevakas — du ser det när den serveras igen');
+    },
+    [isDishFavorite, toggleDishFavorite, flash]
+  );
+
+  const typeChips: ChipSpec[] = useMemo(
+    () => [
+      {
+        id: 'favs',
+        label: '♥ FAVORITER',
+        active: showOnlyFavorites,
+        onClick: () => setShowOnlyFavorites(!showOnlyFavorites),
+      },
+      ...TYPE_FILTERS.map(t => ({
+        id: t.id,
+        label: t.label,
+        active: activeTypes.includes(t.id),
+        onClick: () =>
+          setActiveTypes(prev =>
+            prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id]
+          ),
+      })),
+    ],
+    [showOnlyFavorites, setShowOnlyFavorites, activeTypes]
+  );
+
+  const cravingChips: ChipSpec[] = useMemo(
+    () =>
+      CRAVINGS.map(c => ({
+        id: c.id,
+        label: c.label,
+        active: search.trim().toLowerCase() === c.id,
+        onClick: () => setSearch(prev => (prev.trim().toLowerCase() === c.id ? '' : c.id)),
+      })),
+    [search]
+  );
+
+  // Bevakade rätter som faktiskt serveras den valda dagen.
+  const starredToday = useMemo(() => {
+    const hits: string[] = [];
+    atLocation.forEach(restaurant => {
+      restaurant.dishes.forEach(dish => {
+        if (dish.day !== day) return;
+        if (!isDishFavorite(restaurant.name, dish.description)) return;
+        const label = `${dish.description.slice(0, 60)} (${restaurant.name})`;
+        if (!hits.includes(label)) hits.push(label);
+      });
+    });
+    return hits;
+  }, [atLocation, day, isDishFavorite]);
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#002933]">
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/80"></div>
-          </div>
-          <p className="text-white text-lg">Laddar menyer...</p>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+          HÄMTAR MENYER…
+        </span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen transition-colors duration-300 flex items-center justify-center bg-[#002933]">
-        <div className="text-center p-8 rounded-lg shadow-lg border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
-          <div className="text-4xl mb-4">❌</div>
-          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Något gick fel</h2>
-          <p className="text-gray-600 dark:text-gray-300">{error}</p>
-        </div>
+      <div className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center">
+        <p className="text-[15px] font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
+        <p className="text-[13px] text-[var(--mut)]">{error}</p>
       </div>
     );
   }
 
-      return (
-      <div className="min-h-screen relative bg-[#002933] dark:bg-[#00171d]">
+  const heading = `${day} ${dateForDay(day).toLocaleDateString('sv-SE', {
+    day: 'numeric',
+    month: 'short',
+  })}`;
+  const isEmpty = restaurants.length > 0 && sections.length === 0;
+  const activeFilterCount = activeTypes.length + (showOnlyFavorites ? 1 : 0);
 
-      {needsChoice && (
-        <LocationWelcome
-          locations={locations}
-          onSelect={id => selectLocation(id, true)}
+  return (
+    <div
+      className="grid h-screen grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
+      style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
+    >
+      <Header
+        days={DAYS}
+        selectedDay={day}
+        onSelectDay={next => {
+          setDay(next);
+          setAnimFlip(f => !f);
+          trackEvent('day-select', { day: next });
+        }}
+        locations={locations}
+        selectedLocation={location?.id ?? null}
+        onSelectLocation={id => {
+          selectLocation(id);
+          setActiveRest(null);
+        }}
+        search={search}
+        onSearch={setSearch}
+        clock={clock}
+        weather={weather}
+        onCopy={handleCopy}
+        view={view}
+        onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
+        theme={theme}
+        themeMounted={themeMounted}
+        onToggleTheme={toggleTheme}
+      />
+
+      <div className="grid min-h-0 grid-cols-1 wide:grid-cols-[270px_1fr]">
+        <Rail
+          items={railItems}
+          onSelect={scrollToRestaurant}
+          typeChips={typeChips}
+          cravingChips={cravingChips}
         />
-      )}
 
-      {tourActive && (
-        <WhatsNewTour
-          steps={TOUR_STEPS}
-          onFinish={() => { setTourStepId(null); endTour(); }}
-          onStepChange={step => setTourStepId(step?.target ?? null)}
-        />
-      )}
-
-      {/* Copy-menu toast */}
-      {copyToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-lg shadow-xl border text-sm font-medium bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 animate-fade-in-scale">
-          {copyToast}
-        </div>
-      )}
-
-      {/* Brand Title */}
-       <div className="relative z-10">
-         <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
-           <div className="text-center">
-             <img
-               src="/luns-logo-transparent.png"
-               alt="Luns.se"
-               className="h-32 md:h-64 mx-auto mb-0"
-             />
-           </div>
-         </div>
-       </div>
-
-      {/* Content Container */}
-      <div className="relative z-10">
-                 {/* Dashboard Section - Info Banner with Controls */}
-         <div className="max-w-4xl mx-auto px-4 py-2 relative z-50">
-           <div className="backdrop-blur-sm rounded-xl shadow-lg border p-6 bg-white/95 dark:bg-gray-800/95 border-gray-300 dark:border-gray-600">
-             <InfoBanner
-               latitude={selectedLocation?.latitude}
-               longitude={selectedLocation?.longitude}
-             />
-
-             {/* Action Bar */}
-             <div className="mt-6">
-               <ActionBar
-                 restaurants={locationRestaurants.map(r => r.name)}
-                 onFiltersChange={handleFiltersChange}
-                 viewMode={viewMode}
-                 onViewModeChange={setViewMode}
-                 favoritesCount={favorites.length}
-                 showOnlyFavorites={showOnlyFavorites}
-                 onShowOnlyFavoritesChange={setShowOnlyFavorites}
-                 locations={locations}
-                 selectedLocation={selectedLocation}
-                 onLocationChange={selectLocation}
-                 foodProfile={profile}
-                 onToggleBoostType={toggleBoostType}
-                 onAddHideKeyword={addHideKeyword}
-                 onRemoveHideKeyword={removeHideKeyword}
-                 onCopyMenu={handleCopyMenu}
-                 favoriteDishes={favoriteDishes}
-                 onRemoveDishFavorite={removeDishFavorite}
-                 forceFilterOpen={tourStepId === 'food-profile'}
-               />
-             </div>
-
-             {/* Watched dishes served today — the payoff for starring a dish */}
-             {dishMatchesToday.length > 0 && (
-               <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-300">
-                 ⭐ {dishMatchesToday.length === 1
-                   ? `${dishMatchesToday[0].label} serveras på ${dishMatchesToday[0].restaurant} idag`
-                   : `${dishMatchesToday.length} rätter du bevakar serveras idag: ${dishMatchesToday
-                       .map(m => `${m.label} (${m.restaurant})`)
-                       .join(', ')}`}
-               </p>
-             )}
-
-             {/* Food profile active indicator */}
-             {profileActive && (
-               <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                 ✨ Matprofil aktiv
-                 {profile.boostTypes.length > 0 && ` — ${profile.boostTypes.join(', ')} visas först`}
-                 {hiddenDishCount > 0 && ` — ${hiddenDishCount} ${hiddenDishCount === 1 ? 'rätt dold' : 'rätter dolda'} idag`}
-               </p>
-             )}
-           </div>
-         </div>
-
-        {/* Restaurant Cards or List View */}
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          {filteredRestaurants.length === 0 && !isFiltering ? (
-            <div className="text-center py-16 rounded-xl shadow-lg border bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-600">
-              <div className="text-6xl mb-4">{showOnlyFavorites && favorites.length === 0 ? '⭐' : '🔍'}</div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-                {showOnlyFavorites && favorites.length === 0 ? 'Inga favoriter än' : 'Inga resultat'}
-              </h3>
-              <p className="mb-4 text-gray-600 dark:text-gray-300">
-                {showOnlyFavorites && favorites.length === 0
-                  ? 'Klicka på hjärtat på en restaurang för att spara den som favorit.'
-                  : 'Prova att justera dina filter för att se fler alternativ.'}
-              </p>
-              <button
-                onClick={() => {
-                  setShowOnlyFavorites(false);
-                  setFilters({
-                    selectedFoodTypes: [],
-                    selectedRestaurants: locationRestaurants.map(r => r.name),
-                    searchTerm: '',
-                    todayOnly: false
-                  });
-                }}
-                className="px-4 py-2 rounded-lg transition-colors bg-teal-600 text-white hover:bg-teal-700"
-              >
-                Rensa alla filter
-              </button>
-            </div>
-          ) : viewMode === 'list' ? (
-            <CompactListView
-              restaurants={displayedRestaurants}
-              hasActiveSearch={!!filters.searchTerm.trim()}
-              isFavorite={isFavorite}
-              onToggleFavorite={toggleFavorite}
-              boostTypes={profile.boostTypes}
-              isDishFavorite={isDishFavorite}
-              onToggleDishFavorite={toggleDishFavorite}
-            />
-          ) : (
-            <div className="space-y-4">
-              {displayedRestaurants.map((restaurant, index) => {
-                const isExiting = exitingRestaurants.has(restaurant.name);
-                const isNew = !exitingRestaurants.has(restaurant.name) && !isFiltering;
-
-                return (
-                  <div
-                    key={restaurant.name}
-                    className={`overflow-hidden ${
-                      isExiting
-                        ? 'animate-fade-out-scale'
-                        : 'animate-fade-in-scale'
-                    }`}
-                    style={{
-                      animationDelay: isNew ? `${index * 150}ms` : '0ms'
-                    }}
-                  >
-                    <RestaurantCard
-                      restaurant={restaurant}
-                      allItems={rawMenus[restaurant.name] || []}
-                      originalRestaurant={restaurants.find(r => r.name === restaurant.name)}
-                      hasActiveSearch={!!filters.searchTerm.trim()}
-                      isFavorite={isFavorite(restaurant.name)}
-                      onToggleFavorite={() => toggleFavorite(restaurant.name)}
-                      mapQuery={selectedLocation?.mapQuery ?? ''}
-                      boostTypes={profile.boostTypes}
-                      isTourAnchor={index === 0}
-                      isDishFavorite={isDishFavorite}
-                      onToggleDishFavorite={toggleDishFavorite}
-                      matchedByDish={restaurantsServingAFavoriteDish.has(restaurant.name)}
-                    />
-                  </div>
-                );
-              })}
+        <main
+          ref={mainRef}
+          className={`luns-scroll overflow-y-auto px-4 pb-[90px] wide:px-7 wide:pb-10 ${
+            view === 'map' ? '' : 'luns-mask-main'
+          }`}
+        >
+          {view === 'map' && (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-[var(--glassBrd)] py-20">
+              <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+                KARTAN BYGGS I NÄSTA STEG
+              </span>
             </div>
           )}
-        </div>
 
-        {/* Footer with Status */}
-        <footer className="relative z-50 backdrop-blur-sm border-t py-6 mt-16 bg-white/90 dark:bg-gray-900/90 border-gray-300 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="flex items-center space-x-6 text-sm mb-4 md:mb-0 text-gray-600 dark:text-gray-300">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>Aktiv</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Uppdaterat idag</span>
-                </div>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
-                  Vibe kodad av Henkebus ❤️
-                </p>
-                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
-                  <button
-                    onClick={startTour}
-                    className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-100"
-                  >
-                    ✨ Vad är nytt?
-                  </button>
-                </p>
-                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
-                  Frågor eller förbättringsförslag? Hör av dig på{' '}
-                  <a
-                    href="mailto:luns.se@outlook.com"
-                    className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-100"
-                  >
-                    luns.se@outlook.com
-                  </a>
-                </p>
-
-              </div>
-            </div>
+          <div hidden={view === 'map'}>
+          <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
+            <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
+              {heading}
+            </h1>
+            <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
+              {dishTotal} RÄTTER
+            </span>
           </div>
-        </footer>
+
+          {starredToday.length > 0 && (
+            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-[12.5px] font-semibold text-[var(--accStrong)]">
+              <span className="text-[var(--star)]">★</span>
+              Bevakad rätt idag: {starredToday.join(' · ')}
+            </div>
+          )}
+
+          {isEmpty && (
+            <div className="py-[70px] text-center text-[var(--mut)]">
+              <p className="mb-1.5 text-[15px] font-semibold text-[var(--ink2)]">
+                Inga rätter matchar
+              </p>
+              <p className="mb-4 text-[13px]">Prova en annan dag eller rensa sök och filter</p>
+              <button
+                onClick={() => {
+                  setSearch('');
+                  setActiveTypes([]);
+                  setShowOnlyFavorites(false);
+                }}
+                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-xs font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+              >
+                Rensa allt
+              </button>
+            </div>
+          )}
+
+          <div className={animFlip ? 'luns-anim-a' : 'luns-anim-b'}>
+            <MenuList
+              sections={sections}
+              searchTerms={terms}
+              onToggleFavorite={toggleFavorite}
+              onToggleStar={handleToggleStar}
+            />
+          </div>
+
+          <div style={{ height: spacerHeight }} />
+          </div>
+        </main>
       </div>
 
-      {/* Smart Contextual Back to Top Button */}
-      {showBackToTop && (
-        <div className={`fixed ${isNearFooter ? 'bottom-32' : 'bottom-6'} right-6 xl:right-[calc(50%-32rem-3rem)] z-50 transition-all duration-500 transform ${
-          showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
-          <button
-            onClick={scrollToTop}
-            className="relative backdrop-blur-sm p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 transform hover:-translate-y-1 border bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
-          >
-            {/* Scroll Progress Ring with SVG Arrow */}
-            <div className="relative w-8 h-8">
-              {/* Progress Ring */}
-              <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
-                <circle
-                  cx="16"
-                  cy="16"
-                  r="14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="opacity-20"
-                />
-                <circle
-                  cx="16"
-                  cy="16"
-                  r="14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 14}`}
-                  strokeDashoffset={`${2 * Math.PI * 14 * (1 - scrollProgress / 100)}`}
-                  className="transition-all duration-150 ease-out text-blue-600 dark:text-blue-400"
-                />
-              </svg>
-              {/* SVG Arrow */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-current"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M5 15l7-7 7 7"
-                  />
-                </svg>
-              </div>
-            </div>
-          </button>
+      <MobileBar
+        sheet={sheet}
+        onOpen={setSheet}
+        onClose={() => setSheet(null)}
+        items={railItems}
+        onSelectRestaurant={scrollToRestaurant}
+        typeChips={typeChips}
+        cravingChips={cravingChips}
+        activeFilterCount={activeFilterCount}
+      />
+
+      {toast && (
+        <div className="luns-toast fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-[10px] bg-[var(--ink)] px-[18px] py-2.5 text-[13px] font-semibold text-[var(--bg)] shadow-[0_8px_24px_rgba(0,0,0,.25)]">
+          {toast}
         </div>
+      )}
+
+      {needsChoice && (
+        <LocationWelcome locations={locations} onSelect={id => selectLocation(id, true)} />
       )}
     </div>
   );

@@ -1,5 +1,28 @@
 import type { Metadata } from 'next'
+import { Schibsted_Grotesk, Bricolage_Grotesque, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
+
+/* Designens tre familjer. next/font hämtar dem vid bygget och lägger dem i
+   exporten, så sidan varken slår mot Google vid besök eller blinkar in
+   typsnitten — viktigt eftersom hela sajten är en statisk export. */
+const body = Schibsted_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+})
+
+const heading = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+})
+
+const mono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Luns.se',
@@ -20,7 +43,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="sv"
+      className={`${body.variable} ${heading.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Production only. Loading this in dev sent every click made while
             developing — filter toggles, favorites, tour steps — into the real
@@ -46,7 +73,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body style={{ fontFamily: 'var(--font-body), system-ui, sans-serif' }}>{children}</body>
     </html>
   )
-} 
+}

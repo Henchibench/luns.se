@@ -2,117 +2,163 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbar but keep scroll functionality */
-html {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+/* ---------------------------------------------------------------------------
+   Designtokens — Lunchtavlan (handoff 2026)
+
+   Värdena kommer ur design_handoff_lunchtavlan/README.md och ska inte justeras
+   på känsla. Ljust läge är en dämpad petrolton, mörkt läge är luns.se
+   ursprungliga teal. Allt UI plockar färg härifrån, aldrig ur Tailwinds
+   palett — annars glider de två isär vid nästa ändring.
+--------------------------------------------------------------------------- */
+:root {
+  --mesh: linear-gradient(178deg, #CBDDDF 0%, #BAD1D4 60%, #A9C4C8 100%);
+  --glass: rgba(255, 255, 255, .38);
+  --glass2: rgba(255, 255, 255, .28);
+  --glassBrd: rgba(255, 255, 255, .6);
+  --chip: rgba(255, 255, 255, .48);
+  --hi: rgba(255, 255, 255, .5);
+  --line: rgba(30, 80, 90, .22);
+  --ink: #0E2229;
+  --ink2: #31505A;
+  --mut: #6E8B92;
+  --acc: #0D5B6E;
+  --accStrong: #093F4D;
+  --accBg: rgba(60, 150, 170, .24);
+  --star: #B5892A;
+  --cGreen: #3F7350;
+  --cWarm: #9A5340;
+  --cBlue: #2A6A85;
+  --cPurple: #5D619A;
+  --bg: #E9F1F2;
 }
 
-html::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+html.dark {
+  --mesh: linear-gradient(178deg, #043440 0%, #022A35 60%, #01212A 100%);
+  --glass: rgba(2, 32, 41, .5);
+  --glass2: rgba(255, 255, 255, .045);
+  --glassBrd: rgba(255, 255, 255, .13);
+  --chip: rgba(255, 255, 255, .06);
+  --hi: rgba(255, 255, 255, .08);
+  --line: rgba(255, 255, 255, .13);
+  --ink: #DCEDF0;
+  --ink2: #A3C2C9;
+  --mut: #4F7680;
+  --acc: #54C2D8;
+  --accStrong: #8ADCE8;
+  --accBg: rgba(84, 194, 216, .15);
+  --star: #E3C25B;
+  --cGreen: #8FC49C;
+  --cWarm: #D69A82;
+  --cBlue: #79B7CE;
+  --cPurple: #A2A4D8;
+  --bg: #04252E;
 }
 
-body {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
-
-body::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
-}
-
-/* Favorite heart */
-.favorite-heart {
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-
-.favorite-heart:active {
-  animation: heartPulse 0.25s ease;
-}
-
-@keyframes heartPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* Smooth slide in animation for filter buttons */
-@keyframes slideInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Checkbox selection bounce */
-@keyframes checkboxBounce {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Restaurant card filtering animations */
-@keyframes fadeInScale {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes fadeOutScale {
-  0% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    max-height: 1000px;
-    margin-bottom: 16px;
-  }
-  50% {
-    opacity: 0.3;
-    transform: scale(0.98) translateY(-5px);
-    max-height: 1000px;
-    margin-bottom: 16px;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-    max-height: 0;
-    margin-bottom: 0;
-  }
-}
-
-.animate-fade-in-scale {
-  animation: fadeInScale 0.4s ease-out forwards;
-}
-
-.animate-fade-out-scale {
-  animation: fadeOutScale 0.4s ease-in forwards;
-}
-
+html,
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  height: 100%;
+}
+
+body {
+  background: var(--mesh);
+  background-attachment: fixed;
+  background-size: cover;
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Filmkorn över hela sajten. Ligger över allt innehåll men släpper igenom
+   klick, annars vore sidan omöjlig att använda. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 * {
   box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--acc);
+}
+
+::placeholder {
+  color: var(--mut);
+}
+
+/* Rullningslister göms men innehållet scrollar som vanligt. */
+html,
+body,
+.luns-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.luns-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade-masker. Huvudytan tonar ut 44px i topp och botten, spalten 16/22px. */
+.luns-mask-main {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 44px, #000 calc(100% - 44px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 44px, #000 calc(100% - 44px), transparent);
+}
+
+.luns-mask-rail {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16px, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 16px, #000 calc(100% - 22px), transparent);
+}
+
+/* Dagbytet spelar om samma in-glidning varje gång. Två identiska keyframes
+   som växlas är enklaste sättet att tvinga om en animation utan att slänga
+   och återskapa noderna. */
+@keyframes lunsFadeA {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes lunsFadeB {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-anim-a { animation: lunsFadeA .35s ease; }
+.luns-anim-b { animation: lunsFadeB .35s ease; }
+
+@keyframes lunsRise {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.luns-toast { animation: lunsRise .25s ease-out; }
+
+@keyframes lunsSheetUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-sheet { animation: lunsSheetUp .25s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .luns-anim-a,
+  .luns-anim-b,
+  .luns-toast,
+  .luns-sheet {
+    animation: none;
+  }
 }
