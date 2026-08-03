@@ -284,16 +284,18 @@ export default function InfoBanner({ latitude, longitude }: InfoBannerProps) {
           </div>
         </div>
 
-        {/* Göteborg Joke */}
-        <div className="flex items-center bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-3">
+        {/* Göteborg Joke — desktop only. On a phone these two boxes pushed the
+            first restaurant card a full screen further down; the week and the
+            weather earn their space, the banter does not. */}
+        <div className="hidden md:flex items-center bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-3">
           <span className="text-2xl mr-2 flex-shrink-0">🤭</span>
           <div className="text-sm text-gray-700 dark:text-gray-200 leading-tight">
             {joke}
           </div>
         </div>
 
-        {/* Lunch Countdown */}
-        <div className="flex items-center bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-3">
+        {/* Lunch Countdown — desktop only, same reason */}
+        <div className="hidden md:flex items-center bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-3">
           <span className="text-2xl mr-2 flex-shrink-0">⏰</span>
           <div className="text-sm text-gray-700 dark:text-gray-200 leading-tight">
             {countdown}

@@ -1036,12 +1036,12 @@ export default function MenuPage() {
 
       {/* Brand Title */}
        <div className="relative z-10">
-         <div className="max-w-7xl mx-auto px-4 py-12">
+         <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
            <div className="text-center">
              <img
                src="/luns-logo-transparent.png"
                alt="Luns.se"
-               className="h-64 mx-auto mb-0"
+               className="h-32 md:h-64 mx-auto mb-0"
              />
            </div>
          </div>

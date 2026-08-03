@@ -30,7 +30,15 @@ const CARD_GAP = 14;
 
 function findTarget(step: TourStep | undefined): HTMLElement | null {
   if (!step?.target) return null;
-  return document.querySelector<HTMLElement>(`[data-tour="${step.target}"]`);
+  // First *visible* match, not simply the first: responsive layouts can leave a
+  // display:none twin in the DOM, and spotlighting that gives a zero-sized hole
+  // in the corner.
+  const candidates = document.querySelectorAll<HTMLElement>(`[data-tour="${step.target}"]`);
+  for (const candidate of Array.from(candidates)) {
+    const rect = candidate.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) return candidate;
+  }
+  return null;
 }
 
 export default function WhatsNewTour({ steps, onFinish, onStepChange }: WhatsNewTourProps) {

@@ -84,6 +84,21 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
   // The tour can hold the panel open without disturbing the user's own toggle,
   // so it returns to whatever state it was in once the tour moves on.
   const isFilterOpen = isFilterOpenState || forceFilterOpen;
+
+  // Below md the controls collapse behind a menu button. The tour needs it open
+  // too — on a phone the food profile sits behind both this and the filter panel.
+  const [isMobileMenuOpenState, setIsMobileMenuOpen] = useState(false);
+  const isMobileMenuOpen = isMobileMenuOpenState || forceFilterOpen;
+
+  // The view-mode dropdown is absolutely positioned, so it would be clipped by
+  // the menu's overflow-hidden. Release the clip once the open transition has
+  // finished — during it the clip is what makes the collapse look right.
+  const [mobileMenuSettled, setMobileMenuSettled] = useState(false);
+  useEffect(() => {
+    if (!isMobileMenuOpen) { setMobileMenuSettled(false); return; }
+    const timer = window.setTimeout(() => setMobileMenuSettled(true), 320);
+    return () => clearTimeout(timer);
+  }, [isMobileMenuOpen]);
   const [filters, setFilters] = useState<FilterState>({
     selectedFoodTypes: [],
     selectedRestaurants: restaurants,
@@ -114,18 +129,19 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
     function handleClickOutside(event: MouseEvent) {
       if (filterPanelRef.current && !filterPanelRef.current.contains(event.target as Node)) {
         setIsFilterOpen(false);
+        setIsMobileMenuOpen(false);
       }
     }
 
-    // Not while the tour holds it open — its overlay counts as "outside" and
+    // Not while the tour holds them open — its overlay counts as "outside" and
     // would close the panel the instant it was opened.
-    if (isFilterOpen && !forceFilterOpen) {
+    if ((isFilterOpen || isMobileMenuOpen) && !forceFilterOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [isFilterOpen, forceFilterOpen]);
+  }, [isFilterOpen, isMobileMenuOpen, forceFilterOpen]);
 
   // Handle craving search
   const handleCravingSearch = (craving: typeof CRAVINGS[0]) => {
@@ -143,6 +159,11 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
   const toggleFilterPanel = () => {
     if (!isFilterOpen) trackEvent('filter-open');
     setIsFilterOpen(!isFilterOpen);
+  };
+
+  const toggleMobileMenu = () => {
+    if (!isMobileMenuOpen) trackEvent('mobile-menu-open');
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleViewModeChange = (mode: 'cards' | 'list') => {
@@ -204,17 +225,49 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
 
   return (
     <div className="relative" ref={filterPanelRef}>
-      {/* Action Buttons Row */}
-      <div className="flex items-center justify-between">
-        {/* Left Side Buttons */}
-        <div className="flex items-center space-x-3">
-          {/* Location Picker */}
-          <LocationDropdown
-            locations={locations}
-            selected={selectedLocation}
-            onSelect={onLocationChange}
-          />
+      {/* Action Buttons Row
+          The controls are rendered once. On desktop the wrapper is inline and
+          the row reads as before; below md it takes the full width, which drops
+          it onto its own line, and collapses behind the menu button. Rendering
+          two copies would have been simpler but would give every data-tour
+          target a hidden twin, and the tour spotlights whichever it finds
+          first. */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Location Picker — stays visible: it is also the answer to "which
+            city am I looking at?" */}
+        <LocationDropdown
+          locations={locations}
+          selected={selectedLocation}
+          onSelect={onLocationChange}
+        />
 
+        <button
+          onClick={toggleMobileMenu}
+          aria-expanded={isMobileMenuOpen}
+          aria-label="Visa kontroller"
+          className={`md:hidden backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 border active:scale-95 ${
+            isMobileMenuOpen
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'
+          }`}
+        >
+          <span>☰</span>
+          <span>Meny</span>
+          {hasActiveFilters && !isMobileMenuOpen && (
+            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-sm">
+              {filters.selectedFoodTypes.length + (filters.searchTerm ? 1 : 0) + profileCount}
+            </span>
+          )}
+        </button>
+
+        <div
+          className={`w-full md:w-auto transition-all duration-300 ease-in-out md:max-h-none md:opacity-100 ${
+            mobileMenuSettled ? 'overflow-visible' : 'overflow-hidden'
+          } md:overflow-visible ${
+            isMobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 pt-1 md:pt-0">
           {/* Filter Button */}
           <button
             onClick={toggleFilterPanel}
@@ -311,9 +364,8 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
             <span>📤</span>
             <span>Kopiera dagens meny</span>
           </button>
+          </div>
         </div>
-
-
       </div>
 
       {/* Filter Panel - Normal flow below action bar */}
