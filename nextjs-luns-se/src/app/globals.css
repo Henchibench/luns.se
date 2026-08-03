@@ -172,10 +172,39 @@ html.dark .luns-map .leaflet-tile {
   filter: brightness(1.5) contrast(.92) sepia(.45) hue-rotate(140deg) saturate(1.5);
 }
 
+/* Nålen är två delar: en prick exakt på koordinaten och en etikett bredvid.
+   Etiketten får aldrig ligga över punkten — då döljer den precis det den ska
+   peka ut.
+
+   Själva nålen är en nollstor låda. Leaflet sätter sin position som inline
+   transform, vilket slår all transform härifrån, så en förskjutning av
+   behållaren skulle tyst ignoreras. Med nollstorlek ligger lådans origo på
+   koordinaten och barnen placeras absolut därifrån — då stämmer det oavsett
+   vad Leaflet gör och oavsett hur högt typsnittet råkar rendera. */
 .luns-pin {
-  width: max-content !important;
-  height: auto !important;
-  padding: 4px 10px;
+  width: 0 !important;
+  height: 0 !important;
+  cursor: pointer;
+}
+
+.luns-pin-dot {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #0D5B6E;
+  box-shadow: 0 1px 5px rgba(0, 20, 26, .5);
+}
+
+.luns-pin-label {
+  position: absolute;
+  left: 11px;
+  top: 0;
+  transform: translateY(-50%);
+  padding: 3px 8px;
   border: 1px solid rgba(13, 91, 110, .45);
   border-radius: 999px;
   background: rgba(255, 255, 255, .82);
@@ -185,11 +214,20 @@ html.dark .luns-map .leaflet-tile {
   letter-spacing: .04em;
   white-space: nowrap;
   box-shadow: 0 3px 12px rgba(0, 20, 26, .25);
-  transform: translate(-50%, -50%);
-  cursor: pointer;
 }
 
-html.dark .luns-pin {
+/* Den nål man pekar på lyfts över grannarna, så överlappande etiketter går
+   att läsa en i taget. */
+.luns-pin:hover {
+  z-index: 1000 !important;
+}
+
+html.dark .luns-pin-dot {
+  border-color: #02202A;
+  background: #54C2D8;
+}
+
+html.dark .luns-pin-label {
   background: rgba(2, 32, 41, .85);
   border-color: rgba(84, 194, 216, .5);
   color: #BFE7F0;

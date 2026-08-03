@@ -76,10 +76,12 @@ export default function RestaurantMap({
         const coords: [number, number] = [point.latitude, point.longitude];
         bounds.push(coords);
 
+        // Pricken sitter på koordinaten, namnet bredvid. Med namnet centrerat
+        // över punkten döljer etiketten precis det den ska peka ut.
         const marker = L.marker(coords, {
           icon: L.divIcon({
             className: 'luns-pin',
-            html: escapeHtml(point.name),
+            html: `<i class="luns-pin-dot"></i><span class="luns-pin-label">${escapeHtml(point.name)}</span>`,
             iconSize: undefined,
           }),
           title: point.name,
@@ -104,7 +106,12 @@ export default function RestaurantMap({
       });
 
       if (bounds.length > 1) {
-        map.fitBounds(bounds, { padding: [46, 46] });
+        // Etiketten växer åt höger från sin prick, så nålar längst österut
+        // behöver mer luft på den sidan än på den västra.
+        map.fitBounds(bounds, {
+          paddingTopLeft: [24, 46],
+          paddingBottomRight: [180, 46],
+        });
       } else {
         map.setView(bounds[0], singleZoom);
       }

@@ -432,7 +432,11 @@ export default function LunchBoard() {
             </div>
           )}
 
-          <div hidden={view === 'map'}>
+          {/* Listan renderas inte alls i kartvyn. Att bara dölja den lämnade
+              en utfälld restaurangkarta igång bakom helkartan — en osynlig
+              Leaflet-instans som ritar tiles man aldrig ser. */}
+          {view === 'list' && (
+          <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
@@ -481,6 +485,7 @@ export default function LunchBoard() {
 
           <div style={{ height: spacerHeight }} />
           </div>
+          )}
         </main>
       </div>
 
