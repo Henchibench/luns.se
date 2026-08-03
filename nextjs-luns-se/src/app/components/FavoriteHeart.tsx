@@ -16,7 +16,7 @@ export default function FavoriteHeart({ isFavorite, onToggle, variant = 'button'
 
   const className =
     variant === 'button'
-      ? `backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 favorite-heart ${
+      ? `backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 rounded text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 favorite-heart ${
           isFavorite
             ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'

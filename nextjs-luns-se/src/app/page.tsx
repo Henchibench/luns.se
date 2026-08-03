@@ -265,7 +265,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
     : Object.keys(groupedItems as Record<string, Array<MenuItem & { restaurantName: string }>>).length === 0;
 
   const containerClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm";
-  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
+  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-3 md:p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
 
   if (isEmpty) {
     return (
@@ -309,13 +309,16 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}
-                className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                className={`px-2 py-1.5 md:px-3 md:py-2 mt-1 mb-1 text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
                     ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
                     : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
                 }`}
               >
-                {day}
+                {/* Mån/Tis/… on a phone: five full weekday names do not fit in
+                    311 px and turned the row into a scroller. */}
+                <span className="md:hidden">{day.slice(0, 3)}</span>
+                <span className="hidden md:inline">{day}</span>
               </button>
             ))}
           </div>
@@ -486,14 +489,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
   }, [groupedItems, contentKey]);
 
   const cardClasses = "bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600 shadow-sm overflow-visible";
-  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
+  const headerClasses = "bg-gray-100 dark:bg-gray-900 p-3 md:p-4 text-black dark:text-gray-100 rounded-t border-b border-gray-300 dark:border-gray-600";
 
   return (
     <div className={cardClasses}>
       {/* Restaurant Header */}
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
-          <h2 className="font-bold text-xl">
+          <h2 className="font-bold text-lg md:text-xl">
             {restaurant.name}
             {matchedByDish && (
               <span
@@ -519,10 +522,11 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                   if (!showMap) trackEvent('map-open', { restaurant: restaurant.name });
                   setShowMap(!showMap);
                 }}
-                className="backdrop-blur-sm px-3 py-2 rounded text-sm font-medium transition-all duration-150 flex items-center space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                title="Hitta hit!"
+                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 rounded text-sm font-medium transition-all duration-150 flex items-center md:space-x-1 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 <span>🗺️</span>
-                <span>Hitta hit!</span>
+                <span className="hidden md:inline">Hitta hit!</span>
               </button>
             )}
 
@@ -532,7 +536,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'website' })}
-                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
+                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
               >
                 🏠
               </a>
@@ -544,7 +548,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackEvent('external-link', { restaurant: restaurant.name, type: 'instagram' })}
-                className="backdrop-blur-sm px-3 py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
+                className="backdrop-blur-sm px-2 py-1.5 md:px-3 md:py-2 text-sm font-medium transition-all duration-150 flex items-center hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded"
               >
                 <img src="/instagram.svg" alt="Instagram" className="w-4 h-4" />
               </a>
@@ -570,13 +574,16 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}
-                className={`px-3 py-2 mt-1 mb-1 text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
+                className={`px-2 py-1.5 md:px-3 md:py-2 mt-1 mb-1 text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-150 hover:shadow-md active:scale-95 active:shadow-sm transform hover:-translate-y-0.5 ${
                   selectedDay === day
                     ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-2 border-gray-400 dark:border-gray-500 rounded'
                     : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 rounded'
                 }`}
               >
-                {day}
+                {/* Mån/Tis/… on a phone: five full weekday names do not fit in
+                    311 px and turned the row into a scroller. */}
+                <span className="md:hidden">{day.slice(0, 3)}</span>
+                <span className="hidden md:inline">{day}</span>
               </button>
             ))}
           </div>
@@ -626,7 +633,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
       )}
 
       {/* Menu Content */}
-      <div className="p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+      <div className="p-4 md:p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
         <div className={`space-y-4 transition-opacity duration-400 ${isContentChanging ? 'opacity-50' : 'opacity-100'}`}>
           {Object.entries(groupedItems).length === 0 ? (
             <div className="text-center py-8">
