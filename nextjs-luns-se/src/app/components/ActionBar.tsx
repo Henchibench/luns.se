@@ -5,6 +5,7 @@ import { trackEvent } from '../utils/analytics';
 import { LocationDropdown } from './LocationPicker';
 import type { LunsLocation } from '../hooks/useLocation';
 import type { FoodProfile } from '../hooks/useFoodProfile';
+import { dishDisplayName, type FavoriteDish } from '../hooks/useDishFavorites';
 
 export interface FilterState {
   selectedFoodTypes: string[];
@@ -29,6 +30,8 @@ interface ActionBarProps {
   onAddHideKeyword: (keyword: string) => void;
   onRemoveHideKeyword: (keyword: string) => void;
   onCopyMenu: () => void;
+  favoriteDishes: FavoriteDish[];
+  onRemoveDishFavorite: (restaurant: string, signature: string) => void;
 }
 
 const FOOD_TYPES = [
@@ -70,7 +73,7 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange, foodProfile, onToggleBoostType, onAddHideKeyword, onRemoveHideKeyword, onCopyMenu }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange, foodProfile, onToggleBoostType, onAddHideKeyword, onRemoveHideKeyword, onCopyMenu, favoriteDishes, onRemoveDishFavorite }: ActionBarProps) {
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   const [hideKeywordInput, setHideKeywordInput] = useState('');
   
@@ -179,7 +182,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
     }));
   };
 
-  const profileCount = foodProfile.boostTypes.length + foodProfile.hideKeywords.length;
+  const profileCount = foodProfile.boostTypes.length + foodProfile.hideKeywords.length + favoriteDishes.length;
 
   const hasActiveFilters = filters.selectedFoodTypes.length > 0 ||
                           filters.selectedRestaurants.length < restaurants.length ||
@@ -456,6 +459,39 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
               </div>
             )}
           </div>
+
+          {/* Watched dishes — starred from the menu, listed here so they can be cleared */}
+          {favoriteDishes.length > 0 && (
+            <div className="mb-6 p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Bevakade rätter
+              </label>
+              <p className="text-xs mb-3 text-gray-500 dark:text-gray-400">
+                Du får veta när de — eller något snarlikt — dyker upp igen.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {favoriteDishes.map(dish => (
+                  <span
+                    key={`${dish.restaurant}-${dish.signature}`}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border border-amber-300 dark:border-amber-700"
+                  >
+                    <span>⭐</span>
+                    <span>
+                      {dishDisplayName(dish)}
+                      <span className="opacity-60"> · {dish.restaurant}</span>
+                    </span>
+                    <button
+                      onClick={() => onRemoveDishFavorite(dish.restaurant, dish.signature)}
+                      aria-label={`Sluta bevaka ${dishDisplayName(dish)}`}
+                      className="font-bold hover:text-red-600 dark:hover:text-red-400"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Restaurants */}
           <div className="mb-6">

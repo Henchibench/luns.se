@@ -5,9 +5,11 @@ import InfoBanner from './components/InfoBanner';
 import ActionBar, { FilterState } from './components/ActionBar';
 import ThemeToggle from './components/ThemeToggle';
 import FavoriteHeart from './components/FavoriteHeart';
+import DishStar from './components/DishStar';
 import { LocationWelcome } from './components/LocationPicker';
 import { useFavorites } from './hooks/useFavorites';
 import { useFoodProfile } from './hooks/useFoodProfile';
+import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation, LunsLocation } from './hooks/useLocation';
 import { trackEvent } from './utils/analytics';
 import { buildMenuShareText, copyText } from './utils/shareMenu';
@@ -192,12 +194,14 @@ function groupMenuItemsByCategory(restaurants: Restaurant[], selectedDay: string
   return groupedItems;
 }
 
-function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite, boostTypes }: {
+function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFavorite, boostTypes, isDishFavorite, onToggleDishFavorite }: {
   restaurants: Restaurant[];
   hasActiveSearch?: boolean;
   isFavorite: (name: string) => boolean;
   onToggleFavorite: (name: string) => void;
   boostTypes: string[];
+  isDishFavorite: (restaurant: string, description: string) => boolean;
+  onToggleDishFavorite: (restaurant: string, description: string) => void;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const availableDays = getAvailableDays();
@@ -325,6 +329,10 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
                             </p>
                           </div>
                           <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
+                            <DishStar
+                              isFavorite={isDishFavorite(item.restaurantName, item.description)}
+                              onToggle={() => onToggleDishFavorite(item.restaurantName, item.description)}
+                            />
                             <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
                               {item.restaurantName}
                             </span>
@@ -361,6 +369,10 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
                       </p>
                     </div>
                     <div className="ml-4 flex-shrink-0 flex items-center space-x-1">
+                      <DishStar
+                        isFavorite={isDishFavorite(item.restaurantName, item.description)}
+                        onToggle={() => onToggleDishFavorite(item.restaurantName, item.description)}
+                      />
                       <span className="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
                         {item.restaurantName}
                       </span>
@@ -381,7 +393,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes }: {
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes, isDishFavorite, onToggleDishFavorite, matchedByDish }: {
   restaurant: Restaurant;
   allItems: string[];
   originalRestaurant?: Restaurant;
@@ -390,6 +402,9 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
   onToggleFavorite: () => void;
   mapQuery: string;
   boostTypes: string[];
+  isDishFavorite: (restaurant: string, description: string) => boolean;
+  onToggleDishFavorite: (restaurant: string, description: string) => void;
+  matchedByDish: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
@@ -442,7 +457,17 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
       {/* Restaurant Header */}
       <div className={headerClasses}>
         <div className="flex items-start justify-between mb-4">
-          <h2 className="font-bold text-xl">{restaurant.name}</h2>
+          <h2 className="font-bold text-xl">
+            {restaurant.name}
+            {matchedByDish && (
+              <span
+                className="ml-2 align-middle text-xs font-medium px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                title="Kom med i listan för att en rätt du bevakar serveras idag"
+              >
+                ⭐ favoriträtt idag
+              </span>
+            )}
+          </h2>
 
           {/* Action Buttons */}
           <div className="flex space-x-2 ml-4">
@@ -590,11 +615,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                       </h3>
                       <div className="space-y-2 ml-2">
                         {items.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="text-sm leading-relaxed text-gray-600 dark:text-gray-300"
-                          >
-                            {item.description}
+                          <div key={idx} className="flex items-start gap-2">
+                            <DishStar
+                              isFavorite={isDishFavorite(restaurant.name, item.description)}
+                              onToggle={() => onToggleDishFavorite(restaurant.name, item.description)}
+                            />
+                            <span className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                              {item.description}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -612,11 +640,14 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                 </h3>
                 <div className="space-y-2">
                   {items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="text-sm leading-relaxed text-gray-700 dark:text-gray-200"
-                    >
-                      {item.description}
+                    <div key={idx} className="flex items-start gap-2">
+                      <DishStar
+                        isFavorite={isDishFavorite(restaurant.name, item.description)}
+                        onToggle={() => onToggleDishFavorite(restaurant.name, item.description)}
+                      />
+                      <span className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
+                        {item.description}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -647,6 +678,8 @@ export default function MenuPage() {
 
   const { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
 
+  const { dishes: favoriteDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite, matchingDishesToday } = useDishFavorites();
+
   const { profile, toggleBoostType, addHideKeyword, removeHideKeyword, isActive: profileActive } = useFoodProfile();
   const [hiddenDishCount, setHiddenDishCount] = useState(0);
   const [copyToast, setCopyToast] = useState<string | null>(null);
@@ -659,6 +692,10 @@ export default function MenuPage() {
   const locationRestaurants = selectedLocation
     ? restaurants.filter(r => r.location?.area === selectedLocation.id)
     : [];
+
+  // Watched dishes on today's menu — drives the notice and the card badge.
+  const dishMatchesToday = matchingDishesToday(locationRestaurants, CURRENT_DAY);
+  const restaurantsServingAFavoriteDish = new Set(dishMatchesToday.map(m => m.restaurant));
 
   // Back to top button state
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -764,9 +801,16 @@ export default function MenuPage() {
       filters.selectedRestaurants.includes(restaurant.name)
     );
 
-    // Show only favorites when the favorites toggle is active
+    // Show only favorites when the favorites toggle is active. A starred dish
+    // being served today counts too — that is the whole point of watching a
+    // dish, and it works even at a restaurant you never favorited.
     if (showOnlyFavorites) {
-      newFiltered = newFiltered.filter(restaurant => favorites.includes(restaurant.name));
+      const servingAFavoriteDish = new Set(
+        matchingDishesToday(atLocation, CURRENT_DAY).map(m => m.restaurant)
+      );
+      newFiltered = newFiltered.filter(
+        restaurant => favorites.includes(restaurant.name) || servingAFavoriteDish.has(restaurant.name)
+      );
     }
 
     // Apply filtering to each restaurant's items
@@ -844,7 +888,7 @@ export default function MenuPage() {
       currentDisplayedRef.current = newFiltered;
       setIsFiltering(false);
     }
-  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation, profile]);
+  }, [restaurants, filters, showOnlyFavorites, favorites, selectedLocation, profile, matchingDishesToday]);
 
   useEffect(() => {
     Promise.all([
@@ -977,8 +1021,21 @@ export default function MenuPage() {
                  onAddHideKeyword={addHideKeyword}
                  onRemoveHideKeyword={removeHideKeyword}
                  onCopyMenu={handleCopyMenu}
+                 favoriteDishes={favoriteDishes}
+                 onRemoveDishFavorite={removeDishFavorite}
                />
              </div>
+
+             {/* Watched dishes served today — the payoff for starring a dish */}
+             {dishMatchesToday.length > 0 && (
+               <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                 ⭐ {dishMatchesToday.length === 1
+                   ? `${dishMatchesToday[0].label} serveras på ${dishMatchesToday[0].restaurant} idag`
+                   : `${dishMatchesToday.length} rätter du bevakar serveras idag: ${dishMatchesToday
+                       .map(m => `${m.label} (${m.restaurant})`)
+                       .join(', ')}`}
+               </p>
+             )}
 
              {/* Food profile active indicator */}
              {profileActive && (
@@ -1026,6 +1083,8 @@ export default function MenuPage() {
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
               boostTypes={profile.boostTypes}
+              isDishFavorite={isDishFavorite}
+              onToggleDishFavorite={toggleDishFavorite}
             />
           ) : (
             <div className="space-y-4">
@@ -1054,6 +1113,9 @@ export default function MenuPage() {
                       onToggleFavorite={() => toggleFavorite(restaurant.name)}
                       mapQuery={selectedLocation?.mapQuery ?? ''}
                       boostTypes={profile.boostTypes}
+                      isDishFavorite={isDishFavorite}
+                      onToggleDishFavorite={toggleDishFavorite}
+                      matchedByDish={restaurantsServingAFavoriteDish.has(restaurant.name)}
                     />
                   </div>
                 );
