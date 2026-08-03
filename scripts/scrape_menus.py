@@ -185,6 +185,10 @@ def build_restaurants_response(menus):
             "instagram": info.get("instagram"),
             "review_score": info.get("review_score"),
             "lunch_hours": info.get("lunch_hours"),
+            # Saknas för restauranger vi inte kunnat placera. Frontenden ritar
+            # ingen nål då — en nål på fel ställe är sämre än ingen nål.
+            "latitude": info.get("latitude"),
+            "longitude": info.get("longitude"),
             "has_menu": True,
         }
     return {

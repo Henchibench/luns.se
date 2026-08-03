@@ -16,7 +16,6 @@ interface Props {
   search: string;
   onSearch: (value: string) => void;
 
-  clock: string;
   weather: Weather;
 
   onCopy: () => void;
@@ -41,7 +40,6 @@ export default function Header({
   onSelectLocation,
   search,
   onSearch,
-  clock,
   weather,
   onCopy,
   view,
@@ -114,14 +112,14 @@ export default function Header({
         className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
       />
 
-      {/* Vädret och klockan är samma sorts upplysning: sådant man vill veta
-          medan man bestämmer sig, men inte behöver på en liten skärm. */}
-      <span className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
+      {/* Vädret avgör om man går ut och äter. Klockan gör det inte — den står
+          redan i telefonens statusrad. Dold på smal skärm ändå. */}
+      <span
+        className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
+        title={weather.description}
+      >
         {weather.emoji}
         {weather.temperature ? ` ${weather.temperature}` : ''}
-      </span>
-      <span className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--acc)] whitespace-nowrap">
-        {clock}
       </span>
 
       <button

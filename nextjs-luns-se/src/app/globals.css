@@ -154,6 +154,92 @@ body::-webkit-scrollbar,
 
 .luns-sheet { animation: lunsSheetUp .25s ease-out; }
 
+/* ---------------------------------------------------------------------------
+   Kartan. Leaflet ritar sina egna element, så de stylas globalt.
+--------------------------------------------------------------------------- */
+.luns-map {
+  background: #BAD1D4;
+  z-index: 0; /* håller kartan under menyer och ark */
+}
+
+html.dark .luns-map {
+  background: #02202A;
+}
+
+/* CARTO:s mörka basemap är gråblå. Filtret drar den mot samma teal som
+   resten av sajten. */
+html.dark .luns-map .leaflet-tile {
+  filter: brightness(1.5) contrast(.92) sepia(.45) hue-rotate(140deg) saturate(1.5);
+}
+
+.luns-pin {
+  width: max-content !important;
+  height: auto !important;
+  padding: 4px 10px;
+  border: 1px solid rgba(13, 91, 110, .45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  backdrop-filter: blur(8px);
+  color: #0D3641;
+  font: 600 10.5px var(--font-mono), ui-monospace, monospace;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(0, 20, 26, .25);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+html.dark .luns-pin {
+  background: rgba(2, 32, 41, .85);
+  border-color: rgba(84, 194, 216, .5);
+  color: #BFE7F0;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .94);
+  color: #0E2229;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+html.dark .leaflet-popup-content-wrapper,
+html.dark .leaflet-popup-tip {
+  background: rgba(3, 42, 53, .96);
+  color: #DCEDF0;
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+}
+
+.luns-pp-name {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.luns-pp-meta {
+  margin: 0 0 8px;
+  color: #6E8B92;
+  font: 500 10.5px var(--font-mono), ui-monospace, monospace;
+}
+
+.luns-pp-btn {
+  display: inline-block;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #0D5B6E;
+  color: #fff;
+  font: 600 12px var(--font-body), system-ui, sans-serif;
+  cursor: pointer;
+}
+
+html.dark .luns-pp-btn {
+  background: #54C2D8;
+  color: #02202A;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .luns-anim-a,
   .luns-anim-b,

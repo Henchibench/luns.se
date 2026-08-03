@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Highlight from './Highlight';
+import RestaurantMap from './RestaurantMap';
 
 export interface SectionDish {
   key: string;
@@ -23,6 +24,8 @@ export interface Section {
   website?: string;
   maps?: string;
   instagram?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   favorite: boolean;
   dishes: SectionDish[];
 }
@@ -30,13 +33,24 @@ export interface Section {
 interface Props {
   sections: Section[];
   searchTerms: string[];
+  theme: 'light' | 'dark';
   onToggleFavorite: (name: string) => void;
   onToggleStar: (restaurant: string, description: string) => void;
 }
 
 const LINK_CLASS = 'whitespace-nowrap transition-colors hover:text-[var(--acc)]';
 
-export default function MenuList({ sections, searchTerms, onToggleFavorite, onToggleStar }: Props) {
+export default function MenuList({
+  sections,
+  searchTerms,
+  theme,
+  onToggleFavorite,
+  onToggleStar,
+}: Props) {
+  // Bara en karta åt gången. Flera utfällda kartor i samma lista blir både
+  // rörigt och tungt — varje karta är en egen Leaflet-instans.
+  const [openMap, setOpenMap] = useState<string | null>(null);
+
   return (
     <>
       {sections.map(section => (
@@ -67,11 +81,16 @@ export default function MenuList({ sections, searchTerms, onToggleFavorite, onTo
             )}
 
             <div className="flex flex-none gap-2.5 font-mono text-[10px] text-[var(--mut)]">
-              {section.maps && (
-                <a href={section.maps} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
-                  KARTA ↗
-                </a>
-              )}
+              {/* Kartan fälls ut här nere i stället för att kasta iväg
+                  besökaren till Google Maps i en ny flik. */}
+              <button
+                onClick={() => setOpenMap(prev => (prev === section.name ? null : section.name))}
+                aria-expanded={openMap === section.name}
+                className={`${LINK_CLASS} border-0 bg-transparent p-0 font-mono text-[10px] cursor-pointer`}
+                style={{ color: openMap === section.name ? 'var(--acc)' : undefined }}
+              >
+                KARTA {openMap === section.name ? '↑' : '↓'}
+              </button>
               {section.website && (
                 <a href={section.website} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
                   WWW ↗
@@ -84,6 +103,41 @@ export default function MenuList({ sections, searchTerms, onToggleFavorite, onTo
               )}
             </div>
           </div>
+
+          {openMap === section.name && (
+            <div className="mb-2 mt-1">
+              {section.latitude != null && section.longitude != null ? (
+                <RestaurantMap
+                  points={[
+                    {
+                      name: section.name,
+                      latitude: section.latitude,
+                      longitude: section.longitude,
+                      dishCount: section.dishes.length,
+                    },
+                  ]}
+                  theme={theme}
+                  className="h-[220px] w-full"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-2 rounded-2xl border border-[var(--glassBrd)] py-8">
+                  <span className="font-mono text-[10.5px] tracking-[.1em] text-[var(--mut)]">
+                    VI VET INTE VAR DEN LIGGER ÄN
+                  </span>
+                  {section.maps && (
+                    <a
+                      href={section.maps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-[10px] text-[var(--acc)] hover:underline"
+                    >
+                      SÖK PÅ GOOGLE MAPS ↗
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {section.info && (
             <p className="m-0 mb-1.5 text-[11.5px] text-[var(--mut)]">{section.info}</p>

@@ -5,6 +5,7 @@ import Header from './components/board/Header';
 import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
 import MobileBar, { SheetKind } from './components/board/MobileBar';
+import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
 import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
@@ -59,7 +60,6 @@ export default function LunchBoard() {
   const [toast, setToast] = useState<string | null>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
-  const [clock, setClock] = useState('');
 
   const mainRef = useRef<HTMLElement | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,24 +83,6 @@ export default function LunchBoard() {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
-
-  // Klockan sätts först efter montering. Renderad direkt skulle den bakas in
-  // vid bygget och visa fel tid tills React tar över.
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      const weekday = now.getDay() >= 1 && now.getDay() <= 5;
-      const lunchNow = weekday && now.getHours() >= 11 && now.getHours() < 14;
-      setClock(
-        `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}${
-          lunchNow ? ' · LUNCH PÅGÅR' : ''
-        }`
-      );
-    };
-    tick();
-    const timer = setInterval(tick, 30000);
-    return () => clearInterval(timer);
   }, []);
 
   const flash = useCallback((message: string) => {
@@ -185,6 +167,8 @@ export default function LunchBoard() {
           website: restaurant.meta.website,
           maps: restaurant.meta.maps,
           instagram: restaurant.meta.instagram,
+          latitude: restaurant.meta.latitude,
+          longitude: restaurant.meta.longitude,
           favorite: isFavorite(restaurant.name),
           dishes,
         };
@@ -358,6 +342,18 @@ export default function LunchBoard() {
     );
   }
 
+  // Nålar för helkartan. Restauranger vi inte kunnat placera hoppas över —
+  // en nål på fel ställe är sämre än ingen nål.
+  const mapPoints: MapPoint[] = atLocation
+    .filter(r => r.meta.latitude != null && r.meta.longitude != null)
+    .map(r => ({
+      name: r.name,
+      latitude: r.meta.latitude as number,
+      longitude: r.meta.longitude as number,
+      dishCount: r.dishes.filter(d => d.day === day).length,
+    }));
+  const unmappedCount = atLocation.length - mapPoints.length;
+
   const foodProfileProps = {
     profile,
     onToggleBoostType: toggleBoostType,
@@ -395,7 +391,6 @@ export default function LunchBoard() {
         }}
         search={search}
         onSearch={setSearch}
-        clock={clock}
         weather={weather}
         onCopy={handleCopy}
         view={view}
@@ -421,10 +416,19 @@ export default function LunchBoard() {
           }`}
         >
           {view === 'map' && (
-            <div className="flex h-full items-center justify-center rounded-2xl border border-[var(--glassBrd)] py-20">
-              <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
-                KARTAN BYGGS I NÄSTA STEG
-              </span>
+            <div className="flex h-full flex-col gap-2 pt-1.5 pb-[18px]">
+              <RestaurantMap
+                points={mapPoints}
+                theme={theme}
+                onSelect={scrollToRestaurant}
+                className="min-h-0 flex-1"
+              />
+              {unmappedCount > 0 && (
+                <span className="flex-none font-mono text-[10px] text-[var(--mut)]">
+                  {unmappedCount} restaurang{unmappedCount === 1 ? '' : 'er'} saknar position och
+                  syns inte på kartan
+                </span>
+              )}
             </div>
           )}
 
@@ -469,6 +473,7 @@ export default function LunchBoard() {
             <MenuList
               sections={sections}
               searchTerms={terms}
+              theme={theme}
               onToggleFavorite={toggleFavorite}
               onToggleStar={handleToggleStar}
             />
