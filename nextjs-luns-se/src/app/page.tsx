@@ -7,10 +7,12 @@ import ThemeToggle from './components/ThemeToggle';
 import FavoriteHeart from './components/FavoriteHeart';
 import DishStar from './components/DishStar';
 import { LocationWelcome } from './components/LocationPicker';
+import WhatsNewTour, { type TourStep } from './components/WhatsNewTour';
 import { useFavorites } from './hooks/useFavorites';
 import { useFoodProfile } from './hooks/useFoodProfile';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation, LunsLocation } from './hooks/useLocation';
+import { useWhatsNew } from './hooks/useWhatsNew';
 import { trackEvent } from './utils/analytics';
 import { buildMenuShareText, copyText } from './utils/shareMenu';
 
@@ -164,6 +166,38 @@ function parseRestaurantInfo(items: string[], day: string): string[] {
     .map(item => item.replace(/^INFO:[^-]*-\s*Restaurant Info:\s*/, ''))
     .map(item => item.trim());
 }
+
+const TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Mycket är nytt på luns.se',
+    body: 'Du kan nu välja plats, spara favoriter, ställa in vad du vill äta och dela dagens meny. Ta trettio sekunder så visar vi var allt finns.',
+  },
+  {
+    target: 'location',
+    title: 'Välj var du äter',
+    body: 'Luns täcker inte längre bara Lindholmen — här byter du till Tannefors i Linköping. Valet sparas till nästa besök.',
+  },
+  {
+    target: 'restaurant-heart',
+    title: 'Favoritmarkera ett lunchställe',
+    body: 'Klicka på hjärtat på en restaurang du gillar. Med Favoriter-knappen i kontrollraden visar du sedan bara dina ställen.',
+  },
+  {
+    target: 'dish-star',
+    title: 'Bevaka en enskild rätt',
+    body: 'Stjärnan sparar just den rätten. Nästa gång den — eller något snarlikt — dyker upp på menyn får du veta det direkt högst upp på sidan.',
+  },
+  {
+    target: 'food-profile',
+    title: 'Ställ in din matprofil',
+    body: 'Låt vegetariskt ligga överst, eller dölj rätter med sådant du inte äter. Till skillnad från filtren sparas profilen och gäller varje gång du kommer tillbaka.',
+  },
+  {
+    target: 'copy-menu',
+    title: 'Dela dagens meny',
+    body: 'Kopierar hela dagens utbud som text, redo att klistra in i Teams eller Slack. Uppe till höger hittar du dessutom knappen för mörkt läge.',
+  },
+];
 
 // Stable sort of [category, items] entries putting boosted categories first.
 // Substring match so "Vegetarisk" also catches "Vegetariskt".
@@ -393,7 +427,7 @@ function CompactListView({ restaurants, hasActiveSearch, isFavorite, onToggleFav
   );
 }
 
-function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes, isDishFavorite, onToggleDishFavorite, matchedByDish }: {
+function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSearch, isFavorite, onToggleFavorite, mapQuery, boostTypes, isDishFavorite, onToggleDishFavorite, matchedByDish, isTourAnchor = false }: {
   restaurant: Restaurant;
   allItems: string[];
   originalRestaurant?: Restaurant;
@@ -405,6 +439,8 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
   isDishFavorite: (restaurant: string, description: string) => boolean;
   onToggleDishFavorite: (restaurant: string, description: string) => void;
   matchedByDish: boolean;
+  /** First card on the page — carries the what's-new tour's spotlight targets. */
+  isTourAnchor?: boolean;
 }) {
   const [selectedDay, setSelectedDay] = useState(CURRENT_DAY);
   const [showMap, setShowMap] = useState(false);
@@ -471,7 +507,11 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
 
           {/* Action Buttons */}
           <div className="flex space-x-2 ml-4">
-            <FavoriteHeart isFavorite={isFavorite} onToggle={onToggleFavorite} />
+            <FavoriteHeart
+              isFavorite={isFavorite}
+              onToggle={onToggleFavorite}
+              dataTour={isTourAnchor ? 'restaurant-heart' : undefined}
+            />
 
             {restaurant.location?.maps && (
               <button
@@ -644,6 +684,7 @@ function RestaurantCard({ restaurant, allItems, originalRestaurant, hasActiveSea
                       <DishStar
                         isFavorite={isDishFavorite(restaurant.name, item.description)}
                         onToggle={() => onToggleDishFavorite(restaurant.name, item.description)}
+                        dataTour={isTourAnchor && idx === 0 ? 'dish-star' : undefined}
                       />
                       <span className="text-sm leading-relaxed text-gray-700 dark:text-gray-200">
                         {item.description}
@@ -686,6 +727,11 @@ export default function MenuPage() {
 
   const [locations, setLocations] = useState<LunsLocation[]>([]);
   const { selected: selectedLocation, needsChoice, selectLocation } = useLocation(locations);
+
+  // The tour waits for the location welcome and the initial load — stacking two
+  // overlays would be unusable.
+  const [tourStepId, setTourStepId] = useState<string | null>(null);
+  const { isActive: tourActive, startTour, endTour } = useWhatsNew(needsChoice || loading);
 
   // Restaurants at the selected location. Until a location is known we show
   // none rather than every city at once.
@@ -973,6 +1019,14 @@ export default function MenuPage() {
         />
       )}
 
+      {tourActive && (
+        <WhatsNewTour
+          steps={TOUR_STEPS}
+          onFinish={() => { setTourStepId(null); endTour(); }}
+          onStepChange={step => setTourStepId(step?.target ?? null)}
+        />
+      )}
+
       {/* Copy-menu toast */}
       {copyToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-lg shadow-xl border text-sm font-medium bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 animate-fade-in-scale">
@@ -1023,6 +1077,7 @@ export default function MenuPage() {
                  onCopyMenu={handleCopyMenu}
                  favoriteDishes={favoriteDishes}
                  onRemoveDishFavorite={removeDishFavorite}
+                 forceFilterOpen={tourStepId === 'food-profile'}
                />
              </div>
 
@@ -1113,6 +1168,7 @@ export default function MenuPage() {
                       onToggleFavorite={() => toggleFavorite(restaurant.name)}
                       mapQuery={selectedLocation?.mapQuery ?? ''}
                       boostTypes={profile.boostTypes}
+                      isTourAnchor={index === 0}
                       isDishFavorite={isDishFavorite}
                       onToggleDishFavorite={toggleDishFavorite}
                       matchedByDish={restaurantsServingAFavoriteDish.has(restaurant.name)}
@@ -1141,6 +1197,14 @@ export default function MenuPage() {
               <div className="text-center md:text-right">
                 <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
                   Vibe kodad av Henkebus ❤️
+                </p>
+                <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
+                  <button
+                    onClick={startTour}
+                    className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-100"
+                  >
+                    ✨ Vad är nytt?
+                  </button>
                 </p>
                 <p className="text-sm mb-2 text-gray-600 dark:text-gray-300">
                   Frågor eller förbättringsförslag? Hör av dig på{' '}

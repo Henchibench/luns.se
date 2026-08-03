@@ -32,6 +32,8 @@ interface ActionBarProps {
   onCopyMenu: () => void;
   favoriteDishes: FavoriteDish[];
   onRemoveDishFavorite: (restaurant: string, signature: string) => void;
+  /** Held open by the what's-new tour while it spotlights the panel. */
+  forceFilterOpen?: boolean;
 }
 
 const FOOD_TYPES = [
@@ -73,12 +75,15 @@ const CRAVINGS = [
   }
 ];
 
-export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange, foodProfile, onToggleBoostType, onAddHideKeyword, onRemoveHideKeyword, onCopyMenu, favoriteDishes, onRemoveDishFavorite }: ActionBarProps) {
+export default function ActionBar({ restaurants, onFiltersChange, viewMode, onViewModeChange, favoritesCount, showOnlyFavorites, onShowOnlyFavoritesChange, locations, selectedLocation, onLocationChange, foodProfile, onToggleBoostType, onAddHideKeyword, onRemoveHideKeyword, onCopyMenu, favoriteDishes, onRemoveDishFavorite, forceFilterOpen = false }: ActionBarProps) {
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   const [hideKeywordInput, setHideKeywordInput] = useState('');
   
   // Filter panel state
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpenState, setIsFilterOpen] = useState(false);
+  // The tour can hold the panel open without disturbing the user's own toggle,
+  // so it returns to whatever state it was in once the tour moves on.
+  const isFilterOpen = isFilterOpenState || forceFilterOpen;
   const [filters, setFilters] = useState<FilterState>({
     selectedFoodTypes: [],
     selectedRestaurants: restaurants,
@@ -112,14 +117,15 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
       }
     }
 
-    // Only add listener when filter panel is open
-    if (isFilterOpen) {
+    // Not while the tour holds it open — its overlay counts as "outside" and
+    // would close the panel the instant it was opened.
+    if (isFilterOpen && !forceFilterOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [isFilterOpen]);
+  }, [isFilterOpen, forceFilterOpen]);
 
   // Handle craving search
   const handleCravingSearch = (craving: typeof CRAVINGS[0]) => {
@@ -297,6 +303,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
 
           {/* Copy today's menu */}
           <button
+            data-tour="copy-menu"
             onClick={onCopyMenu}
             title="Kopiera dagens meny som text — klistra in i Teams eller Slack"
             className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 active:scale-95 active:shadow-sm border border-gray-200 dark:border-gray-600 transform hover:-translate-y-0.5"
@@ -391,7 +398,7 @@ export default function ActionBar({ restaurants, onFiltersChange, viewMode, onVi
           </div>
 
           {/* Food profile — remembered across visits, unlike the filters above */}
-          <div className="mb-6 p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50">
+          <div data-tour="food-profile" className="mb-6 p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Min matprofil
             </label>

@@ -5,6 +5,8 @@ import React from 'react';
 interface DishStarProps {
   isFavorite: boolean;
   onToggle: () => void;
+  /** Marks this instance as the what's-new tour's spotlight target */
+  dataTour?: string;
 }
 
 /**
@@ -14,7 +16,7 @@ interface DishStarProps {
  * when starred or hovered, because there is one of these on every dish and a
  * row of solid icons would drown the menu itself.
  */
-export default function DishStar({ isFavorite, onToggle }: DishStarProps) {
+export default function DishStar({ isFavorite, onToggle, dataTour }: DishStarProps) {
   const label = isFavorite ? 'Sluta bevaka rätten' : 'Bevaka rätten — få veta när den kommer tillbaka';
 
   return (
@@ -23,6 +25,7 @@ export default function DishStar({ isFavorite, onToggle }: DishStarProps) {
       title={label}
       aria-label={label}
       aria-pressed={isFavorite}
+      data-tour={dataTour}
       className={`favorite-heart flex-shrink-0 flex items-center transition-opacity ${
         isFavorite
           ? 'text-amber-500 opacity-100'

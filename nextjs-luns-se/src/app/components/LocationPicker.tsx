@@ -33,7 +33,7 @@ export function LocationDropdown({ locations, selected, onSelect }: LocationPick
   const isSwitchable = locations.length > 1;
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative" ref={containerRef} data-tour="location">
       <button
         onClick={() => isSwitchable && setIsOpen(!isOpen)}
         disabled={!isSwitchable}
