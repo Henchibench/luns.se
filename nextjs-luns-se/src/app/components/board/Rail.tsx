@@ -100,7 +100,7 @@ export default function Rail({
 
         <div className="mt-auto flex flex-col items-start gap-1 px-5 pt-5">
           <span className="text-[10.5px] text-[var(--mut)]">
-            Menyer skrapas varje vardagsmorgon
+            Menyer hämtas måndag och onsdag morgon
           </span>
           <div className="flex items-center gap-2.5">
             <button

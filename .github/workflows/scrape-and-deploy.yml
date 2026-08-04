@@ -1,10 +1,17 @@
 name: Scrape and Deploy
 
 on:
+  # Tiderna är UTC — cron kan inte sommartid. 05:00 UTC blir 07:00 svensk tid
+  # på sommaren och 06:00 på vintern, alltså före lunch året om.
+  #
+  # Onsdagen fångar restauranger som lägger ut veckans meny sent, och håller
+  # samtidigt statistiken färsk mitt i veckan. Extra körningar kan bara göra
+  # datan bättre: en skrapa som fallerar behåller förra körningens meny, hämtad
+  # från den publicerade menus.json.
   schedule:
-    - cron: '0 5 * * 1'     # Monday 07:00 CET
-    - cron: '0 7 * * 1'     # Monday 09:00 CET (retry)
-    - cron: '0 5 * * 2'     # Tuesday 07:00 CET (catch late uploads)
+    - cron: '0 5 * * 1'     # måndag morgon
+    - cron: '0 7 * * 1'     # måndag, omkörning två timmar senare
+    - cron: '0 5 * * 3'     # onsdag morgon
   workflow_dispatch:
 
 permissions:
