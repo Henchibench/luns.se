@@ -40,7 +40,7 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           BESÖKSSTATISTIK
         </h3>
         <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
-          För att se om sajten används alls anlitar vi{' '}
+          För att se om sajten används alls använder vi{' '}
           <a
             href="https://umami.is/privacy"
             target="_blank"
@@ -49,8 +49,8 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           >
             Umami
           </a>
-          , som varken sätter cookies eller följer dig mellan sajter. Vi får veta att någon gjorde
-          något, inte vem.
+          , som varken sätter cookies eller följer dig mellan sajter — i princip ett
+          integritetsvänligt alternativ till Google Analytics. Vi får veta att någon gjorde något.
         </p>
 
         <h3 className="mb-1.5 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
