@@ -172,6 +172,19 @@ export default function LunchBoard() {
       });
   }, []);
 
+  /**
+   * Statistiken och integritetsinfon är undersidor till inställningarna, och
+   * kugghjulet är enda vägen in till dem. Att stänga en av dem lämnar därför
+   * alltid tillbaka dit i stället för att kasta ut besökaren till menylistan,
+   * precis som en bakåtknapp. Öppnas de någon gång från ett annat håll får det
+   * bli ett val i stället för en regel.
+   *
+   * Rundan räknas inte in. Den tar över hela sajten för att peka ut var
+   * sakerna sitter, och att lägga en meny över den när den är slut vore att
+   * skyla det den just visat.
+   */
+  const backToSettings = useCallback(() => setSettingsOpen(true), []);
+
   const flash = useCallback((message: string) => {
     setToast(message);
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -633,9 +646,13 @@ export default function LunchBoard() {
         />
       )}
 
-      {privacyOpen && <PrivacyNote onClose={() => setPrivacyOpen(false)} />}
+      {privacyOpen && (
+        <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />
+      )}
 
-      {statsOpen && <StatsOverlay onClose={() => setStatsOpen(false)} />}
+      {statsOpen && (
+        <StatsOverlay onClose={() => setStatsOpen(false)} onCloseStart={backToSettings} />
+      )}
     </div>
   );
 }

@@ -41,11 +41,20 @@ export function useOverlayClose() {
  */
 export default function Overlay({
   onClose,
+  onCloseStart,
   labelledBy,
   children,
 }: {
   /** Utelämnas när rutan inte får stängas, som förstagångsvalet av plats. */
   onClose?: () => void;
+  /**
+   * Går när stängningen inleds, inte när den är klar. Den som vill öppna något
+   * annat i samma andetag behöver det: onClose kommer först när utgången spelat
+   * färdigt, och en ruta som öppnas då tonar in sitt sudd från noll mot en
+   * bakgrund som redan hunnit bli skarp. Härifrån korsar de två animationerna
+   * varandra i stället, som när rutan öppnades.
+   */
+  onCloseStart?: () => void;
   labelledBy: string;
   children: React.ReactNode;
 }) {
@@ -61,6 +70,7 @@ export default function Overlay({
 
   const requestClose = useCallback(() => {
     if (!onClose || closing) return;
+    onCloseStart?.();
 
     // Utan rörelse finns ingen animation att vänta in.
     const stillhet = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -71,7 +81,7 @@ export default function Overlay({
 
     setClosing(true);
     timer.current = setTimeout(onClose, EXIT_MS);
-  }, [onClose, closing]);
+  }, [onClose, onCloseStart, closing]);
 
   useEffect(() => {
     if (!onClose) return;

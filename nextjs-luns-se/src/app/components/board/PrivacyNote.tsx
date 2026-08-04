@@ -18,21 +18,28 @@ import Overlay, { useOverlayClose } from './Overlay';
  * Egen komponent för att kroken ska nå Overlays stängning. Anropad direkt i
  * PrivacyNote körs den utanför providern och får en tom funktion.
  */
-function CloseButton() {
+function CloseButton({ label }: { label: string }) {
   const close = useOverlayClose();
   return (
     <button
       onClick={close}
       className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-[12px] font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
     >
-      Stäng
+      {label}
     </button>
   );
 }
 
-export default function PrivacyNote({ onClose }: { onClose: () => void }) {
+export default function PrivacyNote({
+  onClose,
+  onCloseStart,
+}: {
+  onClose: () => void;
+  /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
+  onCloseStart?: () => void;
+}) {
   return (
-    <Overlay onClose={onClose} labelledBy="luns-privacy-title">
+    <Overlay onClose={onClose} onCloseStart={onCloseStart} labelledBy="luns-privacy-title">
       <div
         className="luns-panel luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7"
         onClick={e => e.stopPropagation()}
@@ -100,7 +107,9 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
         </p>
 
         <div className="flex justify-end">
-          <CloseButton />
+          {/* onCloseStart finns bara när rutan öppnades från inställningarna,
+              och då leder knappen dit i stället för ut. */}
+          <CloseButton label={onCloseStart ? 'Tillbaka' : 'Stäng'} />
         </div>
       </div>
     </Overlay>

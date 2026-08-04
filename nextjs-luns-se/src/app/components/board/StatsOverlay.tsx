@@ -28,14 +28,14 @@ import { StatsFile, formatNumber, loadStats, peakHour } from '../../lib/stats';
  * länken, och de ska inte betala för filen.
  */
 
-function CloseButton() {
+function CloseButton({ label }: { label: string }) {
   const close = useOverlayClose();
   return (
     <button
       onClick={close}
       className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
-      Stäng
+      {label}
     </button>
   );
 }
@@ -66,7 +66,14 @@ function Figure({ value, label }: { value: string; label: string }) {
   );
 }
 
-export default function StatsOverlay({ onClose }: { onClose: () => void }) {
+export default function StatsOverlay({
+  onClose,
+  onCloseStart,
+}: {
+  onClose: () => void;
+  /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
+  onCloseStart?: () => void;
+}) {
   const [stats, setStats] = useState<StatsFile | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -88,7 +95,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
   );
 
   return (
-    <Overlay onClose={onClose} labelledBy="luns-stats-title">
+    <Overlay onClose={onClose} onCloseStart={onCloseStart} labelledBy="luns-stats-title">
       {/* Ingen padding på rullande behållaren — rubriken ska kunna klistras
           fast i toppen utan att texten glider in under en kant. */}
       <div
@@ -106,7 +113,10 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               Så används sajten
             </h2>
           </div>
-          <CloseButton />
+          {/* onCloseStart finns bara när rutan öppnades från inställningarna,
+              och då leder knappen dit i stället för ut. Det ska stå på den
+              innan man klickar, inte upptäckas efteråt. */}
+          <CloseButton label={onCloseStart ? 'Tillbaka' : 'Stäng'} />
         </div>
 
         <div className="px-6 pb-6 pt-5">
