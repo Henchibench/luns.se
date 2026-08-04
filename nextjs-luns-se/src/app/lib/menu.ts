@@ -94,35 +94,6 @@ function parseDish(raw: string): Dish | null {
 
 const INFO_LINE = /^INFO:([^\s-]+)\s*-\s*Restaurant Info:\s*(.*)$/;
 
-/**
- * Pier 11 taggar allt som "Dagens" fastän menyn i praktiken är vegetariskt,
- * fisk och kött i den ordningen. Utan det här blir hela kortet en enda
- * kategori och kategorifärgerna säger ingenting.
- */
-function recategorizePier11(dishes: Dish[]): Dish[] {
-  const byDay = new Map<string, Dish[]>();
-  dishes.forEach(d => {
-    const list = byDay.get(d.day) ?? [];
-    list.push(d);
-    byDay.set(d.day, list);
-  });
-
-  const out: Dish[] = [];
-  byDay.forEach(dayDishes => {
-    const dagens = dayDishes.filter(d => d.category === 'Dagens');
-    const rest = dayDishes.filter(d => d.category !== 'Dagens');
-    const perCategory = Math.ceil(dagens.length / 3);
-
-    dagens.forEach((dish, i) => {
-      const category =
-        i < perCategory ? 'Vegetarisk' : i < perCategory * 2 ? 'Fisk' : 'Kött';
-      out.push({ ...dish, category });
-    });
-    out.push(...rest);
-  });
-  return out;
-}
-
 export function parseRestaurants(
   menus: Record<string, string[]>,
   metaByName: Record<string, RestaurantMeta>
@@ -148,7 +119,7 @@ export function parseRestaurants(
     return {
       name,
       area: meta.area || 'Lindholmen',
-      dishes: name.includes('Pier 11') ? recategorizePier11(dishes) : dishes,
+      dishes,
       info,
       meta,
     };
