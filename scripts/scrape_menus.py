@@ -183,6 +183,8 @@ def build_restaurants_response(menus):
             "instagram": info.get("instagram"),
             "review_score": info.get("review_score"),
             "lunch_hours": info.get("lunch_hours"),
+            # Skriven för hand, inte skrapad — en mening om vad stället är.
+            "description": info.get("description"),
             # Saknas för restauranger vi inte kunnat placera. Frontenden ritar
             # ingen nål då — en nål på fel ställe är sämre än ingen nål.
             "latitude": info.get("latitude"),

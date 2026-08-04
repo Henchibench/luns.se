@@ -32,6 +32,7 @@ LOCATIONS = {
 # Restaurant locations dictionary
 restaurant_locations = {
     "Bar Schiacciate": {
+        "description": "Italiensk mackbar grundad 2023 kring schiacciatan — ett tunnare och krispigare syskon till focaccia. Bröden bakas på plats och fylls med mortadella, stracciatella och prosciutto.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Bar%20Schiacciate%2C%20Lindholmsall%C3%A9n%2022C%2C%20G%C3%B6teborg",
         "latitude": 57.7096229,
         "longitude": 11.9416225,
@@ -41,14 +42,17 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 08–20"
     },
     "Benne Pastabar": {
+        "description": "Färsk pasta som tillverkas på plats varje dag och såser lagade från grunden. Bakom det en uttalad idé: att alla ska ha råd med vällagad mat på restaurang.",
         "maps": "https://maps.app.goo.gl/7sGxXMU8q4wW3LBWA",
         "latitude": 57.7082797,
         "longitude": 11.9430027,
         "website": "https://bennepastabar.se/",
         "instagram": "https://www.instagram.com/bennepastabar/",
-        "area": "Lindholmen"
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 11–21"
     },
     "Bistro 3": {
+        "description": "Modern bistro med pinsa, wraps och sallader. Till det en buffé med sallad, tillbehör och kaffe.",
         "maps": "https://maps.app.goo.gl/vdJa9Hiq8Jx5KzaF6",
         "latitude": 57.7101793,
         "longitude": 11.9477941,
@@ -56,6 +60,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Bistrot": {
+        "description": "Modern lunchrestaurang vid Lindholmspirens strandpromenad. Vällagat med rustik bistrokänsla, svenska och internationella smaker, och alltid kött, fisk och vegetariskt på menyn.",
         "maps": "https://maps.app.goo.gl/avRsfzoVuwcrawUK7",
         "latitude": 57.7061134,
         "longitude": 11.9387859,
@@ -64,6 +69,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Bombay Bistro": {
+        "description": "Indisk restaurang med prisvärd vardagslunch och à la carte på kvällar och helger. Klassiker som butter chicken och vindaloo, med nybakat naan.",
         "maps": "https://maps.app.goo.gl/XS7Lj6ZrKdRQYJem7",
         "latitude": 57.708413,
         "longitude": 11.937699,
@@ -72,6 +78,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Encounter Asian": {
+        "description": "Asiatiskt kök som spänner från koreansk bibimbap till kinesisk shaguo och japansk yakiniku. Sushi och nudelsoppor på samma meny.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Encounter%20Asian%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.709112,
         "longitude": 11.937264,
@@ -79,6 +86,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "District One": {
+        "description": "Asiatiskt i Lindholmen Science Park med inspiration från Japan, Vietnam och Thailand. Sushi, ramen, pho och curry — plus ett par svenska husmansrätter till lunch.",
         "maps": "https://maps.app.goo.gl/RwHPDeykZvKpaTL26",
         "latitude": 57.7096404,
         "longitude": 11.9429148,
@@ -87,6 +95,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Gansu Köket": {
+        "description": "Kinesiskt kök med dumplings som specialitet — serverade i stark biffsoppa eller för sig.",
         "maps": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/@57.7116918,11.9451355,17z/",
         "latitude": 57.7116918,
         "longitude": 11.9451355,
@@ -94,6 +103,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Kooperativet": {
+        "description": "Food court med sex kök under samma tak mitt i Lindholmen Science Park, och en av stadens mest välbesökta lunchrestauranger på vardagar.",
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
         "latitude": 57.7085322,
         "longitude": 11.9446582,
@@ -102,6 +112,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Masala Kitchen": {
+        "description": "Indiskt med lunch mellan 11 och 14, en av flera Masala-restauranger i Göteborg.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Masala%20Kitchen%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.7065735,
         "longitude": 11.9453508,
@@ -125,6 +136,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Mimolett": {
+        "description": "Italiensk lunch med pasta och risotto, med inslag av fisk och grillat. Den krämiga risotton och högrevsburgaren är det gästerna återkommer för.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Mimolett%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.7080059,
         "longitude": 11.9353462,
@@ -133,6 +145,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Miss F": {
+        "description": "Café med frukost och lunch, mest känt för sina grillade matiga mackor. Även pajer, sallader och bibimbap — och uteservering med utsikt över vattnet.",
         "maps": "https://maps.app.goo.gl/bQFos82i7oNAazfv5",
         "latitude": 57.708312,
         "longitude": 11.944489,
@@ -141,6 +154,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Oishii": {
+        "description": "Sushibar på Lindholmsvägen. Maten lagas i eget kök och äts på plats eller tas med.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Oishii%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.7055045,
         "longitude": 11.9336158,
@@ -149,6 +163,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Restaurant Pier 11": {
+        "description": "Lunchbuffé med hållbarhet i fokus. Säsongens råvaror, husmanskost blandat med internationellt, och gott om grönsaker och rotfrukter.",
         "maps": "https://maps.app.goo.gl/VMJKfEYDJ6QFrtfn6",
         "latitude": 57.704871,
         "longitude": 11.9416524,
@@ -165,6 +180,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Uni3 – World of Food": {
+        "description": "Matsal där lunchen delas upp på stationer — Water, Fire och Metal — med en rätt från varje.",
         "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
         "latitude": 57.7112876,
         "longitude": 11.9460612,
@@ -173,6 +189,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Seven Seasons": {
+        "description": "Hållbar lunch där året delas in i sju matårstider i stället för fyra. Menyn följer naturens rytm snarare än kalendern.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Seven%20Seasons%2C%20Planetgatan%208%2C%20G%C3%B6teborg",
         "latitude": 57.7102849,
         "longitude": 11.9472573,
@@ -181,6 +198,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 07.30–16.00"
     },
     "Terrassen": {
+        "description": "Compass Group-restaurang vid Saab i Tannefors. Dagens rätt, dagens soppa och \"Snabbt & Gott\" i olika prislägen.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Ensbov%C3%A4gen+3%2C+582+54+Link%C3%B6ping",
         "latitude": 58.4024082,
         "longitude": 15.6613493,
@@ -189,6 +207,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.00–13.30"
     },
     "Krubbstugan": {
+        "description": "Restaurang och catering på Gelbgjutaregatan. Veckans rätter växlar, medan raggmunken, bruna bönorna och pastasalladen står kvar.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Gelbgjutaregatan+2%2C+581+87+Link%C3%B6ping",
         "latitude": 58.4064633,
         "longitude": 15.6509863,
@@ -197,6 +216,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
     "Skyline": {
+        "description": "Restaurang och bar en trappa upp i terminalen på Linköping City Airport, med uttalat fokus på att minska matsvinnet.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
         "latitude": 58.4075379,
         "longitude": 15.6580456,

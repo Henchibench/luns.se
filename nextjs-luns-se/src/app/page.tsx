@@ -160,6 +160,7 @@ export default function LunchBoard() {
           name: restaurant.name,
           meta: restaurant.meta.lunch_hours ?? '',
           info: (restaurant.info[day] ?? []).join('  ·  '),
+          description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
           empty: !filtering && !hasDayDishes,

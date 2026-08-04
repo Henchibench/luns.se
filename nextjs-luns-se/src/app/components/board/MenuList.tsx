@@ -19,6 +19,8 @@ export interface Section {
   meta: string;
   /** Inforader för vald dag, ihopslagna. */
   info: string;
+  /** Handskriven mening om vad stället är. */
+  description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
   empty: boolean;
   website?: string;
@@ -73,12 +75,6 @@ export default function MenuList({
 
             {/* Linjen fyller ut raden så meta och länkar alltid ligger höger. */}
             <span className="flex-1 h-px bg-[var(--line)]" />
-
-            {section.meta && (
-              <span className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--ink2)] whitespace-nowrap">
-                {section.meta}
-              </span>
-            )}
 
             {/* Länkarna stod i --mut, samma dämpade ton som priser och
                 allergener. De är saker man klickar på, inte fotnoter, så de
@@ -142,8 +138,25 @@ export default function MenuList({
             </div>
           )}
 
-          {section.info && (
-            <p className="m-0 mb-1.5 text-[11.5px] text-[var(--mut)]">{section.info}</p>
+          {/* All information om restaurangen står här, aldrig uppe på
+              rubrikraden. Först vad stället är, sedan det praktiska.
+
+              Beskrivningen är skriven för hand och ändras aldrig; tider och
+              priser kommer dels från restaurangdatan, dels från skrapan. För
+              läsaren är det senare samma sak och står därför på samma rad,
+              med klocka på tiderna så de matchar skrapans stil. */}
+          {section.description && (
+            <p className="m-0 mb-1 max-w-[70ch] text-[12.5px] leading-[1.5] text-[var(--ink2)]">
+              {section.description}
+            </p>
+          )}
+
+          {(section.meta || section.info) && (
+            <p className="m-0 mb-1.5 text-[12px] text-[var(--mut)]">
+              {[section.meta && `🕐 ${section.meta}`, section.info]
+                .filter(Boolean)
+                .join('  ·  ')}
+            </p>
           )}
 
           {section.empty && (
@@ -175,7 +188,7 @@ export default function MenuList({
                   </span>
                 </div>
 
-                <span className="flex-none w-9 text-right font-mono text-[11px] text-[var(--mut)] wide:w-14">
+                <span className="flex-none w-9 text-right font-mono text-[11px] font-medium text-[var(--ink2)] wide:w-14">
                   {dish.price}
                 </span>
 

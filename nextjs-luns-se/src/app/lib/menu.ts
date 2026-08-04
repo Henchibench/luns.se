@@ -26,6 +26,8 @@ export interface RestaurantMeta {
   maps?: string;
   instagram?: string;
   lunch_hours?: string | null;
+  /** Handskriven mening om restaurangen, inte skrapad. */
+  description?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   has_menu?: boolean;
