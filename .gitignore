@@ -23,3 +23,7 @@ npm-debug.log*
 
 # Generated scraper data (built in CI)
 nextjs-luns-se/public/data/
+
+# Personliga Claude Code-inställningar. launch.json är delad och spåras,
+# men behörigheterna i settings.local.json är varje utvecklares egna.
+.claude/settings.local.json
