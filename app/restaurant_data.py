@@ -75,7 +75,7 @@ restaurant_locations = {
         "maps": "https://www.google.com/maps/search/?api=1&query=Encounter%20Asian%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.709112,
         "longitude": 11.937264,
-        "website": "https://tamed.se/take-away-meny/encounter-sushi",
+        "website": "https://encounterasian.se",
         "area": "Lindholmen"
     },
     "District One": {
