@@ -19,6 +19,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.scrapers.restaurants.alkemisten_scraper import AlkemistenScraper
+from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScraper
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
@@ -102,6 +103,7 @@ def scrape_all_menus(previous_menus):
     """Run all scrapers and return the combined menus dict."""
     scrapers = [
         AlkemistenScraper(),
+        BarSchiacciateScraper(),
         BennePastabarScraper(),
         BistrotScraper(),
         BombayBistroScraper(),

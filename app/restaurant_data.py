@@ -39,6 +39,15 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/alkemistenkaffebar/",
         "area": "Lindholmen"
     },
+    "Bar Schiacciate": {
+        "maps": "https://www.google.com/maps/search/?api=1&query=Bar%20Schiacciate%2C%20Lindholmsall%C3%A9n%2022C%2C%20G%C3%B6teborg",
+        "latitude": 57.7096229,
+        "longitude": 11.9416225,
+        "website": "https://www.barschiacciate.se",
+        "instagram": "https://www.instagram.com/barschiacciate/",
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 08–20"
+    },
     "Benne Pastabar": {
         "maps": "https://maps.app.goo.gl/7sGxXMU8q4wW3LBWA",
         "latitude": 57.7082797,
