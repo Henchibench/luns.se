@@ -44,6 +44,20 @@ const HARD_STOP = 56;
 /** Huvudytans padding-bottom, som redan ingår i scrollHeight. */
 const MAIN_PADDING_BOTTOM = 40;
 
+/**
+ * Känner igen att skrapans inforad redan innehåller öppettider.
+ *
+ * Tiderna kan komma från två håll: lunch_hours i restaurangdatan och INFO-rader
+ * från skrapan. Har en restaurang båda hamnar de på samma rad och tiderna står
+ * två gånger, med var sin klocka. Skrapans version vinner — den kommer från
+ * restaurangens egen sida och uppdateras av sig själv.
+ *
+ * Klockan är signalen som räknas: skraporna sätter 🕐 på tider och 💰 på priser,
+ * och det är just klockan som skulle dubbleras. Orden finns med som reserv om
+ * någon skrapa slutar sätta emoji.
+ */
+const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
+
 export default function LunchBoard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [locations, setLocations] = useState<LunsLocation[]>([]);
@@ -156,10 +170,12 @@ export default function LunchBoard() {
 
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
+        const info = (restaurant.info[day] ?? []).join('  ·  ');
+
         return {
           name: restaurant.name,
-          meta: restaurant.meta.lunch_hours ?? '',
-          info: (restaurant.info[day] ?? []).join('  ·  '),
+          meta: INFO_STATES_HOURS.test(info) ? '' : restaurant.meta.lunch_hours ?? '',
+          info,
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
