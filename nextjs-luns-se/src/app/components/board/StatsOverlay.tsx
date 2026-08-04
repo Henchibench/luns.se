@@ -3,29 +3,31 @@
 import React, { useEffect, useState } from 'react';
 import Overlay, { useOverlayClose } from './Overlay';
 import BarList from '../stats/BarList';
-import ColumnChart from '../stats/ColumnChart';
+import HourChart from '../stats/HourChart';
 import { StatsFile, formatNumber, loadStats, peakHour } from '../../lib/stats';
 
 /**
  * Öppen statistik, som ruta över sajten.
  *
- * Samma glasbehandling som platsvalet och integritetsinfon. Siffrorna är
- * kuriosa man tittar på en stund och sedan lämnar — att skicka iväg besökaren
- * till en egen adress och tillbaka igen vore en omväg för något man ändå bara
- * vill glutta på.
+ * Siffrorna är kuriosa man tittar på en stund och sedan lämnar. Att skicka
+ * iväg besökaren till en egen adress och tillbaka igen vore en omväg för något
+ * man ändå bara vill glutta på.
  *
- * Rubrikerna är frågor och inte mätetal. Umamis egna vyer är begripliga för
- * den som byggt sajten och kryptiska för alla andra, och det är alla andra som
- * ska läsa det här.
+ * Rutan var förut byggd som en instrumentpanel: inramade kort med rubrikfrågor
+ * och en förklarande mening var. Den formen behöver mycket data för att bära
+ * sig, och sajten har tre tal. Nu är den byggd som resten av gränssnittet i
+ * stället — mono-versaler över tunna linjer, täta rader, accentfärgen för det
+ * som ska ses först. Vänsterspalten och den här rutan ser ut att komma från
+ * samma sajt igen.
+ *
+ * Ett ord om enheterna: totalen är besök, medan dygns- och veckokurvorna är
+ * sidvisningar. Umami räknar dem olika och summorna går därför inte ihop. De
+ * heter olika saker i rutan av just det skälet.
  *
  * stats.json hämtas först när rutan öppnas. De allra flesta besök rör aldrig
  * länken, och de ska inte betala för filen.
  */
 
-/**
- * Egen komponent för att kroken ska nå Overlays stängning. Anropad direkt i
- * StatsOverlay körs den utanför providern och får en tom funktion.
- */
 function CloseButton() {
   const close = useOverlayClose();
   return (
@@ -38,24 +40,29 @@ function CloseButton() {
   );
 }
 
-function Card({
-  title,
-  lead,
-  children,
-}: {
-  title: string;
-  /** En mening som säger vad diagrammet betyder, på svenska utan facktermer. */
-  lead: string;
-  children: React.ReactNode;
-}) {
+/** Rubriken över en tunn linje, samma grepp som grupperna i vänsterspalten. */
+function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-[var(--glassBrd)] bg-[var(--glass2)] p-4">
-      <h3 className="m-0 font-heading text-[16px] font-bold tracking-[-.01em] text-[var(--ink)]">
-        {title}
-      </h3>
-      <p className="mb-3.5 mt-1 text-[12px] leading-[1.5] text-[var(--mut)]">{lead}</p>
+    <section className="border-t border-[var(--line)] pt-4">
+      <h3 className="mb-3 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">{label}</h3>
       {children}
     </section>
+  );
+}
+
+/**
+ * Talet stort, vad det betyder litet under. Tre bredvid varandra räcker som
+ * sammanfattning, och den som bara öppnat rutan av nyfikenhet får svaret utan
+ * att läsa ett diagram.
+ */
+function Figure({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="min-w-0 flex-1">
+      <div className="font-heading text-[24px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
+        {value}
+      </div>
+      <div className="mt-1.5 font-mono text-[10px] tracking-[.1em] text-[var(--mut)]">{label}</div>
+    </div>
   );
 }
 
@@ -68,13 +75,10 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
   }, []);
 
   const peak = stats ? peakHour(stats.hours) : 0;
-  const busiestDay = stats
-    ? [...stats.visits.weekdays].sort((a, b) => b.value - a.value)[0]
-    : null;
+  const busiestDay = stats ? [...stats.visits.weekdays].sort((a, b) => b.value - a.value)[0] : null;
 
-  // Avsnitten som bygger på händelser står tomma tills den nya sajten ligger
-  // live — versionen som är ute nu skickar bara sidvisningar. Tomma kort som
-  // säger "inget att visa än" fyra gånger i rad är sämre än inga kort alls.
+  // Avsnitten som bygger på händelser står tomma tills den här versionen
+  // legat live ett tag — den som är ute nu skickar bara sidvisningar.
   const hasChoices = Boolean(
     stats &&
       (stats.restaurants.length ||
@@ -88,13 +92,11 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
       {/* Ingen padding på rullande behållaren — rubriken ska kunna klistras
           fast i toppen utan att texten glider in under en kant. */}
       <div
-        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
+        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
         onClick={e => e.stopPropagation()}
       >
         {/* Rubriken måste vara helt täckande — innehållet rullar under den. */}
-        <div
-          className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[var(--bg)] px-6 pb-4 pt-6"
-        >
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[var(--bg)] px-6 pb-4 pt-6">
           <div className="min-w-0">
             <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
             <h2
@@ -122,12 +124,6 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
 
           {stats && busiestDay && (
             <>
-              <p className="m-0 mb-5 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink2)]">
-                Sajten räknar hur den används: när på dygnet folk tittar, vilka dagar det är tryck
-                {hasChoices ? ', och vad de väljer' : ''}. Det är roligt att titta på, så det står
-                öppet i stället för att ligga i en instrumentpanel bara jag ser.
-              </p>
-
               {stats.sample && (
                 <p className="mb-5 rounded-xl border border-[var(--star)] bg-[var(--chip)] px-4 py-3 text-[12px] leading-[1.5] text-[var(--ink2)]">
                   <strong className="text-[var(--ink)]">Exempeldata.</strong> Siffrorna nedan är
@@ -136,87 +132,72 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
                 </p>
               )}
 
-              <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-heading text-[30px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
-                  {formatNumber(stats.visits.total)}
-                </span>
-                <span className="text-[13px] text-[var(--ink2)]">
-                  besök {stats.period.label}
-                </span>
+              {/* Sammanfattningen står överst utan sektionslinje. Den är svaret,
+                  resten av rutan är hur man kommer fram till det. */}
+              <div className="mb-6 flex gap-4">
+                <Figure value={formatNumber(stats.visits.total)} label="BESÖK" />
+                {/* Kort etikett med flit. "Vanligaste tiden" bröt till två
+                    rader på telefon och sköt den tredje siffran ur linje. */}
+                <Figure value={`kl ${peak}`} label="TOPPTID" />
+                <Figure value={busiestDay.label} label="MEST TRYCK" />
               </div>
 
-              <div className="flex flex-col gap-4">
-                {/* Texterna säger vad staplarna visar, inte varför det ser ut
-                    så. Den gamla veckotexten hävdade att intresset sjunker mot
-                    fredagen, vilket den riktiga datan inte alls höll med om. */}
-                <Card
-                  title="När på dygnet kollar folk lunch?"
-                  lead={`En stapel per timme. Flest öppnar sajten vid ${peak}-tiden.`}
-                >
-                  <ColumnChart
-                    unit="besök"
-                    columns={stats.hours.map((value, hour) => ({
-                      label: `kl ${hour}`,
-                      // Var tredje timme får siffra. Alla 24 blir gröt på telefon.
-                      tick: hour % 3 === 0 ? String(hour) : undefined,
-                      value,
-                    }))}
-                  />
-                </Card>
+              <div className="flex flex-col gap-6">
+                <Section label={`DYGNET · ${stats.period.label.toUpperCase()}`}>
+                  <HourChart hours={stats.hours} />
+                </Section>
 
-                <Card
-                  title="Vilken dag är det mest tryck?"
-                  lead={`Besöken lagda på veckodag. ${busiestDay.label} ligger högst.`}
-                >
-                  <ColumnChart
-                    unit="besök"
-                    height={100}
-                    columns={stats.visits.weekdays.map(day => ({
-                      label: day.label,
-                      tick: day.label.slice(0, 3),
-                      value: day.value,
-                    }))}
-                  />
-                </Card>
+                <Section label="VECKAN">
+                  <BarList items={stats.visits.weekdays} unit="sidvisningar" layout="inline" />
+                </Section>
 
+                {/* Varje lista är en egen sektion med mono-etikett, som DYGNET
+                    och VECKAN ovanför. Samlade under en gemensam rubrik fick de
+                    brödtextrubriker i stället, och rutan bytte formspråk halvvägs
+                    ner. */}
                 {stats.restaurants.length > 0 && (
-                  <Card
-                    title="Restaurangerna folk håller koll på"
-                    lead="Hur ofta hjärtat i menylistan klickats, på eller av."
-                  >
+                  <Section label="FAVORITMARKERADE STÄLLEN">
                     <BarList items={stats.restaurants} unit="klick" />
-                  </Card>
+                  </Section>
                 )}
 
                 {stats.dishes.length > 0 && (
-                  <Card
-                    title="Rätterna som bevakas"
-                    lead="Stjärnmärkta rätter, de man vill få veta om när de dyker upp på menyn igen."
-                  >
+                  <Section label="BEVAKADE RÄTTER">
                     <BarList items={stats.dishes} unit="bevakningar" color="var(--star)" />
-                  </Card>
+                  </Section>
                 )}
 
                 {(stats.locations.length > 0 || stats.cravings.length > 0) && (
-                  <div className="grid gap-4 wide:grid-cols-2">
+                  <div className="grid gap-6 wide:grid-cols-2">
                     {stats.locations.length > 0 && (
-                      <Card title="Var folk letar" lead="Vald stadsdel i platsväljaren.">
+                      <Section label="STADSDEL">
                         <BarList items={stats.locations} unit="val" color="var(--cBlue)" />
-                      </Card>
+                      </Section>
                     )}
-
                     {stats.cravings.length > 0 && (
-                      <Card title="Sugen på…" lead="Vilka snabbfilter som används mest.">
+                      <Section label="SUGEN PÅ">
                         <BarList items={stats.cravings} unit="klick" color="var(--cGreen)" />
-                      </Card>
+                      </Section>
                     )}
                   </div>
                 )}
+
+                {/* Att bara utelämna avsnittet var sämre: rutan såg klar ut med
+                    tre tal, och den som undrade varför fick inget svar. */}
+                {!hasChoices && (
+                  <Section label="VAD FOLK VÄLJER">
+                    <p className="m-0 text-[13px] leading-[1.6] text-[var(--ink2)]">
+                      Här kommer det stå vilka restauranger som favoritmarkeras oftast, vilka rätter
+                      som bevakas och vilka sugen på-filter som används. Det kräver att någon hunnit
+                      klicka, och att siffrorna hämtats sedan dess.
+                    </p>
+                  </Section>
+                )}
               </div>
 
-              <p className="mb-0 mt-5 text-[11px] leading-[1.5] text-[var(--mut)]">
-                Allt är ihopräknat. Ingen rad här handlar om en enskild besökare. Siffrorna hämtas
-                när sajten byggs, inte när du öppnar rutan. Uppdaterad{' '}
+              <p className="mb-0 mt-6 border-t border-[var(--line)] pt-4 text-[11px] leading-[1.6] text-[var(--mut)]">
+                Allt är ihopräknat, ingen rad handlar om en enskild besökare. Siffrorna hämtas när
+                sajten byggs och inte när rutan öppnas. Uppdaterad{' '}
                 {new Date(stats.generated).toLocaleDateString('sv-SE', {
                   day: 'numeric',
                   month: 'long',
