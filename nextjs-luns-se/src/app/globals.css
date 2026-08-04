@@ -54,6 +54,27 @@ html.dark {
   --bg: #04252E;
 }
 
+/* ---------------------------------------------------------------------------
+   Textstorlekar
+
+   Åtta steg, och inga andra. Sidan hade arton, med halvpixelsteg intill sina
+   heltalsgrannar: både 13 och 13.5, både 12 och 12.5, både 10 och 10.5. Den
+   sortens skillnad syns inte som en nivå utan bara som oreda.
+
+     10  versaletiketter i mono: kategorier, RESTAURANGER, diagramsiffror
+     11  monolänkar och meta: KARTA, WWW, priser, öppettider
+     12  sekundär text: knappar, chips, inforader
+     13  brödtext: rätter, beskrivningar, rutornas löptext
+     14  framhävd rad: restaurangnamn, listval man klickar
+     16  små rubriker och tydliga val
+     18  logotyp på bred skärm
+     24  rubriker (text-2xl)
+     30  dagrubriken och stora siffror
+
+   Behöver något en egen storlek är svaret nästan alltid att det ska ha en
+   annan vikt, färg eller versalisering i stället.
+--------------------------------------------------------------------------- */
+
 html,
 body {
   margin: 0;

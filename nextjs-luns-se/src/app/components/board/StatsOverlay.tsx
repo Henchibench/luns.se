@@ -34,7 +34,7 @@ function Card({
 }) {
   return (
     <section className="rounded-xl border border-[var(--glassBrd)] bg-[var(--glass2)] p-4">
-      <h3 className="m-0 font-heading text-[15.5px] font-bold tracking-[-.01em] text-[var(--ink)]">
+      <h3 className="m-0 font-heading text-[16px] font-bold tracking-[-.01em] text-[var(--ink)]">
         {title}
       </h3>
       <p className="mb-3.5 mt-1 text-[12px] leading-[1.5] text-[var(--mut)]">{lead}</p>
@@ -90,7 +90,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={onClose}
-            className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-xs font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+            className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
           >
             Stäng
           </button>
@@ -118,7 +118,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               </p>
 
               {stats.sample && (
-                <p className="mb-5 rounded-xl border border-[var(--star)] bg-[var(--chip)] px-4 py-3 text-[12.5px] leading-[1.5] text-[var(--ink2)]">
+                <p className="mb-5 rounded-xl border border-[var(--star)] bg-[var(--chip)] px-4 py-3 text-[12px] leading-[1.5] text-[var(--ink2)]">
                   <strong className="text-[var(--ink)]">Exempeldata.</strong> Siffrorna nedan är
                   påhittade och finns bara för att visa hur rutan ser ut. De byts mot riktiga när
                   insamlingen är igång.
@@ -126,10 +126,10 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               )}
 
               <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-heading text-[32px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
+                <span className="font-heading text-[30px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
                   {formatNumber(stats.visits.total)}
                 </span>
-                <span className="text-[13.5px] text-[var(--ink2)]">
+                <span className="text-[13px] text-[var(--ink2)]">
                   besök {stats.period.label}
                 </span>
               </div>
@@ -203,7 +203,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
                 )}
               </div>
 
-              <p className="mb-0 mt-5 text-[11.5px] leading-[1.5] text-[var(--mut)]">
+              <p className="mb-0 mt-5 text-[11px] leading-[1.5] text-[var(--mut)]">
                 Allt är ihopräknat. Ingen rad här handlar om en enskild besökare. Siffrorna hämtas
                 när sajten byggs, inte när du öppnar rutan. Uppdaterad{' '}
                 {new Date(stats.generated).toLocaleDateString('sv-SE', {

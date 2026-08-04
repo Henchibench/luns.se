@@ -34,7 +34,7 @@ export function RailButton({
 }) {
   const sizing =
     size === 'touch'
-      ? 'rounded-[10px] px-3.5 py-3 text-[14.5px]'
+      ? 'rounded-[10px] px-3.5 py-3 text-[14px]'
       : 'mx-2.5 rounded-lg px-3 py-2 text-[13px]';
 
   return (
@@ -102,13 +102,13 @@ export default function Rail({
           <div className="flex items-center gap-2.5">
             <button
               onClick={onOpenStats}
-              className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
+              className="border-0 bg-transparent p-0 text-[10px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
             >
               Statistik
             </button>
             <button
               onClick={onOpenPrivacy}
-              className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
+              className="border-0 bg-transparent p-0 text-[10px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
             >
               Integritetsinfo
             </button>

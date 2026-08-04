@@ -21,7 +21,7 @@ interface Props {
 }
 
 const BAR_BUTTON =
-  'flex-1 rounded-[14px] border border-[var(--glassBrd)] px-2.5 py-[13px] text-[13.5px] font-bold text-[var(--ink)] cursor-pointer';
+  'flex-1 rounded-[14px] border border-[var(--glassBrd)] px-2.5 py-[13px] text-[13px] font-bold text-[var(--ink)] cursor-pointer';
 
 export default function MobileBar({
   sheet,
@@ -98,7 +98,7 @@ export default function MobileBar({
               </span>
               <button
                 onClick={onClose}
-                className="rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-xs font-semibold text-[var(--ink2)] cursor-pointer"
+                className="rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer"
               >
                 Stäng
               </button>
@@ -128,13 +128,13 @@ export default function MobileBar({
                   <div className="flex items-center gap-3">
                     <button
                       onClick={onOpenStats}
-                      className="border-0 bg-transparent p-0 text-[11.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
+                      className="border-0 bg-transparent p-0 text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
                     >
                       Statistik
                     </button>
                     <button
                       onClick={onOpenPrivacy}
-                      className="border-0 bg-transparent p-0 text-[11.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
+                      className="border-0 bg-transparent p-0 text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
                     >
                       Integritetsinfo
                     </button>

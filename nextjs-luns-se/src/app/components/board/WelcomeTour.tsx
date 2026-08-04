@@ -181,13 +181,13 @@ export default function WelcomeTour({
             : { top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: CARD_WIDTH }
         }
       >
-        <h2 className="m-0 mb-1.5 font-heading text-[19px] font-bold tracking-[-.01em] text-[var(--ink)]">
+        <h2 className="m-0 mb-1.5 font-heading text-[18px] font-bold tracking-[-.01em] text-[var(--ink)]">
           {step.title}
         </h2>
-        <p className="m-0 text-[13.5px] leading-[1.55] text-[var(--ink2)]">{step.body}</p>
+        <p className="m-0 text-[13px] leading-[1.55] text-[var(--ink2)]">{step.body}</p>
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="font-mono text-[10.5px] tracking-[.15em] text-[var(--mut)]">
+          <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
             {index + 1} / {total}
           </span>
           <div className="flex items-center gap-2">

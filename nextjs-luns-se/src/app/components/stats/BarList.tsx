@@ -35,10 +35,10 @@ export default function BarList({
       {items.map((item, i) => (
         <li key={`${item.label}-${i}`} aria-label={`${item.label}: ${item.value} ${unit}`}>
           <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0 text-[13.5px] font-semibold text-[var(--ink)]">
+            <span className="min-w-0 text-[13px] font-semibold text-[var(--ink)]">
               {item.label}
               {item.sub && (
-                <span className="ml-2 text-[11.5px] font-normal text-[var(--mut)]">{item.sub}</span>
+                <span className="ml-2 text-[11px] font-normal text-[var(--mut)]">{item.sub}</span>
               )}
             </span>
             <span className="flex-none font-mono text-[12px] font-medium text-[var(--ink2)]">

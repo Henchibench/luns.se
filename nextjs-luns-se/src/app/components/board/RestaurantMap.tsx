@@ -265,7 +265,7 @@ export default function RestaurantMap({
       <div
         className={`flex items-center justify-center rounded-2xl border border-[var(--glassBrd)] ${className}`}
       >
-        <span className="px-6 text-center font-mono text-[10.5px] leading-[1.6] tracking-[.1em] text-[var(--mut)]">
+        <span className="px-6 text-center font-mono text-[10px] leading-[1.6] tracking-[.1em] text-[var(--mut)]">
           VI VET INTE VAR DEN LIGGER ÄN
         </span>
       </div>

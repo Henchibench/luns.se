@@ -424,7 +424,7 @@ export default function LunchBoard() {
   if (error) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-[15px] font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
+        <p className="text-[16px] font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
         <p className="text-[13px] text-[var(--mut)]">{error}</p>
       </div>
     );
@@ -541,7 +541,7 @@ export default function LunchBoard() {
           </div>
 
           {starredToday.length > 0 && (
-            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-[12.5px] font-semibold text-[var(--accStrong)]">
+            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-[12px] font-semibold text-[var(--accStrong)]">
               <span className="text-[var(--star)]">★</span>
               Bevakad rätt idag: {starredToday.join(' · ')}
             </div>
@@ -549,7 +549,7 @@ export default function LunchBoard() {
 
           {isEmpty && (
             <div className="py-[70px] text-center text-[var(--mut)]">
-              <p className="mb-1.5 text-[15px] font-semibold text-[var(--ink2)]">
+              <p className="mb-1.5 text-[16px] font-semibold text-[var(--ink2)]">
                 Inga rätter matchar
               </p>
               <p className="mb-4 text-[13px]">Prova en annan dag eller rensa sök och filter</p>
@@ -560,7 +560,7 @@ export default function LunchBoard() {
                   setActiveCravings([]);
                   setShowOnlyFavorites(false);
                 }}
-                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-xs font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
               >
                 Rensa allt
               </button>

@@ -37,7 +37,7 @@ export default function LocationWelcome({
               onClick={() => onSelect(location.id)}
               className="flex w-full items-baseline justify-between gap-3 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[var(--hi)]"
             >
-              <span className="text-[15px] font-semibold text-[var(--ink)]">{location.label}</span>
+              <span className="text-[16px] font-semibold text-[var(--ink)]">{location.label}</span>
               <span className="font-mono text-[10px] text-[var(--mut)] whitespace-nowrap">
                 {location.city} · {location.restaurantCount ?? 0} st
               </span>

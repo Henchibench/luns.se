@@ -22,7 +22,7 @@ export default function Chips({
 }) {
   const sizing =
     size === 'touch'
-      ? 'rounded-[9px] px-3.5 py-[9px] text-[12.5px]'
+      ? 'rounded-[9px] px-3.5 py-[9px] text-[12px]'
       : 'rounded-md px-2.5 py-[5px] text-[11px]';
 
   return (

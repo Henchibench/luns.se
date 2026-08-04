@@ -102,15 +102,15 @@ export default function MenuList({
               title={section.favorite ? 'Ta bort favorit' : 'Favoritmarkera'}
               aria-label={section.favorite ? `Ta bort ${section.name} som favorit` : `Favoritmarkera ${section.name}`}
               aria-pressed={section.favorite}
-              className="flex-none border-0 bg-transparent p-0 text-sm leading-none cursor-pointer transition-transform active:scale-90"
+              className="flex-none border-0 bg-transparent p-0 text-[14px] leading-none cursor-pointer transition-transform active:scale-90"
               style={{ color: section.favorite ? 'var(--acc)' : 'var(--mut)' }}
             >
               {section.favorite ? '♥' : '♡'}
             </button>
 
-            {/* Restaurangnamnet var 11.5px medan rätterna är 13.5px, alltså
-                listans minsta text trots att det är dess rubrik. Vid scroll
-                gick gränsen mellan två restauranger obemärkt förbi. */}
+            {/* Namnet var mindre än rätterna under det, alltså listans minsta
+                text trots att det är dess rubrik. Vid scroll gick gränsen
+                mellan två restauranger obemärkt förbi. */}
             <span className="whitespace-nowrap font-mono text-[14px] font-semibold tracking-[.1em] text-[var(--acc)]">
               {section.name.toUpperCase()}
             </span>
@@ -162,7 +162,7 @@ export default function MenuList({
                 />
               ) : (
                 <div className="flex flex-col items-center gap-2 rounded-2xl border border-[var(--glassBrd)] py-8">
-                  <span className="font-mono text-[10.5px] tracking-[.1em] text-[var(--mut)]">
+                  <span className="font-mono text-[10px] tracking-[.1em] text-[var(--mut)]">
                     VI VET INTE VAR DEN LIGGER ÄN
                   </span>
                   {section.maps && (
@@ -188,7 +188,7 @@ export default function MenuList({
               läsaren är det senare samma sak och står därför på samma rad,
               med klocka på tiderna så de matchar skrapans stil. */}
           {section.description && (
-            <p className="m-0 mb-1 max-w-[70ch] text-[12.5px] leading-[1.5] text-[var(--ink2)]">
+            <p className="m-0 mb-1 max-w-[70ch] text-[12px] leading-[1.5] text-[var(--ink2)]">
               {section.description}
             </p>
           )}
@@ -202,7 +202,7 @@ export default function MenuList({
           )}
 
           {section.empty && (
-            <p className="mt-0.5 mb-2 text-[12.5px] italic text-[var(--mut)]">
+            <p className="mt-0.5 mb-2 text-[12px] italic text-[var(--mut)]">
               {emptyMessage(section, dayOffset, day)}
             </p>
           )}
@@ -232,7 +232,7 @@ export default function MenuList({
                     {dish.category.toUpperCase()}
                   </span>
 
-                  <span className="flex-1 text-[13.5px] leading-[1.55] text-[var(--ink2)]">
+                  <span className="flex-1 text-[13px] leading-[1.55] text-[var(--ink2)]">
                     <Highlight text={dish.description} terms={searchTerms} />
                   </span>
                 </div>

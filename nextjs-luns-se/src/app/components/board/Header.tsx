@@ -27,7 +27,7 @@ interface Props {
 }
 
 const CONTROL =
-  'flex-none rounded-lg text-xs font-bold cursor-pointer whitespace-nowrap transition-colors';
+  'flex-none rounded-lg text-[12px] font-bold cursor-pointer whitespace-nowrap transition-colors';
 
 export default function Header({
   days,
@@ -100,7 +100,7 @@ export default function Header({
               key={day}
               onClick={() => onSelectDay(day)}
               aria-pressed={active}
-              className="flex-none rounded-lg border px-[13px] py-[7px] text-[12.5px] cursor-pointer transition-colors"
+              className="flex-none rounded-lg border px-[13px] py-[7px] text-[12px] cursor-pointer transition-colors"
               style={{
                 background: active ? 'var(--acc)' : 'transparent',
                 color: active ? 'var(--bg)' : 'var(--ink2)',
@@ -139,7 +139,7 @@ export default function Header({
         onClick={onToggleTheme}
         title="Ljust eller mörkt läge"
         aria-label={theme === 'dark' ? 'Byt till ljust läge' : 'Byt till mörkt läge'}
-        className="order-2 flex-none h-[38px] w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-sm text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)] wide:order-none"
+        className="order-2 flex-none h-[38px] w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[14px] text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)] wide:order-none"
       >
         {/* Ikonen får inte renderas före hydrering — den skiljer sig mellan
             servern och en besökare som redan valt mörkt läge. Knappen håller

@@ -56,7 +56,7 @@ export default function ColumnChart({
             {/* Raden renderas även tom. Hoppade den över sig när ticken
                 saknades fick den kolumnen mer höjd att växa på, och staplarna
                 stod på två olika golv. */}
-            <span className="h-3 flex-none font-mono text-[9px] leading-3 text-[var(--mut)]">
+            <span className="h-3 flex-none font-mono text-[10px] leading-3 text-[var(--mut)]">
               {column.tick ?? ''}
             </span>
           </div>

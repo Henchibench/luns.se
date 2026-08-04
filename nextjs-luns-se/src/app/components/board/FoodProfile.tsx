@@ -48,7 +48,7 @@ export default function FoodProfile({
 
   const chipSize =
     size === 'touch'
-      ? 'rounded-[9px] px-3.5 py-[9px] text-[12.5px]'
+      ? 'rounded-[9px] px-3.5 py-[9px] text-[12px]'
       : 'rounded-md px-2.5 py-[5px] text-[11px]';
 
   return (
@@ -57,13 +57,13 @@ export default function FoodProfile({
         <GroupLabel>MIN MATPROFIL</GroupLabel>
         {/* Skillnaden mot chipsen ovanför är hela poängen: filtren gäller nu,
             matprofilen gäller nästa gång också. */}
-        <span className="text-[10.5px] leading-[1.45] text-[var(--mut)]">
+        <span className="text-[10px] leading-[1.45] text-[var(--mut)]">
           Sparas till nästa besök.
         </span>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-[10.5px] text-[var(--mut)]">Visa först</span>
+        <span className="text-[10px] text-[var(--mut)]">Visa först</span>
         <div className={`flex flex-wrap ${size === 'touch' ? 'gap-[7px]' : 'gap-1.5'}`}>
           {BOOST_TYPES.map(type => {
             const active = profile.boostTypes.includes(type.id);
@@ -87,7 +87,7 @@ export default function FoodProfile({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-[10.5px] text-[var(--mut)]">Dölj rätter som innehåller</span>
+        <span className="text-[10px] text-[var(--mut)]">Dölj rätter som innehåller</span>
         <div className="flex gap-1.5">
           <input
             value={draft}
@@ -135,7 +135,7 @@ export default function FoodProfile({
         <div className="flex flex-col gap-1.5">
           {/* Stjärnan i menyn tar bort en bevakning, men bara den dag rätten
               serveras. Utan listan går en bevakad rätt inte att ångra. */}
-          <span className="text-[10.5px] text-[var(--mut)]">Bevakade rätter</span>
+          <span className="text-[10px] text-[var(--mut)]">Bevakade rätter</span>
           <div className="flex flex-wrap gap-1.5">
             {watchedDishes.map(dish => (
               <span
