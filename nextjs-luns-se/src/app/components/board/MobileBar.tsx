@@ -44,7 +44,10 @@ export default function MobileBar({
 
   return (
     <div className="wide:hidden">
-      <div className="fixed inset-x-3.5 bottom-3.5 z-40 flex gap-2">
+      {/* Låg knapprad krockar med telefonens egen svepyta — 14px från kanten
+          gjorde dem svåra att träffa. env() lägger till utrymmet för
+          hemindikatorn på de telefoner som har en, och noll på övriga. */}
+      <div className="fixed inset-x-3.5 bottom-[calc(24px+env(safe-area-inset-bottom,0px))] z-40 flex gap-2">
         <button
           onClick={() => onOpen('rest')}
           className={BAR_BUTTON}

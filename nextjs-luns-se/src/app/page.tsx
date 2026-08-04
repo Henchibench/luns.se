@@ -43,9 +43,6 @@ const SPY_OFFSET = 70;
 const SCROLL_OFFSET = 52;
 /** Hur nära toppen sista restaurangen får komma. */
 const HARD_STOP = 56;
-/** Huvudytans padding-bottom, som redan ingår i scrollHeight. */
-const MAIN_PADDING_BOTTOM = 40;
-
 /**
  * Känner igen att skrapans inforad redan innehåller öppettider.
  *
@@ -273,10 +270,11 @@ export default function LunchBoard() {
         return;
       }
       const last = secs[secs.length - 1];
-      const height = Math.max(
-        0,
-        main.clientHeight - last.offsetHeight - HARD_STOP - MAIN_PADDING_BOTTOM
-      );
+      // Padding-bottom läses av i stället för att hårdkodas. Den skiljer sig
+      // mellan mobil och desktop och ändras när mobilens knapprad flyttas —
+      // en konstant här driver tyst isär från verkligheten.
+      const padding = parseFloat(getComputedStyle(main).paddingBottom) || 0;
+      const height = Math.max(0, main.clientHeight - last.offsetHeight - HARD_STOP - padding);
       setSpacerHeight(prev => (Math.abs(prev - height) > 1 ? height : prev));
     };
 
@@ -434,7 +432,7 @@ export default function LunchBoard() {
 
         <main
           ref={mainRef}
-          className={`luns-scroll overflow-y-auto px-4 pb-[90px] wide:px-7 wide:pb-10 ${
+          className={`luns-scroll overflow-y-auto px-4 pb-[calc(100px+env(safe-area-inset-bottom,0px))] wide:px-7 wide:pb-10 ${
             view === 'map' ? '' : 'luns-mask-main'
           }`}
         >
