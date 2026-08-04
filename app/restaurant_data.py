@@ -56,6 +56,13 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/bennepastabar/",
         "area": "Lindholmen"
     },
+    "Bistro 3": {
+        "maps": "https://maps.app.goo.gl/vdJa9Hiq8Jx5KzaF6",
+        "latitude": 57.7101793,
+        "longitude": 11.9477941,
+        "website": "https://bistro3.se",
+        "area": "Lindholmen"
+    },
     "Bistrot": {
         "maps": "https://maps.app.goo.gl/avRsfzoVuwcrawUK7",
         "latitude": 57.7061134,
@@ -172,6 +179,14 @@ restaurant_locations = {
         "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/uni3-world-of-food/",
         "instagram": "https://www.instagram.com/uni3worldoffood/",
         "area": "Lindholmen"
+    },
+    "Seven Seasons": {
+        "maps": "https://www.google.com/maps/search/?api=1&query=Seven%20Seasons%2C%20Planetgatan%208%2C%20G%C3%B6teborg",
+        "latitude": 57.7102849,
+        "longitude": 11.9472573,
+        "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/seven-seasons/",
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 07.30–16.00"
     },
     "Terrassen": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Ensbov%C3%A4gen+3%2C+582+54+Link%C3%B6ping",

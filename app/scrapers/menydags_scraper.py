@@ -43,13 +43,16 @@ class MenydagsScraper(BaseScraper):
                    'quorn', 'tofu', 'seitan', 'oumph', 'ärtprotein', 'vegokorv',
                    'vegobiff', 'vegonugget']
 
+    # Fisk prövas före kött. "Havets wallenbergare" är en fiskbiff, men
+    # wallenbergare är också ett kötträttsord — havet får avgöra.
+    FISH = ['torsk', 'lax', 'kolja', 'sill', 'räk', 'skaldjur', 'fisk', 'spätta',
+            'flundra', 'sej', 'hoki', 'tonfisk', 'musslor', 'krabb', 'havets', 'havs']
+
     # Kött och fisk går före det vegetariska: en kycklingsallad med halloumi
     # är inte vegetarisk, men innehåller ordet.
     MEAT = ['kyckling', 'fläsk', 'oxfilé', 'oxkött', 'biff', 'kalv', 'lamm', 'bacon',
             'korv', 'köttbull', 'entrecote', 'högrev', 'anka', 'kalkon', 'skinka',
-            'pulled', 'kebab', 'karré', 'nötkött', 'wallenbergare']
-    FISH = ['torsk', 'lax', 'kolja', 'sill', 'räk', 'skaldjur', 'fisk', 'spätta',
-            'flundra', 'sej', 'hoki', 'tonfisk', 'musslor', 'krabb']
+            'pulled', 'kebab', 'karré', 'nötkött', 'wallenbergare', 'färs']
     VEG = ['halloumi', 'tofu', 'quorn', 'lins', 'kikärt', 'soja', 'falafel',
            'vegetarisk', 'vegansk', 'grönsak', 'svamp', 'bönor']
 
@@ -72,13 +75,16 @@ class MenydagsScraper(BaseScraper):
             if self.ALLERGENS.match(tag) and re.search(r'\bfisk|skaldjur', lowered):
                 return 'Fisk'
 
-        haystack = f'{name} {description}'.lower()
+        # Parenteser är tillval, inte rätten: "tacofärs (vegfärs tillgängligt)"
+        # är en kötträtt med ett alternativ, inte en vegetarisk rätt.
+        haystack = re.sub(r'\([^)]*\)', ' ', f'{name} {description}').lower()
+
         if any(word in haystack for word in self.SUBSTITUTES):
             return 'Vegetarisk'
-        if any(word in haystack for word in self.MEAT):
-            return 'Kött'
         if any(word in haystack for word in self.FISH):
             return 'Fisk'
+        if any(word in haystack for word in self.MEAT):
+            return 'Kött'
         if any(word in haystack for word in self.VEG):
             return 'Vegetarisk'
         return 'Dagens'

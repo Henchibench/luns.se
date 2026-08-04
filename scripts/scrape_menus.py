@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.scrapers.restaurants.alkemisten_scraper import AlkemistenScraper
 from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScraper
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
+from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
@@ -33,6 +34,7 @@ from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
 from app.scrapers.restaurants.miss_f_scraper import MissFScraper
 from app.scrapers.restaurants.oishii_scraper import OishiiScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.seven_seasons_scraper import SevenSeasonsScraper
 from app.scrapers.restaurants.skyline_scraper import SkylineScraper
 from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
@@ -102,6 +104,7 @@ def scrape_all_menus(previous_menus):
         AlkemistenScraper(),
         BarSchiacciateScraper(),
         BennePastabarScraper(),
+        Bistro3Scraper(),
         BistrotScraper(),
         BombayBistroScraper(),
         DistrictOneScraper(),
@@ -114,6 +117,7 @@ def scrape_all_menus(previous_menus):
         MissFScraper(),
         OishiiScraper(),
         Pier11Scraper(),
+        SevenSeasonsScraper(),
         SkylineScraper(),
         TerrassenScraper(),
         Uni3Scraper(),
