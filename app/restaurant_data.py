@@ -22,6 +22,11 @@ LOCATIONS = {
         "latitude": 58.4108,
         "longitude": 15.6470,
     },
+    # Mjärdevi sträcker sig här längre än stadsdelsgränsen. Pegs & Tails och
+    # Universitetsklubben ligger på Campus Valla, Pinocchio i Lambohov — men
+    # alla tre räknas som Mjärdevis lunchutbud av mjardevi.se själva, och det
+    # är den indelning folk som jobbar där använder. Geografin får ge vika för
+    # hur området faktiskt hänger ihop.
     "Mjärdevi": {
         "label": "Mjärdevi",
         "city": "Linköping",
