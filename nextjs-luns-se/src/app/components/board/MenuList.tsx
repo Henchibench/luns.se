@@ -208,12 +208,19 @@ export default function MenuList({
               >
                 {/* På bred skärm står kategorin i en egen 92px-kolumn. På mobil
                     äter den en tredjedel av raden, så där lägger den sig som
-                    en etikett ovanför beskrivningen i stället. */}
+                    en etikett ovanför beskrivningen i stället.
+
+                    Kategorin bryts över flera rader i stället för att kapas.
+                    Kolumnen rymmer ungefär tolv tecken, och restaurangerna
+                    hittar egna längre namn — "Säsongens meny", "Grillen
+                    serverar" — som blev "Säsongens me…". Att bredda kolumnen
+                    så alla får plats hade stulit utrymme från rätterna på
+                    varje rad, för de fåtal rader som behöver det. */}
                 <div className="flex min-w-0 flex-1 flex-col wide:flex-row wide:items-baseline wide:gap-3.5">
                   <span
-                    className="overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[10px] tracking-[.08em] wide:w-[92px] wide:flex-none"
+                    className="font-mono text-[10px] leading-[1.35] tracking-[.08em] hyphens-auto break-words wide:w-[92px] wide:flex-none"
+                    lang="sv"
                     style={{ color: dish.categoryColor }}
-                    title={dish.category}
                   >
                     {dish.category.toUpperCase()}
                   </span>
