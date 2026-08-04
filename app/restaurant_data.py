@@ -102,14 +102,6 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/districtone.se/",
         "area": "Lindholmen"
     },
-    "Gansu Köket": {
-        "description": "Kinesiskt kök med dumplings som specialitet — serverade i stark biffsoppa eller för sig.",
-        "maps": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/@57.7116918,11.9451355,17z/",
-        "latitude": 57.7116918,
-        "longitude": 11.9451355,
-        "website": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/",
-        "area": "Lindholmen"
-    },
     "Kooperativet": {
         "description": "Food court med sex kök under samma tak mitt i Lindholmen Science Park, och en av stadens mest välbesökta lunchrestauranger på vardagar.",
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
