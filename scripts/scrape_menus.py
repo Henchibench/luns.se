@@ -185,6 +185,9 @@ def build_restaurants_response(menus):
             "lunch_hours": info.get("lunch_hours"),
             # Skriven för hand, inte skrapad — en mening om vad stället är.
             "description": info.get("description"),
+            # Sant för restauranger som bara publicerar dagens meny, aldrig
+            # veckans. Tomma dagar hos dem är väntat och inte ett skrapfel.
+            "daily_menu_only": info.get("daily_menu_only", False),
             # Saknas för restauranger vi inte kunnat placera. Frontenden ritar
             # ingen nål då — en nål på fel ställe är sämre än ingen nål.
             "latitude": info.get("latitude"),

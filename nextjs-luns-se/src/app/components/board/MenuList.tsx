@@ -23,6 +23,8 @@ export interface Section {
   description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
   empty: boolean;
+  /** Publicerar bara dagens meny. Tomma dagar är väntat, inte ett fel. */
+  dailyOnly: boolean;
   website?: string;
   maps?: string;
   instagram?: string;
@@ -34,6 +36,14 @@ export interface Section {
 
 interface Props {
   sections: Section[];
+  /**
+   * Vald dag i förhållande till idag: 0 är idag, positivt framåt i veckan,
+   * negativt bakåt. Styr vad restauranger med endagsmeny får för tomrad —
+   * "kom tillbaka på fredag" är fel besked på en dag som redan varit.
+   */
+  dayOffset: number;
+  /** Vald dag, t.ex. "Fredag". Skrivs ut i beskedet till endagsrestauranger. */
+  day: string;
   searchTerms: string[];
   theme: 'light' | 'dark';
   onToggleFavorite: (name: string) => void;
@@ -42,8 +52,32 @@ interface Props {
 
 const LINK_CLASS = 'whitespace-nowrap transition-colors hover:text-[var(--acc)]';
 
+/**
+ * Texten när en restaurang saknar rätter för den valda dagen.
+ *
+ * Standardsvaret antar att menyn borde ha funnits där. För restauranger som
+ * bara publicerar dagens meny stämmer inte det — tomheten är hur de fungerar,
+ * inte ett tecken på att något gått sönder, och att be någon ringa dit för att
+ * fråga om fredagens lunch på en tisdag hjälper ingen.
+ */
+function emptyMessage(section: Section, dayOffset: number, day: string): string {
+  if (!section.dailyOnly || dayOffset === 0) {
+    return 'Ingen meny idag — kolla direkt med restaurangen via länkarna ovan';
+  }
+
+  // Alla svenska veckodagar slutar på -dag, så genitivformen blir -dagens.
+  const lower = day.toLowerCase();
+
+  if (dayOffset > 0) {
+    return `${section.name} lägger bara ut dagens meny. Kom tillbaka på ${lower} 🙂`;
+  }
+  return `${section.name} lägger bara ut dagens meny, och ${lower}ens hann tas ner.`;
+}
+
 export default function MenuList({
   sections,
+  dayOffset,
+  day,
   searchTerms,
   theme,
   onToggleFavorite,
@@ -162,7 +196,7 @@ export default function MenuList({
 
           {section.empty && (
             <p className="mt-0.5 mb-2 text-[12.5px] italic text-[var(--mut)]">
-              Ingen meny idag — kolla direkt med restaurangen via länkarna ovan
+              {emptyMessage(section, dayOffset, day)}
             </p>
           )}
 

@@ -223,6 +223,10 @@ restaurant_locations = {
         "longitude": 15.6580456,
         "website": "http://restaurangskyline.se",
         "area": "Tannefors",
-        "lunch_hours": "Vardagar 11.00–13.00"
+        "lunch_hours": "Vardagar 11.00–13.00",
+        # Sidan visar en enda dag, den som är idag. Övriga vardagar går inte
+        # att hämta i förväg, och frontenden skriver då en annan tomrad än
+        # den vanliga "ingen meny idag" — det här är inte ett fel.
+        "daily_menu_only": True
     },
 }

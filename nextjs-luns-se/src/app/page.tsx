@@ -23,6 +23,7 @@ import {
   DAYS,
   categoryColor,
   currentDay,
+  currentDayIndex,
   dateForDay,
   loadMenuData,
   type LunsLocation,
@@ -247,6 +248,7 @@ export default function LunchBoard() {
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
           empty: !filtering && !hasDayDishes,
+          dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
           maps: restaurant.meta.maps,
           instagram: restaurant.meta.instagram,
@@ -565,6 +567,8 @@ export default function LunchBoard() {
           <div className={animFlip ? 'luns-anim-a' : 'luns-anim-b'}>
             <MenuList
               sections={sections}
+              dayOffset={(DAYS as readonly string[]).indexOf(day) - currentDayIndex()}
+              day={day}
               searchTerms={terms}
               theme={theme}
               onToggleFavorite={toggleFavorite}

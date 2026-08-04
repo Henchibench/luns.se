@@ -28,6 +28,8 @@ export interface RestaurantMeta {
   lunch_hours?: string | null;
   /** Handskriven mening om restaurangen, inte skrapad. */
   description?: string | null;
+  /** Publicerar bara dagens meny, aldrig veckans. Tomma dagar är väntat. */
+  daily_menu_only?: boolean;
   latitude?: number | null;
   longitude?: number | null;
   has_menu?: boolean;
