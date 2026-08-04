@@ -234,12 +234,11 @@ restaurant_locations = {
     },
     "Pinocchio": {
         "description": "Restaurang och pizzeria i Lambohov, strax söder om Mjärdevi. Två rätter om dagen på lunchmenyn, som byts varje vecka.",
-        "maps": "https://www.google.com/maps/search/?api=1&query=Pinocchio+Pizzeria%2C+Tr%C3%B6skaregatan+33%2C+Link%C3%B6ping",
-        # De publicerar ingen adress själva. Läget kommer från OpenStreetMap
-        # och stöds av att deras Facebooksida heter Pinocchio Pizzeria
-        # Lambohov — men det är den minst styrkta positionen vi har.
-        "latitude": 58.3880235,
-        "longitude": 15.5656599,
+        "maps": "https://www.google.com/maps/search/?api=1&query=Pinocchio+Rest.+%26+Pizzeria%2C+Tr%C3%B6skaregatan+29%2C+583+33+Link%C3%B6ping",
+        # Tröskaregatan 29, uppgiven av användaren och bekräftad mot Googles
+        # egen platsuppgift. OpenStreetMap sa nummer 33, vilket var fel.
+        "latitude": 58.3880316,
+        "longitude": 15.5655798,
         "website": "https://pinoccio.se",
         "area": "Mjärdevi"
     },
