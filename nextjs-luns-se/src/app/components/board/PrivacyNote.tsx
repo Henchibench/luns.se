@@ -65,19 +65,25 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           >
             Umami
           </a>
-          , som varken sätter cookies eller följer dig mellan sajter. I princip ett
+          , som varken sätter cookies eller följer någon mellan sajter. I princip ett
           integritetsvänligt alternativ till Google Analytics. Vi får veta att någon gjorde något.
         </p>
 
         <h3 className="mb-1.5 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
           DET SOM SKICKAS
         </h3>
+        {/* Listan står i passiv form med flit. "Vilken restaurang du
+            favoritmarkerar" låter som att vi vet att det var just du, vilket
+            är precis motsatsen till vad stycket ovanför säger. När uppgiften
+            når Umami finns ingen person kvar, och då ska meningen inte ha
+            någon heller. Där texten handlar om det som stannar på enheten är
+            "du" däremot rätt: det är ditt och lämnar dig aldrig. */}
         <ul className="mb-3 flex list-none flex-col gap-1 p-0 text-[13px] leading-[1.5] text-[var(--ink2)]">
-          <li>· vilken plats du väljer</li>
-          <li>· vilken restaurang du favoritmarkerar eller rätt du bevakar</li>
-          <li>· vilket sugen på-filter du slår på</li>
-          <li>· att matprofilen ändrats, och hur många ord den döljer</li>
-          <li>· att du bytte tema eller öppnade introduktionen</li>
+          <li>· vilken plats som väljs</li>
+          <li>· vilken restaurang som favoritmarkeras eller rätt som bevakas</li>
+          <li>· vilket sugen på-filter som slås på</li>
+          <li>· att en matprofil ändrats, och hur många ord den döljer</li>
+          <li>· att temat byttes eller introduktionen öppnades</li>
         </ul>
         <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
           Ihopräknat visas en del av det för alla under{' '}
