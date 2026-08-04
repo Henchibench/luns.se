@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import Chips, { ChipSpec, GroupLabel } from './Chips';
 
 export interface RailItem {
@@ -20,6 +19,7 @@ interface Props {
   /** Matprofilen, komponerad av sidan så spalten och mobilarket delar den. */
   foodProfile: React.ReactNode;
   onOpenPrivacy: () => void;
+  onOpenStats: () => void;
 }
 
 /** En restaurangrad. Delas mellan spalten och mobilens bottom sheet. */
@@ -69,6 +69,7 @@ export default function Rail({
   cravingChips,
   foodProfile,
   onOpenPrivacy,
+  onOpenStats,
 }: Props) {
   return (
     <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
@@ -102,12 +103,12 @@ export default function Rail({
             Menyer skrapas varje vardagsmorgon
           </span>
           <div className="flex items-center gap-2.5">
-            <Link
-              href="/statistik"
-              className="text-[10.5px] text-[var(--mut)] underline underline-offset-2 transition-colors hover:text-[var(--acc)]"
+            <button
+              onClick={onOpenStats}
+              className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
             >
               Statistik
-            </Link>
+            </button>
             <button
               onClick={onOpenPrivacy}
               className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"

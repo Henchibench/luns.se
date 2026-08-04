@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Link from 'next/link';
 import Chips, { ChipSpec, GroupLabel } from './Chips';
 import { RailButton, RailItem } from './Rail';
 
@@ -18,6 +17,7 @@ interface Props {
   activeFilterCount: number;
   foodProfile: React.ReactNode;
   onOpenPrivacy: () => void;
+  onOpenStats: () => void;
 }
 
 const BAR_BUTTON =
@@ -34,6 +34,7 @@ export default function MobileBar({
   activeFilterCount,
   foodProfile,
   onOpenPrivacy,
+  onOpenStats,
 }: Props) {
   // Escape stänger arket. Utan det är enda vägen ut att träffa exakt rätt yta.
   useEffect(() => {
@@ -125,12 +126,12 @@ export default function MobileBar({
                   </div>
                   <div className="border-t border-[var(--line)] pt-4">{foodProfile}</div>
                   <div className="flex items-center gap-3">
-                    <Link
-                      href="/statistik"
-                      className="text-[11.5px] text-[var(--mut)] underline underline-offset-2"
+                    <button
+                      onClick={onOpenStats}
+                      className="border-0 bg-transparent p-0 text-[11.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
                     >
                       Statistik
-                    </Link>
+                    </button>
                     <button
                       onClick={onOpenPrivacy}
                       className="border-0 bg-transparent p-0 text-[11.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
