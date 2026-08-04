@@ -35,9 +35,13 @@ function persist(profile: FoodProfile) {
   } catch {
     // Private mode or storage full — the profile still applies this session.
   }
+  // Bara antalet dolda ord, aldrig orden. Det är fritext besökaren skrivit
+  // om sin egen kost — "fläsk" eller "skaldjur" säger något om tro eller
+  // allergi och hör inte hemma i besöksstatistiken. Kategorierna är en fast
+  // lista utan fritext och kan skickas som de är.
   trackEvent('food-profile-updated', {
     boostTypes: profile.boostTypes,
-    hideKeywords: profile.hideKeywords,
+    hideCount: profile.hideKeywords.length,
   });
 }
 

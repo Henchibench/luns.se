@@ -71,7 +71,7 @@ const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
 const TOUR_STEPS: TourStep[] = [
   {
     title: 'Luns.se är ombyggd',
-    body: 'Samma menyer, ny sida. Ta tjugo sekunder så visar vi de fyra sakerna som inte syns direkt.',
+    body: 'Samma menyer, ny sida. Ta en halv minut så visar vi det som inte syns direkt.',
   },
   {
     targets: ['[data-tour="rail"]', '[data-tour="rail-mobile"]'],
@@ -92,9 +92,19 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
   },
   {
+    targets: ['[data-tour="favorite"]'],
+    title: 'Favoritmarkera stället',
+    body: 'Hjärtat sparar en restaurang. Sedan kan du filtrera fram bara dina favoriter när du inte orkar läsa hela listan.',
+  },
+  {
     targets: ['[data-tour="star"]'],
     title: 'Bevaka en rätt',
     body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp — även om restaurangen skrivit om den lite.',
+  },
+  {
+    // Inget mål: sista steget är en avrundning, som det första.
+    title: 'Allt stannar hos dig',
+    body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami — cookiefri, och följer dig inte mellan sajter.',
   },
 ];
 

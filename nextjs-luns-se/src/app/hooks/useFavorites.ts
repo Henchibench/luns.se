@@ -31,7 +31,9 @@ export function useFavorites() {
     setFavorites(stored);
     setShowOnlyFavoritesState(readShowOnlyFavorites());
     if (stored.length > 0) {
-      trackEvent('favorites-loaded', { favorites: stored, count: stored.length });
+      // Antalet räcker. Hela listan vid varje sidladdning gav ingenting
+      // som favorite-toggle inte redan berättar, en restaurang i taget.
+      trackEvent('favorites-loaded', { count: stored.length });
     }
   }, []);
 

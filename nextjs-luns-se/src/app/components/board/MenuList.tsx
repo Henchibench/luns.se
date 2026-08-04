@@ -59,6 +59,7 @@ export default function MenuList({
         <div key={section.name} data-sec={section.name} className="flex flex-col">
           <div className="flex items-center gap-3 pt-4 pb-2">
             <button
+              data-tour="favorite"
               onClick={() => onToggleFavorite(section.name)}
               title={section.favorite ? 'Ta bort favorit' : 'Favoritmarkera'}
               aria-label={section.favorite ? `Ta bort ${section.name} som favorit` : `Favoritmarkera ${section.name}`}
