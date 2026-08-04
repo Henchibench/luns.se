@@ -91,7 +91,11 @@ export default function MenuList({
     <>
       {sections.map(section => (
         <div key={section.name} data-sec={section.name} className="flex flex-col">
-          <div className="flex items-center gap-3 pt-4 pb-2">
+          {/* Raden får radbrytas på smal skärm. Utan det bröts långa namn
+              mitt itu när de växte, och "STÅNGS MJÄRDEVI" stod på två rader
+              medan länkarna satt kvar uppe till höger. Nu håller namnet ihop
+              och länkarna flyttar ner i stället. */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 pb-2">
             <button
               data-tour="favorite"
               onClick={() => onToggleFavorite(section.name)}
@@ -104,7 +108,10 @@ export default function MenuList({
               {section.favorite ? '♥' : '♡'}
             </button>
 
-            <span className="font-mono text-[11.5px] font-semibold tracking-[.12em] text-[var(--acc)]">
+            {/* Restaurangnamnet var 11.5px medan rätterna är 13.5px, alltså
+                listans minsta text trots att det är dess rubrik. Vid scroll
+                gick gränsen mellan två restauranger obemärkt förbi. */}
+            <span className="whitespace-nowrap font-mono text-[14px] font-semibold tracking-[.1em] text-[var(--acc)]">
               {section.name.toUpperCase()}
             </span>
 
