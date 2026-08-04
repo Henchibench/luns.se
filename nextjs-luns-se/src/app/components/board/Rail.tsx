@@ -18,8 +18,6 @@ interface Props {
   cravingChips: ChipSpec[];
   /** Matprofilen, komponerad av sidan så spalten och mobilarket delar den. */
   foodProfile: React.ReactNode;
-  onOpenPrivacy: () => void;
-  onOpenStats: () => void;
 }
 
 /** En restaurangrad. Delas mellan spalten och mobilens bottom sheet. */
@@ -68,8 +66,6 @@ export default function Rail({
   typeChips,
   cravingChips,
   foodProfile,
-  onOpenPrivacy,
-  onOpenStats,
 }: Props) {
   return (
     <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
@@ -96,23 +92,6 @@ export default function Rail({
 
         <div data-tour="profile" className="mx-5 mt-3.5 flex flex-none flex-col border-t border-[var(--line)] pt-3.5">
           {foodProfile}
-        </div>
-
-        <div className="mt-auto flex flex-col items-start gap-1 px-5 pt-5">
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={onOpenStats}
-              className="border-0 bg-transparent p-0 text-[10px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
-            >
-              Statistik
-            </button>
-            <button
-              onClick={onOpenPrivacy}
-              className="border-0 bg-transparent p-0 text-[10px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
-            >
-              Integritetsinfo
-            </button>
-          </div>
         </div>
       </div>
     </nav>

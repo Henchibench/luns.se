@@ -16,8 +16,6 @@ interface Props {
   cravingChips: ChipSpec[];
   activeFilterCount: number;
   foodProfile: React.ReactNode;
-  onOpenPrivacy: () => void;
-  onOpenStats: () => void;
 }
 
 const BAR_BUTTON =
@@ -33,8 +31,6 @@ export default function MobileBar({
   cravingChips,
   activeFilterCount,
   foodProfile,
-  onOpenPrivacy,
-  onOpenStats,
 }: Props) {
   // Escape stänger arket. Utan det är enda vägen ut att träffa exakt rätt yta.
   useEffect(() => {
@@ -74,7 +70,10 @@ export default function MobileBar({
             boxShadow: '0 8px 30px rgba(0,10,14,.25)',
           }}
         >
-          ⚙ Filter{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
+          {/* Kugghjulet satt här förut och tillhör inställningarna i headern
+              nu. Två kugghjul med olika betydelse på samma skärm hade varit
+              värre än ett filter utan ikon. */}
+          Filter{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
         </button>
       </div>
 
@@ -124,21 +123,10 @@ export default function MobileBar({
                     <GroupLabel>SUGEN PÅ…</GroupLabel>
                     <Chips chips={cravingChips} size="touch" />
                   </div>
+                  {/* Statistiken och integritetsinfon stod här nere förut,
+                      alltså bakom filterknappen och nedanför matprofilen. De
+                      bor i kugghjulet i headern nu. */}
                   <div className="border-t border-[var(--line)] pt-4">{foodProfile}</div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={onOpenStats}
-                      className="border-0 bg-transparent p-0 text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
-                    >
-                      Statistik
-                    </button>
-                    <button
-                      onClick={onOpenPrivacy}
-                      className="border-0 bg-transparent p-0 text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
-                    >
-                      Integritetsinfo
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

@@ -4,7 +4,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { trackEvent } from '../utils/analytics';
 
 const STORAGE_KEY = 'luns-favorites';
-const FILTER_STORAGE_KEY = 'luns-show-only-favorites';
+/**
+ * Startläget för favoritfiltret, inte filtret självt.
+ *
+ * Förut sparades chipen "♥ FAVORITER" rakt av under luns-show-only-favorites,
+ * vilket gjorde den till det enda filtret som låg kvar till nästa besök. De
+ * andra chipsen nollställs, och ingenting i gränssnittet berättade skillnaden.
+ * Nu är beteendet ett eget val i inställningarna, och chipen är lika flyktig
+ * som sina grannar. Ny nyckel med flit: den gamla beskrev ett filter, den här
+ * beskriver ett startläge.
+ */
+const AUTOSTART_KEY = 'luns-start-with-favorites';
 
 function readFavorites(): string[] {
   if (typeof window === 'undefined') return [];
@@ -16,20 +26,31 @@ function readFavorites(): string[] {
   }
 }
 
-function readShowOnlyFavorites(): boolean {
+function readStartWithFavorites(): boolean {
   if (typeof window === 'undefined') return false;
-  return localStorage.getItem(FILTER_STORAGE_KEY) === 'true';
+  try {
+    return localStorage.getItem(AUTOSTART_KEY) === 'true';
+  } catch {
+    return false;
+  }
 }
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [startWithFavorites, setStartWithFavoritesState] = useState<boolean>(false);
   const [showOnlyFavorites, setShowOnlyFavoritesState] = useState<boolean>(false);
 
   // Read from localStorage on mount + fire analytics
   useEffect(() => {
     const stored = readFavorites();
     setFavorites(stored);
-    setShowOnlyFavoritesState(readShowOnlyFavorites());
+
+    const auto = readStartWithFavorites();
+    setStartWithFavoritesState(auto);
+    // Utan favoriter döljer filtret allt, och sajten öppnar på "Inga rätter
+    // matchar". Inställningen får vänta tills det finns något att visa.
+    if (auto && stored.length > 0) setShowOnlyFavoritesState(true);
+
     if (stored.length > 0) {
       // Antalet räcker. Hela listan vid varje sidladdning gav ingenting
       // som favorite-toggle inte redan berättar, en restaurang i taget.
@@ -38,10 +59,30 @@ export function useFavorites() {
   }, []);
 
   const setShowOnlyFavorites = useCallback((value: boolean) => {
-    localStorage.setItem(FILTER_STORAGE_KEY, value ? 'true' : 'false');
     trackEvent('favorites-filter-toggle', { enabled: value });
     setShowOnlyFavoritesState(value);
   }, []);
+
+  /**
+   * Slår om även filtret som gäller nu. En inställning som inte syns förrän
+   * nästa besök ser trasig ut, och den som klickar vill se vad den gör.
+   *
+   * Utom när det inte finns några favoriter: då är det enda synliga resultatet
+   * en tom sida med "Inga rätter matchar", vilket ser ut som ett fel och inte
+   * som ett val. Valet sparas ändå och börjar gälla när första hjärtat finns.
+   */
+  const setStartWithFavorites = useCallback(
+    (value: boolean) => {
+      try {
+        localStorage.setItem(AUTOSTART_KEY, value ? 'true' : 'false');
+      } catch {
+        // Privat läge: valet gäller den här sessionen och glöms sedan.
+      }
+      setStartWithFavoritesState(value);
+      if (favorites.length > 0 || !value) setShowOnlyFavoritesState(value);
+    },
+    [favorites.length]
+  );
 
   const isFavorite = useCallback(
     (name: string) => favorites.includes(name),
@@ -59,5 +100,13 @@ export function useFavorites() {
     setFavorites(next);
   }, []);
 
-  return { favorites, isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites };
+  return {
+    favorites,
+    isFavorite,
+    toggleFavorite,
+    showOnlyFavorites,
+    setShowOnlyFavorites,
+    startWithFavorites,
+    setStartWithFavorites,
+  };
 }

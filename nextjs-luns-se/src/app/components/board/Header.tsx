@@ -21,13 +21,15 @@ interface Props {
   view: 'list' | 'map';
   onToggleView: () => void;
 
-  theme: 'light' | 'dark';
-  themeMounted: boolean;
-  onToggleTheme: () => void;
+  onOpenSettings: () => void;
 }
 
 const CONTROL =
   'flex-none rounded-lg text-[12px] font-bold cursor-pointer whitespace-nowrap transition-colors';
+
+/** Kvadratisk knapp utan text, i samma storlek som fältet bredvid. */
+const ICON_BUTTON =
+  'flex-none h-[38px] w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]';
 
 export default function Header({
   days,
@@ -41,9 +43,7 @@ export default function Header({
   weather,
   view,
   onToggleView,
-  theme,
-  themeMounted,
-  onToggleTheme,
+  onOpenSettings,
 }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 pt-3 pb-2 wide:px-7 wide:pt-4 wide:pb-2.5">
@@ -135,16 +135,17 @@ export default function Header({
         {view === 'map' ? 'LISTA' : 'KARTA'}
       </button>
 
+      {/* Statistiken och integritetsinfon låg som småtext längst ner i
+          vänsterspalten, alltså bakom hela restauranglistan och osynliga på
+          mobil. Kugghjulet är samma avstånd från maten var man än står, och
+          tar över platsen där temaknappen stod. */}
       <button
-        onClick={onToggleTheme}
-        title="Ljust eller mörkt läge"
-        aria-label={theme === 'dark' ? 'Byt till ljust läge' : 'Byt till mörkt läge'}
-        className="order-2 flex-none h-[38px] w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[14px] text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)] wide:order-none"
+        onClick={onOpenSettings}
+        title="Inställningar och info"
+        aria-label="Inställningar och info"
+        className={`${ICON_BUTTON} order-2 text-[15px] wide:order-none`}
       >
-        {/* Ikonen får inte renderas före hydrering — den skiljer sig mellan
-            servern och en besökare som redan valt mörkt läge. Knappen håller
-            sin plats ändå, så raden hoppar inte. */}
-        {themeMounted ? (theme === 'dark' ? '☀' : '☾') : ''}
+        ⚙
       </button>
     </header>
   );

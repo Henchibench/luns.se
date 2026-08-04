@@ -9,6 +9,7 @@ import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
+import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
 import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
@@ -132,16 +133,27 @@ export default function LunchBoard() {
   const [animFlip, setAnimFlip] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const mainRef = useRef<HTMLElement | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { isFavorite, toggleFavorite, showOnlyFavorites, setShowOnlyFavorites } = useFavorites();
+  const {
+    favorites,
+    isFavorite,
+    toggleFavorite,
+    showOnlyFavorites,
+    setShowOnlyFavorites,
+    startWithFavorites,
+    setStartWithFavorites,
+  } = useFavorites();
   const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
     useDishFavorites();
   const { profile, toggleBoostType, addHideKeyword, removeHideKeyword } = useFoodProfile();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
-  const { theme, toggle: toggleTheme, mounted: themeMounted } = useTheme();
+  // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
+  // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
+  const { theme, toggle: toggleTheme } = useTheme();
   // Rundan väntar tills data finns och platsvalet är gjort — annars pekar
   // den på en tom sida bakom välkomstrutan.
   const welcome = useWelcome(loading || needsChoice || restaurants.length === 0);
@@ -485,9 +497,7 @@ export default function LunchBoard() {
         weather={weather}
         view={view}
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
-        theme={theme}
-        themeMounted={themeMounted}
-        onToggleTheme={toggleTheme}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       <div className="grid min-h-0 grid-cols-1 wide:grid-cols-[270px_1fr]">
@@ -497,8 +507,6 @@ export default function LunchBoard() {
           typeChips={typeChips}
           cravingChips={cravingChips}
           foodProfile={<FoodProfile {...foodProfileProps} />}
-          onOpenPrivacy={() => setPrivacyOpen(true)}
-          onOpenStats={() => setStatsOpen(true)}
         />
 
         {/* pt-8 skjuter innehållet förbi uttoningen. Masken är genomskinlig de
@@ -597,14 +605,6 @@ export default function LunchBoard() {
         cravingChips={cravingChips}
         activeFilterCount={activeFilterCount}
         foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
-        onOpenPrivacy={() => {
-          setSheet(null);
-          setPrivacyOpen(true);
-        }}
-        onOpenStats={() => {
-          setSheet(null);
-          setStatsOpen(true);
-        }}
       />
 
       {toast && (
@@ -618,6 +618,20 @@ export default function LunchBoard() {
       )}
 
       {welcome.open && <WelcomeTour steps={TOUR_STEPS} onClose={welcome.close} />}
+
+      {settingsOpen && (
+        <SettingsOverlay
+          onClose={() => setSettingsOpen(false)}
+          startWithFavorites={startWithFavorites}
+          onToggleStartWithFavorites={setStartWithFavorites}
+          favoriteCount={favorites.length}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onRestartTour={welcome.restart}
+          onOpenStats={() => setStatsOpen(true)}
+          onOpenPrivacy={() => setPrivacyOpen(true)}
+        />
+      )}
 
       {privacyOpen && <PrivacyNote onClose={() => setPrivacyOpen(false)} />}
 
