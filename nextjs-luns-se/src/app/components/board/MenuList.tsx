@@ -193,6 +193,7 @@ export default function MenuList({
                 </span>
 
                 <button
+                  data-tour="star"
                   onClick={() => onToggleStar(section.name, dish.description)}
                   title={dish.starred ? 'Sluta bevaka rätten' : 'Bevaka rätt — du ser det direkt när den serveras igen'}
                   aria-label={dish.starred ? `Sluta bevaka ${dish.description}` : `Bevaka ${dish.description}`}

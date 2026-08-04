@@ -50,6 +50,7 @@ export default function MobileBar({
       <div className="fixed inset-x-3.5 bottom-[calc(24px+env(safe-area-inset-bottom,0px))] z-40 flex gap-2">
         <button
           onClick={() => onOpen('rest')}
+          data-tour="rail-mobile"
           className={BAR_BUTTON}
           style={{
             background: 'color-mix(in srgb, var(--bg) 82%, transparent)',
@@ -61,6 +62,7 @@ export default function MobileBar({
         </button>
         <button
           onClick={() => onOpen('filter')}
+          data-tour="filter-mobile"
           className={BAR_BUTTON}
           style={{
             background: 'color-mix(in srgb, var(--bg) 82%, transparent)',

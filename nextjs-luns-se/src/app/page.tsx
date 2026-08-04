@@ -7,6 +7,7 @@ import MenuList, { Section } from './components/board/MenuList';
 import MobileBar, { SheetKind } from './components/board/MobileBar';
 import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
+import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
@@ -15,6 +16,7 @@ import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
 import { useWeather } from './hooks/useWeather';
+import { useWelcome } from './hooks/useWelcome';
 import {
   DAYS,
   categoryColor,
@@ -57,6 +59,45 @@ const HARD_STOP = 56;
  */
 const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
 
+/**
+ * Rundan tar bara upp det som är nytt och inte går att gissa sig till.
+ * Dagflikar, sökfält och platsväljare förklarar sig själva och skulle bara
+ * lägga klick mellan besökaren och maten.
+ *
+ * Varje steg har flera kandidater: vänsterspalten finns inte på mobil, så
+ * där pekar samma steg på knappen som öppnar den. Saknas alla hoppas steget
+ * över och räknaren justeras.
+ */
+const TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Luns.se är ombyggd',
+    body: 'Samma menyer, ny sida. Ta tjugo sekunder så visar vi de fyra sakerna som inte syns direkt.',
+  },
+  {
+    targets: ['[data-tour="rail"]', '[data-tour="rail-mobile"]'],
+    title: 'Alla restauranger på en gång',
+    // Formulerad så den stämmer i båda vyerna: på mobil pekar steget på
+    // knappen som öppnar listan, och där följer ingenting med när man
+    // scrollar. Det är en detalj man upptäcker på bred skärm ändå.
+    body: 'Hela listan finns här. Klicka på ett namn så hoppar du direkt dit i menyn.',
+  },
+  {
+    targets: ['[data-tour="cravings"]', '[data-tour="filter-mobile"]'],
+    title: 'Sugen på något särskilt?',
+    body: 'Välj burgare, pasta eller pommes — flera samtidigt går bra. Sidan letar efter synonymer också, så pasta hittar även spaghetti och lasagne.',
+  },
+  {
+    targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
+    title: 'Matprofilen minns dig',
+    body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
+  },
+  {
+    targets: ['[data-tour="star"]'],
+    title: 'Bevaka en rätt',
+    body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp — även om restaurangen skrivit om den lite.',
+  },
+];
+
 export default function LunchBoard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [locations, setLocations] = useState<LunsLocation[]>([]);
@@ -83,6 +124,9 @@ export default function LunchBoard() {
   const { profile, toggleBoostType, addHideKeyword, removeHideKeyword } = useFoodProfile();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
   const { theme, toggle: toggleTheme, mounted: themeMounted } = useTheme();
+  // Rundan väntar tills data finns och platsvalet är gjort — annars pekar
+  // den på en tom sida bakom välkomstrutan.
+  const welcome = useWelcome(loading || needsChoice || restaurants.length === 0);
   const weather = useWeather(location?.latitude, location?.longitude);
 
   useEffect(() => {
@@ -532,6 +576,8 @@ export default function LunchBoard() {
       {needsChoice && (
         <LocationWelcome locations={locations} onSelect={id => selectLocation(id, true)} />
       )}
+
+      {welcome.open && <WelcomeTour steps={TOUR_STEPS} onClose={welcome.close} />}
     </div>
   );
 }

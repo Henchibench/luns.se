@@ -62,7 +62,7 @@ export function RailButton({
 
 export default function Rail({ items, onSelect, typeChips, cravingChips, foodProfile }: Props) {
   return (
-    <nav className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
+    <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
       <div className="luns-scroll luns-mask-rail flex flex-1 flex-col overflow-y-auto pt-3.5 pb-[18px]">
         <span className="px-5 pt-1 pb-2 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
           RESTAURANGER · {items.length}
@@ -79,10 +79,12 @@ export default function Rail({ items, onSelect, typeChips, cravingChips, foodPro
 
         <div className="mx-5 mt-3.5 flex flex-none flex-col gap-2 border-t border-[var(--line)] pt-3.5">
           <GroupLabel>SUGEN PÅ…</GroupLabel>
-          <Chips chips={cravingChips} />
+          <div data-tour="cravings">
+            <Chips chips={cravingChips} />
+          </div>
         </div>
 
-        <div className="mx-5 mt-3.5 flex flex-none flex-col border-t border-[var(--line)] pt-3.5">
+        <div data-tour="profile" className="mx-5 mt-3.5 flex flex-none flex-col border-t border-[var(--line)] pt-3.5">
           {foodProfile}
         </div>
 
