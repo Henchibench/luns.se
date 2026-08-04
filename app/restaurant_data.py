@@ -165,13 +165,6 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/pirenlindholmen/",
         "area": "Lindholmen"
     },
-    "The Social": {
-        "maps": "https://www.google.com/maps/search/?api=1&query=The%20Social%2C%20Eriksberg%2C%20G%C3%B6teborg",
-        "latitude": 57.7011411,
-        "longitude": 11.9139184,
-        "website": "https://www.strawberryhotels.com/restaurant/sweden/gothenburg/the-social-eriksberg/",
-        "area": "Lindholmen"
-    },
     "Uni3 – World of Food": {
         "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
         "latitude": 57.7112876,

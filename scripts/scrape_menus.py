@@ -35,7 +35,6 @@ from app.scrapers.restaurants.oishii_scraper import OishiiScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
 from app.scrapers.restaurants.skyline_scraper import SkylineScraper
 from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
-from app.scrapers.restaurants.the_social_scraper import TheSocialScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
 from app.restaurant_data import restaurant_locations, LOCATIONS
 
@@ -117,7 +116,6 @@ def scrape_all_menus(previous_menus):
         Pier11Scraper(),
         SkylineScraper(),
         TerrassenScraper(),
-        TheSocialScraper(),
         Uni3Scraper(),
     ]
 
