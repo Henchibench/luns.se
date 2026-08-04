@@ -141,6 +141,7 @@ export default function Header({
           tar över platsen där temaknappen stod. */}
       <button
         onClick={onOpenSettings}
+        data-tour="settings"
         title="Inställningar och info"
         aria-label="Inställningar och info"
         className={`${ICON_BUTTON} order-2 text-[15px] wide:order-none`}

@@ -109,6 +109,14 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp, även om restaurangen skrivit om den lite.',
   },
   {
+    // Kugghjulet är nytt och har ingen självklar innebörd: det kan lika gärna
+    // vara filter eller ett konto. Steget säger vad som finns bakom det, så
+    // det inte blir en knapp man aldrig råkar trycka på.
+    targets: ['[data-tour="settings"]'],
+    title: 'Resten bor i kugghjulet',
+    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, öppen statistik över hur sajten används och vad vi sparar. Den här rundan går att köra om därifrån också.',
+  },
+  {
     // Inget mål: sista steget är en avrundning, som det första.
     title: 'Allt stannar hos dig',
     body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
