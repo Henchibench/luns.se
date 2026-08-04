@@ -8,6 +8,7 @@ import MobileBar, { SheetKind } from './components/board/MobileBar';
 import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
+import PrivacyNote from './components/board/PrivacyNote';
 import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
@@ -124,6 +125,7 @@ export default function LunchBoard() {
   const [toast, setToast] = useState<string | null>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   const mainRef = useRef<HTMLElement | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -482,6 +484,7 @@ export default function LunchBoard() {
           typeChips={typeChips}
           cravingChips={cravingChips}
           foodProfile={<FoodProfile {...foodProfileProps} />}
+          onOpenPrivacy={() => setPrivacyOpen(true)}
         />
 
         <main
@@ -575,6 +578,10 @@ export default function LunchBoard() {
         cravingChips={cravingChips}
         activeFilterCount={activeFilterCount}
         foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
+        onOpenPrivacy={() => {
+          setSheet(null);
+          setPrivacyOpen(true);
+        }}
       />
 
       {toast && (
@@ -588,6 +595,8 @@ export default function LunchBoard() {
       )}
 
       {welcome.open && <WelcomeTour steps={TOUR_STEPS} onClose={welcome.close} />}
+
+      {privacyOpen && <PrivacyNote onClose={() => setPrivacyOpen(false)} />}
     </div>
   );
 }

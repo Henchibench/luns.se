@@ -16,6 +16,7 @@ interface Props {
   cravingChips: ChipSpec[];
   activeFilterCount: number;
   foodProfile: React.ReactNode;
+  onOpenPrivacy: () => void;
 }
 
 const BAR_BUTTON =
@@ -31,6 +32,7 @@ export default function MobileBar({
   cravingChips,
   activeFilterCount,
   foodProfile,
+  onOpenPrivacy,
 }: Props) {
   // Escape stänger arket. Utan det är enda vägen ut att träffa exakt rätt yta.
   useEffect(() => {
@@ -121,6 +123,12 @@ export default function MobileBar({
                     <Chips chips={cravingChips} size="touch" />
                   </div>
                   <div className="border-t border-[var(--line)] pt-4">{foodProfile}</div>
+                  <button
+                    onClick={onOpenPrivacy}
+                    className="self-start border-0 bg-transparent p-0 text-[11.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer"
+                  >
+                    Integritetsinfo
+                  </button>
                 </div>
               )}
             </div>

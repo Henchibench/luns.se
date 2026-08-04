@@ -18,6 +18,7 @@ interface Props {
   cravingChips: ChipSpec[];
   /** Matprofilen, komponerad av sidan så spalten och mobilarket delar den. */
   foodProfile: React.ReactNode;
+  onOpenPrivacy: () => void;
 }
 
 /** En restaurangrad. Delas mellan spalten och mobilens bottom sheet. */
@@ -60,7 +61,14 @@ export function RailButton({
   );
 }
 
-export default function Rail({ items, onSelect, typeChips, cravingChips, foodProfile }: Props) {
+export default function Rail({
+  items,
+  onSelect,
+  typeChips,
+  cravingChips,
+  foodProfile,
+  onOpenPrivacy,
+}: Props) {
   return (
     <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
       <div className="luns-scroll luns-mask-rail flex flex-1 flex-col overflow-y-auto pt-3.5 pb-[18px]">
@@ -88,9 +96,17 @@ export default function Rail({ items, onSelect, typeChips, cravingChips, foodPro
           {foodProfile}
         </div>
 
-        <span className="mt-auto px-5 pt-5 text-[10.5px] text-[var(--mut)]">
-          Menyer skrapas varje vardagsmorgon
-        </span>
+        <div className="mt-auto flex flex-col items-start gap-1 px-5 pt-5">
+          <span className="text-[10.5px] text-[var(--mut)]">
+            Menyer skrapas varje vardagsmorgon
+          </span>
+          <button
+            onClick={onOpenPrivacy}
+            className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
+          >
+            Integritetsinfo
+          </button>
+        </div>
       </div>
     </nav>
   );
