@@ -223,6 +223,16 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Brödernas kök": {
+        "description": "Bowls och sallader på Teknikringen. En dagens bowl per veckodag, och en säsongsmeny som står kvar hela veckan. Plocksallad från buffén går också att sätta ihop själv.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Br%C3%B6dernas+K%C3%B6k%2C+Teknikringen+10%2C+583+30+Link%C3%B6ping",
+        # Teknikringen 10 enligt deras egen sida, bekräftat i OpenStreetMap.
+        "latitude": 58.3942950,
+        "longitude": 15.5592605,
+        "website": "https://www.brodernaskok.se",
+        "area": "Mjärdevi",
+        "lunch_hours": "Mån–fre 11.00–13.30"
+    },
     "Stångs Mjärdevi": {
         "description": "Klimatsmart restaurang i Collegium på Teknikringen, med närodlade råvaror. Dagens rätt och dagens grönt varje dag, plus veckans sallad och dessert. Tio procent rabatt före 11.30 och efter 13.00.",
         "maps": "https://www.google.com/maps/search/?api=1&query=St%C3%A5ngs+Mj%C3%A4rdevi%2C+Teknikringen+7%2C+583+30+Link%C3%B6ping",
@@ -241,7 +251,8 @@ restaurant_locations = {
         "latitude": 58.3972517,
         "longitude": 15.5723987,
         "website": "https://www.nordrest.se/restaurang/universitetsklubben/",
-        "area": "Mjärdevi"
+        "area": "Mjärdevi",
+        "lunch_hours": "Mån–fre 11.30–13.30"
     },
     "Jasons Matstuga": {
         "description": "Jason växte upp i Mjölby, började i restaurangbranschen i Linköping och kom tillbaka efter tjugo år utomlands. Här möter svensk husmanskost en asiatisk buffé, och båda ingår i lunchen.",

@@ -22,6 +22,7 @@ from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScrap
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
+from app.scrapers.restaurants.brodernas_kok_scraper import BrodernasKokScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
@@ -107,6 +108,7 @@ def scrape_all_menus(previous_menus):
         BennePastabarScraper(),
         Bistro3Scraper(),
         BistrotScraper(),
+        BrodernasKokScraper(),
         BombayBistroScraper(),
         DistrictOneScraper(),
         EncounterAsianScraper(),
