@@ -1,8 +1,3 @@
-# Restaurant name modifications
-restaurant_name_modifications = {
-    "Rollin Bistros": "Piren"
-}
-
 # Location metadata.
 #
 # Which restaurants belong to a location is NOT listed here — it is derived
@@ -119,22 +114,6 @@ restaurant_locations = {
         "website": "https://masalakitchen.se/lunch/",
         "area": "Lindholmen"
     },
-    "L's Resto": {
-        "maps": "https://maps.app.goo.gl/RtVkeYh96g2zebqd7",
-        "latitude": 57.7069994,
-        "longitude": 11.9401762,
-        "website": "https://www.lsresto.se/",
-        "instagram": "https://www.instagram.com/lsrestogbg/",
-        "area": "Lindholmen"
-    },
-    "Matminnen": {
-        "maps": "https://maps.app.goo.gl/qobKmdY8mWpKQxvCA",
-        "latitude": 57.7132789,
-        "longitude": 11.948823,
-        "website": "https://matminnen.se/",
-        "instagram": "https://www.instagram.com/matminnen/",
-        "area": "Lindholmen"
-    },
     "Mimolett": {
         "description": "Italiensk lunch med pasta och risotto, med inslag av fisk och grillat. Den krämiga risotton och högrevsburgaren är det gästerna återkommer för.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Mimolett%2C%20Lindholmen%2C%20G%C3%B6teborg",
@@ -169,14 +148,6 @@ restaurant_locations = {
         "longitude": 11.9416524,
         "website": "https://ericssonbynordrest.se/restaurang/restaurant-pier-11/",
         "instagram": "https://www.instagram.com/pier11lindholmen/",
-        "area": "Lindholmen"
-    },
-    "Piren": {
-        "maps": "https://maps.app.goo.gl/25UAJZWyC2wp5myh8",
-        "latitude": 57.7059689,
-        "longitude": 11.9399868,
-        "website": "https://www.pirengbg.se/",
-        "instagram": "https://www.instagram.com/pirenlindholmen/",
         "area": "Lindholmen"
     },
     "Uni3 – World of Food": {
