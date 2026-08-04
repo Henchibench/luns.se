@@ -223,6 +223,26 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Pegs & Tails": {
+        "description": "Krog vid Campus Valla. En dagens rätt per veckodag, och dessutom veckans fisk, veckans green och ett par rätter som står kvar hela veckan.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Pegs+%26+Tails%2C+Universitetsv%C3%A4gen+8%2C+583+30+Link%C3%B6ping",
+        "latitude": 58.4014320,
+        "longitude": 15.5705894,
+        "website": "https://www.pegsandtails.se",
+        "area": "Mjärdevi",
+        "lunch_hours": "Vardagar 11.30–14.00"
+    },
+    "Pinocchio": {
+        "description": "Restaurang och pizzeria i Lambohov, strax söder om Mjärdevi. Två rätter om dagen på lunchmenyn, som byts varje vecka.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Pinocchio+Pizzeria%2C+Tr%C3%B6skaregatan+33%2C+Link%C3%B6ping",
+        # De publicerar ingen adress själva. Läget kommer från OpenStreetMap
+        # och stöds av att deras Facebooksida heter Pinocchio Pizzeria
+        # Lambohov — men det är den minst styrkta positionen vi har.
+        "latitude": 58.3880235,
+        "longitude": 15.5656599,
+        "website": "https://pinoccio.se",
+        "area": "Mjärdevi"
+    },
     "La Fontana": {
         "description": "Italienskt i Mjärdevi med lunchbuffé varje vardag. Onsdag och fredag tänder de grillen, och det finns dagens pizza hela veckan.",
         "maps": "https://www.google.com/maps/search/?api=1&query=La+Fontana%2C+Teknikringen+7%2C+583+30+Link%C3%B6ping",
