@@ -66,6 +66,16 @@ export default function Header({
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
+        {/* Vädret avgör om man går ut och äter, så det står bredvid namnet.
+            Dolt på smal skärm — där äter raden redan upp bredden. */}
+        <span
+          className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
+          title={weather.description}
+        >
+          {weather.emoji}
+          {weather.temperature ? ` ${weather.temperature}` : ''}
+        </span>
+
         {locations.length > 1 && (
           <select
             value={selectedLocation ?? ''}
@@ -111,16 +121,6 @@ export default function Header({
         aria-label="Sök rätt eller restaurang"
         className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
       />
-
-      {/* Vädret avgör om man går ut och äter. Klockan gör det inte — den står
-          redan i telefonens statusrad. Dold på smal skärm ändå. */}
-      <span
-        className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
-        title={weather.description}
-      >
-        {weather.emoji}
-        {weather.temperature ? ` ${weather.temperature}` : ''}
-      </span>
 
       <button
         onClick={onCopy}
