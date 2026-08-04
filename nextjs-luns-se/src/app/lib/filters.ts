@@ -60,6 +60,28 @@ export function searchTerms(search: string): string[] {
   return craving ? craving.terms : [term];
 }
 
+/** Alla synonymer för de valda sugen på-chipsen, för markering av träffar. */
+export function cravingTerms(activeCravingIds: string[]): string[] {
+  return activeCravingIds.flatMap(id => CRAVINGS.find(c => c.id === id)?.terms ?? []);
+}
+
+/**
+ * Sugen på-chipsen är ett OR mellan varandra: väljer man burgare och pasta
+ * vill man se båda, inte rätter som råkar vara bådadera. Mot sökfältet och
+ * övriga filter gäller AND, som för allt annat.
+ */
+export function matchesCravings(
+  dish: Dish,
+  restaurantName: string,
+  activeCravingIds: string[]
+): boolean {
+  if (activeCravingIds.length === 0) return true;
+  const haystack = `${dish.description} ${dish.category} ${restaurantName}`.toLowerCase();
+  return activeCravingIds.some(id =>
+    CRAVINGS.find(c => c.id === id)?.terms.some(term => haystack.includes(term))
+  );
+}
+
 export function matchesSearch(dish: Dish, restaurantName: string, search: string): boolean {
   const terms = searchTerms(search);
   if (terms.length === 0) return true;

@@ -28,7 +28,9 @@ import {
   CRAVINGS,
   TYPE_FILTERS,
   boostByProfile,
+  cravingTerms,
   hiddenByProfile,
+  matchesCravings,
   matchesSearch,
   matchesTypes,
   searchTerms as expandSearch,
@@ -67,6 +69,7 @@ export default function LunchBoard() {
   const [day, setDay] = useState<string>(currentDay());
   const [search, setSearch] = useState('');
   const [activeTypes, setActiveTypes] = useState<string[]>([]);
+  const [activeCravings, setActiveCravings] = useState<string[]>([]);
   const [activeRest, setActiveRest] = useState<string | null>(null);
   const [view, setView] = useState<'list' | 'map'>('list');
   const [sheet, setSheet] = useState<SheetKind>(null);
@@ -108,7 +111,10 @@ export default function LunchBoard() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
 
-  const terms = useMemo(() => expandSearch(search), [search]);
+  const terms = useMemo(
+    () => [...expandSearch(search), ...cravingTerms(activeCravings)],
+    [search, activeCravings]
+  );
 
   const atLocation = useMemo(
     () => (location ? restaurants.filter(r => r.area === location.id) : []),
@@ -126,11 +132,12 @@ export default function LunchBoard() {
           d.day === day &&
           matchesSearch(d, restaurant.name, search) &&
           matchesTypes(d, activeTypes) &&
+          matchesCravings(d, restaurant.name, activeCravings) &&
           !hiddenByProfile(d, profile.hideKeywords)
       );
       return boostByProfile(kept, profile.boostTypes);
     },
-    [day, search, activeTypes, profile.hideKeywords, profile.boostTypes]
+    [day, search, activeTypes, activeCravings, profile.hideKeywords, profile.boostTypes]
   );
 
   /** Hur många rätter matprofilen tar bort idag — annars försvinner de tyst. */
@@ -144,13 +151,18 @@ export default function LunchBoard() {
             d.day === day &&
             matchesSearch(d, restaurant.name, search) &&
             matchesTypes(d, activeTypes) &&
+            matchesCravings(d, restaurant.name, activeCravings) &&
             hiddenByProfile(d, profile.hideKeywords)
         ).length,
       0
     );
-  }, [atLocation, day, search, activeTypes, profile.hideKeywords]);
+  }, [atLocation, day, search, activeTypes, activeCravings, profile.hideKeywords]);
 
-  const filtering = search.trim().length > 0 || activeTypes.length > 0 || showOnlyFavorites;
+  const filtering =
+    search.trim().length > 0 ||
+    activeTypes.length > 0 ||
+    activeCravings.length > 0 ||
+    showOnlyFavorites;
 
   const sections: Section[] = useMemo(() => {
     const list = showOnlyFavorites
@@ -303,15 +315,21 @@ export default function LunchBoard() {
     [showOnlyFavorites, setShowOnlyFavorites, activeTypes]
   );
 
+  // Chipsen skrev förut till sökfältet, som bara rymmer ett värde åt gången.
+  // Nu är de ett eget filter och går att kombinera — burgare och pasta
+  // samtidigt visar båda.
   const cravingChips: ChipSpec[] = useMemo(
     () =>
       CRAVINGS.map(c => ({
         id: c.id,
         label: c.label,
-        active: search.trim().toLowerCase() === c.id,
-        onClick: () => setSearch(prev => (prev.trim().toLowerCase() === c.id ? '' : c.id)),
+        active: activeCravings.includes(c.id),
+        onClick: () =>
+          setActiveCravings(prev =>
+            prev.includes(c.id) ? prev.filter(x => x !== c.id) : [...prev, c.id]
+          ),
       })),
-    [search]
+    [activeCravings]
   );
 
   // Bevakade rätter som faktiskt serveras den valda dagen.
@@ -373,7 +391,8 @@ export default function LunchBoard() {
     month: 'short',
   })}`;
   const isEmpty = restaurants.length > 0 && sections.length === 0;
-  const activeFilterCount = activeTypes.length + (showOnlyFavorites ? 1 : 0);
+  const activeFilterCount =
+    activeTypes.length + activeCravings.length + (showOnlyFavorites ? 1 : 0);
 
   return (
     <div
@@ -468,6 +487,7 @@ export default function LunchBoard() {
                 onClick={() => {
                   setSearch('');
                   setActiveTypes([]);
+                  setActiveCravings([]);
                   setShowOnlyFavorites(false);
                 }}
                 className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-xs font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
