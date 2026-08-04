@@ -18,12 +18,18 @@ export default function LocationWelcome({
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: 'color-mix(in srgb, var(--bg) 82%, transparent)', backdropFilter: 'blur(20px)' }}
+      style={{ background: 'color-mix(in srgb, var(--bg) 90%, transparent)', backdropFilter: 'blur(28px)' }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="luns-welcome-title"
     >
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] p-7">
+      {/* Samma ytor som integritets- och statistikrutan. Den här är kortare
+          och klarade sig längre på --glass2, men tre rutor som ser ut att
+          höra ihop ska också bete sig lika. */}
+      <div
+        className="w-full max-w-sm rounded-2xl border border-[var(--glassBrd)] p-7"
+        style={{ background: 'color-mix(in srgb, var(--bg) 94%, transparent)' }}
+      >
         <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
         <h2
           id="luns-welcome-title"
