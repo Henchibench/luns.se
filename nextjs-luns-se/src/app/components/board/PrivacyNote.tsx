@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
+import Overlay from './Overlay';
 
 /**
  * Vad sajten sparar och vad den skickar vidare.
@@ -14,34 +15,10 @@ import React, { useEffect } from 'react';
  * meddelande från sajten.
  */
 export default function PrivacyNote({ onClose }: { onClose: () => void }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{
-        background: 'color-mix(in srgb, var(--bg) 90%, transparent)',
-        backdropFilter: 'blur(28px)',
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="luns-privacy-title"
-      onClick={onClose}
-    >
-      {/* Rutan är nästan täckande. Med --glass2 lyste menyn bakom rakt
-          igenom, och den här texten är fjorton rader småtext man faktiskt
-          ska läsa — inte en rubrik man ögnar. En aning genomskinlighet är
-          kvar så den fortfarande ligger ovanpå sajten och inte i stället
-          för den. */}
+    <Overlay onClose={onClose} labelledBy="luns-privacy-title">
       <div
-        className="luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] p-7"
-        style={{ background: 'color-mix(in srgb, var(--bg) 94%, transparent)' }}
+        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7"
         onClick={e => e.stopPropagation()}
       >
         <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
@@ -109,6 +86,6 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

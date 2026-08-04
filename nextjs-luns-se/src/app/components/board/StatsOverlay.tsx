@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Overlay from './Overlay';
 import BarList from '../stats/BarList';
 import ColumnChart from '../stats/ColumnChart';
 import { StatsFile, formatNumber, loadStats, peakHour } from '../../lib/stats';
@@ -50,14 +51,6 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
     loadStats().then(setStats).catch(() => setFailed(true));
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   const peak = stats ? peakHour(stats.hours) : 0;
   const busiestDay = stats
     ? [...stats.visits.weekdays].sort((a, b) => b.value - a.value)[0]
@@ -75,36 +68,16 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
   );
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{
-        background: 'color-mix(in srgb, var(--bg) 82%, transparent)',
-        backdropFilter: 'blur(20px)',
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="luns-stats-title"
-      onClick={onClose}
-    >
+    <Overlay onClose={onClose} labelledBy="luns-stats-title">
       {/* Ingen padding på rullande behållaren — rubriken ska kunna klistras
-          fast i toppen utan att texten glider in under en kant.
-
-          Ytan är nästan täckande, till skillnad från platsvalets och
-          integritetsinfons rutor som använder --glass2. De är små och
-          fåordiga; den här är bred, hög och full av småtext och tunna staplar,
-          och då läser menyn bakom rakt igenom. Suddet utanför kanterna gör
-          fortfarande jobbet. */}
+          fast i toppen utan att texten glider in under en kant. */}
       <div
-        className="luns-scroll max-h-[86vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--glassBrd)]"
-        style={{ background: 'color-mix(in srgb, var(--bg) 93%, transparent)' }}
+        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
         onClick={e => e.stopPropagation()}
       >
+        {/* Rubriken måste vara helt täckande — innehållet rullar under den. */}
         <div
-          className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--line)] px-6 pb-4 pt-6"
-          style={{
-            background: 'color-mix(in srgb, var(--bg) 90%, transparent)',
-            backdropFilter: 'blur(12px)',
-          }}
+          className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[var(--bg)] px-6 pb-4 pt-6"
         >
           <div className="min-w-0">
             <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
@@ -244,6 +217,6 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
           )}
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

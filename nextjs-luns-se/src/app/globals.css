@@ -155,6 +155,48 @@ body::-webkit-scrollbar,
 .luns-sheet { animation: lunsSheetUp .25s ease-out; }
 
 /* ---------------------------------------------------------------------------
+   Rutorna som lägger sig över sajten: platsvalet, integritetsinfon och
+   statistiken.
+
+   Skärmen är mörk och panelen ren --bg. Byggde båda på --bg blev ljust läge
+   vitt på vitt — kanten är rgba(255,255,255,.6) och syns bara mot en mörk
+   sajt. Nu kommer separationen från kontrast och håller i båda lägena.
+
+   Suddet är kraftigt med flit. Meningen är att sajten bakom ska bli en
+   stämning att vila mot, inte text man börjar läsa i stället för rutans.
+--------------------------------------------------------------------------- */
+@keyframes lunsOverlayIn {
+  0% {
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    background-color: rgba(0, 14, 18, .42);
+    -webkit-backdrop-filter: blur(26px);
+    backdrop-filter: blur(26px);
+  }
+}
+
+.luns-overlay {
+  background-color: rgba(0, 14, 18, .42);
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+  animation: lunsOverlayIn .32s ease-out both;
+}
+
+/* Panelen kommer en aning efter skärmen, så suddet hinner lägga sig först. */
+@keyframes lunsPanelIn {
+  0% { opacity: 0; transform: translateY(10px) scale(.985); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-panel {
+  box-shadow: 0 18px 50px rgba(0, 10, 14, .35);
+  animation: lunsPanelIn .34s cubic-bezier(.2, .8, .2, 1) .06s both;
+}
+
+/* ---------------------------------------------------------------------------
    Kartan. Leaflet ritar sina egna element, så de stylas globalt.
 --------------------------------------------------------------------------- */
 .luns-map {
@@ -282,7 +324,9 @@ html.dark .luns-pp-btn {
   .luns-anim-a,
   .luns-anim-b,
   .luns-toast,
-  .luns-sheet {
+  .luns-sheet,
+  .luns-overlay,
+  .luns-panel {
     animation: none;
   }
 }
