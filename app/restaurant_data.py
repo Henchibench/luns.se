@@ -229,7 +229,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
     "Skyline": {
-        "description": "Restaurang och bar en trappa upp i terminalen på Linköping City Airport, med uttalat fokus på att minska matsvinnet. Skyline lägger ut menyn en dag i taget, så här syns bara dagens rätter.",
+        "description": "Drivs av Karin och Fredrik Eklund, som i fjorton år hade Göta Hotell vid Göta kanal — flera gånger Östergötlands bästa restaurang enligt White Guide. En trappa upp i terminalen på Linköping City Airport blir det café, bar och bricklunch, med matsvinnet som uttalad hjärtefråga. Menyn läggs ut en dag i taget, så här syns bara dagens rätter.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
         "latitude": 58.4075379,
         "longitude": 15.6580456,
