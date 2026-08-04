@@ -71,30 +71,25 @@ export default function MenuList({
               {section.name.toUpperCase()}
             </span>
 
-            {/* Linjen fyller ut raden så meta och länkar alltid ligger höger.
-                Den tonar från accentfärgen vid namnet och ut mot länkarna, så
-                den binder ihop de två i stället för att bara vara en skiljare. */}
-            <span
-              className="flex-1 rounded-full h-[2px]"
-              style={{
-                background:
-                  'linear-gradient(90deg, var(--acc) 0%, var(--accBg) 55%, var(--accStrong) 100%)',
-              }}
-            />
+            {/* Linjen fyller ut raden så meta och länkar alltid ligger höger. */}
+            <span className="flex-1 h-px bg-[var(--line)]" />
 
             {section.meta && (
-              <span className="hidden wide:inline flex-none font-mono text-[10.5px] text-[var(--mut)] whitespace-nowrap">
+              <span className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--ink2)] whitespace-nowrap">
                 {section.meta}
               </span>
             )}
 
-            <div className="flex flex-none gap-2.5 font-mono text-[10px] text-[var(--mut)]">
+            {/* Länkarna stod i --mut, samma dämpade ton som priser och
+                allergener. De är saker man klickar på, inte fotnoter, så de
+                får samma läsbarhet som rätterna. */}
+            <div className="flex flex-none gap-3 font-mono text-[11px] font-medium text-[var(--ink2)]">
               {/* Kartan fälls ut här nere i stället för att kasta iväg
                   besökaren till Google Maps i en ny flik. */}
               <button
                 onClick={() => setOpenMap(prev => (prev === section.name ? null : section.name))}
                 aria-expanded={openMap === section.name}
-                className={`${LINK_CLASS} border-0 bg-transparent p-0 font-mono text-[10px] cursor-pointer`}
+                className={`${LINK_CLASS} border-0 bg-transparent p-0 font-mono text-[11px] font-medium cursor-pointer`}
                 style={{ color: openMap === section.name ? 'var(--acc)' : undefined }}
               >
                 KARTA {openMap === section.name ? '↑' : '↓'}
