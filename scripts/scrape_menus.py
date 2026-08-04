@@ -24,9 +24,11 @@ from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
 from app.scrapers.restaurants.brodernas_kok_scraper import BrodernasKokScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
+from app.scrapers.restaurants.chili_lime_scraper import ChiliLimeScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
 from app.scrapers.restaurants.gansu_scraper import GansuScraper
+from app.scrapers.restaurants.husman_scraper import HusmanScraper
 from app.scrapers.restaurants.jasons_matstuga_scraper import JasonsMatstugaScraper
 from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
 from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
@@ -110,9 +112,11 @@ def scrape_all_menus(previous_menus):
         BistrotScraper(),
         BrodernasKokScraper(),
         BombayBistroScraper(),
+        ChiliLimeScraper(),
         DistrictOneScraper(),
         EncounterAsianScraper(),
         GansuScraper(),
+        HusmanScraper(),
         JasonsMatstugaScraper(),
         KooperativetScraper(),
         KrubbstuganScraper(),

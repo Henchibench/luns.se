@@ -223,6 +223,24 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Restaurang Husman": {
+        "description": "Husmanskost på Teknikringen med två dagsrätter, plus pasta eller wok, vegetariskt och en sallad. Grillen står framme hela veckan med hamburgar- och kebabtallrikar.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang+Husman%2C+Teknikringen+8%2C+583+30+Link%C3%B6ping",
+        "latitude": 58.3948533,
+        "longitude": 15.5614184,
+        "website": "https://restauranghusman.se",
+        "area": "Mjärdevi",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
+    "Chili & Lime": {
+        "description": "Husmanskost och asiatisk buffé i Mjärdevi Center. Två dagsrätter att välja mellan, och varje dag dessutom poke bowl, vegetariskt och något från grillen.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Chili+%26+Lime%2C+Teknikringen+10%2C+583+30+Link%C3%B6ping",
+        # Teknikringen 10 enligt deras egen sida, bekräftat i OpenStreetMap.
+        "latitude": 58.3941110,
+        "longitude": 15.5589143,
+        "website": "http://www.chili-lime.se",
+        "area": "Mjärdevi"
+    },
     "Brödernas kök": {
         "description": "Bowls och sallader på Teknikringen. En dagens bowl per veckodag, och en säsongsmeny som står kvar hela veckan. Plocksallad från buffén går också att sätta ihop själv.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Br%C3%B6dernas+K%C3%B6k%2C+Teknikringen+10%2C+583+30+Link%C3%B6ping",
