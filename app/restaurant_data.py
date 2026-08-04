@@ -223,6 +223,15 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "La Fontana": {
+        "description": "Italienskt i Mjärdevi med lunchbuffé varje vardag. Onsdag och fredag tänder de grillen, och det finns dagens pizza hela veckan.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=La+Fontana%2C+Teknikringen+7%2C+583+30+Link%C3%B6ping",
+        "latitude": 58.3938460,
+        "longitude": 15.5612025,
+        "website": "http://lafontanamjardevi.se",
+        "area": "Mjärdevi",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
     "Restaurang Husman": {
         "description": "Husmanskost på Teknikringen med två dagsrätter, plus pasta eller wok, vegetariskt och en sallad. Grillen står framme hela veckan med hamburgar- och kebabtallrikar.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang+Husman%2C+Teknikringen+8%2C+583+30+Link%C3%B6ping",

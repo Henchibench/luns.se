@@ -31,6 +31,7 @@ from app.scrapers.restaurants.gansu_scraper import GansuScraper
 from app.scrapers.restaurants.husman_scraper import HusmanScraper
 from app.scrapers.restaurants.jasons_matstuga_scraper import JasonsMatstugaScraper
 from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from app.scrapers.restaurants.la_fontana_scraper import LaFontanaScraper
 from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
 from app.scrapers.restaurants.masala_scraper import MasalaScraper
 from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
@@ -120,6 +121,7 @@ def scrape_all_menus(previous_menus):
         JasonsMatstugaScraper(),
         KooperativetScraper(),
         KrubbstuganScraper(),
+        LaFontanaScraper(),
         MasalaScraper(),
         MimolettScraper(),
         MissFScraper(),
