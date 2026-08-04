@@ -76,9 +76,15 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
         <ul className="mb-3 flex list-none flex-col gap-1 p-0 text-[13px] leading-[1.5] text-[var(--ink2)]">
           <li>· vilken dag och vilken plats du väljer</li>
           <li>· vilken restaurang eller rätt du markerar</li>
+          <li>· vilket sugen på-filter du slår på</li>
           <li>· att matprofilen ändrats, och hur många ord den döljer</li>
           <li>· att du bytte tema eller öppnade introduktionen</li>
         </ul>
+        <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
+          Ihopräknat visas en del av det för alla under{' '}
+          <span className="font-semibold text-[var(--ink2)]">Statistik</span> — aldrig per person,
+          bara som summor.
+        </p>
 
         <h3 className="mb-1.5 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
           DET SOM ALDRIG SKICKAS

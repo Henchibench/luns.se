@@ -380,10 +380,17 @@ export default function LunchBoard() {
         id: c.id,
         label: c.label,
         active: activeCravings.includes(c.id),
-        onClick: () =>
+        onClick: () => {
+          // Räknas ut här och inte inne i uppdateraren — React kör den två
+          // gånger i StrictMode, och då hade varje klick blivit två.
+          const on = !activeCravings.includes(c.id);
+          // Bara id:t, aldrig etiketten — den bär emoji och versaler och
+          // skulle se ut som skrik i statistikrutan.
+          trackEvent('craving-toggle', { craving: c.id, active: on });
           setActiveCravings(prev =>
-            prev.includes(c.id) ? prev.filter(x => x !== c.id) : [...prev, c.id]
-          ),
+            on ? [...prev, c.id] : prev.filter(x => x !== c.id)
+          );
+        },
       })),
     [activeCravings]
   );

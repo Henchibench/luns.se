@@ -27,6 +27,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 BASE = os.environ.get("UMAMI_SHARE_BASE", "https://cloud.umami.is/analytics/eu/api")
@@ -48,14 +49,25 @@ OUT = Path(__file__).resolve().parent.parent / "nextjs-luns-se" / "public" / "da
 # kör en produktionsbygge lokalt. Värdnamnet håller.
 HOSTNAME = os.environ.get("UMAMI_HOSTNAME", "luns.se")
 
+# Sajten listar lunchmenyer i Göteborg. En besökare från Singapore letar inte
+# lunch på Lindholmen, så allt utanför Sverige är brus — crawlers, skannrar,
+# någon som klickat fel. Just nu rör det fyra av 77 besökare, alltså inget som
+# välter statistiken, men skevheten växer om sajten någon gång blir upptäckt av
+# en botfarm.
+COUNTRY = os.environ.get("UMAMI_COUNTRY", "SE")
+
 WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"]
 
 # Vilka händelser som blir vilket avsnitt. Namnen måste matcha det sajten
 # faktiskt skickar — se trackEvent-anropen i src/app/hooks/.
+#   avsnitt, händelse, egenskap, är egenskapen ett id?
+# Restaurang- och rättnamn kommer ordagrant ur menydatan och ska inte röras —
+# pretty() hade gjort "Bar Schiacciate" till "Bar schiacciate".
 BREAKDOWNS = [
-    ("restaurants", "favorite-toggle", "restaurant"),
-    ("dishes", "dish-favorite-toggle", "dish"),
-    ("locations", "location-select", "location"),
+    ("restaurants", "favorite-toggle", "restaurant", False),
+    ("dishes", "dish-favorite-toggle", "dish", False),
+    ("locations", "location-select", "location", True),
+    ("cravings", "craving-toggle", "craving", True),
 ]
 
 
@@ -80,6 +92,22 @@ def api(path: str, token: str | None = None, **params) -> object:
         raise Unavailable(f"{path}: {error}") from error
 
 
+def local(stamp: str) -> datetime:
+    """Umami stämplar bucketarna i UTC men lägger dem på lokal dygnsgräns.
+
+    Midnatt den 6 juli i Stockholm kommer alltså som 2026-07-05T22:00:00Z. Läser
+    man den som UTC hamnar måndagens besök på söndagen och lunchtoppen två
+    timmar för tidigt — det såg ut som att sajten var populärast på söndagar
+    klockan åtta, vilket är fel dag och fel tid för en lunchsajt.
+    """
+    return datetime.fromisoformat(stamp.replace("Z", "+00:00")).astimezone(ZoneInfo(TZ))
+
+
+def pretty(value: str) -> str:
+    """Sajten skickar id:n — 'hamburgare', 'lindholmen'. Rutan visar text."""
+    return value.replace("-", " ").replace("_", " ").strip().capitalize()
+
+
 def parse_series(rows: object, key: str = "pageviews") -> list[dict]:
     """Umami svarar än med en lista, än med {"pageviews": [...]}."""
     if isinstance(rows, dict):
@@ -99,6 +127,8 @@ def build_stats() -> dict:
     end = int(time.time() * 1000)
     start = end - DAYS * 24 * 3600 * 1000
     window = {"startAt": start, "endAt": end, "timezone": TZ, "hostname": HOSTNAME}
+    if COUNTRY:
+        window["country"] = COUNTRY
 
     summary = api(f"websites/{website}/stats", token, **window)
     if not isinstance(summary, dict) or "visits" not in summary:
@@ -107,14 +137,12 @@ def build_stats() -> dict:
     daily = parse_series(api(f"websites/{website}/pageviews", token, unit="day", **window))
     weekday_totals = defaultdict(int)
     for row in daily:
-        day = datetime.fromisoformat(str(row["x"]).replace("Z", "+00:00"))
-        weekday_totals[day.weekday()] += row.get("y", 0)
+        weekday_totals[local(str(row["x"])).weekday()] += row.get("y", 0)
 
     hourly = parse_series(api(f"websites/{website}/pageviews", token, unit="hour", **window))
     hours = [0] * 24
     for row in hourly:
-        stamp = datetime.fromisoformat(str(row["x"]).replace("Z", "+00:00"))
-        hours[stamp.hour] += row.get("y", 0)
+        hours[local(str(row["x"])).hour] += row.get("y", 0)
 
     stats = {
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -135,7 +163,7 @@ def build_stats() -> dict:
 
     # Tomma listor så länge sajten som ligger live inte skickar händelser.
     # Rutan utelämnar de avsnitten helt i stället för att visa tomma diagram.
-    for section, event_name, property_name in BREAKDOWNS:
+    for section, event_name, property_name, is_id in BREAKDOWNS:
         values = api(
             f"websites/{website}/event-data/values",
             token,
@@ -145,7 +173,10 @@ def build_stats() -> dict:
         )
         if isinstance(values, list):
             stats[section] = [
-                {"label": str(row["value"]), "value": row["total"]}
+                {
+                    "label": pretty(str(row["value"])) if is_id else str(row["value"]),
+                    "value": row["total"],
+                }
                 for row in values
                 if isinstance(row, dict) and row.get("value")
             ][:10]
