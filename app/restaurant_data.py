@@ -31,14 +31,6 @@ LOCATIONS = {
 
 # Restaurant locations dictionary
 restaurant_locations = {
-    "Alkemisten Kaffebar & Kafé": {
-        "maps": "https://maps.app.goo.gl/HrvVSYgfaqzw7ARf8",
-        "latitude": 57.7086547,
-        "longitude": 11.9401064,
-        "website": "https://www.alkemistenkaffebar.se/",
-        "instagram": "https://www.instagram.com/alkemistenkaffebar/",
-        "area": "Lindholmen"
-    },
     "Bar Schiacciate": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Bar%20Schiacciate%2C%20Lindholmsall%C3%A9n%2022C%2C%20G%C3%B6teborg",
         "latitude": 57.7096229,

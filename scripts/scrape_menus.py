@@ -18,7 +18,6 @@ import requests
 # Add project root to path so we can import the scraper modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.scrapers.restaurants.alkemisten_scraper import AlkemistenScraper
 from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScraper
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
@@ -101,7 +100,6 @@ def scrape_with_retry(scraper):
 def scrape_all_menus(previous_menus):
     """Run all scrapers and return the combined menus dict."""
     scrapers = [
-        AlkemistenScraper(),
         BarSchiacciateScraper(),
         BennePastabarScraper(),
         Bistro3Scraper(),
