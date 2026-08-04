@@ -5,9 +5,16 @@ import Overlay from './Overlay';
 import type { LunsLocation } from '../../lib/menu';
 
 /**
- * Förstagångsvalet. Designen har bara väljaren i headern, men utan det här
- * landar alla i Linköping på Lindholmen och tror att sajten är fel.
- * Visas en gång; sedan sköter väljaren i headern resten.
+ * Förstagångsvalet, och sajtens första intryck.
+ *
+ * Designen har bara väljaren i headern, men utan det här landar alla i
+ * Linköping på Lindholmen och tror att sajten är fel. Visas en gång; sedan
+ * sköter väljaren i headern resten.
+ *
+ * Rutan hälsar också välkommen. Vid nylanseringen är det här det första de
+ * som känner sajten sedan tidigare möter, och de förtjänar ett besked om
+ * varför allt ser annorlunda ut. Rundan tar därför inte upp det igen: den
+ * inleds med vad som är nytt, inte med att något är nytt.
  */
 export default function LocationWelcome({
   locations,
@@ -19,15 +26,33 @@ export default function LocationWelcome({
   return (
     <Overlay labelledBy="luns-welcome-title">
       <div className="luns-panel w-full max-w-sm rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7">
-        <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
+        {/* Ordmärket står redan i headern bakom rutan, och rubriken säger
+            luns.se i klartext. Loggan får bära igenkänningen ensam. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/luns-logo-transparent.png"
+          alt=""
+          width={72}
+          height={72}
+          className="h-[72px] w-[72px] object-contain"
+        />
+
         <h2
           id="luns-welcome-title"
-          className="mt-2 mb-1 font-heading text-2xl font-bold tracking-[-.02em] text-[var(--ink)]"
+          className="mt-4 mb-2 font-heading text-2xl font-bold leading-[1.15] tracking-[-.02em] text-[var(--ink)]"
         >
-          Var äter du lunch?
+          Välkommen till nya luns.se
         </h2>
-        <p className="mb-5 text-[13px] leading-[1.55] text-[var(--ink2)]">
-          Välj plats så visar vi menyerna där. Vi kommer ihåg valet till nästa gång.
+        <p className="mb-6 text-[13px] leading-[1.55] text-[var(--ink2)]">
+          Sidan är ombyggd från grunden. Samma menyer som förut, men lättare att läsa, med karta,
+          favoriter och en matprofil som minns vad du gillar.
+        </p>
+
+        <h3 className="mb-1 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
+          VAR ÄTER DU LUNCH?
+        </h3>
+        <p className="mb-3 text-[12px] leading-[1.5] text-[var(--mut)]">
+          Vi kommer ihåg valet till nästa gång.
         </p>
 
         <div className="flex flex-col gap-2">

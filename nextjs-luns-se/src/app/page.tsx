@@ -73,8 +73,11 @@ const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
  */
 const TOUR_STEPS: TourStep[] = [
   {
-    title: 'Luns.se är ombyggd',
-    body: 'Samma menyer, ny sida. Ta en halv minut så visar vi det som inte syns direkt.',
+    // Platsvalet har redan hälsat välkommen och sagt att sajten är ombyggd.
+    // Att upprepa det direkt efteråt vore att säga samma sak två gånger i
+    // rad, så steget går rakt på vad rundan faktiskt ska visa.
+    title: 'Det som är nytt',
+    body: 'Ta en halv minut så visar vi det som inte syns direkt.',
   },
   {
     targets: ['[data-tour="rail"]', '[data-tour="rail-mobile"]'],
