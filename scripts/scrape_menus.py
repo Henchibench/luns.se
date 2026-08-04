@@ -23,13 +23,11 @@ from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScrap
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
-from app.scrapers.restaurants.cuckoos_nest_scraper import CuckoosNestScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
 from app.scrapers.restaurants.gansu_scraper import GansuScraper
 from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
 from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
-from app.scrapers.restaurants.ls_kitchen_scraper import LsKitchenScraper
 from app.scrapers.restaurants.masala_scraper import MasalaScraper
 from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
 from app.scrapers.restaurants.miss_f_scraper import MissFScraper
@@ -107,13 +105,11 @@ def scrape_all_menus(previous_menus):
         BennePastabarScraper(),
         BistrotScraper(),
         BombayBistroScraper(),
-        CuckoosNestScraper(),
         DistrictOneScraper(),
         EncounterAsianScraper(),
         GansuScraper(),
         KooperativetScraper(),
         KrubbstuganScraper(),
-        LsKitchenScraper(),
         MasalaScraper(),
         MimolettScraper(),
         MissFScraper(),

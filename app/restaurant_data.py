@@ -72,14 +72,6 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/bombaybistrogbg/",
         "area": "Lindholmen"
     },
-    "Cuckoo's Nest": {
-        "maps": "https://maps.app.goo.gl/g8AkjGt6yr91R9rdA",
-        "latitude": 57.707716,
-        "longitude": 11.9410299,
-        "website": "https://www.cuckoosnest.se/",
-        "instagram": "https://www.instagram.com/cuckoosnest_restaurant",
-        "area": "Lindholmen"
-    },
     "Encounter Asian": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Encounter%20Asian%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.709112,
@@ -106,14 +98,6 @@ restaurant_locations = {
         "longitude": 11.9446582,
         "website": "https://www.kooperativet.se/",
         "instagram": "https://www.instagram.com/kooperativetlindholmen/",
-        "area": "Lindholmen"
-    },
-    "L's Kitchen": {
-        "maps": "https://maps.app.goo.gl/mmYxMRt4VM4wnR1i8",
-        "latitude": 57.7069994,
-        "longitude": 11.9401762,
-        "website": "https://www.lskitchen.se/",
-        "instagram": "https://www.instagram.com/lskitchengbg/",
         "area": "Lindholmen"
     },
     "Masala Kitchen": {
