@@ -71,8 +71,16 @@ export default function MenuList({
               {section.name.toUpperCase()}
             </span>
 
-            {/* Linjen fyller ut raden så meta och länkar alltid ligger höger. */}
-            <span className="flex-1 h-px bg-[var(--line)]" />
+            {/* Linjen fyller ut raden så meta och länkar alltid ligger höger.
+                Den tonar från accentfärgen vid namnet och ut mot länkarna, så
+                den binder ihop de två i stället för att bara vara en skiljare. */}
+            <span
+              className="flex-1 rounded-full h-[2px]"
+              style={{
+                background:
+                  'linear-gradient(90deg, var(--acc) 0%, var(--accBg) 55%, var(--accStrong) 100%)',
+              }}
+            />
 
             {section.meta && (
               <span className="hidden wide:inline flex-none font-mono text-[10.5px] text-[var(--mut)] whitespace-nowrap">
