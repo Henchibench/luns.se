@@ -16,11 +16,18 @@ class MashieScraper(BaseScraper):
     Find a restaurant's Mashie URL by opening its Compass Group page and
     reading the src of the non-cookie iframe.
 
-    Mashie publishes two weeks at a time. Each day is a
-    `div.panel.app-default` whose heading reads e.g. "03 aug Måndag", and each
-    dish is a `.list-group-item-menu` where — despite the class names —
+    Mashie publishes two weeks at a time. Each day is a `div.panel` whose
+    heading reads e.g. "03 aug Måndag", and each dish is a
+    `.list-group-item-menu` where — despite the class names —
     `.app-alternative-name` holds the category ("Gröna smaker") and
     `.app-daymenu-name` holds the dish description.
+
+    Two things about today's panel. It is classed `panel-primary` rather than
+    `panel-default app-default`, because Mashie highlights the current day —
+    selecting on `app-default` therefore dropped today, every day, silently.
+    And it is rendered twice: once as a highlighted box above the list and
+    once in its place inside it. Hence the selector is the plain `div.panel`
+    and days are deduplicated by date.
     """
 
     SWEDISH_DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
@@ -113,14 +120,21 @@ class MashieScraper(BaseScraper):
                 return {self.name: ["Ett fel uppstod vid hämtning av menyn"]}
 
             days: List[dict] = []
-            for panel in soup.select('div.panel.app-default'):
+            seen_dates = set()
+            for panel in soup.select('div.panel'):
                 heading_el = panel.select_one('.panel-heading')
                 if not heading_el:
                     continue
                 heading = ' '.join(heading_el.get_text(' ', strip=True).split())
                 day_name, day_date = self._parse_heading(heading)
                 if not day_name or not day_date:
+                    # Panelen är inte en dag — sidan har även rutor för
+                    # öppettider och kontaktuppgifter.
                     continue
+                if day_date in seen_dates:
+                    # Dagens panel står två gånger på sidan.
+                    continue
+                seen_dates.add(day_date)
 
                 dishes = []
                 for item in panel.select('.list-group-item-menu'):
