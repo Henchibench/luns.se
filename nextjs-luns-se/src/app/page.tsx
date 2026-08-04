@@ -94,7 +94,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
-    title: 'Matprofilen minns dig',
+    title: 'Matprofilen ligger kvar',
     body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
   },
   {

@@ -244,7 +244,7 @@ export default function MenuList({
                 <button
                   data-tour="star"
                   onClick={() => onToggleStar(section.name, dish.description)}
-                  title={dish.starred ? 'Sluta bevaka rätten' : 'Bevaka rätt — du ser det direkt när den serveras igen'}
+                  title={dish.starred ? 'Sluta bevaka rätten' : 'Bevaka rätt, du ser det direkt när den serveras igen'}
                   aria-label={dish.starred ? `Sluta bevaka ${dish.description}` : `Bevaka ${dish.description}`}
                   aria-pressed={dish.starred}
                   className="flex-none border-0 bg-transparent px-0.5 text-[13px] leading-none cursor-pointer transition-transform active:scale-90"

@@ -53,7 +53,7 @@ export default function LocationWelcome({
         </h2>
         <p className="mb-6 text-[13px] leading-[1.55] text-[var(--ink2)]">
           Sidan är ombyggd från grunden. Samma menyer som förut, men lättare att läsa, med karta,
-          favoriter och en matprofil som minns vad du gillar.
+          favoriter och en matprofil som sparar vad du gillar.
         </p>
 
         <h3 className="mb-1 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
