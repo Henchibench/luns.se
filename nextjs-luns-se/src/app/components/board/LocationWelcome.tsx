@@ -27,15 +27,23 @@ export default function LocationWelcome({
     <Overlay labelledBy="luns-welcome-title">
       <div className="luns-panel w-full max-w-sm rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7">
         {/* Ordmärket står redan i headern bakom rutan, och rubriken säger
-            luns.se i klartext. Loggan får bära igenkänningen ensam. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/luns-logo-transparent.png"
-          alt=""
-          width={72}
-          height={72}
-          className="h-[72px] w-[72px] object-contain"
-        />
+            luns.se i klartext. Loggan får bära igenkänningen ensam.
+
+            Plattan finns för ljust läge. Loggan har vit text inbakad i
+            bilden, och mot en nästan vit panel försvinner "LUNS MENU" medan
+            maten står kvar. Tonen är mörka lägets panelfärg, alltså exakt
+            den yta loggan är ritad för — i mörkt läge blir plattan därmed
+            osynlig av sig själv och behöver inte stängas av. */}
+        <div className="inline-flex rounded-2xl bg-[#04252E] p-2.5 dark:bg-transparent dark:p-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/luns-logo-transparent.png"
+            alt=""
+            width={72}
+            height={72}
+            className="h-[72px] w-[72px] object-contain"
+          />
+        </div>
 
         <h2
           id="luns-welcome-title"
