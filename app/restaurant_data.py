@@ -141,6 +141,8 @@ restaurant_locations = {
     },
     "Oishii": {
         "maps": "https://www.google.com/maps/search/?api=1&query=Oishii%2C%20Lindholmen%2C%20G%C3%B6teborg",
+        "latitude": 57.7055045,
+        "longitude": 11.9336158,
         "website": "https://oishii.se/",
         "instagram": "https://www.instagram.com/oishii_gbg/",
         "area": "Lindholmen"
@@ -163,6 +165,8 @@ restaurant_locations = {
     },
     "The Social": {
         "maps": "https://www.google.com/maps/search/?api=1&query=The%20Social%2C%20Eriksberg%2C%20G%C3%B6teborg",
+        "latitude": 57.7011411,
+        "longitude": 11.9139184,
         "website": "https://www.strawberryhotels.com/restaurant/sweden/gothenburg/the-social-eriksberg/",
         "area": "Lindholmen"
     },
