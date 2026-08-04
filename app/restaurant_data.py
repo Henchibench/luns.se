@@ -27,6 +27,13 @@ LOCATIONS = {
         "latitude": 58.4108,
         "longitude": 15.6470,
     },
+    "Mjärdevi": {
+        "label": "Mjärdevi",
+        "city": "Linköping",
+        "map_query": "mjärdevi linköping",
+        "latitude": 58.3940,
+        "longitude": 15.5590,
+    },
 }
 
 # Restaurant locations dictionary
@@ -215,6 +222,26 @@ restaurant_locations = {
         "website": "https://krubbstugan.se",
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
+    },
+    "Stångs Mjärdevi": {
+        "description": "Klimatsmart restaurang i Collegium på Teknikringen, med närodlade råvaror. Dagens rätt och dagens grönt varje dag, plus veckans sallad och dessert. Tio procent rabatt före 11.30 och efter 13.00.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=St%C3%A5ngs+Mj%C3%A4rdevi%2C+Teknikringen+7%2C+583+30+Link%C3%B6ping",
+        # Ur kartlänken på deras egen sida.
+        "latitude": 58.3935717,
+        "longitude": 15.5585668,
+        "website": "https://stangsmjardevi.se",
+        "instagram": "https://www.instagram.com/stangsmjardevi/",
+        "area": "Mjärdevi",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
+    "Universitetsklubben": {
+        "description": "Campusrestaurang i huset Vallfarten på Linköpings universitet, med två matsalar. Två rätter om dagen, ofta en vegetarisk.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Universitetsklubben%2C+Vallfarten%2C+Campus+Valla%2C+Link%C3%B6ping",
+        # Vallfarten enligt OpenStreetMap — huset restaurangen själv uppger.
+        "latitude": 58.3972517,
+        "longitude": 15.5723987,
+        "website": "https://www.nordrest.se/restaurang/universitetsklubben/",
+        "area": "Mjärdevi"
     },
     "Jasons Matstuga": {
         "description": "Jason växte upp i Mjölby, började i restaurangbranschen i Linköping och kom tillbaka efter tjugo år utomlands. Här möter svensk husmanskost en asiatisk buffé, och båda ingår i lunchen.",

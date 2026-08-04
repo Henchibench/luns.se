@@ -36,8 +36,10 @@ from app.scrapers.restaurants.oishii_scraper import OishiiScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
 from app.scrapers.restaurants.seven_seasons_scraper import SevenSeasonsScraper
 from app.scrapers.restaurants.skyline_scraper import SkylineScraper
+from app.scrapers.restaurants.stangs_mjardevi_scraper import StangsMjardeviScraper
 from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
+from app.scrapers.restaurants.universitetsklubben_scraper import UniversitetsklubbenScraper
 from app.restaurant_data import restaurant_locations, LOCATIONS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -119,8 +121,10 @@ def scrape_all_menus(previous_menus):
         Pier11Scraper(),
         SevenSeasonsScraper(),
         SkylineScraper(),
+        StangsMjardeviScraper(),
         TerrassenScraper(),
         Uni3Scraper(),
+        UniversitetsklubbenScraper(),
     ]
 
     menus = {}
