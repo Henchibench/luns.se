@@ -216,6 +216,18 @@ restaurant_locations = {
         "area": "Tannefors",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Jasons Matstuga": {
+        "description": "Jason växte upp i Mjölby, började i restaurangbranschen i Linköping och kom tillbaka efter tjugo år utomlands. Här möter svensk husmanskost en asiatisk buffé, och båda ingår i lunchen.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Jasons+Matstuga%2C+Torvingegatan+16%2C+582+78+Link%C3%B6ping",
+        # Torvingegatan 16, slaget i OpenStreetMap. Kvarteret heter Kallerstad
+        # där, men ligger vägg i vägg med Tannefors och hör till samma
+        # lunchområde som Skyline och Terrassen.
+        "latitude": 58.4173106,
+        "longitude": 15.6723059,
+        "website": "https://www.jasonmatstuga.com",
+        "area": "Tannefors",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
     "Skyline": {
         "description": "Restaurang och bar en trappa upp i terminalen på Linköping City Airport, med uttalat fokus på att minska matsvinnet. Skyline lägger ut menyn en dag i taget, så här syns bara dagens rätter.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
