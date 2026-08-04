@@ -217,7 +217,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
     "Skyline": {
-        "description": "Restaurang och bar en trappa upp i terminalen på Linköping City Airport, med uttalat fokus på att minska matsvinnet.",
+        "description": "Restaurang och bar en trappa upp i terminalen på Linköping City Airport, med uttalat fokus på att minska matsvinnet. Skyline lägger ut menyn en dag i taget, så här syns bara dagens rätter.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
         "latitude": 58.4075379,
         "longitude": 15.6580456,
