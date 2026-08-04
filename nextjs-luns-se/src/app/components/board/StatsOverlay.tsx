@@ -63,6 +63,17 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
     ? [...stats.visits.weekdays].sort((a, b) => b.value - a.value)[0]
     : null;
 
+  // Avsnitten som bygger på händelser står tomma tills den nya sajten ligger
+  // live — versionen som är ute nu skickar bara sidvisningar. Tomma kort som
+  // säger "inget att visa än" fyra gånger i rad är sämre än inga kort alls.
+  const hasChoices = Boolean(
+    stats &&
+      (stats.restaurants.length ||
+        stats.dishes.length ||
+        stats.locations.length ||
+        stats.cravings.length)
+  );
+
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
@@ -128,9 +139,9 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
           {stats && busiestDay && (
             <>
               <p className="m-0 mb-5 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink2)]">
-                Sajten räknar hur den används — vilken dag folk klickar sig till, vilka restauranger
-                som favoritmarkeras, när på dygnet det händer. Det är roligt att titta på, så det
-                står öppet i stället för att ligga i en instrumentpanel bara jag ser.
+                Sajten räknar hur den används — när på dygnet folk tittar, vilka dagar det är tryck
+                {hasChoices ? ', och vad de väljer' : ''}. Det är roligt att titta på, så det står
+                öppet i stället för att ligga i en instrumentpanel bara jag ser.
               </p>
 
               {stats.sample && (
@@ -151,9 +162,12 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               </div>
 
               <div className="flex flex-col gap-4">
+                {/* Texterna säger vad staplarna visar, inte varför det ser ut
+                    så. Den gamla veckotexten hävdade att intresset sjunker mot
+                    fredagen, vilket den riktiga datan inte alls höll med om. */}
                 <Card
                   title="När på dygnet kollar folk lunch?"
-                  lead={`En stapel per timme. Toppen ligger vid ${peak}-tiden — ungefär då hungern går från tanke till beslut.`}
+                  lead={`En stapel per timme. Flest öppnar sajten vid ${peak}-tiden.`}
                 >
                   <ColumnChart
                     unit="besök"
@@ -168,7 +182,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
 
                 <Card
                   title="Vilken dag är det mest tryck?"
-                  lead={`${busiestDay.label} vinner. Att intresset sjunker mot fredagen känns rimligt — då är fler redan bortbokade på lunch.`}
+                  lead={`Besöken lagda på veckodag. ${busiestDay.label} ligger högst.`}
                 >
                   <ColumnChart
                     unit="besök"
@@ -181,29 +195,39 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
                   />
                 </Card>
 
-                <Card
-                  title="Restaurangerna folk håller koll på"
-                  lead="Antal gånger någon har favoritmarkerat stället med hjärtat i menylistan."
-                >
-                  <BarList items={stats.restaurants} unit="favoritmarkeringar" />
-                </Card>
-
-                <Card
-                  title="Rätterna som bevakas"
-                  lead="Stjärnmärkta rätter — de man vill få veta om när de dyker upp på menyn igen."
-                >
-                  <BarList items={stats.dishes} unit="bevakningar" color="var(--star)" />
-                </Card>
-
-                <div className="grid gap-4 wide:grid-cols-2">
-                  <Card title="Var folk letar" lead="Vald stadsdel i platsväljaren.">
-                    <BarList items={stats.locations} unit="val" color="var(--cBlue)" />
+                {stats.restaurants.length > 0 && (
+                  <Card
+                    title="Restaurangerna folk håller koll på"
+                    lead="Hur ofta hjärtat i menylistan klickats — på eller av."
+                  >
+                    <BarList items={stats.restaurants} unit="klick" />
                   </Card>
+                )}
 
-                  <Card title="Sugen på…" lead="Vilka snabbfilter som används mest.">
-                    <BarList items={stats.cravings} unit="klick" color="var(--cGreen)" />
+                {stats.dishes.length > 0 && (
+                  <Card
+                    title="Rätterna som bevakas"
+                    lead="Stjärnmärkta rätter — de man vill få veta om när de dyker upp på menyn igen."
+                  >
+                    <BarList items={stats.dishes} unit="bevakningar" color="var(--star)" />
                   </Card>
-                </div>
+                )}
+
+                {(stats.locations.length > 0 || stats.cravings.length > 0) && (
+                  <div className="grid gap-4 wide:grid-cols-2">
+                    {stats.locations.length > 0 && (
+                      <Card title="Var folk letar" lead="Vald stadsdel i platsväljaren.">
+                        <BarList items={stats.locations} unit="val" color="var(--cBlue)" />
+                      </Card>
+                    )}
+
+                    {stats.cravings.length > 0 && (
+                      <Card title="Sugen på…" lead="Vilka snabbfilter som används mest.">
+                        <BarList items={stats.cravings} unit="klick" color="var(--cGreen)" />
+                      </Card>
+                    )}
+                  </div>
+                )}
               </div>
 
               <p className="mb-0 mt-5 text-[11.5px] leading-[1.5] text-[var(--mut)]">
