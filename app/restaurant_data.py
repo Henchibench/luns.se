@@ -52,12 +52,13 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11–21"
     },
     "Bistro 3": {
-        "description": "Modern bistro med pinsa, wraps och sallader. Till det en buffé med sallad, tillbehör och kaffe.",
+        "description": "Sallader och välfyllda wraps med marinerade råvaror, plus pinsa och en salladsbuffé. Lunchen serveras både i bistron och uppe på takterrassen Rooftop.",
         "maps": "https://maps.app.goo.gl/vdJa9Hiq8Jx5KzaF6",
         "latitude": 57.7101793,
         "longitude": 11.9477941,
         "website": "https://bistro3.se",
-        "area": "Lindholmen"
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 11–14"
     },
     "Bistrot": {
         "description": "Modern lunchrestaurang vid Lindholmspirens strandpromenad. Vällagat med rustik bistrokänsla, svenska och internationella smaker, och alltid kött, fisk och vegetariskt på menyn.",
