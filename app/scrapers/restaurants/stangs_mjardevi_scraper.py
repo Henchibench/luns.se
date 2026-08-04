@@ -148,7 +148,7 @@ class StangsMjardeviScraper(BaseScraper):
                     continue
                 description = self.clean_text(meal.get('description', ''))
                 if description:
-                    dish = f'{dish} — {description}'
+                    dish = f'{dish}: {description}'
 
                 line = f"{day}|<strong>{category}</strong> - {dish}"
                 price = prices.get(meal.get('idProduct'))

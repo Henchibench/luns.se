@@ -77,7 +77,7 @@ class PinocchioScraper(BaseScraper):
                         if description_el else ''
                     )
                     if description:
-                        dish = f'{dish} — {description}'
+                        dish = f'{dish}: {description}'
 
                     line = f"{day}|<strong>Dagens</strong> - {dish}"
                     if price:

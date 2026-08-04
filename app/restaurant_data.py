@@ -39,7 +39,7 @@ LOCATIONS = {
 # Restaurant locations dictionary
 restaurant_locations = {
     "Bar Schiacciate": {
-        "description": "Italiensk mackbar grundad 2023 kring schiacciatan — ett tunnare och krispigare syskon till focaccia. Bröden bakas på plats och fylls med mortadella, stracciatella och prosciutto.",
+        "description": "Italiensk mackbar grundad 2023 kring schiacciatan, ett tunnare och krispigare syskon till focaccia. Bröden bakas på plats och fylls med mortadella, stracciatella och prosciutto.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Bar%20Schiacciate%2C%20Lindholmsall%C3%A9n%2022C%2C%20G%C3%B6teborg",
         "latitude": 57.7096229,
         "longitude": 11.9416225,
@@ -94,7 +94,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "District One": {
-        "description": "Asiatiskt i Lindholmen Science Park med inspiration från Japan, Vietnam och Thailand. Sushi, ramen, pho och curry — plus ett par svenska husmansrätter till lunch.",
+        "description": "Asiatiskt i Lindholmen Science Park med inspiration från Japan, Vietnam och Thailand. Sushi, ramen, pho och curry, plus ett par svenska husmansrätter till lunch.",
         "maps": "https://maps.app.goo.gl/RwHPDeykZvKpaTL26",
         "latitude": 57.7096404,
         "longitude": 11.9429148,
@@ -129,7 +129,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Miss F": {
-        "description": "Café med frukost och lunch, mest känt för sina grillade matiga mackor. Även pajer, sallader och bibimbap — och uteservering med utsikt över vattnet.",
+        "description": "Café med frukost och lunch, mest känt för sina grillade matiga mackor. Även pajer, sallader och bibimbap, och uteservering med utsikt över vattnet.",
         "maps": "https://maps.app.goo.gl/bQFos82i7oNAazfv5",
         "latitude": 57.708312,
         "longitude": 11.944489,
@@ -156,7 +156,7 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Uni3 – World of Food": {
-        "description": "Matsal där lunchen delas upp på stationer — Water, Fire och Metal — med en rätt från varje.",
+        "description": "Matsal där lunchen delas upp på stationerna Water, Fire och Metal, med en rätt från varje.",
         "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
         "latitude": 57.7112876,
         "longitude": 11.9460612,

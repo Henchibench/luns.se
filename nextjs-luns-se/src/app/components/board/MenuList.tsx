@@ -62,7 +62,7 @@ const LINK_CLASS = 'whitespace-nowrap transition-colors hover:text-[var(--acc)]'
  */
 function emptyMessage(section: Section, dayOffset: number, day: string): string {
   if (!section.dailyOnly || dayOffset === 0) {
-    return 'Ingen meny idag — kolla direkt med restaurangen via länkarna ovan';
+    return 'Ingen meny idag. Kolla direkt med restaurangen via länkarna ovan';
   }
 
   // Alla svenska veckodagar slutar på -dag, så genitivformen blir -dagens.

@@ -128,7 +128,7 @@ class BrodernasKokScraper(BaseScraper):
             def line_for(day: str, category: str, dish: dict) -> str:
                 text = dish['name']
                 if dish.get('description'):
-                    text += f" — {dish['description']}"
+                    text += f": {dish['description']}"
                 line = f"{day}|<strong>{category}</strong> - {text}"
                 if dish.get('price'):
                     line += f" ({dish['price']})"

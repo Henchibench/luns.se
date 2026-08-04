@@ -112,7 +112,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
           {stats && busiestDay && (
             <>
               <p className="m-0 mb-5 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink2)]">
-                Sajten räknar hur den används — när på dygnet folk tittar, vilka dagar det är tryck
+                Sajten räknar hur den används: när på dygnet folk tittar, vilka dagar det är tryck
                 {hasChoices ? ', och vad de väljer' : ''}. Det är roligt att titta på, så det står
                 öppet i stället för att ligga i en instrumentpanel bara jag ser.
               </p>
@@ -171,7 +171,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
                 {stats.restaurants.length > 0 && (
                   <Card
                     title="Restaurangerna folk håller koll på"
-                    lead="Hur ofta hjärtat i menylistan klickats — på eller av."
+                    lead="Hur ofta hjärtat i menylistan klickats, på eller av."
                   >
                     <BarList items={stats.restaurants} unit="klick" />
                   </Card>
@@ -180,7 +180,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
                 {stats.dishes.length > 0 && (
                   <Card
                     title="Rätterna som bevakas"
-                    lead="Stjärnmärkta rätter — de man vill få veta om när de dyker upp på menyn igen."
+                    lead="Stjärnmärkta rätter, de man vill få veta om när de dyker upp på menyn igen."
                   >
                     <BarList items={stats.dishes} unit="bevakningar" color="var(--star)" />
                   </Card>
@@ -204,7 +204,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               </div>
 
               <p className="mb-0 mt-5 text-[11.5px] leading-[1.5] text-[var(--mut)]">
-                Allt är ihopräknat — ingen rad här handlar om en enskild besökare. Siffrorna hämtas
+                Allt är ihopräknat. Ingen rad här handlar om en enskild besökare. Siffrorna hämtas
                 när sajten byggs, inte när du öppnar rutan. Uppdaterad{' '}
                 {new Date(stats.generated).toLocaleDateString('sv-SE', {
                   day: 'numeric',

@@ -115,7 +115,7 @@ class PegsAndTailsScraper(BaseScraper):
             def line_for(day: str, category: str, entry: dict) -> str:
                 text = entry['name']
                 if entry['description']:
-                    text += f" — {entry['description']}"
+                    text += f": {entry['description']}"
                 if entry['allergens']:
                     text += f" ({entry['allergens']})"
                 line = f"{day}|<strong>{category}</strong> - {text}"

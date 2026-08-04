@@ -49,7 +49,7 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           >
             Umami
           </a>
-          , som varken sätter cookies eller följer dig mellan sajter — i princip ett
+          , som varken sätter cookies eller följer dig mellan sajter. I princip ett
           integritetsvänligt alternativ till Google Analytics. Vi får veta att någon gjorde något.
         </p>
 
@@ -65,7 +65,7 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
         </ul>
         <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
           Ihopräknat visas en del av det för alla under{' '}
-          <span className="font-semibold text-[var(--ink2)]">Statistik</span> — aldrig per person,
+          <span className="font-semibold text-[var(--ink2)]">Statistik</span>, aldrig per person,
           bara som summor.
         </p>
 
@@ -74,7 +74,7 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
         </h3>
         <p className="mb-5 text-[13px] leading-[1.6] text-[var(--ink2)]">
           Det du skriver själv. Sökrutan spåras inte alls, och orden du döljer i matprofilen stannar
-          i din webbläsare — bara antalet räknas.
+          i din webbläsare. Bara antalet räknas.
         </p>
 
         <div className="flex justify-end">

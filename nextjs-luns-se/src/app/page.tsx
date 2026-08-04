@@ -87,7 +87,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     targets: ['[data-tour="cravings"]', '[data-tour="filter-mobile"]'],
     title: 'Sugen på något särskilt?',
-    body: 'Välj burgare, pasta eller pommes — flera samtidigt går bra. Sidan letar efter synonymer också, så pasta hittar även spaghetti och lasagne.',
+    body: 'Välj burgare, pasta eller pommes, flera samtidigt går bra. Sidan letar efter synonymer också, så pasta hittar även spaghetti och lasagne.',
   },
   {
     targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
@@ -102,12 +102,12 @@ const TOUR_STEPS: TourStep[] = [
   {
     targets: ['[data-tour="star"]'],
     title: 'Bevaka en rätt',
-    body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp — även om restaurangen skrivit om den lite.',
+    body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp, även om restaurangen skrivit om den lite.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.
     title: 'Allt stannar hos dig',
-    body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami — cookiefri, och följer dig inte mellan sajter.',
+    body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
   },
 ];
 
@@ -347,7 +347,7 @@ export default function LunchBoard() {
     (restaurant: string, description: string) => {
       const wasStarred = isDishFavorite(restaurant, description);
       toggleDishFavorite(restaurant, description);
-      flash(wasStarred ? 'Bevakning borttagen' : 'Rätten bevakas — du ser det när den serveras igen');
+      flash(wasStarred ? 'Bevakning borttagen' : 'Rätten bevakas, du ser det när den serveras igen');
     },
     [isDishFavorite, toggleDishFavorite, flash]
   );
