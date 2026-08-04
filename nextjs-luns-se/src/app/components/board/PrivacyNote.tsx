@@ -73,8 +73,8 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
           DET SOM SKICKAS
         </h3>
         <ul className="mb-3 flex list-none flex-col gap-1 p-0 text-[13px] leading-[1.5] text-[var(--ink2)]">
-          <li>· vilken dag och vilken plats du väljer</li>
-          <li>· vilken restaurang eller rätt du markerar</li>
+          <li>· vilken plats du väljer</li>
+          <li>· vilken restaurang du favoritmarkerar eller rätt du bevakar</li>
           <li>· vilket sugen på-filter du slår på</li>
           <li>· att matprofilen ändrats, och hur många ord den döljer</li>
           <li>· att du bytte tema eller öppnade introduktionen</li>

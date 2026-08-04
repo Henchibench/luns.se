@@ -473,7 +473,6 @@ export default function LunchBoard() {
         onSelectDay={next => {
           setDay(next);
           setAnimFlip(f => !f);
-          trackEvent('day-select', { day: next });
         }}
         locations={locations}
         selectedLocation={location?.id ?? null}
