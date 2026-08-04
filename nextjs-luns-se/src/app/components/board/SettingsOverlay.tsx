@@ -49,7 +49,8 @@ function Switch({
   checked: boolean;
   onChange: (value: boolean) => void;
   title: string;
-  hint: string;
+  /** Utelämnas när rubriken räcker. Mörkt läge behöver ingen förklaring. */
+  hint?: string;
 }) {
   return (
     <button
@@ -60,7 +61,9 @@ function Switch({
     >
       <span className="min-w-0 flex-1">
         <span className="block text-[13px] font-semibold text-[var(--ink)]">{title}</span>
-        <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">{hint}</span>
+        {hint && (
+          <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">{hint}</span>
+        )}
       </span>
 
       <span
@@ -181,12 +184,7 @@ export default function SettingsOverlay({
 
         <SectionLabel>INSTÄLLNINGAR</SectionLabel>
         <div className="flex flex-col gap-2">
-          <Switch
-            checked={theme === 'dark'}
-            onChange={onToggleTheme}
-            title="Mörkt läge"
-            hint="Ljust läge är lättare att läsa i dagsljus, mörkt är snällare mot ögonen inomhus."
-          />
+          <Switch checked={theme === 'dark'} onChange={onToggleTheme} title="Mörkt läge" />
 
           <div>
             <Switch
