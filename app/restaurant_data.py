@@ -208,7 +208,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.00–13.30"
     },
     "Krubbstugan": {
-        "description": "Restaurang och catering på Gelbgjutaregatan. Veckans rätter växlar, medan raggmunken, bruna bönorna och pastasalladen står kvar.",
+        "description": "Restaurang och catering på Gelbgjutaregatan. Dagens rätter och veckans special växlar, medan raggmunken och de bruna bönorna alltid finns kvar.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Gelbgjutaregatan+2%2C+581+87+Link%C3%B6ping",
         "latitude": 58.4064633,
         "longitude": 15.6509863,

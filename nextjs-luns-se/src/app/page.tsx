@@ -499,9 +499,12 @@ export default function LunchBoard() {
           onOpenStats={() => setStatsOpen(true)}
         />
 
+        {/* pt-8 skjuter innehållet förbi uttoningen. Masken är genomskinlig de
+            första 44 pixlarna, och dagrubriken låg på 14–46 — alltså i princip
+            helt inne i den, vilket fick den att se blek ut. */}
         <main
           ref={mainRef}
-          className={`luns-scroll overflow-y-auto px-4 pb-[calc(100px+env(safe-area-inset-bottom,0px))] wide:px-7 wide:pb-10 ${
+          className={`luns-scroll overflow-y-auto px-4 pt-8 pb-[calc(100px+env(safe-area-inset-bottom,0px))] wide:px-7 wide:pb-10 ${
             view === 'map' ? '' : 'luns-mask-main'
           }`}
         >
