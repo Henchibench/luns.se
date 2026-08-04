@@ -53,23 +53,26 @@ export default function Header({
       {/* På mobil radbryter headern ändå, så ordningen styrs om till tre täta
           rader: logga + tema, dagflikar, sök + knappar. I bredd nollställs
           order och allt ligger som i källan, på en rad. */}
-      <div className="order-1 flex flex-1 items-center gap-3 wide:order-none wide:flex-none">
+      {/* Med temperaturen på plats fattas det sju pixlar för att logga,
+          namn, väder, platsväljare och temaknapp ska rymmas på en rad vid
+          375px. Logga, mellanrum och ordmärke krymper något på mobil så att
+          temaknappen slipper hamna först på dagraden. */}
+      <div className="order-1 flex flex-1 items-center gap-2.5 wide:order-none wide:flex-none wide:gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/luns-logo-transparent.png"
           alt="Luns"
           width={36}
           height={36}
-          className="flex-none h-9 w-9 object-contain"
+          className="flex-none h-8 w-8 object-contain wide:h-9 wide:w-9"
         />
-        <span className="font-mono text-[18px] font-semibold tracking-[.04em] text-[var(--acc)]">
+        <span className="font-mono text-[16px] font-semibold tracking-[.04em] text-[var(--acc)] wide:text-[18px]">
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
-        {/* Vädret avgör om man går ut och äter, så det står bredvid namnet.
-            Dolt på smal skärm — där äter raden redan upp bredden. */}
+        {/* Vädret avgör om man går ut och äter, så det står bredvid namnet. */}
         <span
-          className="hidden wide:inline flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
+          className="flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
           title={weather.description}
         >
           {weather.emoji}
