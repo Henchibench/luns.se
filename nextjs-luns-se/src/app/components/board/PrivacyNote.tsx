@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Overlay from './Overlay';
+import Overlay, { useOverlayClose } from './Overlay';
 
 /**
  * Vad sajten sparar och vad den skickar vidare.
@@ -14,6 +14,22 @@ import Overlay from './Overlay';
  * Samma glasruta som förstagångsvalet av plats, så de känns som samma sorts
  * meddelande från sajten.
  */
+/**
+ * Egen komponent för att kroken ska nå Overlays stängning. Anropad direkt i
+ * PrivacyNote körs den utanför providern och får en tom funktion.
+ */
+function CloseButton() {
+  const close = useOverlayClose();
+  return (
+    <button
+      onClick={close}
+      className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-[12px] font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
+    >
+      Stäng
+    </button>
+  );
+}
+
 export default function PrivacyNote({ onClose }: { onClose: () => void }) {
   return (
     <Overlay onClose={onClose} labelledBy="luns-privacy-title">
@@ -78,12 +94,7 @@ export default function PrivacyNote({ onClose }: { onClose: () => void }) {
         </p>
 
         <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-[12px] font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
-          >
-            Stäng
-          </button>
+          <CloseButton />
         </div>
       </div>
     </Overlay>

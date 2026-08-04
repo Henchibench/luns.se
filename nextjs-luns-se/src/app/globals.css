@@ -194,16 +194,38 @@ body::-webkit-scrollbar,
   }
   100% {
     background-color: rgba(0, 14, 18, .42);
-    -webkit-backdrop-filter: blur(26px);
-    backdrop-filter: blur(26px);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
 }
 
 .luns-overlay {
   background-color: rgba(0, 14, 18, .42);
-  -webkit-backdrop-filter: blur(26px);
-  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   animation: lunsOverlayIn .32s ease-out both;
+}
+
+/* Vägen ut. Opaciteten ligger på skärmen och tar därför panelen med sig, så
+   allt tonar bort tillsammans. Snabbare än vägen in: att öppna får ta tid,
+   att stänga ska kännas som att man redan är tillbaka. */
+@keyframes lunsOverlayOut {
+  0% {
+    opacity: 1;
+    background-color: rgba(0, 14, 18, .42);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+  100% {
+    opacity: 0;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+}
+
+.luns-overlay-out {
+  animation: lunsOverlayOut .24s ease-in both;
 }
 
 /* Panelen kommer en aning efter skärmen, så suddet hinner lägga sig först. */
@@ -347,6 +369,7 @@ html.dark .luns-pp-btn {
   .luns-toast,
   .luns-sheet,
   .luns-overlay,
+  .luns-overlay-out,
   .luns-panel {
     animation: none;
   }

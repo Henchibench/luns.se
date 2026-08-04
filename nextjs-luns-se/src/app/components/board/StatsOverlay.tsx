@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Overlay from './Overlay';
+import Overlay, { useOverlayClose } from './Overlay';
 import BarList from '../stats/BarList';
 import ColumnChart from '../stats/ColumnChart';
 import { StatsFile, formatNumber, loadStats, peakHour } from '../../lib/stats';
@@ -21,6 +21,22 @@ import { StatsFile, formatNumber, loadStats, peakHour } from '../../lib/stats';
  * stats.json hämtas först när rutan öppnas. De allra flesta besök rör aldrig
  * länken, och de ska inte betala för filen.
  */
+
+/**
+ * Egen komponent för att kroken ska nå Overlays stängning. Anropad direkt i
+ * StatsOverlay körs den utanför providern och får en tom funktion.
+ */
+function CloseButton() {
+  const close = useOverlayClose();
+  return (
+    <button
+      onClick={close}
+      className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+    >
+      Stäng
+    </button>
+  );
+}
 
 function Card({
   title,
@@ -88,12 +104,7 @@ export default function StatsOverlay({ onClose }: { onClose: () => void }) {
               Så används sajten
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
-          >
-            Stäng
-          </button>
+          <CloseButton />
         </div>
 
         <div className="px-6 pb-6 pt-5">
