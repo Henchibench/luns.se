@@ -18,8 +18,6 @@ interface Props {
 
   weather: Weather;
 
-  onCopy: () => void;
-
   view: 'list' | 'map';
   onToggleView: () => void;
 
@@ -41,7 +39,6 @@ export default function Header({
   search,
   onSearch,
   weather,
-  onCopy,
   view,
   onToggleView,
   theme,
@@ -124,15 +121,6 @@ export default function Header({
         aria-label="Sök rätt eller restaurang"
         className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
       />
-
-      <button
-        onClick={onCopy}
-        title="Kopiera dagens meny — klistra in i Teams eller Slack"
-        className={`${CONTROL} order-5 border-0 bg-[var(--acc)] px-3 py-[9px] text-[var(--bg)] hover:opacity-90 wide:order-none wide:px-3.5`}
-      >
-        <span className="hidden wide:inline">KOPIERA DAGENS</span>
-        <span className="wide:hidden">KOPIERA</span>
-      </button>
 
       <button
         onClick={onToggleView}

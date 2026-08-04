@@ -33,7 +33,6 @@ import {
   matchesTypes,
   searchTerms as expandSearch,
 } from './lib/filters';
-import { buildMenuShareText, copyText } from './utils/shareMenu';
 import { trackEvent } from './utils/analytics';
 
 /** Avstånd från huvudytans topp där en sektion räknas som den aktiva. */
@@ -257,17 +256,6 @@ export default function LunchBoard() {
     return () => window.removeEventListener('resize', measure);
   }, [sections, view]);
 
-  const handleCopy = useCallback(async () => {
-    const text = buildMenuShareText(sections, day, location?.label);
-    if (!text) {
-      flash('Det finns inget att kopiera för den här dagen');
-      return;
-    }
-    const ok = await copyText(text);
-    trackEvent('copy-menu', { day, location: location?.id, restaurants: sections.length });
-    flash(ok ? 'Dagens meny kopierad — klistra in i Teams eller Slack!' : 'Kunde inte kopiera i den här webbläsaren');
-  }, [sections, day, location, flash]);
-
   const handleToggleStar = useCallback(
     (restaurant: string, description: string) => {
       const wasStarred = isDishFavorite(restaurant, description);
@@ -392,7 +380,6 @@ export default function LunchBoard() {
         search={search}
         onSearch={setSearch}
         weather={weather}
-        onCopy={handleCopy}
         view={view}
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         theme={theme}
