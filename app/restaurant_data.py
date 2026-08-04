@@ -88,7 +88,9 @@ restaurant_locations = {
         "area": "Lindholmen"
     },
     "Gansu Köket": {
-        "maps": "https://www.google.com/maps/search/?api=1&query=Gansu%20K%C3%B6ket%2C%20Lindholmen%2C%20G%C3%B6teborg",
+        "maps": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/@57.7116918,11.9451355,17z/",
+        "latitude": 57.7116918,
+        "longitude": 11.9451355,
         "website": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/",
         "area": "Lindholmen"
     },
