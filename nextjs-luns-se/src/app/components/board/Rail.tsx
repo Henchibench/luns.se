@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Chips, { ChipSpec, GroupLabel } from './Chips';
 
 export interface RailItem {
@@ -100,12 +101,20 @@ export default function Rail({
           <span className="text-[10.5px] text-[var(--mut)]">
             Menyer skrapas varje vardagsmorgon
           </span>
-          <button
-            onClick={onOpenPrivacy}
-            className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
-          >
-            Integritetsinfo
-          </button>
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/statistik"
+              className="text-[10.5px] text-[var(--mut)] underline underline-offset-2 transition-colors hover:text-[var(--acc)]"
+            >
+              Statistik
+            </Link>
+            <button
+              onClick={onOpenPrivacy}
+              className="border-0 bg-transparent p-0 text-[10.5px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
+            >
+              Integritetsinfo
+            </button>
+          </div>
         </div>
       </div>
     </nav>
