@@ -49,6 +49,16 @@ class MasalaScraper(StaticMenuScraper):
         }
         super().__init__(restaurant_info, 'masala_lunch_all_weeks.json')
 
+    @staticmethod
+    def _dish_name(name: str) -> str:
+        """"CHICKEN MURG MANGO" → "Chicken Murg Mango".
+
+        Versal på varje ord, inte bara det första. Rätterna heter det de
+        heter — Butter Chicken, Rogan Josh, Palak Paneer — och skrivs så
+        överallt utom i menybilden, där allt står i versaler.
+        """
+        return ' '.join(word.capitalize() for word in name.split())
+
     def _current_menu_number(self) -> Optional[int]:
         """Vilken av de fyra menyerna som hänger uppe den här veckan."""
         try:
@@ -93,13 +103,15 @@ class MasalaScraper(StaticMenuScraper):
                 day_dishes = daily_menus.get(eng_day, [])
                 for dish in day_dishes:
                     items.append(self.format_static_item(
-                        swe_day, 'Dagens', dish['name'], dish.get('description', ''), dish.get('price', '')
+                        swe_day, 'Dagens', self._dish_name(dish['name']),
+                        dish.get('description', ''), dish.get('price', '')
                     ))
 
                 # Standing menu
                 for dish in standing_items:
                     items.append(self.format_static_item(
-                        swe_day, 'Stående meny', dish['name'], dish.get('description', ''), dish.get('price', '')
+                        swe_day, 'Stående meny', self._dish_name(dish['name']),
+                        dish.get('description', ''), dish.get('price', '')
                     ))
 
             if not items:
