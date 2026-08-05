@@ -11,10 +11,8 @@ import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
-import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
-import { useFoodProfile } from './hooks/useFoodProfile';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
@@ -33,9 +31,7 @@ import {
 import {
   CRAVINGS,
   TYPE_FILTERS,
-  boostByProfile,
   cravingTerms,
-  hiddenByProfile,
   matchesCravings,
   matchesSearch,
   matchesTypes,
@@ -94,16 +90,6 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Välj burgare, pasta eller pommes, flera samtidigt går bra. Sidan letar efter synonymer också, så pasta hittar även spaghetti och lasagne.',
   },
   {
-    targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
-    // Rubriken har hetat både "minns dig" och "ligger kvar". Den första
-    // påstod att sajten känner igen besökaren, den andra lät som att något
-    // blivit över. Att den sparas är en egenskap och hör hemma i brödtexten,
-    // som redan säger det. Rubriken får i stället bli en uppmaning, som
-    // stegen om favoriter och bevakade rätter.
-    title: 'Gör en egen matprofil',
-    body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
-  },
-  {
     targets: ['[data-tour="favorite"]'],
     title: 'Favoritmarkera stället',
     body: 'Hjärtat sparar en restaurang. Sedan kan du filtrera fram bara dina favoriter när du inte orkar läsa hela listan.',
@@ -119,12 +105,12 @@ const TOUR_STEPS: TourStep[] = [
     // det inte blir en knapp man aldrig råkar trycka på.
     targets: ['[data-tour="settings"]'],
     title: 'Resten bor i kugghjulet',
-    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, öppen statistik över hur sajten används och vad vi sparar. Den här rundan går att köra om därifrån också.',
+    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.
     title: 'Allt stannar hos dig',
-    body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
+    body: 'Favoriter och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i sökrutan skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
   },
 ];
 
@@ -162,7 +148,6 @@ export default function LunchBoard() {
   } = useFavorites();
   const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
     useDishFavorites();
-  const { profile, toggleBoostType, addHideKeyword, removeHideKeyword } = useFoodProfile();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
@@ -243,42 +228,18 @@ export default function LunchBoard() {
     [restaurants, location]
   );
 
-  /**
-   * Rätter för vald dag som klarar sök, typfilter och matprofil. Profilens
-   * valda kategorier lyfts till toppen, dess dolda ord filtreras bort.
-   */
+  /** Rätter för vald dag som klarar sök, typfilter och sugen på-filter. */
   const visibleDishes = useCallback(
-    (restaurant: Restaurant) => {
-      const kept = restaurant.dishes.filter(
+    (restaurant: Restaurant) =>
+      restaurant.dishes.filter(
         d =>
           d.day === day &&
           matchesSearch(d, restaurant.name, search) &&
           matchesTypes(d, activeTypes) &&
-          matchesCravings(d, restaurant.name, activeCravings) &&
-          !hiddenByProfile(d, profile.hideKeywords)
-      );
-      return boostByProfile(kept, profile.boostTypes);
-    },
-    [day, search, activeTypes, activeCravings, profile.hideKeywords, profile.boostTypes]
+          matchesCravings(d, restaurant.name, activeCravings)
+      ),
+    [day, search, activeTypes, activeCravings]
   );
-
-  /** Hur många rätter matprofilen tar bort idag — annars försvinner de tyst. */
-  const hiddenCount = useMemo(() => {
-    if (profile.hideKeywords.length === 0) return 0;
-    return atLocation.reduce(
-      (sum, restaurant) =>
-        sum +
-        restaurant.dishes.filter(
-          d =>
-            d.day === day &&
-            matchesSearch(d, restaurant.name, search) &&
-            matchesTypes(d, activeTypes) &&
-            matchesCravings(d, restaurant.name, activeCravings) &&
-            hiddenByProfile(d, profile.hideKeywords)
-        ).length,
-      0
-    );
-  }, [atLocation, day, search, activeTypes, activeCravings, profile.hideKeywords]);
 
   const filtering =
     search.trim().length > 0 ||
@@ -508,14 +469,6 @@ export default function LunchBoard() {
     }));
   const unmappedCount = atLocation.length - mapPoints.length;
 
-  const foodProfileProps = {
-    profile,
-    onToggleBoostType: toggleBoostType,
-    onAddHideKeyword: addHideKeyword,
-    onRemoveHideKeyword: removeHideKeyword,
-    watchedDishes,
-    onRemoveWatched: removeDishFavorite,
-  };
 
   const heading = `${day} ${dateForDay(day).toLocaleDateString('sv-SE', {
     day: 'numeric',
@@ -557,7 +510,6 @@ export default function LunchBoard() {
           onSelect={scrollToRestaurant}
           typeChips={typeChips}
           cravingChips={cravingChips}
-          foodProfile={<FoodProfile {...foodProfileProps} />}
         />
 
         {/* pt-8 skjuter innehållet förbi uttoningen. Masken är genomskinlig de
@@ -595,9 +547,11 @@ export default function LunchBoard() {
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
             </h1>
+            {/* Antalet dolda stod här bredvid, med en väg in till matprofilen
+                som gömde dem. Nu finns ingenting som tar bort rätter i tysthet:
+                filtren syns på skärmen medan de gäller. */}
             <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
-              {hiddenCount > 0 && ` · ${hiddenCount} DOLDA`}
             </span>
           </div>
 
@@ -655,7 +609,6 @@ export default function LunchBoard() {
         typeChips={typeChips}
         cravingChips={cravingChips}
         activeFilterCount={activeFilterCount}
-        foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
       />
 
       {toast && (
@@ -678,6 +631,8 @@ export default function LunchBoard() {
           favoriteCount={favorites.length}
           theme={theme}
           onToggleTheme={toggleTheme}
+          watchedDishes={watchedDishes}
+          onRemoveWatched={removeDishFavorite}
           onRestartTour={welcome.restart}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}
