@@ -30,10 +30,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      # Versionerna hålls på de major som kör Node 24. Node 20 fasas ut, och
+      # GitHub tvingade redan över de gamla dit med en varning i varje körning.
+      #
+      # upload-pages-artifact slutade ta med dolda filer i v4. Bygget har bara
+      # .gitkeep, en tom platshållare som inte gör något i den publicerade
+      # sajten, så det spelar ingen roll här.
+      - uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -52,7 +58,7 @@ jobs:
         run: python scripts/fetch_stats.py
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: 'npm'
@@ -65,10 +71,10 @@ jobs:
           npm run build
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: nextjs-luns-se/out
 
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
