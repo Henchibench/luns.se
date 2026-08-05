@@ -89,6 +89,7 @@ export default function PrivacyNote({
           <li>· vilken plats som väljs</li>
           <li>· vilken restaurang som favoritmarkeras eller rätt som bevakas</li>
           <li>· vilket sugen på-filter som slås på</li>
+          <li>· att sökfältet användes, aldrig vad som skrevs i det</li>
           <li>· att en matprofil ändrats, och hur många ord den döljer</li>
           <li>· att temat byttes eller introduktionen öppnades</li>
         </ul>
@@ -102,8 +103,9 @@ export default function PrivacyNote({
           DET SOM ALDRIG SKICKAS
         </h3>
         <p className="mb-5 text-[13px] leading-[1.6] text-[var(--ink2)]">
-          Det du skriver själv. Sökrutan spåras inte alls, och orden du döljer i matprofilen stannar
-          i din webbläsare. Bara antalet räknas.
+          Det du skriver själv. Sökorden lämnar aldrig din webbläsare, och inte heller orden du
+          döljer i matprofilen. Att sökfältet användes räknas, liksom hur många ord matprofilen
+          döljer, men aldrig vilka de är.
         </p>
 
         <div className="flex justify-end">

@@ -30,6 +30,14 @@ export interface StatsFile {
   visits: { total: number; weekdays: Bucket[] };
   /** Ett värde per timme, index 0–23. */
   hours: number[];
+  /**
+   * Hur många gånger sökfältet användes. Aldrig vad som söktes efter — sajten
+   * skickar bara att det hände.
+   *
+   * Valfritt: filer skrivna innan siffran fanns saknar den, och skillnaden
+   * mellan "ingen sökte" och "vi mätte inte" ska inte suddas ut till en nolla.
+   */
+  searches?: number;
   restaurants: Bucket[];
   dishes: Bucket[];
   locations: Bucket[];

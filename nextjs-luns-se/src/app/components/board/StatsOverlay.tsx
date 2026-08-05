@@ -94,6 +94,13 @@ export default function StatsOverlay({
         stats.cravings.length)
   );
 
+  /**
+   * Söksiffran visas bara när det finns andra händelser att jämföra med.
+   * "Ingen har sökt" och "vi samlar inte in det än" ser likadana ut som en
+   * nolla, och det första påståendet är intressant medan det andra är fel.
+   */
+  const showSearches = stats?.searches !== undefined && (hasChoices || stats.searches > 0);
+
   return (
     <Overlay onClose={onClose} onCloseStart={onCloseStart} labelledBy="luns-stats-title">
       {/* Ingen padding på rullande behållaren — rubriken ska kunna klistras
@@ -161,6 +168,27 @@ export default function StatsOverlay({
                   <BarList items={stats.visits.weekdays} unit="sidvisningar" layout="inline" />
                 </Section>
 
+                {showSearches && (
+                  <Section label="SÖK">
+                    <p className="m-0 text-[13px] leading-[1.6] text-[var(--ink2)]">
+                      {stats.searches === 0 ? (
+                        'Ingen har använt sökfältet under perioden.'
+                      ) : (
+                        <>
+                          Sökfältet användes{' '}
+                          <span className="font-semibold text-[var(--ink)]">
+                            {formatNumber(stats.searches as number)}
+                          </span>{' '}
+                          gånger.
+                        </>
+                      )}{' '}
+                      <span className="text-[var(--mut)]">
+                        Att fältet användes räknas, aldrig vad som skrevs i det.
+                      </span>
+                    </p>
+                  </Section>
+                )}
+
                 {/* Varje lista är en egen sektion med mono-etikett, som DYGNET
                     och VECKAN ovanför. Samlade under en gemensam rubrik fick de
                     brödtextrubriker i stället, och rutan bytte formspråk halvvägs
@@ -198,8 +226,8 @@ export default function StatsOverlay({
                   <Section label="VAD FOLK VÄLJER">
                     <p className="m-0 text-[13px] leading-[1.6] text-[var(--ink2)]">
                       Här kommer det stå vilka restauranger som favoritmarkeras oftast, vilka rätter
-                      som bevakas och vilka sugen på-filter som används. Det kräver att någon hunnit
-                      klicka, och att siffrorna hämtats sedan dess.
+                      som bevakas, vilka sugen på-filter som används och hur ofta någon söker. Det
+                      kräver att någon hunnit klicka, och att siffrorna hämtats sedan dess.
                     </p>
                   </Section>
                 )}

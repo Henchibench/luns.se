@@ -108,6 +108,29 @@ def pretty(value: str) -> str:
     return value.replace("-", " ").replace("_", " ").strip().capitalize()
 
 
+def event_total(website: str, token: str, name: str, window: dict) -> int:
+    """Hur många gånger en händelse skickats, utan uppdelning på egenskap.
+
+    metrics med type=event listar varje händelsenamn med sitt antal. Ett eget
+    try här, till skillnad från anropen ovanför: skulle just den vyn ändra sig
+    ska resten av statistiken ändå bli av. En nolla ser likadan ut som
+    "ingen har sökt", men det avsnittet visas bara när det finns andra
+    händelser, alltså när vi vet att insamlingen fungerar.
+    """
+    try:
+        rows = api(f"websites/{website}/metrics", token, type="event", **window)
+    except Unavailable as error:
+        print(f"stats: händelsesummor hoppades över ({error})", file=sys.stderr)
+        return 0
+
+    if not isinstance(rows, list):
+        return 0
+    for row in rows:
+        if isinstance(row, dict) and row.get("x") == name:
+            return int(row.get("y") or 0)
+    return 0
+
+
 def parse_series(rows: object, key: str = "pageviews") -> list[dict]:
     """Umami svarar än med en lista, än med {"pageviews": [...]}."""
     if isinstance(rows, dict):
@@ -155,6 +178,9 @@ def build_stats() -> dict:
             ],
         },
         "hours": hours,
+        # Bara antalet. Sökorden skickas aldrig från sajten och finns därför
+        # inte att hämta — se integritetsinfon, som lovar just det.
+        "searches": event_total(website, token, "search-used", window),
         "restaurants": [],
         "dishes": [],
         "locations": [],

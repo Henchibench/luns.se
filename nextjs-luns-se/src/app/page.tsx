@@ -193,6 +193,31 @@ export default function LunchBoard() {
    */
   const backToSettings = useCallback(() => setSettingsOpen(true), []);
 
+  /**
+   * Att sökfältet användes. Aldrig vad som skrevs i det.
+   *
+   * Frågan bakom siffran är om fältet är värt sin plats, och den besvaras av
+   * hur många som rör det. Sökorden i sig skulle vara både känsligare och
+   * mindre användbara, så de skickas inte, och integritetsinfon säger det.
+   *
+   * En gång per besök, inte per tangenttryck. Fördröjningen väntar in att
+   * någon slutat skriva, så "sushi" blir en händelse och inte fem, och
+   * ref:en ser till att den som söker tre gånger under samma besök räknas
+   * som en. Måttet blir därmed andelen besök som använder sök, vilket är vad
+   * beslutet hänger på.
+   */
+  const searchCounted = useRef(false);
+  useEffect(() => {
+    if (searchCounted.current) return;
+    // En bokstav är oftast en felträff på tangentbordet.
+    if (search.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      searchCounted.current = true;
+      trackEvent('search-used');
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const flash = useCallback((message: string) => {
     setToast(message);
     if (toastTimer.current) clearTimeout(toastTimer.current);
