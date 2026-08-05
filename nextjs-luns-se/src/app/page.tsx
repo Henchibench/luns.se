@@ -95,7 +95,12 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
-    title: 'Matprofilen ligger kvar',
+    // Rubriken har hetat både "minns dig" och "ligger kvar". Den första
+    // påstod att sajten känner igen besökaren, den andra lät som att något
+    // blivit över. Att den sparas är en egenskap och hör hemma i brödtexten,
+    // som redan säger det. Rubriken får i stället bli en uppmaning, som
+    // stegen om favoriter och bevakade rätter.
+    title: 'Gör en egen matprofil',
     body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
   },
   {
