@@ -17,6 +17,9 @@ import Overlay, { useOverlayClose } from './Overlay';
  * hemma här och inte bland dagflikarna.
  */
 
+/** Samma adress som gamla sajten hade i sidfoten, så den som mejlat förr känner igen den. */
+const FEEDBACK_ADDRESS = 'luns.se@outlook.com';
+
 interface Props {
   onClose: () => void;
   startWithFavorites: boolean;
@@ -103,6 +106,39 @@ function LinkRow({
         →
       </span>
     </button>
+  );
+}
+
+/**
+ * Samma yta som raderna ovanför, men en länk som lämnar sajten.
+ *
+ * Ett formulär hade krävt någon som tar emot det, och sajten är en statisk
+ * export utan server. Alternativet vore en tredjepartstjänst, alltså att
+ * besökarens meddelande och IP går till någon annan — svårt att förena med
+ * integritetsinfon två klick bort, som lovar att det som skrivs stannar i
+ * webbläsaren. Mejlklienten är läsarens egen.
+ *
+ * Adressen står i klartext och inte bara bakom länken. Alla vill inte att en
+ * mejlklient öppnar sig, en del vill kopiera den.
+ */
+function MailRow({ address }: { address: string }) {
+  return (
+    <a
+      href={`mailto:${address}?subject=${encodeURIComponent('Om luns.se')}`}
+      className="flex w-full items-center gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5 text-left no-underline cursor-pointer transition-colors hover:bg-[var(--hi)]"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-semibold text-[var(--ink)]">
+          Tyck till om sajten
+        </span>
+        <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">
+          Saknas en restaurang, eller är något fel? Mejla {address}.
+        </span>
+      </span>
+      <span aria-hidden="true" className="flex-none text-[13px] text-[var(--mut)]">
+        ↗
+      </span>
+    </a>
   );
 }
 
@@ -209,6 +245,13 @@ export default function SettingsOverlay({
             onOpenStats={onOpenStats}
             onOpenPrivacy={onOpenPrivacy}
           />
+        </div>
+
+        {/* Egen rubrik, inte en fjärde rad under INFORMATION. Den här leder ut
+            ur sajten och handlar om att säga något, inte om att läsa något. */}
+        <div className="mt-6">
+          <SectionLabel>KONTAKT</SectionLabel>
+          <MailRow address={FEEDBACK_ADDRESS} />
         </div>
 
         <div className="mt-6 flex justify-end">
