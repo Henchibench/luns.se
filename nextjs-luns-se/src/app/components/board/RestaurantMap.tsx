@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 
 export interface MapPoint {
@@ -99,12 +99,33 @@ export default function RestaurantMap({
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
 
+  /**
+   * Nålarna, med en identitet som håller så länge innehållet gör det.
+   *
+   * Båda anropsplatserna bygger sin points-array under renderingen: sidan
+   * räknar fram sin efter komponentens tidiga returer, där en hook inte får
+   * stå, och menylistan skriver sin rakt i JSX inuti en map(). Arrayen är
+   * alltså ny vid varje omritning även när nålarna är exakt desamma, och med
+   * den som beroende revs hela Leaflet-kartan och byggdes upp igen varje gång.
+   * Ett tecken i sökfältet räckte, trots att sökningen inte rör nålarna.
+   *
+   * Signaturen jämför innehåll i stället, så kartan byggs om när den behöver
+   * det: nya restauranger, flyttade nålar, eller ett annat antal rätter i
+   * popupen.
+   */
+  const signature = points
+    .map(point => `${point.name}@${point.latitude},${point.longitude}:${point.dishCount}`)
+    .join('|');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const pins = useMemo(() => points, [signature]);
+
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || points.length === 0) return;
+    if (!container || pins.length === 0) return;
 
     let map: import('leaflet').Map | null = null;
     let cancelled = false;
+    let settle: ReturnType<typeof setTimeout> | null = null;
 
     import('leaflet').then(mod => {
       const L = mod.default ?? mod;
@@ -121,7 +142,7 @@ export default function RestaurantMap({
       const bounds: [number, number][] = [];
       const placedLabels: Array<{ point: MapPoint; marker: import('leaflet').Marker }> = [];
 
-      points.forEach(point => {
+      pins.forEach(point => {
         const coords: [number, number] = [point.latitude, point.longitude];
         bounds.push(coords);
 
@@ -248,7 +269,7 @@ export default function RestaurantMap({
 
       // Kartan monteras ibland medan panelen fortfarande fälls ut, och mäter
       // då fel storlek. En omräkning när animationen är klar rättar det.
-      setTimeout(() => {
+      settle = setTimeout(() => {
         map?.invalidateSize();
         layoutLabels();
       }, 260);
@@ -256,9 +277,16 @@ export default function RestaurantMap({
 
     return () => {
       cancelled = true;
+      // Timern måste stoppas, inte bara ignoreras. Fälls kartan ihop inom de
+      // 260 millisekunderna hinner map.remove() köra först, och invalidateSize
+      // läser då lägen ur en karta vars paneler är borta: "Cannot read
+      // properties of undefined (reading '_leaflet_pos')". Att nolla map
+      // efteråt gör dessutom layoutLabels tyst om något ändå hunnit köa.
+      if (settle) clearTimeout(settle);
       map?.remove();
+      map = null;
     };
-  }, [points, theme, singleZoom]);
+  }, [pins, theme, singleZoom]);
 
   if (points.length === 0) {
     return (
