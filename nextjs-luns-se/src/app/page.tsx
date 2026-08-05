@@ -542,7 +542,17 @@ export default function LunchBoard() {
               en utfälld restaurangkarta igång bakom helkartan — en osynlig
               Leaflet-instans som ritar tiles man aldrig ser. */}
           {view === 'list' && (
-          <div>
+          /* Menyn får ett tak, kartan inte.
+           *
+           * På en bred skärm sträckte raderna ut sig hela vägen och priset
+           * hamnade nästan två tusen pixlar från rätten det gällde, med ett
+           * fält av ingenting emellan. Rätternas text är i median 470 pixlar
+           * bred och nio av tio ryms under 789, så vid 1100 får de allra
+           * flesta plats på en rad och priset stannar i närheten.
+           *
+           * Kartan står utanför med flit. Den blir bättre av varje pixel den
+           * får, till skillnad från en textrad. */
+          <div className="w-full max-w-[1100px]">
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
