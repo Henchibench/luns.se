@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;height:100%}
+#map{height:100%;background:#BAD1D4}
+html.dark #map{background:#02202A}
+html.dark .leaflet-tile{filter:brightness(1.5) contrast(.92) sepia(.45) hue-rotate(140deg) saturate(1.5)}
+.luns-pin{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);border:1px solid rgba(13,91,110,.45);border-radius:999px;padding:4px 10px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#0D3641;white-space:nowrap;box-shadow:0 3px 12px rgba(0,20,26,.25);width:max-content !important;height:auto !important;transform:translate(-50%,-50%);cursor:pointer}
+html.dark .luns-pin{background:rgba(2,32,41,.85);border-color:rgba(84,194,216,.5);color:#BFE7F0}
+.leaflet-popup-content-wrapper{background:rgba(255,255,255,.94);border-radius:12px;font-family:'Schibsted Grotesk',sans-serif;color:#0E2229}
+html.dark .leaflet-popup-content-wrapper,html.dark .leaflet-popup-tip{background:rgba(3,42,53,.96);color:#DCEDF0}
+.leaflet-popup-content{margin:12px 16px}
+.pp-name{font-weight:700;font-size:14px;margin:0 0 2px}
+.pp-meta{font:500 10.5px 'IBM Plex Mono',monospace;color:#6E8B92;margin:0 0 8px}
+.pp-btn{display:inline-block;border:none;background:#0D5B6E;color:#fff;border-radius:8px;padding:7px 12px;font:600 12px 'Schibsted Grotesk',sans-serif;cursor:pointer}
+html.dark .pp-btn{background:#54C2D8;color:#02202A}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const params = new URLSearchParams(location.search);
+if (params.get('theme') === 'dark') document.documentElement.classList.add('dark');
+const AREA = params.get('loc') || 'Lindholmen';
+// OBS: ungefärliga koordinater — justera vid behov
+const COORDS = {
+  'Alkemisten Kaffebar & Kafé':[57.70486,11.93290],
+  'Benne Pastabar':[57.70662,11.93861],
+  'Bistrot':[57.70598,11.94129],
+  'Bombay Bistro':[57.70841,11.93450],
+  "Cuckoo's Nest":[57.70571,11.94276],
+  'District One':[57.70684,11.94459],
+  'Encounter Asian':[57.70725,11.93741],
+  'Gansu Köket':[57.70770,11.93610],
+  'Kooperativet':[57.70455,11.93235],
+  "L's Kitchen":[57.70640,11.93930],
+  'Masala Kitchen':[57.70800,11.93900],
+  'Mimolett':[57.70530,11.93700],
+  'Miss F':[57.70690,11.93560],
+  'Oishii':[57.70750,11.94050],
+  'Restaurant Pier 11':[57.70480,11.94620],
+  'Skyline':[57.70620,11.94200],
+  'Terrassen':[57.70560,11.93520],
+  'The Social':[57.70640,11.93440],
+  'Uni3 – World of Food':[57.70900,11.93280],
+  'Krubbstugan':[58.41080,15.64400]
+};
+const DAYS = ['Måndag','Tisdag','Onsdag','Torsdag','Fredag'];
+function currentDay(){ const d = new Date().getDay(); const m = d === 0 ? 6 : d - 1; return DAYS[m > 4 ? 0 : m]; }
+const map = L.map('map', { zoomControl: true });
+// CARTO Positron/Dark Matter — minimalistiska basemaps på OpenStreetMap-data
+const style = document.documentElement.classList.contains('dark') ? 'dark_all' : 'light_all';
+L.tileLayer('https://basemaps.cartocdn.com/' + style + '/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap contributors © CARTO', maxZoom: 20 }).addTo(map);
+Promise.all([
+  fetch('data/restaurants.json').then(r=>r.json()),
+  fetch('data/menus.json').then(r=>r.json())
+]).then(([rd, md]) => {
+  const day = currentDay();
+  const bounds = [];
+  Object.values(rd.restaurants).forEach(r => {
+    if (r.area !== AREA) return;
+    const c = COORDS[r.name]; if (!c) return;
+    bounds.push(c);
+    const items = (md.menus[r.name] || []).filter(i => !i.startsWith('INFO:') && i.startsWith(day + '|'));
+    const marker = L.marker(c, { icon: L.divIcon({ className: 'luns-pin', html: r.name, iconSize: null }) }).addTo(map);
+    const div = document.createElement('div');
+    div.innerHTML = '<p class="pp-name"></p><p class="pp-meta">' + (items.length ? items.length + ' RÄTTER IDAG' : 'INGEN MENY IDAG') + '</p>';
+    div.querySelector('.pp-name').textContent = r.name;
+    const btn = document.createElement('button');
+    btn.className = 'pp-btn'; btn.textContent = 'Visa meny →';
+    btn.onclick = () => window.parent.postMessage({ type: 'luns-select', name: r.name }, '*');
+    div.appendChild(btn);
+    marker.bindPopup(div);
+  });
+  if (bounds.length) map.fitBounds(bounds, { padding: [46, 46] });
+  else map.setView([57.7066, 11.9386], 15);
+});
+</script>
+</body>
+</html>

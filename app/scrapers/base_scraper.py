@@ -44,6 +44,12 @@ class BaseScraper(ABC):
                 timeout=30,
             )
             response.raise_for_status()
+            # Utan charset i Content-Type gissar requests ISO-8859-1, och då
+            # blir å ä ö till Ã¥ Ã¤ Ã¶. Dokumentets egen <meta charset> är en
+            # betydligt bättre källa, och den läser BeautifulSoup själv ur
+            # bytesen. Anger servern en kodning litar vi på den som förut.
+            if 'charset' not in response.headers.get('Content-Type', '').lower():
+                return BeautifulSoup(response.content, 'html.parser')
             return BeautifulSoup(response.text, 'html.parser')
         except requests.RequestException as e:
             self.log_error(f"Failed to retrieve page: {str(e)}")

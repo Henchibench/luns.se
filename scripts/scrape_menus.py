@@ -18,13 +18,34 @@ import requests
 # Add project root to path so we can import the scraper modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScraper
+from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
+from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
+from app.scrapers.restaurants.brodernas_kok_scraper import BrodernasKokScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
-from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
-from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.chili_lime_scraper import ChiliLimeScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
+from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
+from app.scrapers.restaurants.husman_scraper import HusmanScraper
+from app.scrapers.restaurants.jasons_matstuga_scraper import JasonsMatstugaScraper
+from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from app.scrapers.restaurants.la_fontana_scraper import LaFontanaScraper
+from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
+from app.scrapers.restaurants.masala_scraper import MasalaScraper
+from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
+from app.scrapers.restaurants.miss_f_scraper import MissFScraper
+from app.scrapers.restaurants.oishii_scraper import OishiiScraper
+from app.scrapers.restaurants.pegs_and_tails_scraper import PegsAndTailsScraper
+from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.pinocchio_scraper import PinocchioScraper
+from app.scrapers.restaurants.seven_seasons_scraper import SevenSeasonsScraper
+from app.scrapers.restaurants.skyline_scraper import SkylineScraper
+from app.scrapers.restaurants.stangs_mjardevi_scraper import StangsMjardeviScraper
+from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
-from app.restaurant_data import restaurant_locations
+from app.scrapers.restaurants.universitetsklubben_scraper import UniversitetsklubbenScraper
+from app.restaurant_data import restaurant_locations, LOCATIONS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -87,12 +108,33 @@ def scrape_with_retry(scraper):
 def scrape_all_menus(previous_menus):
     """Run all scrapers and return the combined menus dict."""
     scrapers = [
+        BarSchiacciateScraper(),
+        BennePastabarScraper(),
+        Bistro3Scraper(),
         BistrotScraper(),
+        BrodernasKokScraper(),
         BombayBistroScraper(),
-        KooperativetScraper(),
-        Pier11Scraper(),
+        ChiliLimeScraper(),
         DistrictOneScraper(),
+        EncounterAsianScraper(),
+        HusmanScraper(),
+        JasonsMatstugaScraper(),
+        KooperativetScraper(),
+        KrubbstuganScraper(),
+        LaFontanaScraper(),
+        MasalaScraper(),
+        MimolettScraper(),
+        MissFScraper(),
+        OishiiScraper(),
+        PegsAndTailsScraper(),
+        Pier11Scraper(),
+        PinocchioScraper(),
+        SevenSeasonsScraper(),
+        SkylineScraper(),
+        StangsMjardeviScraper(),
+        TerrassenScraper(),
         Uni3Scraper(),
+        UniversitetsklubbenScraper(),
     ]
 
     menus = {}
@@ -118,6 +160,32 @@ def scrape_all_menus(previous_menus):
     return menus
 
 
+def build_locations_response(restaurants):
+    """Build the location list for the frontend picker.
+
+    Only locations that actually have a scraped restaurant are emitted, so a
+    location can be prepared in LOCATIONS before its scrapers exist without
+    showing up as an empty choice in the picker.
+    """
+    areas = {r["area"] for r in restaurants.values()}
+    locations = []
+    for area in sorted(areas):
+        meta = LOCATIONS.get(area)
+        if not meta:
+            logger.warning(f"[LOCATION] '{area}' has restaurants but no entry in LOCATIONS — skipping")
+            continue
+        locations.append({
+            "id": area,
+            "label": meta["label"],
+            "city": meta["city"],
+            "mapQuery": meta["map_query"],
+            "latitude": meta["latitude"],
+            "longitude": meta["longitude"],
+            "restaurantCount": sum(1 for r in restaurants.values() if r["area"] == area),
+        })
+    return locations
+
+
 def build_restaurants_response(menus):
     """Build the restaurants JSON matching the /restaurants API shape."""
     restaurants = {}
@@ -130,9 +198,23 @@ def build_restaurants_response(menus):
             "maps": info.get("maps"),
             "instagram": info.get("instagram"),
             "review_score": info.get("review_score"),
+            "lunch_hours": info.get("lunch_hours"),
+            # Skriven för hand, inte skrapad — en mening om vad stället är.
+            "description": info.get("description"),
+            # Sant för restauranger som bara publicerar dagens meny, aldrig
+            # veckans. Tomma dagar hos dem är väntat och inte ett skrapfel.
+            "daily_menu_only": info.get("daily_menu_only", False),
+            # Saknas för restauranger vi inte kunnat placera. Frontenden ritar
+            # ingen nål då — en nål på fel ställe är sämre än ingen nål.
+            "latitude": info.get("latitude"),
+            "longitude": info.get("longitude"),
             "has_menu": True,
         }
-    return {"restaurants": restaurants, "total": len(restaurants)}
+    return {
+        "restaurants": restaurants,
+        "total": len(restaurants),
+        "locations": build_locations_response(restaurants),
+    }
 
 
 def build_menus_response(menus):

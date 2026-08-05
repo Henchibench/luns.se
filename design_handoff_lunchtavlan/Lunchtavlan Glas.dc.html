@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;height:100%}
+a{color:inherit;text-decoration:none}a:hover{color:var(--acc)}
+:root{--mesh:linear-gradient(178deg, #CBDDDF 0%, #BAD1D4 60%, #A9C4C8 100%);
+--glass:rgba(255,255,255,.38);--glass2:rgba(255,255,255,.28);--glassBrd:rgba(255,255,255,.6);--chip:rgba(255,255,255,.48);--hi:rgba(255,255,255,.5);
+--line:rgba(30,80,90,.22);--ink:#0E2229;--ink2:#31505A;--mut:#6E8B92;--acc:#0D5B6E;--accStrong:#093F4D;--accBg:rgba(60,150,170,.24);--star:#B5892A;--cGreen:#3F7350;--cWarm:#9A5340;--cBlue:#2A6A85;--cPurple:#5D619A;--bg:#E9F1F2}
+html.dark{--mesh:linear-gradient(178deg, #043440 0%, #022A35 60%, #01212A 100%);
+--glass:rgba(2,32,41,.5);--glass2:rgba(255,255,255,.045);--glassBrd:rgba(255,255,255,.13);--chip:rgba(255,255,255,.06);--hi:rgba(255,255,255,.08);
+--line:rgba(255,255,255,.13);--ink:#DCEDF0;--ink2:#A3C2C9;--mut:#4F7680;--acc:#54C2D8;--accStrong:#8ADCE8;--accBg:rgba(84,194,216,.15);--star:#E3C25B;--cGreen:#8FC49C;--cWarm:#D69A82;--cBlue:#79B7CE;--cPurple:#A2A4D8;--bg:#04252E}
+body{background:var(--mesh);background-attachment:fixed;background-size:cover}
+body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+::placeholder{color:var(--mut)}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,10px)}100%{opacity:1;transform:translate(-50%,0)}}
+@keyframes fadeA{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+@keyframes fadeB{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+</style>
+</helmet>
+<div data-screen-label="Lunchtavlan Glas" style="display:grid;grid-template-rows:auto 1fr;height:100vh;background:var(--glass);backdrop-filter:blur(30px) saturate(1.15);color:var(--ink);font-family:'Schibsted Grotesk',sans-serif;overflow:hidden">
+  <header style="display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:{{ headPad }}">
+    <div style="display:flex;align-items:center;gap:12px;flex:none">
+      <img src="assets/luns-logo-transparent.png" alt="Luns" style="width:36px;height:36px;object-fit:contain;flex:none">
+      <span style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;letter-spacing:.04em;color:var(--acc)">LUNS<span style="color:var(--mut)">.SE</span></span>
+      <select value="{{ location }}" onChange="{{ onLocChange }}" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink2);background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer">
+        <sc-for list="{{ locations }}" as="loc" hint-placeholder-count="2"><option value="{{ loc }}">{{ loc }}</option></sc-for>
+      </select>
+    </div>
+    <div style="display:flex;gap:6px;flex:none;max-width:100%;overflow-x:auto">
+      <sc-for list="{{ days }}" as="d" hint-placeholder-count="5">
+        <button onClick="{{ d.onClick }}" style="padding:7px 13px;border-radius:8px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};font-size:12.5px;font-weight:{{ d.weight }};font-family:'Schibsted Grotesk',sans-serif;cursor:pointer">{{ d.label }}</button>
+      </sc-for>
+    </div>
+    <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="⌕  Sök rätt eller restaurang…" style="flex:1 1 160px;min-width:0;background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:9px 14px;color:var(--ink);font-size:13px;font-family:'Schibsted Grotesk',sans-serif;outline:none">
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--acc);white-space:nowrap">{{ clock }}</span></sc-if>
+    <button onClick="{{ onCopy }}" title="Kopiera dagens meny — klistra in i Teams eller Slack" style="flex:none;padding:9px 14px;border-radius:8px;border:none;background:var(--acc);color:var(--bg);font-size:12px;font-weight:700;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ copyLabel }}</button>
+    <button onClick="{{ onToggleView }}" title="Växla lista/karta" style="flex:none;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:{{ viewBtnBg }};color:{{ viewBtnColor }};font-size:12px;font-weight:700;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ viewLabel }}</button>
+    <button onClick="{{ onToggleTheme }}" title="Ljust/mörkt läge" style="flex:none;width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink2);font-size:14px;cursor:pointer">{{ themeIcon }}</button>
+  </header>
+  <div style="display:grid;grid-template-columns:{{ gridCols }};grid-template-rows:{{ gridRows }};min-height:0">
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+    <nav style="display:flex;flex-direction:column;margin:4px 0 18px 18px;border-radius:16px;background:var(--glass2);border:1px solid var(--glassBrd);overflow:hidden;min-height:0">
+      <div style="display:flex;flex:1;flex-direction:column;overflow-y:auto;padding:14px 0 18px;mask-image:linear-gradient(180deg,transparent,#000 16px,#000 calc(100% - 22px),transparent)">
+      <span style="padding:4px 20px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mut)">RESTAURANGER · {{ railCount }}</span>
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="10">
+        <button onClick="{{ r.onSelect }}" style="display:flex;justify-content:space-between;align-items:center;gap:7px;flex:none;margin:0 10px;padding:8px 12px;border:none;border-radius:8px;text-align:left;background:{{ r.bg }};font-size:13px;color:{{ r.color }};font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;font-weight:{{ r.weight }};transition:background .3s ease,color .3s ease" style-hover="background:var(--hi)">
+          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
+          <span style="flex:none;font-size:11px;color:var(--acc)">{{ r.favMark }}</span>
+        </button>
+      </sc-for>
+      <div style="display:flex;gap:8px;flex-direction:column;flex:none;margin:14px 20px 0;padding:14px 0 0;border-top:1px solid var(--line)">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mut)">FILTER</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ typeChips }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.onClick }}" style="flex:none;padding:5px 10px;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:11px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-direction:column;flex:none;margin:14px 20px 0;padding:14px 0 0;border-top:1px solid var(--line)">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mut)">SUGEN PÅ…</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ cravingChips }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.onClick }}" style="flex:none;padding:5px 10px;border-radius:6px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:11px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <span style="margin-top:auto;padding:20px 20px 0;font-size:10.5px;color:var(--mut)">Menyer skrapas varje vardagsmorgon</span>
+      </div>
+    </nav>
+    </sc-if>
+    <main style="overflow-y:auto;padding:{{ mainPad }};mask-image:{{ mainMask }}">
+      <sc-if value="{{ mapView }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%;padding:6px 0 18px">
+          <iframe src="{{ mapSrc }}" title="Karta över restaurangerna" style="width:100%;height:100%;border:1px solid var(--glassBrd);border-radius:16px;display:block"></iframe>
+        </div>
+      </sc-if>
+      <sc-if value="{{ listView }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 6px;padding:14px 0 8px">
+        <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:{{ h1Size }};letter-spacing:-.02em">{{ heading }}</h1>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut);white-space:nowrap">{{ dishTotal }} RÄTTER</span>
+      </div>
+      <sc-if value="{{ starBanner }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px;padding:10px 14px;border-radius:8px;background:var(--accBg);color:var(--accStrong);font-size:12.5px;font-weight:600"><span style="color:var(--star)">★</span> {{ starBannerText }}</div>
+      </sc-if>
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:70px 0;color:var(--mut)">
+          <p style="margin:0 0 6px;font-size:15px;font-weight:600;color:var(--ink2)">Inga rätter matchar</p>
+          <p style="margin:0 0 16px;font-size:13px">Prova en annan dag eller rensa sök och filter</p>
+          <button onClick="{{ onClearAll }}" style="padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink2);font-size:12px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer">Rensa allt</button>
+        </div>
+      </sc-if>
+      <div style="animation:{{ menuAnim }}">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="4">
+        <div data-sec="{{ s.secName }}" style="display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 0 8px">
+            <button onClick="{{ s.onFav }}" title="Favoritmarkera" style="border:none;background:none;padding:0;font-size:14px;color:{{ s.favColor }};cursor:pointer;line-height:1">{{ s.favIcon }}</button>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:var(--acc);font-weight:600">{{ s.name }}</span>
+            <span style="flex:1;height:1px;background:var(--line)"></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--mut);white-space:nowrap">{{ s.meta }}</span>
+            <div style="display:flex;gap:10px;flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut)">
+              <sc-if value="{{ s.maps }}" hint-placeholder-val="{{ false }}"><a href="{{ s.maps }}" target="_blank" rel="noopener">KARTA ↗</a></sc-if>
+              <sc-if value="{{ s.website }}" hint-placeholder-val="{{ false }}"><a href="{{ s.website }}" target="_blank" rel="noopener">MENY ↗</a></sc-if>
+              <sc-if value="{{ s.instagram }}" hint-placeholder-val="{{ false }}"><a href="{{ s.instagram }}" target="_blank" rel="noopener">INSTA ↗</a></sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ s.infoText }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0 0 6px;font-size:11.5px;color:var(--mut)">{{ s.infoText }}</p>
+          </sc-if>
+          <sc-if value="{{ s.emptyNote }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:2px 0 8px;font-size:12.5px;font-style:italic;color:var(--mut)">Ingen meny idag — kolla direkt med restaurangen via länkarna ovan</p>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:2px;padding-bottom:6px">
+            <sc-for list="{{ s.dishes }}" as="d" hint-placeholder-count="3">
+              <div style="display:flex;gap:14px;align-items:baseline;padding:5px 8px;border-radius:6px" style-hover="background:var(--hi)">
+                <span style="flex:none;width:92px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:{{ d.catColor }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.cat }}</span>
+                <span style="flex:1;font-size:13.5px;line-height:1.55;color:var(--ink2)">{{ d.desc }}</span>
+                <span style="flex:none;width:56px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut)">{{ d.price }}</span>
+                <button onClick="{{ d.onStar }}" title="Bevaka rätt — du ser det direkt när den serveras igen" style="flex:none;border:none;background:none;padding:0 2px;font-size:13px;color:{{ d.starColor }};cursor:pointer;line-height:1">{{ d.starIcon }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+      </div>
+      <div style="height:{{ spacerH }}px"></div>
+      </sc-if>
+    </main>
+  </div>
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:14px;right:14px;bottom:14px;z-index:40;display:flex;gap:8px">
+      <button onClick="{{ onOpenRest }}" style="flex:1;padding:13px 10px;border-radius:14px;border:1px solid var(--glassBrd);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(20px);color:var(--ink);font-size:13.5px;font-weight:700;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;box-shadow:0 8px 30px rgba(0,10,14,.25)">☰ Restauranger</button>
+      <button onClick="{{ onOpenFilter }}" style="flex:1;padding:13px 10px;border-radius:14px;border:1px solid var(--glassBrd);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(20px);color:var(--ink);font-size:13.5px;font-weight:700;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;box-shadow:0 8px 30px rgba(0,10,14,.25)">{{ filterBtnLabel }}</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseSheet }}" style="position:fixed;inset:0;z-index:45;background:rgba(0,14,18,.4)"></div>
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:46;max-height:72vh;display:flex;flex-direction:column;border-radius:20px 20px 0 0;background:var(--bg);border-top:1px solid var(--glassBrd);box-shadow:0 -12px 50px rgba(0,10,14,.35);animation:toastIn .25s ease-out">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--mut)">{{ sheetTitle }}</span>
+        <button onClick="{{ onCloseSheet }}" style="border:none;background:var(--chip);border-radius:8px;padding:6px 12px;color:var(--ink2);font-size:12px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer">Stäng</button>
+      </div>
+      <div style="overflow-y:auto;padding:4px 12px 24px">
+        <sc-if value="{{ sheetIsRest }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ rail }}" as="r" hint-placeholder-count="8">
+              <button onClick="{{ r.onSelect }}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;border:none;border-radius:10px;text-align:left;background:{{ r.bg }};font-size:14.5px;color:{{ r.color }};font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;font-weight:{{ r.weight }}">
+                <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
+                <span style="flex:none;font-size:12px;color:var(--acc)">{{ r.favMark }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sheetIsFilter }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px;padding:8px 8px 0">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mut)">FILTER</span>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <sc-for list="{{ typeChips }}" as="c" hint-placeholder-count="6">
+                  <button onClick="{{ c.onClick }}" style="flex:none;padding:9px 14px;border-radius:9px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:12.5px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--mut)">SUGEN PÅ…</span>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <sc-for list="{{ cravingChips }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.onClick }}" style="flex:none;padding:9px 14px;border-radius:9px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:12.5px;font-weight:600;font-family:'Schibsted Grotesk',sans-serif;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:toastIn .25s ease-out;z-index:50">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Utseende&quot;},&quot;showPrices&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Innehåll&quot;}}">
+const DAYS = ['Måndag','Tisdag','Onsdag','Torsdag','Fredag'];
+const CRAVINGS = [
+  {id:'hamburgare', label:'🍔 BURGARE', terms:['burger','hamburgare','högrevsburgare','cheeseburger','veggieburger','veganburger','halloumiburger','kyckling','beef']},
+  {id:'pasta', label:'🍝 PASTA', terms:['pasta','spaghetti','penne','carbonara','bolognese','marinara','pesto','nudlar','lasagne','tortellini']},
+  {id:'pommes', label:'🍟 POMMES', terms:['pommes','potatis','fries','klyftpotatis','wedges']},
+  {id:'mos', label:'🥔 MOS', terms:['mos','potatismos','potatispure','potatispuré','krossad potatis']}
+];
+const TYPES = [
+  {id:'veg', label:'VEG', kw:['veg','grön']},
+  {id:'kott', label:'KÖTT', kw:['kött','lamm','fläsk','kyckling','biff','burger','husman','anka']},
+  {id:'fisk', label:'FISK', kw:['fisk','sushi','räk','lax','skaldjur','spätta','flundra']},
+  {id:'sallad', label:'SALLAD', kw:['sallad','bowl']},
+  {id:'asiat', label:'ASIAT.', kw:['asiat','sushi','dumpling','wok','thai','poke','nudel']},
+  {id:'indisk', label:'INDISKT', kw:['indisk','masala','thali','tandoori','vindaloo','kadhai','punjabi','dopiaza']}
+];
+function catColorVar(cat){
+  const c = cat.toLowerCase();
+  if (/veg|grön|sallad/.test(c)) return 'var(--cGreen)';
+  if (/fisk|sushi|räk|lax|skaldjur/.test(c)) return 'var(--cBlue)';
+  if (/kött|lamm|fläsk|kyckling|biff|burger|husman|indisk|anka/.test(c)) return 'var(--cWarm)';
+  return 'var(--cPurple)';
+}
+function currentDay(){
+  const d = new Date().getDay();
+  const m = d === 0 ? 6 : d - 1;
+  return DAYS[m > 4 ? 0 : m];
+}
+function load(key, fb){ try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fb; } catch(e){ return fb; } }
+class Component extends DCLogic {
+  mainRef = React.createRef();
+  state = {
+    restaurants: [], locations: ['Lindholmen'], location: load('luns2026-loc','Lindholmen'),
+    day: currentDay(), search: '', types: [], onlyFavs: false, activeRest: null,
+    favs: load('luns2026-favs',[]), stars: load('luns2026-stars',[]),
+    theme: load('luns2026-theme', this.props.startTheme ?? 'dark'), toast: null, spacerH: 0, animFlip: false, sheet: null, view: 'list'
+  };
+  measureSpacer(){
+    const main = document.querySelector('main'); if (!main) return;
+    const secs = main.querySelectorAll('[data-sec]'); if (!secs.length) return;
+    const last = secs[secs.length - 1];
+    // Tomrum så att sista restaurangen kan nå exakt toppen — men inte längre (hard stop)
+    // 40px = main:s padding-bottom som redan ingår i scrollHeight; 56px = stopp strax under fade-zonen
+    const h = Math.max(0, main.clientHeight - last.offsetHeight - 56 - 40);
+    if (Math.abs(h - this.state.spacerH) > 1) this.setState({ spacerH: h });
+  }
+  componentDidUpdate(){ window.__lunsSpyTick = () => this.spyTick(); this.measureSpacer(); }
+  highlightDesc(desc){
+    const t = this.state.search.toLowerCase().trim();
+    if (!t) return desc;
+    const crav = CRAVINGS.find(c => c.id === t || c.label.toLowerCase().includes(t));
+    const terms = crav ? crav.terms : [t];
+    const re = new RegExp('(' + terms.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+    const parts = desc.split(re);
+    if (parts.length < 2) return desc;
+    return React.createElement('span', null, ...parts.map((p, i) => i % 2 === 1
+      ? React.createElement('span', { key: i, style: { background: 'var(--accBg)', borderRadius: '4px', padding: '0 2px' } }, p)
+      : p));
+  }
+  spyTick(){
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null;
+      try {
+        const main = document.querySelector('main'); if (!main) return;
+        const mtop = main.getBoundingClientRect().top;
+        let act = null;
+        main.querySelectorAll('[data-sec]').forEach(el => {
+          if (el.getBoundingClientRect().top - mtop <= 70) act = el.dataset.sec;
+        });
+        if (act !== this.state.activeRest) this.setState({ activeRest: act });
+      } catch(e){}
+    });
+  }
+  componentDidMount(){
+    document.documentElement.classList.toggle('dark', this.state.theme === 'dark');
+    window.__lunsSpyTick = () => this.spyTick();
+    this._spy = () => { if (window.__lunsSpyTick) window.__lunsSpyTick(); };
+    this._spyTimer = setInterval(() => {
+      const main = document.querySelector('main');
+      if (main && !main._spyBound) { main._spyBound = true; main.addEventListener('scroll', this._spy, { passive: true }); clearInterval(this._spyTimer); this.measureSpacer(); }
+    }, 300);
+    this._onResize = () => { this.measureSpacer(); this.forceUpdate(); };
+    window.addEventListener('resize', this._onResize);
+    this._onMsg = e => {
+      if (e.data && e.data.type === 'luns-select') {
+        const name = e.data.name;
+        this.setState({ view: 'list', sheet: null });
+        setTimeout(() => {
+          const main = document.querySelector('main'); if (!main) return;
+          const el = main.querySelector('[data-sec="' + CSS.escape(name) + '"]'); if (!el) return;
+          const top = el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 52;
+          main.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }, 250);
+      }
+    };
+    window.addEventListener('message', this._onMsg);
+    Promise.all([fetch('data/menus.json').then(r=>r.json()), fetch('data/restaurants.json').then(r=>r.json())])
+      .then(([m, r]) => {
+        const restaurants = Object.entries(m.menus).map(([name, items]) => {
+          const meta = r.restaurants[name] || {};
+          const dishes = []; const info = {};
+          items.forEach(it => {
+            if (it.startsWith('INFO:')) {
+              const mm = it.match(/^INFO:([^\s-]+)\s*-\s*Restaurant Info:\s*(.*)$/);
+              if (mm) { (info[mm[1]] = info[mm[1]] || []).push(mm[2].trim()); }
+              return;
+            }
+            const mm = it.match(/^([^|]+)\|<strong>(.*?)<\/strong>\s*-?\s*(.*)$/);
+            if (!mm) return;
+            let desc = mm[3].trim(); let price = '';
+            const pm = desc.match(/\((\d+)[.,]?\s*kr\)\s*$/i);
+            if (pm) { price = pm[1] + ':-'; desc = desc.slice(0, pm.index).trim(); }
+            dishes.push({ day: mm[1], cat: mm[2], desc, price });
+          });
+          return { name, area: meta.area || 'Lindholmen', website: meta.website, maps: meta.maps, instagram: meta.instagram, hours: meta.lunch_hours, dishes, info };
+        });
+        const locations = [...new Set(restaurants.map(x=>x.area))];
+        const location = locations.includes(this.state.location) ? this.state.location : locations[0];
+        this.setState({ restaurants, locations, location });
+      })
+      .catch(() => this.setState({ toast: 'Kunde inte läsa menydata' }));
+  }
+  save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+  matchesSearch(dish, rName, term){
+    const t = term.toLowerCase().trim();
+    if (!t) return true;
+    const hay = (dish.desc + ' ' + dish.cat + ' ' + rName).toLowerCase();
+    const crav = CRAVINGS.find(c => c.id === t || c.label.toLowerCase().includes(t));
+    if (crav) return crav.terms.some(v => hay.includes(v));
+    return hay.includes(t);
+  }
+  matchesTypes(dish, active){
+    if (!active.length) return true;
+    const hay = (dish.cat + ' ' + dish.desc).toLowerCase();
+    return active.some(id => TYPES.find(x=>x.id===id).kw.some(k => hay.includes(k)));
+  }
+  flash(msg){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(()=>this.setState({toast:null}), 2400); }
+  renderVals(){
+    const st = this.state;
+    const atLoc = st.restaurants.filter(r => r.area === st.location);
+    const activeTypes = st.types;
+    const searching = st.search.trim().length > 0;
+    const dayDishes = r => r.dishes.filter(d => d.day === st.day);
+    const visDishes = r => dayDishes(r).filter(d => this.matchesSearch(d, r.name, st.search) && this.matchesTypes(d, activeTypes));
+    const isFav = n => st.favs.includes(n);
+    const starSig = (n,d) => n + '|' + d.desc;
+    const isStar = (n,d) => st.stars.includes(starSig(n,d));
+    let list = atLoc;
+    if (st.onlyFavs) list = list.filter(r => isFav(r.name));
+    const sections = list.map(r => {
+      const dishes = visDishes(r).map(d => ({
+        cat: d.cat.toUpperCase(), catColor: catColorVar(d.cat), desc: this.highlightDesc(d.desc), price: (this.props.showPrices ?? true) ? d.price : '',
+        starIcon: isStar(r.name,d) ? '★' : '☆', starColor: isStar(r.name,d) ? 'var(--star)' : 'var(--mut)',
+        onStar: () => { const sig = starSig(r.name,d); const stars = isStar(r.name,d) ? st.stars.filter(x=>x!==sig) : [...st.stars, sig]; this.save('luns2026-stars', stars); this.setState({stars}); this.flash(isStar(r.name,d) ? 'Bevakning borttagen' : 'Rätten bevakas — du ser det när den serveras igen'); }
+      }));
+      const metaParts = [];
+      if (r.hours) metaParts.push(r.hours);
+      const info = (r.info[st.day] || []).join('  ·  ');
+      const showEmpty = !searching && !activeTypes.length && !st.onlyFavs && dayDishes(r).length === 0;
+      return {
+        name: r.name.toUpperCase(), secName: r.name, meta: metaParts.join(' · '), infoText: info || false, emptyNote: showEmpty,
+        website: r.website || false, maps: r.maps || false, instagram: r.instagram || false,
+        favIcon: isFav(r.name) ? '♥' : '♡', favColor: isFav(r.name) ? 'var(--acc)' : 'var(--mut)',
+        onFav: () => { const favs = isFav(r.name) ? st.favs.filter(x=>x!==r.name) : [...st.favs, r.name]; this.save('luns2026-favs', favs); this.setState({favs}); },
+        dishes
+      };
+    }).filter(s => s.dishes.length > 0 || s.emptyNote);
+    const dishTotal = sections.reduce((a,s)=>a+s.dishes.length, 0);
+    const isMobile = window.innerWidth < 760;
+    const rail = atLoc.map(r => {
+      const n = visDishes(r).length; const act = st.activeRest === r.name; const fav = isFav(r.name);
+      return {
+        name: r.name, favMark: fav ? '♥' : '',
+        bg: act ? 'var(--accBg)' : (isMobile ? 'var(--chip)' : 'transparent'),
+        color: act ? 'var(--accStrong)' : (n === 0 ? 'var(--mut)' : 'var(--ink2)'), weight: act ? '600' : '400',
+        onSelect: () => {
+          if (this.state.sheet || this.state.view === 'map') this.setState({ sheet: null, view: 'list' });
+          const main = document.querySelector('main'); if (!main) return;
+          const el = main.querySelector('[data-sec="' + CSS.escape(r.name) + '"]'); if (!el) return;
+          const top = el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 52;
+          main.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }
+      };
+    });
+    const days = DAYS.map(d => {
+      const active = d === st.day;
+      return { label: d.slice(0,3).toUpperCase(), bg: active ? 'var(--acc)' : 'transparent', color: active ? 'var(--bg)' : 'var(--ink2)', border: active ? 'var(--acc)' : 'var(--line)', weight: active ? '700' : '400', onClick: () => this.setState({ day: d, animFlip: !st.animFlip }) };
+    });
+    const chip = (label, active, onClick) => ({ label, onClick, bg: active ? 'var(--accBg)' : 'var(--chip)', color: active ? 'var(--accStrong)' : 'var(--ink2)', border: active ? 'var(--accBg)' : 'var(--line)' });
+    const typeChips = [
+      chip('♥ FAVORITER', st.onlyFavs, () => this.setState({ onlyFavs: !st.onlyFavs })),
+      ...TYPES.map(t => chip(t.label, activeTypes.includes(t.id), () => this.setState({ types: activeTypes.includes(t.id) ? activeTypes.filter(x=>x!==t.id) : [...activeTypes, t.id] })))
+    ];
+    const cravingChips = CRAVINGS.map(c => chip(c.label, st.search.trim().toLowerCase() === c.id, () => this.setState({ search: st.search.trim().toLowerCase() === c.id ? '' : c.id })));
+    const starMatches = [];
+    atLoc.forEach(r => dayDishes(r).forEach(d => { if (isStar(r.name,d)) starMatches.push({ r: r.name, desc: d.desc }); }));
+    const now = new Date(); const hh = now.getHours(); const wk = now.getDay() >= 1 && now.getDay() <= 5;
+    const clock = String(hh).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + (wk && hh >= 11 && hh < 14 ? ' · LUNCH PÅGÅR' : '');
+    const dayIdx = DAYS.indexOf(st.day);
+    const todayIdx = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + (todayIdx > 4 ? 7 - todayIdx : -todayIdx)); // helger pekar på nästa veckas måndag
+    const dayDate = new Date(monday); dayDate.setDate(monday.getDate() + dayIdx);
+    const dateStr = dayDate.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+    return {
+      locations: st.locations, location: st.location,
+      onLocChange: e => { this.save('luns2026-loc', e.target.value); this.setState({ location: e.target.value, activeRest: null }); },
+
+      days, search: st.search, onSearch: e => this.setState({ search: e.target.value }),
+      clock, themeIcon: st.theme === 'dark' ? '☀' : '☾',
+      onToggleTheme: () => { const theme = st.theme === 'dark' ? 'light' : 'dark'; this.save('luns2026-theme', theme); document.documentElement.classList.toggle('dark', theme === 'dark'); this.setState({ theme }); },
+      onCopy: () => {
+        const lines = ['Lunch ' + st.day.toLowerCase() + ' — ' + st.location + ' (luns.se)', ''];
+        sections.forEach(s => { lines.push(s.name); s.dishes.forEach(d => lines.push('  • ' + (d.cat !== 'DAGENS' ? d.cat + ': ' : '') + d.desc + (d.price ? ' (' + d.price + ')' : ''))); lines.push(''); });
+        navigator.clipboard.writeText(lines.join('\n')).then(() => this.flash('Dagens meny kopierad — klistra in i Teams eller Slack!')).catch(() => this.flash('Kunde inte kopiera i den här webbläsaren'));
+      },
+      railCount: atLoc.length, rail,
+      typeChips, cravingChips,
+      heading: st.day + ' ' + dateStr, dishTotal,
+      starBanner: starMatches.length > 0, starBannerText: starMatches.length ? 'Bevakad rätt idag: ' + starMatches.map(m => m.desc.slice(0,60) + ' (' + m.r + ')').join(' · ') : '',
+      isEmpty: st.restaurants.length > 0 && sections.length === 0,
+      onClearAll: () => this.setState({ search: '', types: [], onlyFavs: false }),
+      sections, toast: st.toast, spacerH: st.spacerH,
+      notMobile: !isMobile, isMobile,
+      copyLabel: isMobile ? 'KOPIERA' : 'KOPIERA DAGENS',
+      headPad: isMobile ? '12px 14px 8px' : '16px 28px 10px',
+      gridCols: isMobile ? '1fr' : '270px 1fr',
+      gridRows: 'minmax(0,1fr)',
+      mainPad: isMobile ? '0 16px 90px' : '0 28px 40px',
+      h1Size: isMobile ? '24px' : '30px',
+      menuAnim: st.animFlip ? 'fadeA .35s ease' : 'fadeB .35s ease',
+      sheetOpen: !!st.sheet, sheetIsRest: st.sheet === 'rest', sheetIsFilter: st.sheet === 'filter',
+      sheetTitle: st.sheet === 'rest' ? 'RESTAURANGER · ' + atLoc.length : 'FILTER',
+      filterBtnLabel: (activeTypes.length + (st.onlyFavs ? 1 : 0)) > 0 ? '⚙ Filter · ' + (activeTypes.length + (st.onlyFavs ? 1 : 0)) : '⚙ Filter',
+      onOpenRest: () => this.setState({ sheet: 'rest' }),
+      onOpenFilter: () => this.setState({ sheet: 'filter' }),
+      onCloseSheet: () => this.setState({ sheet: null }),
+      mapView: st.view === 'map', listView: st.view !== 'map',
+      viewLabel: st.view === 'map' ? 'LISTA' : 'KARTA',
+      viewBtnBg: st.view === 'map' ? 'var(--accBg)' : 'var(--chip)',
+      viewBtnColor: st.view === 'map' ? 'var(--accStrong)' : 'var(--ink2)',
+      mapSrc: 'karta.html?loc=' + encodeURIComponent(st.location) + '&theme=' + st.theme,
+      mainMask: st.view === 'map' ? 'none' : 'linear-gradient(180deg,transparent,#000 44px,#000 calc(100% - 44px),transparent)',
+      onToggleView: () => this.setState({ view: st.view === 'map' ? 'list' : 'map' })
+    };
+  }
+}
+</script>
+</body>
+</html>

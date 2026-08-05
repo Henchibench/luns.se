@@ -1,0 +1,226 @@
+{
+  "restaurants": {
+    "Alkemisten Kaffebar & Kafé": {
+      "name": "Alkemisten Kaffebar & Kafé",
+      "area": "Lindholmen",
+      "website": "https://www.alkemistenkaffebar.se/",
+      "maps": "https://maps.app.goo.gl/HrvVSYgfaqzw7ARf8",
+      "instagram": "https://www.instagram.com/alkemistenkaffebar/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Benne Pastabar": {
+      "name": "Benne Pastabar",
+      "area": "Lindholmen",
+      "website": "https://bennepastabar.se/",
+      "maps": "https://maps.app.goo.gl/7sGxXMU8q4wW3LBWA",
+      "instagram": "https://www.instagram.com/bennepastabar/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Bistrot": {
+      "name": "Bistrot",
+      "area": "Lindholmen",
+      "website": "https://www.bistrot.se/",
+      "maps": "https://maps.app.goo.gl/avRsfzoVuwcrawUK7",
+      "instagram": "https://www.instagram.com/bistrotlindholmen/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Bombay Bistro": {
+      "name": "Bombay Bistro",
+      "area": "Lindholmen",
+      "website": "https://www.bombaybistro.se/",
+      "maps": "https://maps.app.goo.gl/XS7Lj6ZrKdRQYJem7",
+      "instagram": "https://www.instagram.com/bombaybistrogbg/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Cuckoo's Nest": {
+      "name": "Cuckoo's Nest",
+      "area": "Lindholmen",
+      "website": "https://www.cuckoosnest.se/",
+      "maps": "https://maps.app.goo.gl/g8AkjGt6yr91R9rdA",
+      "instagram": "https://www.instagram.com/cuckoosnest_restaurant",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "District One": {
+      "name": "District One",
+      "area": "Lindholmen",
+      "website": "https://www.districtone.se/",
+      "maps": "https://maps.app.goo.gl/RwHPDeykZvKpaTL26",
+      "instagram": "https://www.instagram.com/districtone.se/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Encounter Asian": {
+      "name": "Encounter Asian",
+      "area": "Lindholmen",
+      "website": "https://tamed.se/take-away-meny/encounter-sushi",
+      "maps": "https://maps.app.goo.gl/encounter-asian-lindholmen",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Gansu Köket": {
+      "name": "Gansu Köket",
+      "area": "Lindholmen",
+      "website": "https://www.google.com/maps/place/Gansu+K%C3%B6ket/",
+      "maps": "https://maps.app.goo.gl/gansu-koket-lindholmen",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Kooperativet": {
+      "name": "Kooperativet",
+      "area": "Lindholmen",
+      "website": "https://www.kooperativet.se/",
+      "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
+      "instagram": "https://www.instagram.com/kooperativetlindholmen/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Krubbstugan": {
+      "name": "Krubbstugan",
+      "area": "Tannefors",
+      "website": "https://krubbstugan.se",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Gelbgjutaregatan+2%2C+581+87+Link%C3%B6ping",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": "Mån–fre 11.00–14.00",
+      "has_menu": true
+    },
+    "L's Kitchen": {
+      "name": "L's Kitchen",
+      "area": "Lindholmen",
+      "website": "https://www.lskitchen.se/",
+      "maps": "https://maps.app.goo.gl/mmYxMRt4VM4wnR1i8",
+      "instagram": "https://www.instagram.com/lskitchengbg/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Masala Kitchen": {
+      "name": "Masala Kitchen",
+      "area": "Lindholmen",
+      "website": "https://masalakitchen.se/lunch/",
+      "maps": "https://maps.app.goo.gl/masala-kitchen-lindholmen",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Mimolett": {
+      "name": "Mimolett",
+      "area": "Lindholmen",
+      "website": "https://restaurangmimolett.se/",
+      "maps": "https://maps.app.goo.gl/mimolett-lindholmen",
+      "instagram": "https://www.instagram.com/restaurangmimolett/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Miss F": {
+      "name": "Miss F",
+      "area": "Lindholmen",
+      "website": "https://www.facebook.com/missfgbg/",
+      "maps": "https://maps.app.goo.gl/bQFos82i7oNAazfv5",
+      "instagram": "https://www.instagram.com/missfgbg/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Oishii": {
+      "name": "Oishii",
+      "area": "Lindholmen",
+      "website": "https://oishii.se/",
+      "maps": "https://maps.app.goo.gl/oishii-lindholmen",
+      "instagram": "https://www.instagram.com/oishii_gbg/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Restaurant Pier 11": {
+      "name": "Restaurant Pier 11",
+      "area": "Lindholmen",
+      "website": "https://ericssonbynordrest.se/restaurang/restaurant-pier-11/",
+      "maps": "https://maps.app.goo.gl/VMJKfEYDJ6QFrtfn6",
+      "instagram": "https://www.instagram.com/pier11lindholmen/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Skyline": {
+      "name": "Skyline",
+      "area": "Tannefors",
+      "website": "http://restaurangskyline.se",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Link%C3%B6pings+flygplats%2C+582+54+Link%C3%B6ping",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": "Vardagar 11.00–13.00",
+      "has_menu": true
+    },
+    "Terrassen": {
+      "name": "Terrassen",
+      "area": "Tannefors",
+      "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/terrassen/",
+      "maps": "https://www.google.com/maps/search/?api=1&query=Ensbov%C3%A4gen+3%2C+582+54+Link%C3%B6ping",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": "Mån–fre 11.00–13.30",
+      "has_menu": true
+    },
+    "The Social": {
+      "name": "The Social",
+      "area": "Lindholmen",
+      "website": "https://www.strawberryhotels.com/restaurant/sweden/gothenburg/the-social-eriksberg/",
+      "maps": "https://maps.app.goo.gl/the-social-eriksberg",
+      "instagram": null,
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    },
+    "Uni3 – World of Food": {
+      "name": "Uni3 – World of Food",
+      "area": "Lindholmen",
+      "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/uni3-world-of-food/",
+      "maps": "https://maps.app.goo.gl/4Ec1qUTYguYDXSwz7",
+      "instagram": "https://www.instagram.com/uni3worldoffood/",
+      "review_score": null,
+      "lunch_hours": null,
+      "has_menu": true
+    }
+  },
+  "total": 20,
+  "locations": [
+    {
+      "id": "Lindholmen",
+      "label": "Lindholmen",
+      "city": "Göteborg",
+      "mapQuery": "lindholmen göteborg",
+      "latitude": 57.7059,
+      "longitude": 11.9359,
+      "restaurantCount": 17
+    },
+    {
+      "id": "Tannefors",
+      "label": "Tannefors",
+      "city": "Linköping",
+      "mapQuery": "tannefors linköping",
+      "latitude": 58.4108,
+      "longitude": 15.647,
+      "restaurantCount": 3
+    }
+  ],
+  "scrape_timestamp": "2026-08-01T03:11:44.583264"
+}

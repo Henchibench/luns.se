@@ -2,101 +2,375 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbar but keep scroll functionality */
-html {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+/* ---------------------------------------------------------------------------
+   Designtokens — Lunchtavlan (handoff 2026)
+
+   Värdena kommer ur design_handoff_lunchtavlan/README.md och ska inte justeras
+   på känsla. Ljust läge är en dämpad petrolton, mörkt läge är luns.se
+   ursprungliga teal. Allt UI plockar färg härifrån, aldrig ur Tailwinds
+   palett — annars glider de två isär vid nästa ändring.
+--------------------------------------------------------------------------- */
+:root {
+  --mesh: linear-gradient(178deg, #CBDDDF 0%, #BAD1D4 60%, #A9C4C8 100%);
+  --glass: rgba(255, 255, 255, .38);
+  --glass2: rgba(255, 255, 255, .28);
+  --glassBrd: rgba(255, 255, 255, .6);
+  --chip: rgba(255, 255, 255, .48);
+  --hi: rgba(255, 255, 255, .5);
+  --line: rgba(30, 80, 90, .22);
+  --ink: #0E2229;
+  --ink2: #31505A;
+  --mut: #6E8B92;
+  --acc: #0D5B6E;
+  --accStrong: #093F4D;
+  --accBg: rgba(60, 150, 170, .24);
+  --star: #B5892A;
+  --cGreen: #3F7350;
+  --cWarm: #9A5340;
+  --cBlue: #2A6A85;
+  --cPurple: #5D619A;
+  --bg: #E9F1F2;
 }
 
-html::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+html.dark {
+  --mesh: linear-gradient(178deg, #043440 0%, #022A35 60%, #01212A 100%);
+  --glass: rgba(2, 32, 41, .5);
+  --glass2: rgba(255, 255, 255, .045);
+  --glassBrd: rgba(255, 255, 255, .13);
+  --chip: rgba(255, 255, 255, .06);
+  --hi: rgba(255, 255, 255, .08);
+  --line: rgba(255, 255, 255, .13);
+  --ink: #DCEDF0;
+  --ink2: #A3C2C9;
+  --mut: #4F7680;
+  --acc: #54C2D8;
+  --accStrong: #8ADCE8;
+  --accBg: rgba(84, 194, 216, .15);
+  --star: #E3C25B;
+  --cGreen: #8FC49C;
+  --cWarm: #D69A82;
+  --cBlue: #79B7CE;
+  --cPurple: #A2A4D8;
+  --bg: #04252E;
 }
 
-body {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
+/* ---------------------------------------------------------------------------
+   Textstorlekar
 
-body::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
-}
+   Åtta steg, och inga andra. Sidan hade arton, med halvpixelsteg intill sina
+   heltalsgrannar: både 13 och 13.5, både 12 och 12.5, både 10 och 10.5. Den
+   sortens skillnad syns inte som en nivå utan bara som oreda.
 
-/* Smooth slide in animation for filter buttons */
-@keyframes slideInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
+     10  versaletiketter i mono: kategorier, RESTAURANGER, diagramsiffror
+     11  monolänkar och meta: KARTA, WWW, priser, öppettider
+     12  sekundär text: knappar, chips, inforader
+     13  brödtext: rätter, beskrivningar, rutornas löptext
+     14  framhävd rad: restaurangnamn, listval man klickar
+     16  små rubriker och tydliga val
+     18  logotyp på bred skärm
+     24  rubriker (text-2xl)
+     30  dagrubriken och stora siffror
 
-/* Checkbox selection bounce */
-@keyframes checkboxBounce {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
+   Behöver något en egen storlek är svaret nästan alltid att det ska ha en
+   annan vikt, färg eller versalisering i stället.
+--------------------------------------------------------------------------- */
 
-/* Restaurant card filtering animations */
-@keyframes fadeInScale {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes fadeOutScale {
-  0% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    max-height: 1000px;
-    margin-bottom: 16px;
-  }
-  50% {
-    opacity: 0.3;
-    transform: scale(0.98) translateY(-5px);
-    max-height: 1000px;
-    margin-bottom: 16px;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-    max-height: 0;
-    margin-bottom: 0;
-  }
-}
-
-.animate-fade-in-scale {
-  animation: fadeInScale 0.4s ease-out forwards;
-}
-
-.animate-fade-out-scale {
-  animation: fadeOutScale 0.4s ease-in forwards;
-}
-
+html,
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  height: 100%;
+}
+
+body {
+  background: var(--mesh);
+  background-attachment: fixed;
+  background-size: cover;
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Filmkorn över hela sajten. Ligger över allt innehåll men släpper igenom
+   klick, annars vore sidan omöjlig att använda. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 * {
   box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--acc);
+}
+
+::placeholder {
+  color: var(--mut);
+}
+
+/* Rullningslister göms men innehållet scrollar som vanligt. */
+html,
+body,
+.luns-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.luns-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade-masker. Huvudytan tonar ut 44px i topp och botten, spalten 16/22px. */
+.luns-mask-main {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 44px, #000 calc(100% - 44px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 44px, #000 calc(100% - 44px), transparent);
+}
+
+.luns-mask-rail {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16px, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 16px, #000 calc(100% - 22px), transparent);
+}
+
+/* Dagbytet spelar om samma in-glidning varje gång. Två identiska keyframes
+   som växlas är enklaste sättet att tvinga om en animation utan att slänga
+   och återskapa noderna. */
+@keyframes lunsFadeA {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes lunsFadeB {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-anim-a { animation: lunsFadeA .35s ease; }
+.luns-anim-b { animation: lunsFadeB .35s ease; }
+
+@keyframes lunsRise {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.luns-toast { animation: lunsRise .25s ease-out; }
+
+@keyframes lunsSheetUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-sheet { animation: lunsSheetUp .25s ease-out; }
+
+/* ---------------------------------------------------------------------------
+   Rutorna som lägger sig över sajten: platsvalet, integritetsinfon och
+   statistiken.
+
+   Skärmen är mörk och panelen ren --bg. Byggde båda på --bg blev ljust läge
+   vitt på vitt — kanten är rgba(255,255,255,.6) och syns bara mot en mörk
+   sajt. Nu kommer separationen från kontrast och håller i båda lägena.
+
+   Suddet är kraftigt med flit. Meningen är att sajten bakom ska bli en
+   stämning att vila mot, inte text man börjar läsa i stället för rutans.
+--------------------------------------------------------------------------- */
+@keyframes lunsOverlayIn {
+  0% {
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    background-color: rgba(0, 14, 18, .42);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+}
+
+.luns-overlay {
+  background-color: rgba(0, 14, 18, .42);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  animation: lunsOverlayIn .32s ease-out both;
+}
+
+/* Vägen ut. Opaciteten ligger på skärmen och tar därför panelen med sig, så
+   allt tonar bort tillsammans. Snabbare än vägen in: att öppna får ta tid,
+   att stänga ska kännas som att man redan är tillbaka. */
+@keyframes lunsOverlayOut {
+  0% {
+    opacity: 1;
+    background-color: rgba(0, 14, 18, .42);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+  100% {
+    opacity: 0;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+}
+
+.luns-overlay-out {
+  animation: lunsOverlayOut .24s ease-in both;
+}
+
+/* Panelen kommer en aning efter skärmen, så suddet hinner lägga sig först. */
+@keyframes lunsPanelIn {
+  0% { opacity: 0; transform: translateY(10px) scale(.985); }
+  100% { opacity: 1; transform: none; }
+}
+
+.luns-panel {
+  box-shadow: 0 18px 50px rgba(0, 10, 14, .35);
+  animation: lunsPanelIn .34s cubic-bezier(.2, .8, .2, 1) .06s both;
+}
+
+/* ---------------------------------------------------------------------------
+   Kartan. Leaflet ritar sina egna element, så de stylas globalt.
+--------------------------------------------------------------------------- */
+.luns-map {
+  background: #BAD1D4;
+  z-index: 0; /* håller kartan under menyer och ark */
+}
+
+html.dark .luns-map {
+  background: #02202A;
+}
+
+/* CARTO:s mörka basemap är gråblå. Filtret drar den mot samma teal som
+   resten av sajten. */
+html.dark .luns-map .leaflet-tile {
+  filter: brightness(1.5) contrast(.92) sepia(.45) hue-rotate(140deg) saturate(1.5);
+}
+
+/* Nålen är två delar: en prick exakt på koordinaten och en etikett bredvid.
+   Etiketten får aldrig ligga över punkten — då döljer den precis det den ska
+   peka ut.
+
+   Själva nålen är en nollstor låda. Leaflet sätter sin position som inline
+   transform, vilket slår all transform härifrån, så en förskjutning av
+   behållaren skulle tyst ignoreras. Med nollstorlek ligger lådans origo på
+   koordinaten och barnen placeras absolut därifrån — då stämmer det oavsett
+   vad Leaflet gör och oavsett hur högt typsnittet råkar rendera. */
+.luns-pin {
+  width: 0 !important;
+  height: 0 !important;
+  cursor: pointer;
+}
+
+.luns-pin-dot {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #0D5B6E;
+  box-shadow: 0 1px 5px rgba(0, 20, 26, .5);
+}
+
+.luns-pin-label {
+  position: absolute;
+  left: 11px;
+  top: 0;
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border: 1px solid rgba(13, 91, 110, .45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  backdrop-filter: blur(8px);
+  color: #0D3641;
+  font: 600 10.5px var(--font-mono), ui-monospace, monospace;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(0, 20, 26, .25);
+}
+
+/* Den nål man pekar på lyfts över grannarna, så överlappande etiketter går
+   att läsa en i taget. */
+.luns-pin:hover {
+  z-index: 1000 !important;
+}
+
+html.dark .luns-pin-dot {
+  border-color: #02202A;
+  background: #54C2D8;
+}
+
+html.dark .luns-pin-label {
+  background: rgba(2, 32, 41, .85);
+  border-color: rgba(84, 194, 216, .5);
+  color: #BFE7F0;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .94);
+  color: #0E2229;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+html.dark .leaflet-popup-content-wrapper,
+html.dark .leaflet-popup-tip {
+  background: rgba(3, 42, 53, .96);
+  color: #DCEDF0;
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+}
+
+.luns-pp-name {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.luns-pp-meta {
+  margin: 0 0 8px;
+  color: #6E8B92;
+  font: 500 10.5px var(--font-mono), ui-monospace, monospace;
+}
+
+.luns-pp-btn {
+  display: inline-block;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #0D5B6E;
+  color: #fff;
+  font: 600 12px var(--font-body), system-ui, sans-serif;
+  cursor: pointer;
+}
+
+html.dark .luns-pp-btn {
+  background: #54C2D8;
+  color: #02202A;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luns-anim-a,
+  .luns-anim-b,
+  .luns-toast,
+  .luns-sheet,
+  .luns-overlay,
+  .luns-overlay-out,
+  .luns-panel {
+    animation: none;
+  }
 }

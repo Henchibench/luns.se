@@ -1,10 +1,21 @@
 name: Scrape and Deploy
 
 on:
+  # Tiderna är UTC — cron kan inte sommartid. 05:00 UTC blir 07:00 svensk tid
+  # på sommaren och 06:00 på vintern, alltså före lunch året om.
+  #
+  # Varje vardag, inte bara måndag. Skyline publicerar en dag i taget och har
+  # aldrig mer än dagens lunch uppe, så deras meny finns bara att hämta samma
+  # morgon. Det fångar dessutom alla som lägger ut veckan sent.
+  #
+  # Andra körningen tar dem som publicerar efter sju. Den ligger före tio, som
+  # är timmen då flest öppnar sajten.
+  #
+  # Extra körningar kan bara göra datan bättre: en skrapa som fallerar behåller
+  # förra körningens meny, hämtad från den publicerade menus.json.
   schedule:
-    - cron: '0 5 * * 1'     # Monday 07:00 CET
-    - cron: '0 7 * * 1'     # Monday 09:00 CET (retry)
-    - cron: '0 5 * * 2'     # Tuesday 07:00 CET (catch late uploads)
+    - cron: '0 5 * * 1-5'   # vardagar, morgon
+    - cron: '0 7 * * 1-5'   # vardagar, omkörning två timmar senare
   workflow_dispatch:
 
 permissions:
@@ -31,6 +42,14 @@ jobs:
 
       - name: Run scrapers
         run: python scripts/scrape_menus.py
+
+      # Statistiken är kuriosa, menyerna är poängen. Skriptet avbryter tyst och
+      # skriver ingen fil om Umami inte svarar, så ett haveri där aldrig kan
+      # stoppa dagens menyer från att gå ut.
+      - name: Fetch visitor stats
+        env:
+          UMAMI_SHARE_SLUG: ${{ secrets.UMAMI_SHARE_SLUG }}
+        run: python scripts/fetch_stats.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
