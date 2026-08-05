@@ -478,11 +478,33 @@ export default function LunchBoard() {
   const activeFilterCount =
     activeTypes.length + activeCravings.length + (showOnlyFavorites ? 1 : 0);
 
+  /**
+   * Taket för läsytan, och undantaget som spränger det.
+   *
+   * På en bred skärm sträckte raderna ut sig hela vägen och priset hamnade
+   * nästan två tusen pixlar från rätten det gällde, med ett fält av
+   * ingenting emellan. Rätternas text är i median 470 pixlar bred och nio av
+   * tio ryms under 789, så 1440 minus spalten och marginalerna lämnar drygt
+   * 1100 till raderna: de allra flesta får plats på en rad och priset stannar
+   * i närheten.
+   *
+   * Taket ligger på hela skalet och inte bara på listan. Med bara listan
+   * centrerad öppnade sig en tom kanal mellan vänsterspalten och texten,
+   * eftersom spalten satt kvar i kanten medan innehållet flyttade in. De hör
+   * ihop och centreras därför tillsammans.
+   *
+   * Kartvyn tar bort taket. En karta blir bättre av varje pixel den får, till
+   * skillnad från en textrad, och att växla till den läser då som att
+   * gränssnittet fälls ut över skärmen.
+   */
+  const shell = view === 'list' ? 'mx-auto w-full max-w-[1440px]' : 'w-full';
+
   return (
     <div
       className="grid h-screen grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
+      <div className={shell}>
       <Header
         days={DAYS}
         selectedDay={day}
@@ -503,8 +525,9 @@ export default function LunchBoard() {
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         onOpenSettings={() => setSettingsOpen(true)}
       />
+      </div>
 
-      <div className="grid min-h-0 grid-cols-1 wide:grid-cols-[270px_1fr]">
+      <div className={`${shell} grid min-h-0 grid-cols-1 wide:grid-cols-[270px_1fr]`}>
         <Rail
           items={railItems}
           onSelect={scrollToRestaurant}
@@ -542,17 +565,7 @@ export default function LunchBoard() {
               en utfälld restaurangkarta igång bakom helkartan — en osynlig
               Leaflet-instans som ritar tiles man aldrig ser. */}
           {view === 'list' && (
-          /* Menyn får ett tak, kartan inte.
-           *
-           * På en bred skärm sträckte raderna ut sig hela vägen och priset
-           * hamnade nästan två tusen pixlar från rätten det gällde, med ett
-           * fält av ingenting emellan. Rätternas text är i median 470 pixlar
-           * bred och nio av tio ryms under 789, så vid 1100 får de allra
-           * flesta plats på en rad och priset stannar i närheten.
-           *
-           * Kartan står utanför med flit. Den blir bättre av varje pixel den
-           * får, till skillnad från en textrad. */
-          <div className="w-full max-w-[1100px]">
+          <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
