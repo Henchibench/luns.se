@@ -121,10 +121,9 @@ export default function MobileBar({
                     <GroupLabel>SUGEN PÅ…</GroupLabel>
                     <Chips chips={cravingChips} size="touch" />
                   </div>
-                  {/* Arket innehåller bara filter nu. Statistiken,
-                      integritetsinfon och matprofilen låg här nere förut,
-                      alltså bakom filterknappen, och bor i kugghjulet i
-                      headern i stället. */}
+                  {/* Arket innehåller bara filter nu. Statistiken och
+                      integritetsinfon låg här nere förut, alltså bakom
+                      filterknappen, och bor i kugghjulet i headern i stället. */}
                 </div>
               )}
             </div>

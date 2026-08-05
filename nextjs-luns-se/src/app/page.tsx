@@ -11,10 +11,8 @@ import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
-import FoodProfile from './components/board/FoodProfile';
 import { ChipSpec } from './components/board/Chips';
 import { useFavorites } from './hooks/useFavorites';
-import { useFoodProfile } from './hooks/useFoodProfile';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
@@ -33,9 +31,7 @@ import {
 import {
   CRAVINGS,
   TYPE_FILTERS,
-  boostByProfile,
   cravingTerms,
-  hiddenByProfile,
   matchesCravings,
   matchesSearch,
   matchesTypes,
@@ -107,19 +103,14 @@ const TOUR_STEPS: TourStep[] = [
     // Kugghjulet är nytt och har ingen självklar innebörd: det kan lika gärna
     // vara filter eller ett konto. Steget säger vad som finns bakom det, så
     // det inte blir en knapp man aldrig råkar trycka på.
-    //
-    // Matprofilen hade ett eget steg när den låg i vänsterspalten. Nu bor den
-    // här inne, och två steg i rad som ringar in samma kugghjul hade sett ut
-    // som att rundan hakat upp sig. Den får i stället första meningen, som
-    // det mest värda bakom knappen.
     targets: ['[data-tour="settings"]'],
     title: 'Resten bor i kugghjulet',
-    body: 'Där ligger matprofilen, som lyfter fram det du gillar och gömmer det du inte äter, nästa besök också. Plus ljust eller mörkt läge, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
+    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.
     title: 'Allt stannar hos dig',
-    body: 'Favoriter, matprofil och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i matprofilen skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
+    body: 'Favoriter och bevakade rätter sparas i din egen webbläsare. Det finns inget konto och ingen databas hos oss, och det du skriver i sökrutan skickas aldrig vidare. Besöksstatistiken sköts av Umami, som är cookiefri och inte följer dig mellan sajter.',
   },
 ];
 
@@ -157,7 +148,6 @@ export default function LunchBoard() {
   } = useFavorites();
   const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
     useDishFavorites();
-  const { profile, toggleBoostType, addHideKeyword, removeHideKeyword } = useFoodProfile();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
@@ -238,42 +228,18 @@ export default function LunchBoard() {
     [restaurants, location]
   );
 
-  /**
-   * Rätter för vald dag som klarar sök, typfilter och matprofil. Profilens
-   * valda kategorier lyfts till toppen, dess dolda ord filtreras bort.
-   */
+  /** Rätter för vald dag som klarar sök, typfilter och sugen på-filter. */
   const visibleDishes = useCallback(
-    (restaurant: Restaurant) => {
-      const kept = restaurant.dishes.filter(
+    (restaurant: Restaurant) =>
+      restaurant.dishes.filter(
         d =>
           d.day === day &&
           matchesSearch(d, restaurant.name, search) &&
           matchesTypes(d, activeTypes) &&
-          matchesCravings(d, restaurant.name, activeCravings) &&
-          !hiddenByProfile(d, profile.hideKeywords)
-      );
-      return boostByProfile(kept, profile.boostTypes);
-    },
-    [day, search, activeTypes, activeCravings, profile.hideKeywords, profile.boostTypes]
+          matchesCravings(d, restaurant.name, activeCravings)
+      ),
+    [day, search, activeTypes, activeCravings]
   );
-
-  /** Hur många rätter matprofilen tar bort idag — annars försvinner de tyst. */
-  const hiddenCount = useMemo(() => {
-    if (profile.hideKeywords.length === 0) return 0;
-    return atLocation.reduce(
-      (sum, restaurant) =>
-        sum +
-        restaurant.dishes.filter(
-          d =>
-            d.day === day &&
-            matchesSearch(d, restaurant.name, search) &&
-            matchesTypes(d, activeTypes) &&
-            matchesCravings(d, restaurant.name, activeCravings) &&
-            hiddenByProfile(d, profile.hideKeywords)
-        ).length,
-      0
-    );
-  }, [atLocation, day, search, activeTypes, activeCravings, profile.hideKeywords]);
 
   const filtering =
     search.trim().length > 0 ||
@@ -503,14 +469,6 @@ export default function LunchBoard() {
     }));
   const unmappedCount = atLocation.length - mapPoints.length;
 
-  const foodProfileProps = {
-    profile,
-    onToggleBoostType: toggleBoostType,
-    onAddHideKeyword: addHideKeyword,
-    onRemoveHideKeyword: removeHideKeyword,
-    watchedDishes,
-    onRemoveWatched: removeDishFavorite,
-  };
 
   const heading = `${day} ${dateForDay(day).toLocaleDateString('sv-SE', {
     day: 'numeric',
@@ -589,25 +547,11 @@ export default function LunchBoard() {
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
             </h1>
-            {/* Antalet dolda är en knapp och inte bara en siffra.
-                Matprofilen ligger bakom kugghjulet nu, så det som tar bort
-                rätter ur listan syns inte längre på skärmen. Utan en väg
-                tillbaka härifrån är den enda ledtråden ett tal, och den som
-                undrar vart maten tog vägen får leta. */}
+            {/* Antalet dolda stod här bredvid, med en väg in till matprofilen
+                som gömde dem. Nu finns ingenting som tar bort rätter i tysthet:
+                filtren syns på skärmen medan de gäller. */}
             <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
-              {hiddenCount > 0 && (
-                <>
-                  {' · '}
-                  <button
-                    onClick={() => setSettingsOpen(true)}
-                    title="Matprofilen döljer dem. Öppna inställningarna för att ändra."
-                    className="border-0 bg-transparent p-0 font-mono text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
-                  >
-                    {hiddenCount} DOLDA
-                  </button>
-                </>
-              )}
             </span>
           </div>
 
@@ -687,9 +631,8 @@ export default function LunchBoard() {
           favoriteCount={favorites.length}
           theme={theme}
           onToggleTheme={toggleTheme}
-          // Rutan är en dialog och används med tumme lika ofta som med mus, så
-          // chipsen får sin större storlek oavsett skärmbredd.
-          foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
+          watchedDishes={watchedDishes}
+          onRemoveWatched={removeDishFavorite}
           onRestartTour={welcome.restart}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}

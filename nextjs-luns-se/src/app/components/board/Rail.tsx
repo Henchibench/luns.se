@@ -80,10 +80,9 @@ export default function Rail({
           <Chips chips={typeChips} />
         </div>
 
-        {/* Matprofilen låg här under. Den var spaltens enda kontroll som gällde
-            nästa besök också, mitt bland filter som nollställs, och tog dessutom
-            mer höjd än allt annat tillsammans. Den bor bland inställningarna nu.
-            Kvar står bara sådant som gäller just nu. */}
+        {/* Spalten innehåller bara sådant som gäller just nu. Matprofilen låg
+            här under och gällde nästa besök också, vilket var en skillnad
+            ingenting förklarade. Den är borttagen. */}
         <div className="mx-5 mt-3.5 flex flex-none flex-col gap-2 border-t border-[var(--line)] pt-3.5">
           <GroupLabel>SUGEN PÅ…</GroupLabel>
           <div data-tour="cravings">

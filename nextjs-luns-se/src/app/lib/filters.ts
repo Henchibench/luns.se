@@ -97,21 +97,3 @@ export function matchesTypes(dish: Dish, activeTypeIds: string[]): boolean {
     return filter ? filter.keywords.some(k => haystack.includes(k)) : false;
   });
 }
-
-/**
- * Sorterar rätter så att matprofilens valda kategorier hamnar överst. Stabil
- * inom respektive grupp, så menyns egen ordning består i övrigt.
- */
-export function boostByProfile(dishes: Dish[], boostTypes: string[]): Dish[] {
-  if (boostTypes.length === 0) return dishes;
-  const boosted = (d: Dish) =>
-    boostTypes.some(t => d.category.toLowerCase().includes(t.toLowerCase()));
-  return [...dishes.filter(boosted), ...dishes.filter(d => !boosted(d))];
-}
-
-/** Rätter matprofilen gömmer undan. */
-export function hiddenByProfile(dish: Dish, hideKeywords: string[]): boolean {
-  if (hideKeywords.length === 0) return false;
-  const haystack = `${dish.category} ${dish.description}`.toLowerCase();
-  return hideKeywords.some(k => haystack.includes(k));
-}

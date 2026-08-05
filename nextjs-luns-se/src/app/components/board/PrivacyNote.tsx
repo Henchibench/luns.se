@@ -8,8 +8,8 @@ import Overlay, { useOverlayClose } from './Overlay';
  *
  * Texten räknar upp exakt vilka händelser som går till Umami i stället för
  * att lova något svepande. "Ingenting lämnar din enhet" hade varit enklare
- * att skriva men är inte sant — vilken restaurang du favoritmarkerar går
- * dit som vanlig produktstatistik. Det som aldrig skickas är fritexten.
+ * att skriva men är inte sant: vilken restaurang som favoritmarkeras går dit
+ * som vanlig produktstatistik. Det som aldrig skickas är fritexten.
  *
  * Samma glasruta som förstagångsvalet av plats, så de känns som samma sorts
  * meddelande från sajten.
@@ -53,9 +53,8 @@ export default function PrivacyNote({
         </h2>
 
         <p className="mb-4 text-[13px] leading-[1.6] text-[var(--ink2)]">
-          Det finns inget konto på luns.se och ingen databas med besökare. Dina favoriter, din
-          matprofil, dina bevakade rätter, ditt tema och din valda plats ligger i din egen
-          webbläsare. Rensar du webbläsardata är de borta, och de följer inte med till en annan
+          Det finns inget konto på luns.se och ingen databas med besökare. Dina favoriter, dina
+          bevakade rätter, ditt tema och din valda plats ligger i din egen webbläsare. Rensar du webbläsardata är de borta, och de följer inte med till en annan
           enhet.
         </p>
 
@@ -90,7 +89,6 @@ export default function PrivacyNote({
           <li>· vilken restaurang som favoritmarkeras eller rätt som bevakas</li>
           <li>· vilket sugen på-filter som slås på</li>
           <li>· att sökfältet användes, aldrig vad som skrevs i det</li>
-          <li>· att en matprofil ändrats, och hur många ord den döljer</li>
           <li>· att temat byttes eller introduktionen öppnades</li>
         </ul>
         <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
@@ -103,9 +101,8 @@ export default function PrivacyNote({
           DET SOM ALDRIG SKICKAS
         </h3>
         <p className="mb-5 text-[13px] leading-[1.6] text-[var(--ink2)]">
-          Det du skriver själv. Sökorden lämnar aldrig din webbläsare, och inte heller orden du
-          döljer i matprofilen. Att sökfältet användes räknas, liksom hur många ord matprofilen
-          döljer, men aldrig vilka de är.
+          Det du skriver själv. Sökorden lämnar aldrig din webbläsare. Att sökfältet användes
+          räknas, aldrig vad som stod i det.
         </p>
 
         <div className="flex justify-end">

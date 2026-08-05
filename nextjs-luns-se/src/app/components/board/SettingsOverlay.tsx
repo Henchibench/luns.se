@@ -2,15 +2,16 @@
 
 import React from 'react';
 import Overlay, { useOverlayClose } from './Overlay';
+import WatchedDishes from './WatchedDishes';
+import type { FavoriteDish } from '../../hooks/useDishFavorites';
 
 /**
  * En dörr in till allt som inte är dagens lunch.
  *
  * Statistiken och integritetsinfon låg som två understrukna tioradersord
- * längst ner i vänsterspalten, under matprofilen och bortom listans scroll.
- * Den som inte redan visste att de fanns hittade dem aldrig. Nu ligger de
- * bakom kugghjulet i headern, tillsammans med rundan och de val som gäller
- * till nästa besök.
+ * längst ner i vänsterspalten, bortom listans scroll. Den som inte redan
+ * visste att de fanns hittade dem aldrig. Nu ligger de bakom kugghjulet i
+ * headern, tillsammans med rundan och de val som gäller till nästa besök.
  *
  * Platsen står kvar i headern: den byts under besöket, av samma person som
  * äter på två ställen. Temat väljs en gång och rörs sedan aldrig, så det hör
@@ -27,8 +28,9 @@ interface Props {
   favoriteCount: number;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
-  /** Matprofilen, komponerad av sidan som äger dess state. */
-  foodProfile: React.ReactNode;
+  /** Bevakade rätter, som bara går att ta bort härifrån de dagar de inte serveras. */
+  watchedDishes: FavoriteDish[];
+  onRemoveWatched: (restaurant: string, signature: string) => void;
   onRestartTour: () => void;
   onOpenStats: () => void;
   onOpenPrivacy: () => void;
@@ -202,7 +204,8 @@ export default function SettingsOverlay({
   favoriteCount,
   theme,
   onToggleTheme,
-  foodProfile,
+  watchedDishes,
+  onRemoveWatched,
   onRestartTour,
   onOpenStats,
   onOpenPrivacy,
@@ -241,11 +244,13 @@ export default function SettingsOverlay({
           </div>
         </div>
 
-        {/* Matprofilen har sin egen rubrik inbakad, så ingen SectionLabel här.
-            Den flyttade in från vänsterspalten: den gällde nästa besök också,
-            till skillnad från filtren den låg bland, och är alltså något man
-            ställer in en gång. */}
-        <div className="mt-6">{foodProfile}</div>
+        {/* Egen rubrik inbakad, så ingen SectionLabel här. Avsnittet finns
+            inte alls när ingenting bevakas. */}
+        {watchedDishes.length > 0 && (
+          <div className="mt-6">
+            <WatchedDishes dishes={watchedDishes} onRemove={onRemoveWatched} />
+          </div>
+        )}
 
         <div className="mt-6">
           <SectionLabel>INFORMATION</SectionLabel>
