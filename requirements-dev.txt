@@ -1,0 +1,14 @@
+# Utvecklingsberoenden — installeras ALDRIG i GitHub Actions.
+#
+# Workflowet kör `pip install requests beautifulsoup4 lxml` och inget annat.
+# Det som står här finns bara på utvecklingsmaskinen, för att titta på en sida
+# innan skrapan skrivs. En färdig skrapa som importerar något härifrån kraschar
+# i produktion. Se CLAUDE.md.
+#
+# Utöver det här behövs:
+#   playwright install chromium     (en gång, som din egen användare)
+#   apt-get install poppler-utils   (ger pdftotext, kräver root en gång)
+
+-r requirements.txt
+
+playwright

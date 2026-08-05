@@ -6,6 +6,12 @@ __pycache__/
 
 # Virtual environment
 venv/
+.venv/
+
+# Spaningsutdata från scripts/spana.py. Sidkopior, skärmbilder och nedladdade
+# menybilder hör hemma i en temporärkatalog, aldrig i repot.
+spana-*/
+
 
 # Node.js
 node_modules/
