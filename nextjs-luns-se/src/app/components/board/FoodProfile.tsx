@@ -53,14 +53,12 @@ export default function FoodProfile({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <GroupLabel>MIN MATPROFIL</GroupLabel>
-        {/* Skillnaden mot chipsen ovanför är hela poängen: filtren gäller nu,
-            matprofilen gäller nästa gång också. */}
-        <span className="text-[10px] leading-[1.45] text-[var(--mut)]">
-          Sparas till nästa besök.
-        </span>
-      </div>
+      {/* "Sparas till nästa besök" stod här förut. Raden fanns för att skilja
+          profilen från filterchipsen den låg under i vänsterspalten, och när
+          den flyttade in bland inställningarna vändes betydelsen: allt i den
+          rutan sparas, så att påpeka det om just profilen antyder att de
+          andra inte gör det. */}
+      <GroupLabel>MIN MATPROFIL</GroupLabel>
 
       <div className="flex flex-col gap-1.5">
         <span className="text-[10px] text-[var(--mut)]">Visa först</span>

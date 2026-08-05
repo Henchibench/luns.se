@@ -27,6 +27,8 @@ interface Props {
   favoriteCount: number;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  /** Matprofilen, komponerad av sidan som äger dess state. */
+  foodProfile: React.ReactNode;
   onRestartTour: () => void;
   onOpenStats: () => void;
   onOpenPrivacy: () => void;
@@ -200,6 +202,7 @@ export default function SettingsOverlay({
   favoriteCount,
   theme,
   onToggleTheme,
+  foodProfile,
   onRestartTour,
   onOpenStats,
   onOpenPrivacy,
@@ -237,6 +240,12 @@ export default function SettingsOverlay({
             )}
           </div>
         </div>
+
+        {/* Matprofilen har sin egen rubrik inbakad, så ingen SectionLabel här.
+            Den flyttade in från vänsterspalten: den gällde nästa besök också,
+            till skillnad från filtren den låg bland, och är alltså något man
+            ställer in en gång. */}
+        <div className="mt-6">{foodProfile}</div>
 
         <div className="mt-6">
           <SectionLabel>INFORMATION</SectionLabel>

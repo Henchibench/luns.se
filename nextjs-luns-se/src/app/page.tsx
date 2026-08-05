@@ -94,16 +94,6 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Välj burgare, pasta eller pommes, flera samtidigt går bra. Sidan letar efter synonymer också, så pasta hittar även spaghetti och lasagne.',
   },
   {
-    targets: ['[data-tour="profile"]', '[data-tour="filter-mobile"]'],
-    // Rubriken har hetat både "minns dig" och "ligger kvar". Den första
-    // påstod att sajten känner igen besökaren, den andra lät som att något
-    // blivit över. Att den sparas är en egenskap och hör hemma i brödtexten,
-    // som redan säger det. Rubriken får i stället bli en uppmaning, som
-    // stegen om favoriter och bevakade rätter.
-    title: 'Gör en egen matprofil',
-    body: 'Lyft fram det du gillar och göm det du inte äter. Till skillnad från filtren ovanför gäller den även nästa gång du kommer hit.',
-  },
-  {
     targets: ['[data-tour="favorite"]'],
     title: 'Favoritmarkera stället',
     body: 'Hjärtat sparar en restaurang. Sedan kan du filtrera fram bara dina favoriter när du inte orkar läsa hela listan.',
@@ -117,9 +107,14 @@ const TOUR_STEPS: TourStep[] = [
     // Kugghjulet är nytt och har ingen självklar innebörd: det kan lika gärna
     // vara filter eller ett konto. Steget säger vad som finns bakom det, så
     // det inte blir en knapp man aldrig råkar trycka på.
+    //
+    // Matprofilen hade ett eget steg när den låg i vänsterspalten. Nu bor den
+    // här inne, och två steg i rad som ringar in samma kugghjul hade sett ut
+    // som att rundan hakat upp sig. Den får i stället första meningen, som
+    // det mest värda bakom knappen.
     targets: ['[data-tour="settings"]'],
     title: 'Resten bor i kugghjulet',
-    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, öppen statistik över hur sajten används och vad vi sparar. Den här rundan går att köra om därifrån också.',
+    body: 'Där ligger matprofilen, som lyfter fram det du gillar och gömmer det du inte äter, nästa besök också. Plus ljust eller mörkt läge, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.
@@ -557,7 +552,6 @@ export default function LunchBoard() {
           onSelect={scrollToRestaurant}
           typeChips={typeChips}
           cravingChips={cravingChips}
-          foodProfile={<FoodProfile {...foodProfileProps} />}
         />
 
         {/* pt-8 skjuter innehållet förbi uttoningen. Masken är genomskinlig de
@@ -595,9 +589,25 @@ export default function LunchBoard() {
             <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
               {heading}
             </h1>
+            {/* Antalet dolda är en knapp och inte bara en siffra.
+                Matprofilen ligger bakom kugghjulet nu, så det som tar bort
+                rätter ur listan syns inte längre på skärmen. Utan en väg
+                tillbaka härifrån är den enda ledtråden ett tal, och den som
+                undrar vart maten tog vägen får leta. */}
             <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
-              {hiddenCount > 0 && ` · ${hiddenCount} DOLDA`}
+              {hiddenCount > 0 && (
+                <>
+                  {' · '}
+                  <button
+                    onClick={() => setSettingsOpen(true)}
+                    title="Matprofilen döljer dem. Öppna inställningarna för att ändra."
+                    className="border-0 bg-transparent p-0 font-mono text-[11px] text-[var(--mut)] underline underline-offset-2 cursor-pointer transition-colors hover:text-[var(--acc)]"
+                  >
+                    {hiddenCount} DOLDA
+                  </button>
+                </>
+              )}
             </span>
           </div>
 
@@ -655,7 +665,6 @@ export default function LunchBoard() {
         typeChips={typeChips}
         cravingChips={cravingChips}
         activeFilterCount={activeFilterCount}
-        foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
       />
 
       {toast && (
@@ -678,6 +687,9 @@ export default function LunchBoard() {
           favoriteCount={favorites.length}
           theme={theme}
           onToggleTheme={toggleTheme}
+          // Rutan är en dialog och används med tumme lika ofta som med mus, så
+          // chipsen får sin större storlek oavsett skärmbredd.
+          foodProfile={<FoodProfile {...foodProfileProps} size="touch" />}
           onRestartTour={welcome.restart}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}

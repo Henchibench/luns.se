@@ -16,8 +16,6 @@ interface Props {
   onSelect: (name: string) => void;
   typeChips: ChipSpec[];
   cravingChips: ChipSpec[];
-  /** Matprofilen, komponerad av sidan så spalten och mobilarket delar den. */
-  foodProfile: React.ReactNode;
 }
 
 /** En restaurangrad. Delas mellan spalten och mobilens bottom sheet. */
@@ -65,7 +63,6 @@ export default function Rail({
   onSelect,
   typeChips,
   cravingChips,
-  foodProfile,
 }: Props) {
   return (
     <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
@@ -83,15 +80,15 @@ export default function Rail({
           <Chips chips={typeChips} />
         </div>
 
+        {/* Matprofilen låg här under. Den var spaltens enda kontroll som gällde
+            nästa besök också, mitt bland filter som nollställs, och tog dessutom
+            mer höjd än allt annat tillsammans. Den bor bland inställningarna nu.
+            Kvar står bara sådant som gäller just nu. */}
         <div className="mx-5 mt-3.5 flex flex-none flex-col gap-2 border-t border-[var(--line)] pt-3.5">
           <GroupLabel>SUGEN PÅ…</GroupLabel>
           <div data-tour="cravings">
             <Chips chips={cravingChips} />
           </div>
-        </div>
-
-        <div data-tour="profile" className="mx-5 mt-3.5 flex flex-none flex-col border-t border-[var(--line)] pt-3.5">
-          {foodProfile}
         </div>
       </div>
     </nav>
