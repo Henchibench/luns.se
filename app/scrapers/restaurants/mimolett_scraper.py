@@ -1,147 +1,200 @@
-from ..base_scraper import BaseScraper
-from typing import Dict, List
 import re
+from datetime import date
+from html import unescape
+from typing import Dict, List
+
+from bs4 import BeautifulSoup
+
+from ..static_menu_scraper import StaticMenuScraper
+
+# Osynliga tecken som markerar var fetstilen började och slutade.
+BOLD_OPEN = '\x01'
+BOLD_CLOSE = '\x02'
 
 
-class MimolettScraper(BaseScraper):
-    BACKUP_URL = "https://www.kvartersmenyn.se/index.php/rest/13278/"
-    DEFAULT_PRICE = "129 kr"
+class MimolettScraper(StaticMenuScraper):
+    """Mimolett, med sparad meny som botten.
+
+    Restaurangens egen domän finns inte längre. restaurangmimolett.se ligger
+    kvar i DNS men skickar vidare till helt andra sajter: en fransk
+    WordPress-installation vid ett tillfälle, en nederländsk vid nästa. Den går
+    alltså varken att skrapa eller att länka till.
+
+    Kvartersmenyn har menyn kvar, men ligger bakom Cloudflare som svarar 403 på
+    GitHub Actions adresser. Från en vanlig uppkoppling går samma anrop igenom,
+    så anropet är kvar: det ger uppdaterad meny när skrapan körs lokalt, och
+    börjar fungera av sig självt om blocket släpper.
+
+    I bygget är det därför den sparade menyn som gäller. Den går att göra just
+    för Mimolett eftersom menyn är stående, samma rätter vecka efter vecka.
+    Priset och innehållet kommer från kvartersmenyn den dag som står i
+    data/mimolett.json, och behöver läsas om för hand när restaurangen byter
+    meny. Alternativet vore att visa "ingen meny idag" varje dag, vilket är
+    sämre och dessutom osant.
+    """
+
+    KVARTERSMENYN = 'https://mimolett.kvartersmenyn.se/'
+    DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
+    CATEGORY_NAMES = {'KÖTT & FISK', 'RISOTTO', 'PASTARÄTTER'}
+    # Kvartersmenyn strör in korta bokstavskoder som egna rader, uppenbarligen
+    # interna markörer: "pogre", "ccj", "ja". De hör inte till rätten.
+    MARKER = re.compile(r'^[a-zåäö]{2,5}$')
+    # Efter ett kvartal är en stående meny inte längre trovärdig av sig själv.
+    STALE_AFTER_DAYS = 90
 
     def __init__(self):
-        restaurant_info = {
-            'name': 'Mimolett',
-            'website': 'https://restaurangmimolett.se/',
-            'menu_url': 'https://restaurangmimolett.se/lunch/',
-        }
-        super().__init__(restaurant_info)
+        super().__init__(
+            {
+                'name': 'Mimolett',
+                # Båda pekar på kvartersmenyn. Restaurangens egen adress går
+                # inte att använda ens som identitet längre, och den länk
+                # besökaren ser kommer från restaurant_data.py, inte härifrån.
+                'website': self.KVARTERSMENYN,
+                'menu_url': self.KVARTERSMENYN,
+            },
+            'mimolett.json',
+        )
 
     def scrape(self) -> Dict[str, List[str]]:
-        # Try primary site first
-        items = self._scrape_primary()
+        categories, note = self._scrape_kvartersmenyn()
 
-        # Fallback to kvartersmenyn
-        if not items:
-            items = self._scrape_backup()
+        if categories:
+            self.log_info(f'Kvartersmenyn svarade, {sum(len(c["dishes"]) for c in categories)} rätter')
+        else:
+            categories = self.menu_data['categories']
+            note = self.menu_data.get('note', '')
+            captured = self.menu_data['captured']
+            self.log_warning(f'Kvartersmenyn gav ingen meny, använder sparad från {captured}')
 
-        if not items:
-            return {self.name: ["Ingen lunchmeny tillgänglig"]}
+            # En sparad meny är det enda i skrapan som inte märker att den blivit
+            # gammal. Restaurangen byter meny någon gång, och då står fel rätter
+            # kvar utan att något går sönder. Loggen får skrika i stället.
+            age = (date.today() - date.fromisoformat(captured)).days
+            if age > self.STALE_AFTER_DAYS:
+                self.log_error(
+                    f'Sparad meny är {age} dagar gammal. Läs om den från '
+                    f'{self.KVARTERSMENYN} och uppdatera data/mimolett.json.'
+                )
 
-        self.log_info(f"Found {len(items)} menu items")
-        return {self.name: items}
+        return {self.name: self._format(categories, note)}
 
-    def _scrape_primary(self) -> List[str]:
+    def _format(self, categories: List[dict], note: str) -> List[str]:
+        """Samma väg ut för hämtad och sparad meny, så de inte kan glida isär."""
+        price = self.menu_data['price']
+        items: List[str] = []
+
+        for day in self.DAYS:
+            for category in categories:
+                for dish in category['dishes']:
+                    text = dish['name']
+                    if dish.get('description'):
+                        text += f": {dish['description']}"
+                    items.append(
+                        f"{day}|<strong>{category['category']}</strong> - {text} ({price})"
+                    )
+            if note:
+                items.append(f'INFO:{day} - Restaurant Info: {note}')
+
+        return items
+
+    def _scrape_kvartersmenyn(self):
+        """Menyn som den ser ut just nu, eller tomt när sidan inte svarar."""
         try:
             soup = self.get_page_content()
             if not soup:
-                return []
+                return [], ''
+            return self._parse(soup)
+        except Exception as error:
+            self.log_warning(f'Kvartersmenyn misslyckades: {error}')
+            return [], ''
 
-            items = []
-            for container in soup.select('div.menu-list'):
-                cat_elem = container.select_one('h2.menu-list__title')
-                if not cat_elem:
-                    continue
-                category = cat_elem.get_text(strip=True)
+    def _parse(self, soup):
+        """Rätterna ligger som fet text med beskrivningen på raden under.
 
-                for li in container.select('li.menu-list__item'):
-                    name_el = li.select_one('.item_title')
-                    desc_el = li.select_one('.desc__content')
-                    price_el = li.select_one('.menu-list__item-price')
+        Sidan har ingen struktur att hänga upp sig på utöver div.meny, så
+        radbrytningarna får bära betydelsen. Den enda skillnaden mellan en
+        beskrivning och sidans avslutande notis om glutenfri pasta är att
+        beskrivningen står direkt under sitt namn medan notisen har en tomrad
+        före sig. Utan den hamnade notisen som beskrivning på lasagnen, alltså
+        på en rätt den inte handlar om.
 
-                    if not name_el:
-                        continue
+        Därför tas taggarna bort med regex i stället för med get_text(). Det
+        senare lägger till egna radbrytningar mellan elementen, och då ser
+        varje rätt ut att ha en tomrad före sin beskrivning.
+        """
+        categories: List[dict] = []
+        current = None
+        note = ''
 
-                    name = name_el.get_text(strip=True)
-                    description = desc_el.get_text(strip=True) if desc_el else ''
+        for block in soup.select('div.meny'):
+            # Rutan med pris och öppettider är ingen meny.
+            if 'PRIS:' in block.get_text(' ', strip=True).upper():
+                continue
 
-                    if price_el:
-                        price = price_el.get_text(strip=True).replace(':-', ' kr')
-                    else:
-                        price = self.DEFAULT_PRICE
+            raw = ''.join(str(child) for child in block.children)
+            raw = re.sub(r'<br\s*/?>', '\n', raw)
+            # De grå kodorden ligger i egna i-taggar och hör inte till rätten.
+            raw = re.sub(r'<i\b[^>]*>.*?</i>', '', raw, flags=re.S)
+            # Fetstilen märks ut innan resten av taggarna faller, så namnen
+            # går att känna igen när bara text är kvar.
+            # Sidan använder både <b> och <strong>, och blandar dem: två av
+            # tre kategorirubriker är <b>, den tredje <strong>. Bara den ena
+            # kände parsern igen, så pastan hamnade under RISOTTO.
+            raw = re.sub(r'<(?:b|strong)\b[^>]*>', BOLD_OPEN, raw)
+            raw = re.sub(r'</(?:b|strong)>', BOLD_CLOSE, raw)
+            raw = re.sub(r'<[^>]+>', '', raw)
+            lines = [unescape(line).strip() for line in raw.split('\n')]
 
-                    dish_text = self.clean_text(name)
-                    if description:
-                        dish_text += f": {self.clean_text(description)}"
+            i = 0
+            while i < len(lines):
+                name, suffix = self._split_bold(lines[i])
 
-                    formatted = f"<strong>{category}</strong> - {dish_text} ({price})"
-
-                    for day in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']:
-                        items.append(f"{day}|{formatted}")
-
-            return items
-
-        except Exception as e:
-            self.log_warning(f"Primary site failed: {e}")
-            return []
-
-    def _scrape_backup(self) -> List[str]:
-        try:
-            soup = self.get_page_content(self.BACKUP_URL)
-            if not soup:
-                return []
-
-            items = []
-            category_names = {'KÖTT & FISK', 'RISOTTO', 'PASTARÄTTER'}
-
-            for meny in soup.select('div.meny'):
-                full_text_upper = meny.get_text(' ', strip=True).upper()
-                if 'PRIS:' in full_text_upper:
-                    continue
-
-                bold_texts = [b.get_text(' ', strip=True) for b in meny.find_all(['b', 'strong'])]
-                bold_set = set(bold_texts)
-
-                inner_html = ''.join(str(child) for child in meny.children)
-                inner_html = inner_html.replace('<br/>', '\n').replace('<br>', '\n')
-                from bs4 import BeautifulSoup
-                text_block = BeautifulSoup(inner_html, 'html.parser').get_text('\n')
-                lines = [line.strip() for line in text_block.split('\n') if line.strip()]
-
-                current_category = 'Lunchmeny'
-                i = 0
-                while i < len(lines):
-                    line = lines[i]
-                    if 'PRIS:' in line.upper():
-                        break
-
-                    if line.upper() in category_names:
-                        current_category = line
-                        i += 1
-                        continue
-
-                    if line in bold_set and line.upper() not in category_names:
-                        name = line
-                        desc_parts = []
-                        j = i + 1
-                        marker_codes = {'pogre', 'bii', 'bei', 'cbf', 'ca'}
-                        while j < len(lines):
-                            nxt = lines[j]
-                            if nxt.upper() in category_names or nxt in bold_set or nxt.upper() == 'SMAKLIG MÅLTID!':
-                                break
-                            if nxt.lower() not in marker_codes:
-                                desc_parts.append(nxt)
-                            j += 1
-
-                        raw_desc = ' '.join(desc_parts).strip()
-                        # Clean description
-                        raw_desc = re.split(r'SMAKLIG MÅLTID!\s*', raw_desc, flags=re.IGNORECASE)[0]
-                        raw_desc = re.sub(r'\b(pogre|bii|bei|cbf|ca)\b', '', raw_desc, flags=re.IGNORECASE)
-                        raw_desc = re.sub(r'\s{2,}', ' ', raw_desc).strip(' ,')
-
-                        dish_text = self.clean_text(name)
-                        if raw_desc:
-                            dish_text += f": {self.clean_text(raw_desc)}"
-
-                        formatted = f"<strong>{current_category}</strong> - {dish_text} ({self.DEFAULT_PRICE})"
-                        for day in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']:
-                            items.append(f"{day}|{formatted}")
-
-                        i = j
-                        continue
-
+                if name is None:
                     i += 1
+                    continue
 
-            return items
+                if name.upper() in self.CATEGORY_NAMES:
+                    current = {'category': name, 'dishes': []}
+                    categories.append(current)
+                    i += 1
+                    continue
 
-        except Exception as e:
-            self.log_warning(f"Backup site failed: {e}")
-            return []
+                if current is None:
+                    i += 1
+                    continue
+
+                # Suffixet står på samma rad som namnet, t.ex. vilka dagar
+                # rätten serveras, och hör till rätten och inte till texten
+                # under.
+                parts = [suffix] if suffix else []
+                trailing, j, gap = [], i + 1, False
+                while j < len(lines):
+                    nxt = lines[j]
+                    if not nxt:
+                        gap = True
+                        j += 1
+                        continue
+                    next_name, _ = self._split_bold(nxt)
+                    if next_name is not None or nxt.upper() == 'SMAKLIG MÅLTID!':
+                        break
+                    if not self.MARKER.match(nxt):
+                        (trailing if gap else parts).append(nxt)
+                    j += 1
+
+                current['dishes'].append(
+                    {'name': name, 'description': ' '.join(parts).strip(' ,')}
+                )
+                if trailing:
+                    note = ' '.join(trailing).strip(' ,')
+                i = j
+
+        return categories, note
+
+    @staticmethod
+    def _split_bold(line: str):
+        """Namnet inuti fetstilsmarkörerna, och det som står efter på raden."""
+        if BOLD_OPEN not in line:
+            return None, ''
+        after = line.split(BOLD_OPEN, 1)[1]
+        name, _, rest = after.partition(BOLD_CLOSE)
+        return name.strip(), rest.strip()
