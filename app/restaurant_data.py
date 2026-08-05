@@ -124,7 +124,11 @@ restaurant_locations = {
         "maps": "https://www.google.com/maps/search/?api=1&query=Mimolett%2C%20Lindholmen%2C%20G%C3%B6teborg",
         "latitude": 57.7080059,
         "longitude": 11.9353462,
-        "website": "https://restaurangmimolett.se/",
+        # Ingen website. restaurangmimolett.se ligger kvar i DNS men skickar
+        # vidare till helt andra sajter: en fransk WordPress-installation vid
+        # ett tillfälle, en nederländsk vid nästa. Att låta WWW-länken peka dit
+        # vore att skicka besökare till en okänd sajt i restaurangens namn.
+        # Instagram finns kvar och får bära kontakten tills domänen är i ordning.
         "instagram": "https://www.instagram.com/restaurangmimolett/",
         "area": "Lindholmen"
     },

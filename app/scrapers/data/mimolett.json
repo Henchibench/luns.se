@@ -1,0 +1,91 @@
+{
+  "source": "https://mimolett.kvartersmenyn.se",
+  "captured": "2026-08-05",
+  "price": "129 kr",
+  "note": "Vi har glutenfri pasta, fullkornspasta och olika rätter enligt LCHF",
+  "categories": [
+    {
+      "category": "KÖTT & FISK",
+      "dishes": [
+        {
+          "name": "Grillad Entrecôte",
+          "description": "med friterad klyftpotatis och veckans sås (200 gr)"
+        },
+        {
+          "name": "Black Angus Burger (200 gr)",
+          "description": "Briochebröd, senap, majosås, sallad, rostad lök, pepperjack ost, grillad bacon, BBQ-sås och klyftpotatis"
+        },
+        {
+          "name": "Husets fiskgratäng",
+          "description": "(tisdag och torsdag) Flundrafilé, potatismos, mozzarellaost, tomat, dillsås och citron"
+        }
+      ]
+    },
+    {
+      "category": "RISOTTO",
+      "dishes": [
+        {
+          "name": "Bacon Risotto",
+          "description": "Bacon, grillade grönsaker, grana padano, smör, ruccola"
+        },
+        {
+          "name": "Scampi Risotto",
+          "description": "Tigerräkor, röd chili, vitlök, grana padano, smör, ruccola"
+        }
+      ]
+    },
+    {
+      "category": "PASTARÄTTER",
+      "dishes": [
+        {
+          "name": "Penne Aglio",
+          "description": "Oxfilé, champinjoner, crème fraiche vitlök, grädde, grana padano"
+        },
+        {
+          "name": "Penne Afrikana",
+          "description": "Kyckling, paprika, ananas, jordnötter, grädde, curry, grana padano"
+        },
+        {
+          "name": "Penne Patrone",
+          "description": "Oxfilé, soltorkad tomat, vitlök, tomatsås, grädde, grana padano"
+        },
+        {
+          "name": "Tagliatelle Salmone",
+          "description": "Laxfilé, purjolök, crème fraiche, vitlök, grädde, grana padano"
+        },
+        {
+          "name": "Spagetti Modo Nostro",
+          "description": "Köttfärssås, gorgonzola, champinjoner, grädde, piri piri, grana padano"
+        },
+        {
+          "name": "Tagliatelle con Scampi",
+          "description": "Tigerräkor, tomatsås, vitlök, basilika, grana padano"
+        },
+        {
+          "name": "Penne Romana",
+          "description": "Kyckling, champinjoner, vitlök, grädde, grana padano"
+        },
+        {
+          "name": "Penne Diavolo",
+          "description": "Köttfärssås, grädde, piri-piri, grana padano"
+        },
+        {
+          "name": "Spagetti Carbonara",
+          "description": "Rostad bacon, persilja, vitlök, grädde, grana padano"
+        },
+        {
+          "name": "Penne Vegetale",
+          "description": "Grönsaksmix, champinjoner, tomatsås, vitlök, grana padano"
+        },
+        {
+          "name": "Penne Pesto",
+          "description": "Soltorkad tomat. pesto, vitlök, grädde, mozzarella, grana padano"
+        },
+        {
+          "name": "Hemlagat Lasagne al Forno",
+          "description": ""
+        }
+      ]
+    }
+  ]
+}
