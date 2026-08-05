@@ -9,9 +9,11 @@ If a scraper fails, falls back to the previous data from the live site.
 import json
 import logging
 import os
+import random
 import sys
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -160,6 +162,28 @@ def scrape_all_menus(previous_menus):
     return menus
 
 
+def shuffle_menus(menus):
+    """Blandar om restaurangernas ordning, en ny ordning varje dag.
+
+    Listan skrevs i bokstavsordning, vilket inte är neutralt: den som heter
+    Bar Schiacciate stod överst varje dag för alltid, och den som heter Uni3
+    längst ner. Ögat börjar uppifrån, så alfabetet blev en tyst förmån.
+
+    Slumpen sås av dagens datum i stället för att vara ny vid varje körning.
+    Skrapan går två gånger på förmiddagen, och utan sådden hade sidan bytt
+    ordning mitt framför den som satt och läste den. Nu ser alla samma ordning
+    hela dagen, och en ny i morgon.
+
+    Datumet är svenskt och inte UTC. Menyerna är sorterade på svenska
+    veckodagar, och då ska ordningen byta när dygnet byter här.
+    """
+    today = datetime.now(ZoneInfo("Europe/Stockholm")).date().isoformat()
+    order = list(menus)
+    random.Random(today).shuffle(order)
+    logger.info(f"[ORDNING] Blandad för {today}, först: {order[0]}")
+    return {name: menus[name] for name in order}
+
+
 def build_locations_response(restaurants):
     """Build the location list for the frontend picker.
 
@@ -245,6 +269,7 @@ def main():
 
     logger.info("Starting menu scrape...")
     menus = scrape_all_menus(previous_menus)
+    menus = shuffle_menus(menus)
 
     menus_data = build_menus_response(menus)
     restaurants_data = build_restaurants_response(menus)
