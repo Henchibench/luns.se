@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import LocationSelect from './LocationSelect';
 import type { LunsLocation } from '../../lib/menu';
 import type { Weather } from '../../hooks/useWeather';
 
@@ -77,18 +78,11 @@ export default function Header({
         </span>
 
         {locations.length > 1 && (
-          <select
-            value={selectedLocation ?? ''}
-            onChange={e => onSelectLocation(e.target.value)}
-            aria-label="Välj plats"
-            className="cursor-pointer rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-[11px] text-[var(--ink2)]"
-          >
-            {locations.map(loc => (
-              <option key={loc.id} value={loc.id}>
-                {loc.label}
-              </option>
-            ))}
-          </select>
+          <LocationSelect
+            locations={locations}
+            selected={selectedLocation}
+            onSelect={onSelectLocation}
+          />
         )}
       </div>
 

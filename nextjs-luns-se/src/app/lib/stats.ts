@@ -27,7 +27,16 @@ export interface StatsFile {
    */
   sample?: boolean;
   period: { label: string; days: number };
-  visits: { total: number; weekdays: Bucket[] };
+  visits: {
+    total: number;
+    /**
+     * Besök de senaste sju dagarna, samma mått som total men kortare fönster.
+     * Valfritt: filer skrivna innan siffran fanns saknar den, och anropet kan
+     * fallera för sig utan att resten av statistiken gör det.
+     */
+    week?: number;
+    weekdays: Bucket[];
+  };
   /** Ett värde per timme, index 0–23. */
   hours: number[];
   /**

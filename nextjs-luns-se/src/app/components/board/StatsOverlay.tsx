@@ -57,7 +57,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
  */
 function Figure({ value, label }: { value: string; label: string }) {
   return (
-    <div className="min-w-0 flex-1">
+    <div className="min-w-0">
       <div className="font-heading text-[24px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
         {value}
       </div>
@@ -106,7 +106,7 @@ export default function StatsOverlay({
       {/* Ingen padding på rullande behållaren — rubriken ska kunna klistras
           fast i toppen utan att texten glider in under en kant. */}
       <div
-        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
+        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
         onClick={e => e.stopPropagation()}
       >
         {/* Rubriken måste vara helt täckande — innehållet rullar under den. */}
@@ -150,9 +150,38 @@ export default function StatsOverlay({
               )}
 
               {/* Sammanfattningen står överst utan sektionslinje. Den är svaret,
-                  resten av rutan är hur man kommer fram till det. */}
-              <div className="mb-6 flex gap-4">
-                <Figure value={formatNumber(stats.visits.total)} label="BESÖK" />
+                  resten av rutan är hur man kommer fram till det.
+
+                  Antalet spalter följer antalet tal, för veckosiffran finns
+                  bara när den hämtats. Med ett fast tvåspaltsrutnät hamnade
+                  det tredje talet ensamt nere till vänster med ett hål bredvid
+                  sig, medan avsnitten under spände hela bredden. Raden såg
+                  vänsterlutad ut mot resten av rutan.
+
+                  På telefon är det alltid två. Rutan är knappt 300 pixlar bred
+                  invändigt där, och fyra spalter blir 59 var.
+
+                  Sista spalten är auto och inte 1fr. Med lika breda spalter
+                  står varje tal vänsterställt i sin egen, och den sista blir
+                  bredare än ordet den rymmer: "Måndag" fick åttio pixlar luft
+                  mot högerkanten medan "99" låg tätt mot den vänstra. Raden
+                  såg vänsterlutad ut trots att den spände hela bredden. Nu tar
+                  sista spalten bara sin egen bredd, så raden börjar och slutar
+                  vid väggen. */}
+              <div
+                className={`mb-6 grid grid-cols-[1fr_auto] gap-x-4 gap-y-5 ${
+                  stats.visits.week !== undefined
+                    ? 'wide:grid-cols-[1fr_1fr_1fr_auto]'
+                    : 'wide:grid-cols-[1fr_1fr_auto]'
+                }`}
+              >
+                {/* Månaden säger om sajten används, veckan om den används just
+                    nu. Perioden står i etiketten på båda, annars går de inte
+                    att skilja åt. */}
+                <Figure value={formatNumber(stats.visits.total)} label="BESÖK 30 DAGAR" />
+                {stats.visits.week !== undefined && (
+                  <Figure value={formatNumber(stats.visits.week)} label="BESÖK 7 DAGAR" />
+                )}
                 {/* Kort etikett med flit. "Vanligaste tiden" bröt till två
                     rader på telefon och sköt den tredje siffran ur linje. */}
                 <Figure value={`kl ${peak}`} label="TOPPTID" />

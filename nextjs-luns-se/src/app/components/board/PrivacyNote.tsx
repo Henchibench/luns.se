@@ -9,7 +9,10 @@ import Overlay, { useOverlayClose } from './Overlay';
  * Texten räknar upp exakt vilka händelser som går till Umami i stället för
  * att lova något svepande. "Ingenting lämnar din enhet" hade varit enklare
  * att skriva men är inte sant: vilken restaurang som favoritmarkeras går dit
- * som vanlig produktstatistik. Det som aldrig skickas är fritexten.
+ * som vanlig produktstatistik. Att fritexten aldrig skickas står numera i
+ * listan i stället för i ett eget avsnitt: raden om sökfältet bär hela
+ * löftet, och en rubrik till för samma sak gjorde rutan längre utan att
+ * säga mer.
  *
  * Samma glasruta som förstagångsvalet av plats, så de känns som samma sorts
  * meddelande från sajten.
@@ -72,7 +75,7 @@ export default function PrivacyNote({
             Umami
           </a>
           , som varken sätter cookies eller följer någon mellan sajter. I princip ett
-          integritetsvänligt alternativ till Google Analytics. Vi får veta att någon gjorde något.
+          integritetsvänligt alternativ till Google Analytics.
         </p>
 
         <h3 className="mb-1.5 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
@@ -91,18 +94,12 @@ export default function PrivacyNote({
           <li>· att sökfältet användes, aldrig vad som skrevs i det</li>
           <li>· att temat byttes eller introduktionen öppnades</li>
         </ul>
-        <p className="mb-3 text-[13px] leading-[1.6] text-[var(--ink2)]">
+        {/* Sista stycket i rutan nu, så det bär avståndet ner till knappen
+            som avsnittet under tidigare gjorde. */}
+        <p className="mb-5 text-[13px] leading-[1.6] text-[var(--ink2)]">
           Ihopräknat visas en del av det för alla under{' '}
           <span className="font-semibold text-[var(--ink2)]">Statistik</span>, aldrig per person,
           bara som summor.
-        </p>
-
-        <h3 className="mb-1.5 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
-          DET SOM ALDRIG SKICKAS
-        </h3>
-        <p className="mb-5 text-[13px] leading-[1.6] text-[var(--ink2)]">
-          Det du skriver själv. Sökorden lämnar aldrig din webbläsare. Att sökfältet användes
-          räknas, aldrig vad som stod i det.
         </p>
 
         <div className="flex justify-end">

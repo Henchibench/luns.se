@@ -11,6 +11,12 @@
    palett — annars glider de två isär vid nästa ändring.
 --------------------------------------------------------------------------- */
 :root {
+  /* Talar om för webbläsaren vilket utförande den ska rita sina egna
+     kontroller i: platsväljarens utfällda lista, rullningslister, fokusringar.
+     Utan den står den på "normal", vilket betyder ljust oavsett vårt tema. I
+     mörkt läge hamnade därför vår bleka etikettfärg på en vit systemruta, och
+     listan blev nästan oläslig medan den stängda knappen såg fin ut. */
+  color-scheme: light;
   --mesh: linear-gradient(178deg, #CBDDDF 0%, #BAD1D4 60%, #A9C4C8 100%);
   --glass: rgba(255, 255, 255, .38);
   --glass2: rgba(255, 255, 255, .28);
@@ -33,6 +39,7 @@
 }
 
 html.dark {
+  color-scheme: dark;
   --mesh: linear-gradient(178deg, #043440 0%, #022A35 60%, #01212A 100%);
   --glass: rgba(2, 32, 41, .5);
   --glass2: rgba(255, 255, 255, .045);
