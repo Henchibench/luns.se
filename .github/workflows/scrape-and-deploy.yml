@@ -1,21 +1,28 @@
 name: Scrape and Deploy
 
 on:
-  # Tiderna är UTC — cron kan inte sommartid. 05:00 UTC blir 07:00 svensk tid
-  # på sommaren och 06:00 på vintern, alltså före lunch året om.
+  # Tiderna är UTC, för cron kan inte sommartid. 03:00 UTC är 05:00 svensk tid
+  # på sommaren och 04:00 på vintern.
+  #
+  # Klockslaget ser orimligt tidigt ut och är satt med flit. GitHub startar
+  # inte schemalagda körningar på utsatt tid utan när det finns kapacitet, och
+  # för det här repot har förseningen legat konsekvent på två till två och en
+  # halv timme: 05:00 blev 07:44, 07:00 blev 09:41. Med 03:00 landar den
+  # omkring halv sex till sex UTC, alltså vid sjutiden svensk tid, och
+  # menyerna hinner upp innan någon börjar fundera på lunch.
   #
   # Varje vardag, inte bara måndag. Skyline publicerar en dag i taget och har
   # aldrig mer än dagens lunch uppe, så deras meny finns bara att hämta samma
-  # morgon. Det fångar dessutom alla som lägger ut veckan sent.
+  # morgon.
   #
-  # Andra körningen tar dem som publicerar efter sju. Den ligger före tio, som
-  # är timmen då flest öppnar sajten.
+  # Måndag får en körning till. Det är dagen då veckans menyer läggs ut, och
+  # de som är sena med det fångas av den andra vändan.
   #
   # Extra körningar kan bara göra datan bättre: en skrapa som fallerar behåller
   # förra körningens meny, hämtad från den publicerade menus.json.
   schedule:
-    - cron: '0 5 * * 1-5'   # vardagar, morgon
-    - cron: '0 7 * * 1-5'   # vardagar, omkörning två timmar senare
+    - cron: '0 3 * * 1-5'   # vardagar, tidig morgon
+    - cron: '0 5 * * 1'     # måndag, omkörning för sent utlagda veckomenyer
   workflow_dispatch:
 
 permissions:
