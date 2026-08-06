@@ -114,14 +114,6 @@ body::after {
   box-sizing: border-box;
 }
 
-/* Den utfällda listan ritas av webbläsaren och ärver annars select-elementets
-   genomskinliga bakgrund, vilket ger olika resultat i olika webbläsare. En
-   solid färg gör den till en del av sajten i stället för en systemruta. */
-select option {
-  background: var(--bg);
-  color: var(--ink);
-}
-
 a {
   color: inherit;
   text-decoration: none;
