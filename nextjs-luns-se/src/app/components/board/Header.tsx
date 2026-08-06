@@ -81,7 +81,7 @@ export default function Header({
             value={selectedLocation ?? ''}
             onChange={e => onSelectLocation(e.target.value)}
             aria-label="Välj plats"
-            className="cursor-pointer rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-[11px] text-[var(--ink2)]"
+            className="cursor-pointer rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-[11px] text-[var(--ink)]"
           >
             {locations.map(loc => (
               <option key={loc.id} value={loc.id}>
