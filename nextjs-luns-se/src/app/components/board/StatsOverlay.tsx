@@ -57,7 +57,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
  */
 function Figure({ value, label }: { value: string; label: string }) {
   return (
-    <div className="min-w-0 flex-1">
+    <div className="w-[calc(50%-8px)]">
       <div className="font-heading text-[24px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
         {value}
       </div>
@@ -150,9 +150,20 @@ export default function StatsOverlay({
               )}
 
               {/* Sammanfattningen står överst utan sektionslinje. Den är svaret,
-                  resten av rutan är hur man kommer fram till det. */}
-              <div className="mb-6 flex gap-4">
-                <Figure value={formatNumber(stats.visits.total)} label="BESÖK" />
+                  resten av rutan är hur man kommer fram till det.
+
+                  Siffrorna ligger två och två. Rutan är som bredast 512 pixlar
+                  och fyra i bredd får inte plats där ens på en stor skärm: de
+                  wrappade till tre plus en, med "Måndag" ensam på egen rad.
+                  Halva bredden var ger samma rutnät oavsett skärm. */}
+              <div className="mb-6 flex flex-wrap gap-x-4 gap-y-5">
+                {/* Månaden säger om sajten används, veckan om den används just
+                    nu. Perioden står i etiketten på båda, annars går de inte
+                    att skilja åt. */}
+                <Figure value={formatNumber(stats.visits.total)} label="BESÖK 30 DAGAR" />
+                {stats.visits.week !== undefined && (
+                  <Figure value={formatNumber(stats.visits.week)} label="BESÖK 7 DAGAR" />
+                )}
                 {/* Kort etikett med flit. "Vanligaste tiden" bröt till två
                     rader på telefon och sköt den tredje siffran ur linje. */}
                 <Figure value={`kl ${peak}`} label="TOPPTID" />

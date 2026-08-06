@@ -37,6 +37,9 @@ SLUG = os.environ.get("UMAMI_SHARE_SLUG", "")
 # lunchtoppen en timme fel på sommaren.
 TZ = "Europe/Stockholm"
 DAYS = 30
+# Den kortare siffran vid sidan av totalen. En månad säger om sajten används,
+# en vecka säger om den används just nu.
+WEEK_DAYS = 7
 OUT = Path(__file__).resolve().parent.parent / "nextjs-luns-se" / "public" / "data" / "stats.json"
 
 # Allt räknas per värdnamn, annars blandas våra egna klick in bland besökarnas.
@@ -108,6 +111,26 @@ def pretty(value: str) -> str:
     return value.replace("-", " ").replace("_", " ").strip().capitalize()
 
 
+def visits_over(website: str, token: str, window: dict, days: int):
+    """Besöken under de senaste `days` dagarna, eller None när det inte gick.
+
+    Egen fönsterlängd men samma mått som totalen, annars går de inte att
+    jämföra. Ett eget try av samma skäl som event_total: skulle just det här
+    anropet fallera ska resten av statistiken ändå bli av. Utan det hade en
+    extra siffra kunnat fälla hela filen.
+    """
+    smalt = dict(window)
+    smalt["startAt"] = window["endAt"] - days * 24 * 3600 * 1000
+    try:
+        svar = api(f"websites/{website}/stats", token, **smalt)
+    except Unavailable as error:
+        print(f"stats: veckosiffran hoppades över ({error})", file=sys.stderr)
+        return None
+    if not isinstance(svar, dict) or "visits" not in svar:
+        return None
+    return svar["visits"]
+
+
 def event_total(website: str, token: str, name: str, window: dict) -> int:
     """Hur många gånger en händelse skickats, utan uppdelning på egenskap.
 
@@ -157,6 +180,8 @@ def build_stats() -> dict:
     if not isinstance(summary, dict) or "visits" not in summary:
         raise Unavailable("stats svarade utan besökssiffra")
 
+    week = visits_over(website, token, window, WEEK_DAYS)
+
     daily = parse_series(api(f"websites/{website}/pageviews", token, unit="day", **window))
     weekday_totals = defaultdict(int)
     for row in daily:
@@ -172,6 +197,9 @@ def build_stats() -> dict:
         "period": {"label": f"senaste {DAYS} dagarna", "days": DAYS},
         "visits": {
             "total": summary["visits"],
+            # Utelämnas hellre än att skrivas som noll när anropet inte gick
+            # igenom. En nolla hade lästs som "ingen kom hit i veckan".
+            **({"week": week} if week is not None else {}),
             "weekdays": [
                 {"label": name, "value": weekday_totals.get(index, 0)}
                 for index, name in enumerate(WEEKDAYS)
