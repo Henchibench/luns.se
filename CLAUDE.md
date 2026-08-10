@@ -140,6 +140,23 @@ Kontrollen som avslöjar det: **räkna rätterna per dag före och efter** din
 ändring och diffa raderna. En dag som tappar en rad, eller en rad som blivit
 misstänkt lång, är en hopklistrad rätt.
 
+### Och det näst tystaste: en kategori du hittat på
+
+Kategorin är inte dekoration. `VEGETARISK` framför en rätt är ett påstående om
+maten, och den som läser sajten kan ha ett skäl att lita på det.
+
+Sätt därför bara en kategori du kan **peka på i källan** — en rubrik, en
+etikett, restaurangens egna ord. Att härleda den ur *ordningen* på raderna är
+alltid fel, hur konsekvent mönstret än ser ut den vecka du mäter. Östgöta Kök
+skriver "ny vegetarisk och ny animalisk rätt varje dag" och lade den
+vegetariska först alla fem dagarna 2026-08-10 — men de har aldrig lovat
+ordningen, och dagen de byter står det fel utan att något går sönder.
+
+Saknas rubrik finns två ärliga utvägar: `Dagens`, eller rättens eget namn
+(`ostgota_kok_scraper.py` delar raden vid snedstrecket som restaurangen själv
+skiljer rätt från tillbehör med). Blir den delningen fel är det en kosmetisk
+gräns — inte en osann uppgift om mat.
+
 ## Kolla plattformarna först
 
 Många restauranger publicerar via en plattform vi redan kan. Då är skrapan tio
@@ -315,3 +332,20 @@ person som står inför att sidan slutat fungera ska slippa göra om utredningen
 Väljer du en selektor på `data-kind` i stället för på klassnamn: skriv varför
 (byggaren hashar sina CSS-moduler). Det är den sortens anteckning som är värd
 plats.
+
+## Selektorer som ser stabila ut och inte är det
+
+Två mönster går att känna igen på håll, och båda ger en skrapa som fungerar
+idag och tystnar utan förvarning:
+
+- **`data-v-…` på varje element** är Vue/Nuxt scopade CSS. Hashen byts när de
+  bygger om frontenden. Använd komponentens eget klassnamn i stället — se
+  `rp_restaurang_bar_scraper.py`, som ankrar på `html-render-container` och
+  väljer rätt block genom att räkna veckodagar i det.
+- **Numrerade klasser i WordPress-teman**, som Divis `et_pb_text_2_tb_body`,
+  räknar moduler i sidordning och flyttar sig när någon lägger till en modul
+  ovanför. Leta efter ett handskrivet `id` i stället — Östgöta Köks meny står
+  i `<div id="menyblock">`, och det är sidans enda fasta punkt.
+
+Regeln bakom båda: fäst i något en **människa** har skrivit, inte i något en
+byggare har genererat.
