@@ -115,6 +115,31 @@ Kasta gärna undantag också; runnern fångar dem och gör samma sak.
 **Hitta aldrig på en rätt.** Kan du inte läsa menyn, returnera fellägena. Det
 här är en sajt folk väljer lunch efter.
 
+### Det tystaste felet: en rätt som hamnar i fel rad
+
+Fellägena ovan fångar att hämtningen sprack. De fångar inte att skrapan läste
+sidan, fick med all text, och lade en rätt på fel ställe. Då är rätten kvar i
+`menus.json` men osynlig för den som läser — ingen loggrad, inget larm.
+
+Källan är nästan alltid att någon skriver menyn för hand i en WordPress. Bygg
+därför aldrig igenkänningen på att texten är **snyggt formaterad**:
+
+- Kräv inte att ett stycke *börjar* med sin rubrik. Rubriken kan stå mitt i
+  stycket, och då hamnar rätten efter den under föregående kategori. Det var
+  precis det som hände Kooperativet 2026-08-10 — se klassdocstringen i
+  `kooperativet_scraper.py`, den beskriver mönstret och lösningen.
+- Lita inte på `<strong>`. De glömmer fetstilen lika gärna som
+  styckebrytningen. Ha en lista med kända kategorinamn som funkar på egen hand.
+- Men lita inte bara på listan heller: en ny kategori som inte står där går
+  annars förlorad. Ta rubrikkandidater från **båda** hållen.
+- Matcha kategorinamn versalkänsligt och på hela ord. Rubriker skrivs i
+  VERSALER medan "kött" och "fisk" står i var tredje rättsbeskrivning, och
+  ordkravet är det som skiljer `VEG Taco Bowl` från kategorin `VEGETARISK`.
+
+Kontrollen som avslöjar det: **räkna rätterna per dag före och efter** din
+ändring och diffa raderna. En dag som tappar en rad, eller en rad som blivit
+misstänkt lång, är en hopklistrad rätt.
+
 ## Kolla plattformarna först
 
 Många restauranger publicerar via en plattform vi redan kan. Då är skrapan tio
