@@ -326,14 +326,55 @@ for rad in DinScraper().scrape()['Ditt Namn']: print(rad)
 Rätter på flera veckodagar är rimligt. Noll rätter, eller hela veckan på en dag,
 är det inte.
 
-Sedan hela vägen:
+## Testservern — sista steget innan du lämnar över
+
+`scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
+**<http://10.0.1.34:3002/>** (dev01). Det är där Henrik tittar på ditt jobb
+innan han slår ihop Dev med main, och därför är **inget kort klart förrän
+servern kör och adressen står i rapporten**.
 
 ```bash
-python scripts/scrape_menus.py          # skriver JSON till nextjs-luns-se/public/data/
-cd nextjs-luns-se && npm ci && npm run build
+scripts/testserver.sh                 # skrapa, bygg, (om)starta servern
+scripts/testserver.sh --utan-skrap    # bygg bara om frontenden
+scripts/testserver.sh status          # kör den, och vad visar den?
+scripts/testserver.sh stopp
 ```
 
-Kontrollera att restaurangen dyker upp under rätt område.
+Den ersätter `scrape_menus.py` + `npm run build` som du körde för hand: samma
+kommandon i samma ordning, plus tre saker de inte gjorde.
+
+**Den kör i ett venv utan playwright.** `.venv-prod` byggs ur
+`requirements.txt` och speglar det workflowet installerar. Har din skrapa råkat
+importera playwright faller den *här*, direkt, i stället för tyst i Actions tre
+dagar senare. Det är den enda platsen den fällan faktiskt fångas.
+
+**Den sammanfattar skrapningen** med `scripts/menylage.py`: rätter per veckodag,
+en rad per restaurang, med de två felsträngarna utskrivna som fel. Läs tabellen
+— det är där du ser att din restaurang fick mat på fem dagar och inte allt på
+måndag. Vill du jämföra före och efter din ändring: kopiera undan
+`nextjs-luns-se/public/data/menus.json` innan du kör, och kör `menylage.py` mot
+kopian efteråt.
+
+**Den märker sidan** med ett gult band överst — gren, commit, byggtid, och om
+arbetsträdet har okommittade ändringar. Bandet är ett CSS-pseudoelement på
+`html` och injiceras i `out/`, som är gitignorerad. Det kan alltså varken följa
+med en commit eller hamna på den riktiga sajten. En `<div>` gick inte: React
+hydrerar hela dokumentet och rensar bort noder den inte känner igen, så bandet
+försvann efter en sekund och sidan såg skarp ut precis när man började läsa den.
+
+Går något fel avbryter skriptet och rör **inte** den körande servern. En gammal
+version uppe är bättre än en trasig sida, och bandet visar när den byggdes.
+
+Låt servern stå kvar när du är klar — Henrik ska kunna titta i morgon bitti utan
+att starta något. Nästa kort bygger om och startar om den. Efter en omstart av
+dev01 är den borta, med flit: en gammal sajt utan avsändare är sämre än ingen.
+
+Två saker som ser ut som fel och inte är det: sidan frågar efter område första
+gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
+`stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
+
+Kontrollera i webbläsaren att restaurangen dyker upp under rätt område. Att den
+står under fel område, eller som `Unknown`, syns inte i skrapans utdata.
 
 ## Körningen i produktion
 
