@@ -297,8 +297,11 @@ restaurant_locations = {
         # den vanliga "ingen meny idag" — det här är inte ett fel.
         "daily_menu_only": True
     },
-    "RP Restaurang & Bar": {
-        "description": "Restaurang och bar inne i Saab Arena, med salladsbuffé till lunchen. Två rätter om dagen måndag till torsdag, grillbuffé på fredagen, och en vegetarisk rätt som står kvar hela veckan. Medlemmar i Linköping Hockey Club får rabatt.",
+    # Restaurangen heter RP – Restaurang & Bar, men i Linköping säger man SAAB
+    # Arena, och det är namnet folk letar efter. Det egna namnet står först i
+    # beskrivningen så att den som känner till det ändå hittar rätt.
+    "SAAB Arena": {
+        "description": "RP – Restaurang & Bar inne i Saab Arena, med salladsbuffé till lunchen. Två rätter om dagen måndag till torsdag, grillbuffé på fredagen, och en vegetarisk rätt som står kvar hela veckan. Medlemmar i Linköping Hockey Club får rabatt.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Saab+Arena%2C+Gumpekullav%C3%A4gen+1%2C+582+78+Link%C3%B6ping",
         # Arenabyggnaden i OpenStreetMap. Restaurangen ligger inne i huset och
         # har ingen egen gatuadress, så husets punkt är så nära entrén vi kan

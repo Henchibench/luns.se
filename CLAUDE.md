@@ -60,6 +60,14 @@ Uppslaget i `restaurant_data.py`:
 `instagram` är valfritt. Koordinaterna slår du upp i OpenStreetMap — de
 används för avståndssorteringen och ska peka på entrén, inte på kvarteret.
 
+**Nyckeln här måste vara exakt samma sträng som skrapans `name`.** Menyerna
+läggs upp under `scraper.name`, och `build_restaurants_response()` slår sedan
+upp metadatan på den strängen. Stämmer de inte hamnar restaurangen på sajten
+med `area: "Unknown"`, utan beskrivning och utan nål på kartan — och den räknas
+inte in i något område. Ingenting går sönder, det syns bara på fel ställe.
+Byter du visningsnamn: byt på båda ställena i samma commit, och kör
+`scrape_menus.py` och kontrollera att inget står som `Unknown`.
+
 `area` måste finnas i `LOCATIONS` högst upp i samma fil. Idag finns
 **Lindholmen** (Göteborg), **Tannefors** och **Mjärdevi** (Linköping). Ett nytt
 område kräver ett uppslag där också, annars hoppas restaurangen tyst över i
@@ -340,7 +348,7 @@ idag och tystnar utan förvarning:
 
 - **`data-v-…` på varje element** är Vue/Nuxt scopade CSS. Hashen byts när de
   bygger om frontenden. Använd komponentens eget klassnamn i stället — se
-  `rp_restaurang_bar_scraper.py`, som ankrar på `html-render-container` och
+  `saab_arena_scraper.py`, som ankrar på `html-render-container` och
   väljer rätt block genom att räkna veckodagar i det.
 - **Numrerade klasser i WordPress-teman**, som Divis `et_pb_text_2_tb_body`,
   räknar moduler i sidordning och flyttar sig när någon lägger till en modul

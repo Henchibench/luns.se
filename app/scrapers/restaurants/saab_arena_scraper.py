@@ -5,8 +5,12 @@ from typing import Dict, List, Optional
 from ..base_scraper import BaseScraper
 
 
-class RpRestaurangBarScraper(BaseScraper):
-    """RP – Restaurang & Bar i Saab Arena, Linköping (lhc.eu/lunch).
+class SaabArenaScraper(BaseScraper):
+    """SAAB Arena, Linköping (lhc.eu/lunch).
+
+    Restaurangen heter egentligen RP – Restaurang & Bar, men i Linköping säger
+    man SAAB Arena, och sajten listar den under det namnet. Söker någon på det
+    riktiga namnet står det i beskrivningen i `restaurant_data.py`.
 
     Sidan är en Nuxt-app, men den serverrenderas: hela menyn ligger i den
     HTML `requests` får, så ingen webbläsare behövs.
@@ -73,7 +77,7 @@ class RpRestaurangBarScraper(BaseScraper):
 
     def __init__(self):
         restaurant_info = {
-            'name': 'RP Restaurang & Bar',
+            'name': 'SAAB Arena',
             'website': 'https://www.lhc.eu',
             'menu_url': 'https://www.lhc.eu/lunch',
         }
