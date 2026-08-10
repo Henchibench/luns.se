@@ -15,16 +15,27 @@ on:
   # aldrig mer än dagens lunch uppe, så deras meny finns bara att hämta samma
   # morgon.
   #
-  # TRE VÄNDOR VARJE VARDAG, och det är mätt. En jämförelse mellan måndagens
-  # morgonkörning (06:16 UTC) och samma kväll: Pier 11 hade 2 rätter på
-  # måndagen och 3 senare, över veckan 13 rader mot 20. Seven Seasons 1 mot 2,
-  # och 5 mot 10 över veckan. Restauranger fyller alltså på långt efter att
-  # morgonens körning gått, och det syns inte — sidan ser komplett ut ändå.
+  # MÅNDAGEN FÅR TRE VÄNDOR, övriga vardagar två.
   #
-  # Att välja ETT bättre klockslag hjälper inte: spridningen i fördröjningen är
-  # hundra minuter och äter upp precisionen. Fler vändor gör det. De kostar
-  # ingenting, och en extra körning kan bara förbättra datan — en skrapa som
-  # inte hittar något behåller förra körningens meny.
+  # Måndagen är dagen veckans menyer läggs ut, och den är mätt: en jämförelse
+  # mellan måndagens morgonkörning (06:16 UTC) och samma kväll visade att
+  # Pier 11 hade 2 rätter på måndagen och 3 senare — över veckan 13 rader mot
+  # 20 — och Seven Seasons 1 mot 2, 5 mot 10 över veckan. Restauranger fyller
+  # alltså på långt efter morgonens körning, och det syns inte: sidan ser
+  # komplett ut ändå.
+  #
+  # Att välja ETT bättre klockslag hjälper inte. Spridningen i GitHubs
+  # fördröjning är hundra minuter (uppmätt 75–176) och äter upp precisionen.
+  # Fler vändor gör det, och de kostar ingenting — en skrapa som inte hittar
+  # något behåller förra körningens meny, så en extra körning kan bara
+  # förbättra datan.
+  #
+  # Tisdag till fredag har bara två. Där är veckomenyerna redan uppe, och de
+  # som publicerar en dag i taget (Skyline) har sin meny klar tidigt — de
+  # fångas av morgonvändan. Andra vändan är hängslen och livrem, och håller
+  # samtidigt besöksstatistiken färsk. Att det INTE är mätt för de dagarna är
+  # medvetet: hypotesen är att de inte behöver mer, och den får revideras om
+  # samma jämförelse görs en tisdag och visar något annat.
   #
   # Förmiddagsvändan finns för att restauranger fyller på EFTER morgonens
   # körning. Pier 11 hade två rätter när skrapningen kördes 06:16 UTC och tre
@@ -43,9 +54,9 @@ on:
   # Extra körningar kan bara göra datan bättre: en skrapa som fallerar behåller
   # förra körningens meny, hämtad från den publicerade menus.json.
   schedule:
-    - cron: '0 3 * * 1-5'   # landar ~06:25–07:55 svensk tid
-    - cron: '37 4 * * 1-5'  # landar ~07:50–09:35
-    - cron: '23 5 * * 1-5'  # landar ~08:40–10:20, för de sista eftersläntrarna
+    - cron: '0 3 * * 1-5'   # alla vardagar, landar ~06:25–07:55 svensk tid
+    - cron: '37 4 * * 1-5'  # alla vardagar, landar ~07:50–09:35
+    - cron: '23 5 * * 1'    # bara måndag, landar ~08:40–10:20
   workflow_dispatch:
 
 permissions:
