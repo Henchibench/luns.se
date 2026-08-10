@@ -18,10 +18,25 @@ on:
   # Måndag får en körning till. Det är dagen då veckans menyer läggs ut, och
   # de som är sena med det fångas av den andra vändan.
   #
+  # Förmiddagsvändan finns för att restauranger fyller på EFTER morgonens
+  # körning. Pier 11 hade två rätter när skrapningen kördes 06:16 UTC och tre
+  # en stund senare — och det syns inte, för sidan ser komplett ut ändå.
+  #
+  # Klockslaget är räknat baklänges, inte gissat. Mätt fördröjning på det här
+  # repot är 75–176 minuter (median 107). Trycket på luns.se är högst kl 10
+  # svensk tid, alltså 08:00 UTC. 04:37 + värsta uppmätta fördröjning landar
+  # 07:33 UTC — före toppen även en dålig dag. Ett senare klockslag hade
+  # medianen talat för, men då hamnar de dåliga dagarna efter lunchrusningen,
+  # och det är just de dagarna det spelar roll.
+  #
+  # 37 och inte 00: hel timme är när alla andras jobb också startar, och det
+  # är en stor del av kön ovan.
+  #
   # Extra körningar kan bara göra datan bättre: en skrapa som fallerar behåller
   # förra körningens meny, hämtad från den publicerade menus.json.
   schedule:
     - cron: '0 3 * * 1-5'   # vardagar, tidig morgon
+    - cron: '37 4 * * 1-5'  # vardagar, förmiddagsvända före lunchrusningen
     - cron: '0 5 * * 1'     # måndag, omkörning för sent utlagda veckomenyer
   workflow_dispatch:
 
