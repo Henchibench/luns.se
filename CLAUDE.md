@@ -336,6 +336,23 @@ for rad in DinScraper().scrape()['Ditt Namn']: print(rad)
 Rätter på flera veckodagar är rimligt. Noll rätter, eller hela veckan på en dag,
 är det inte.
 
+Vill du kontrollera utfallet i den byggda datan ligger båda filerna under
+`nextjs-luns-se/public/data/` — men **de är omslagna**, inte uppslag direkt på
+restaurangnamnet. `menus.json` har raderna under `["menus"][namn]` och
+`restaurants.json` metadatan under `["restaurants"][namn]`; resten är
+`metadata`, `total`, `locations` och `scrape_timestamp`. Slår du upp namnet på
+toppnivån får du `None` och tror att skrapan gav noll rätter.
+
+```bash
+python -c "
+import json
+m = json.load(open('nextjs-luns-se/public/data/menus.json'))['menus']
+for rad in m['Ditt Namn']: print(rad)
+"
+```
+
+Det är också där du ser att `area` blev rätt — det syns inte i skrapans utdata.
+
 ## Testservern — sista steget innan du lämnar över
 
 `scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
@@ -459,3 +476,64 @@ idag och tystnar utan förvarning:
 
 Regeln bakom båda: fäst i något en **människa** har skrivit, inte i något en
 byggare har genererat.
+
+Har Divi-sidan varken `id` eller rubrikklasser finns en tredje väg:
+**avgränsa ett intervall med två rubriker någon skrivit själv** och tolka
+dokumentordningen där emellan. Divi lägger varje rubrik och varje stycke i sin
+egen `div.et_pb_text_inner`, så rätten och dess beskrivning är **syskon** och
+inte nästlade — det finns ingen behållare per rätt att greppa. Rubriktexten
+("Vår menu", "Du hittar oss på") är det enda i markupen en människa bestämt.
+Se `sukaldari_scraper.py`.
+
+## En foodtruck är inte en restaurang med adress
+
+Står stället på olika platser olika veckodagar räcker det inte att skrapa
+menyn — då måste **platsschemat läsas också**, och menyn läggas bara på de
+dagar stället faktiskt står i vårt område. Sukaldari står vid Dataton på
+Teknikringen mån–ons och fre, men vid Saab på Ensbovägen på torsdagar.
+
+Det är ett av de tystaste felen som finns: lägger man menyn på alla fem dagar
+går någon ut på lunchen till en tom parkering, och ingenting på sajten ser
+trasigt ut. Hårdkoda inte dagarna heller — läs dem ur schemat vid varje
+körning, och returnera fellägena om schemat inte går att tolka. Då behåller
+`scrape_menus.py` de dagar som senast stämde i stället för att gissa.
+
+## Vad som faktiskt finns i Mjärdevi
+
+`mjardevi.se/dagens-lunch/` är områdets egen lista och duger som facit när
+någon föreslår en restaurang. Per 2026-08-11 täcker luns.se hela den listan.
+
+Vill du bredda: `lunchaimjardevi.com` täcker mer än Mjärdevi och har sina
+skrapor öppna på `github.com/popeen/Luncha-I-Mjardevi-Scraper` (PowerShell).
+Kontrollerad 2026-08-11 innehöll den nio ställen vi saknade, men bara
+Sukaldari och Stångs Matlådor låg i Mjärdevi: Zodiaken var nedlagd (`hors.se`
+pekar numera på Nordrest, som inte har den), Ros Bröllop hade blivit ren
+eventlokal, Trucken en eventfoodtruck utan dagslunch, Freshmarket hade slagits
+ihop med Östgöta Kök som vi redan skrapar, och Torn1, Ellas och Gastromix
+ligger i Tornby och Malmslätt. Kontrollera alltid **både** att stället finns
+kvar och att det ligger i ett område vi har.
+
+## En kyl på ett kontor är också ett lunchställe
+
+Stångs Matlådor avfärdades först som "en produkt hos en restaurang vi redan
+har". Det var fel: kylarna står ute i husen — Stångs kallar dem **Stångs
+Express** och installerar dem hos företagen — så för den som sitter i ett hus
+med en är det ett eget alternativ, inte ett besök hos Stångs Mjärdevi. Fråga
+"kan man äta lunch här utan att gå till restaurangen?" innan du skriver av
+något som en produkt.
+
+Sortimentet ligger bara i kassasystemet, och `POST db20.bokad.se/webdata` med
+`{"system": "<system>"}` ger **hela registret i ett anrop** — kategorier,
+produkter och priser. Det är en annan väg in än `/find` och `/findone` som
+`stangs_mjardevi_scraper.py` använder för dagens rätter, och den enda som
+visar vad som står i kylarna. Prislistorna följer dock inte med; standard-
+prislistans id kräver fortfarande ett `/findone` mot `pricelists`.
+
+Varje kyl har sina egna kategorier med i stort sett samma rätter i
+("QUALCOMM MATLÅDOR", "SAAB MATLÅDOR", "Sectra Teknikringen Lunchlåda", …).
+Lägg ihop dem och deduplicera på rättens namn — men **säg i en INFO-rad att
+alla alternativ inte finns i alla kylar**, för det gör de inte. Att i stället
+lista bara "rätt" kyl kräver en hårdkodad lista över vilka hus som har en, och
+den ruttnar tyst nästa gång Stångs sätter upp en till. `productGroups` i
+svaret avslöjar var de står bättre än kategorinamnen gör: `SAAB MJÄRDEVI 6%`
+är hur man vet att Saab-kylen står i Mjärdevi och inte på Ensbovägen.
