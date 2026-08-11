@@ -262,6 +262,20 @@ restaurant_locations = {
         "area": "Mjärdevi",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Sukaldari": {
+        "description": "Foodtruck med hemgjorda burgare och dressingar, uppkallad efter baskiskans ord för kock. Står vid Dataton på Teknikringen måndag till onsdag och på fredagar — på torsdagar är den vid Saab på Ensbovägen, och då står ingen meny här. Menyn är fast, inte veckovis.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Sukaldari%2C+Teknikringen+22%2C+583+35+Link%C3%B6ping",
+        # Ur kartlänken på deras egen sida, som pekar på Dataton. Nominatim
+        # bekräftar att punkten ligger i Mjärdevi.
+        "latitude": 58.3941106,
+        "longitude": 15.5554433,
+        "website": "https://sukaldari.se",
+        "instagram": "https://instagram.com/sukaldari.se",
+        "area": "Mjärdevi",
+        # Inga öppettider utsatta någonstans på deras sida, och en foodtrucks
+        # tider är inget att gissa sig till. Fältet utelämnas hellre än fylls
+        # med något som ser säkert ut.
+    },
     "Universitetsklubben": {
         "description": "Campusrestaurang i huset Vallfarten på Linköpings universitet, med två matsalar. Två rätter om dagen, ofta en vegetarisk.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Universitetsklubben%2C+Vallfarten%2C+Campus+Valla%2C+Link%C3%B6ping",
