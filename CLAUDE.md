@@ -379,6 +379,23 @@ Låt servern stå kvar när du är klar — Henrik ska kunna titta i morgon bitt
 att starta något. Nästa kort bygger om och startar om den. Efter en omstart av
 dev01 är den borta, med flit: en gammal sajt utan avsändare är sämre än ingen.
 
+**Den bygger med rensad miljö**, och det är inte kosmetik. Kör du skriptet ur
+ett skal som ärvts från en `next start` — eller ur en agent som startats där —
+följer `NEXT_*`, `__NEXT_*` och `TURBOPACK=1` med hela vägen in i bygget.
+`TURBOPACK=1` tvingar turbopack-bygge, och turbopack spricker med
+`output: 'export'` på Nexts inbyggda felsidor:
+
+    Error: <Html> should not be imported outside of pages/_document.
+    Error occurred prerendering page "/404"
+
+Kompileringen går igenom först, så felet ser ut att sitta i sidkoden — det gör
+det inte, ingen fil i repot importerar `next/document`. `NODE_ENV=production`
+ur samma arv ger i stället `npm ci` utan devDependencies och ett bygge som
+faller på `Cannot find module 'tailwindcss'`. Actions ser ingetdera, eftersom
+det startar i ett tomt skal. Skriptet rensar därför båda innan bygget. Bygger
+du för hand med `npm run build`: kolla `env | grep -E 'TURBOPACK|NODE_ENV'`
+innan du felsöker något annat. Node-versionen har inget med saken att göra.
+
 Två saker som ser ut som fel och inte är det: sidan frågar efter område första
 gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
 `stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
