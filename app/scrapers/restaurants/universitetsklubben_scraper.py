@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List
 
 from ..base_scraper import BaseScraper
@@ -14,6 +15,15 @@ class UniversitetsklubbenScraper(BaseScraper):
     Sidan växlar språk i webbläsaren genom att skriva om samma element, och
     attributet är det som håller den svenska versionen oavsett vilket språk
     som råkade vara valt när sidan renderades.
+
+    Dagrubriken bär inget eget data-sv — dagnamnet ligger i ett inre
+    `span.castit-i18n`, och innevarande dag får dessutom ett andra span,
+    `castit-day__badge` med texten "Idag". Läser man hela h3:ns text blir
+    den alltså "Tisdag Idag" på tisdagar, och en exakt jämförelse mot
+    veckodagen missar. Det gjorde att skrapan tappade exakt den dag som
+    besökaren är ute efter, varje dag, utan att något gick sönder: sajten
+    visade resten av veckan och stod tom för idag. Därför plockas dagnamnet
+    ur språkspanen, och badgen sorteras bort på sin egen klass.
 
     Veckoväxlaren är JavaScript utan länkar, så vi får den vecka servern
     väljer — vilket är innevarande, alltså samma som en besökare ser.
@@ -36,6 +46,33 @@ class UniversitetsklubbenScraper(BaseScraper):
         text = element.get('data-sv') or element.get_text(' ', strip=True)
         return self.clean_text(text)
 
+    def _day_from_title(self, title) -> str:
+        """Veckodagen ur dagrubriken, utan att badgen "Idag" stör.
+
+        Kandidaterna tas ur språkspanen först, och badgen väljs bort på sin
+        klass. Skulle de sluta märka upp dagnamnet med ett eget span får
+        hela rubriktexten stå som sista utväg — där matchas veckodagen som
+        helt ord, så att en rubrik med tillägg ändå går att läsa.
+        """
+        if title is None:
+            return ''
+
+        candidates = [
+            self._swedish(span)
+            for span in title.select('.castit-i18n')
+            if 'castit-day__badge' not in span.get('class', [])
+        ]
+        for text in candidates:
+            for day in self.SWEDISH_DAYS:
+                if text.lower() == day.lower():
+                    return day
+
+        heading = self._swedish(title)
+        for day in self.SWEDISH_DAYS:
+            if re.search(rf'\b{day}\b', heading, re.IGNORECASE):
+                return day
+        return ''
+
     def scrape(self) -> Dict[str, List[str]]:
         try:
             soup = self.get_page_content()
@@ -46,13 +83,7 @@ class UniversitetsklubbenScraper(BaseScraper):
             days_seen: List[str] = []
 
             for section in soup.select('section.castit-day'):
-                title = section.select_one('.castit-day__title')
-                heading = self._swedish(title) or self._swedish(
-                    title.select_one('.castit-i18n') if title else None
-                )
-                day = next(
-                    (d for d in self.SWEDISH_DAYS if d.lower() == heading.lower()), ''
-                )
+                day = self._day_from_title(section.select_one('.castit-day__title'))
                 if not day:
                     continue
 

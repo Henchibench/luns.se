@@ -162,6 +162,23 @@ fi
 
 cd "$FRONT" || avbryt "hittar inte $FRONT"
 
+# Bygget körs med rensad miljö, för Actions startar sitt i ett tomt skal och det
+# är den miljön skriptet lovar att spegla. Ett skal som ärvts från en körande
+# "next start" — eller från en agent som startats ur ett sådant — bär med sig
+# NEXT_*, __NEXT_* och framför allt TURBOPACK=1, och de överlever ända in i
+# bygget. Två konkreta haverier, båda felsökta som något annat:
+#
+#   TURBOPACK=1  tvingar turbopack-bygge, och det spricker med output:'export'
+#                på Nexts inbyggda felsidor: "<Html> should not be imported
+#                outside of pages/_document" vid prerender av /404 och /_error.
+#                Kompileringen går igenom, så felet ser ut att sitta i sidkoden.
+#   NODE_ENV=production  får npm ci att hoppa över devDependencies, och bygget
+#                faller i stället på "Cannot find module 'tailwindcss'".
+#
+# Ingen av dem har med repots kod att göra, och båda försvinner här.
+unset TURBOPACK NODE_ENV
+for VAR in $(compgen -v | grep -E '^_*NEXT_'); do unset "$VAR"; done
+
 # npm ci bara när låsfilen faktiskt är nyare än den installerade trädet. npm
 # skriver node_modules/.package-lock.json vid varje install, så jämförelsen är
 # exakt och kostar inget.
