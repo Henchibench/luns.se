@@ -297,4 +297,33 @@ restaurant_locations = {
         # den vanliga "ingen meny idag" — det här är inte ett fel.
         "daily_menu_only": True
     },
+    # Restaurangen heter RP – Restaurang & Bar, men i Linköping säger man SAAB
+    # Arena, och det är namnet folk letar efter. Det egna namnet står först i
+    # beskrivningen så att den som känner till det ändå hittar rätt.
+    "SAAB Arena": {
+        "description": "RP – Restaurang & Bar inne i Saab Arena, med salladsbuffé till lunchen. Två rätter om dagen måndag till torsdag, grillbuffé på fredagen, och en vegetarisk rätt som står kvar hela veckan. Medlemmar i Linköping Hockey Club får rabatt.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Saab+Arena%2C+Gumpekullav%C3%A4gen+1%2C+582+78+Link%C3%B6ping",
+        # Arenabyggnaden i OpenStreetMap. Restaurangen ligger inne i huset och
+        # har ingen egen gatuadress, så husets punkt är så nära entrén vi kan
+        # komma. Kvarteret heter Kallerstad men OSM för det till Tannefors,
+        # liksom Jasons Matstuga och Skyline.
+        "latitude": 58.4173938,
+        "longitude": 15.6355515,
+        "website": "https://www.lhc.eu/lunch",
+        "area": "Tannefors"
+        # Inga lunchtider anges någonstans på lhc.eu, så fältet står tomt
+        # hellre än gissat.
+    },
+    "Östgöta Kök": {
+        "description": "Klimatsmart husmanskost på Garnisonen, där den vegetariska rätten spelar huvudrollen. En vegetarisk och en animalisk rätt varje dag, plus veckans sallad, veckans fisk och ett par klassiker som står kvar hela veckan. Eget bageri med surdegsbröd från morgonen.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=%C3%96stg%C3%B6ta+K%C3%B6k%2C+Artillerigatan+15%2C+587+58+Link%C3%B6ping",
+        # Restaurangens egen nod i OpenStreetMap, Artillerigatan 15.
+        "latitude": 58.3958660,
+        "longitude": 15.6179954,
+        # Ligger på Garnisonen, drygt två kilometer väster om Tannefors, och
+        # förs hit på beställning snarare än på geografi.
+        "website": "https://linkoping.ostgotakok.se",
+        "area": "Tannefors",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
 }

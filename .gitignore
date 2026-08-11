@@ -8,6 +8,12 @@ __pycache__/
 venv/
 .venv/
 
+# Testserverns venv och körtidsfiler (scripts/testserver.sh). .venv-prod är
+# medvetet ett ANNAT venv än .venv: det speglar Actions och får därför aldrig
+# innehålla playwright.
+.venv-prod/
+.testserver/
+
 # Spaningsutdata från scripts/spana.py. Sidkopior, skärmbilder och nedladdade
 # menybilder hör hemma i en temporärkatalog, aldrig i repot.
 spana-*/

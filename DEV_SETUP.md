@@ -32,6 +32,20 @@ npm run build     # Produces the out/ directory
 npx serve out     # Serve it locally
 ```
 
+### 3b. Or run the whole chain in one command
+
+`scripts/testserver.sh` does steps 1–3 the way GitHub Actions does — scrape in a
+playwright-free venv, build, serve — and marks every page with a yellow banner
+so the local copy can never be mistaken for the live site.
+
+```bash
+scripts/testserver.sh          # http://<host>:3002/
+scripts/testserver.sh status
+scripts/testserver.sh stopp
+```
+
+On dev01 it runs at <http://10.0.1.34:3002/>. See "Testservern" in `CLAUDE.md`.
+
 ## How It Works
 
 - **Scrapers** (`scripts/scrape_menus.py`) fetch lunch menus from ~6 restaurant websites and write static JSON files to `nextjs-luns-se/public/data/`

@@ -15,6 +15,34 @@ def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
 socket.getaddrinfo = _ipv4_getaddrinfo
 
 class BaseScraper(ABC):
+    # Elementor märker responsivt dolda block med en klass per brytpunkt:
+    # elementor-hidden-mobile, -tablet, -laptop, -desktop. Bär ett block ALLA
+    # fyra samtidigt finns ingen skärmbredd kvar där det kan visas — det är
+    # avställt innehåll någon glömt radera, inte en mobilvariant. En skrapa som
+    # läser rå HTML ser annars ingen skillnad på det som visas och det som är
+    # avstängt, och kan servera förra årets meny utan att något går sönder.
+    #
+    # Regeln är med flit smal, och ska förbli det:
+    #
+    # - Bara NÅGRA av klasserna betyder responsivt dolt. Det blocket visas för
+    #   någon och måste behållas, annars tappar vi menyer som bara finns på
+    #   mobil. Därför krävs hela mängden, som delmängd — extra brytpunkter
+    #   (widescreen, mobile_extra) får finnas, de gör bara blocket mer dolt.
+    # - Vanlig display:none rörs inte. Menysidor bygger dragspel och flikar
+    #   där dagarna är dolda tills man klickar; rensar man dem raderar man
+    #   menyer. Elementor-klasserna är det enda fall vi kan BEVISA ur markupen
+    #   ensam att innehållet aldrig kan nå en besökare.
+    #
+    # Är en sida konfigurerad utan laptop-brytpunkten missar vi dess döda
+    # block. Det är rätt fel att göra: vi behåller för mycket hellre än att
+    # radera något synligt.
+    ELEMENTOR_ALL_BREAKPOINTS = frozenset({
+        'elementor-hidden-desktop',
+        'elementor-hidden-laptop',
+        'elementor-hidden-tablet',
+        'elementor-hidden-mobile',
+    })
+
     def __init__(self, restaurant_info: dict):
         self.name = restaurant_info['name']
         self.url = restaurant_info['website']
@@ -49,12 +77,27 @@ class BaseScraper(ABC):
             # betydligt bättre källa, och den läser BeautifulSoup själv ur
             # bytesen. Anger servern en kodning litar vi på den som förut.
             if 'charset' not in response.headers.get('Content-Type', '').lower():
-                return BeautifulSoup(response.content, 'html.parser')
-            return BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(response.content, 'html.parser')
+            else:
+                soup = BeautifulSoup(response.text, 'html.parser')
+            return self.remove_always_hidden(soup)
         except requests.RequestException as e:
             self.log_error(f"Failed to retrieve page: {str(e)}")
             return None
-    
+
+    def remove_always_hidden(self, soup: BeautifulSoup) -> BeautifulSoup:
+        """Ta bort block som är dolda på samtliga brytpunkter.
+
+        Se ELEMENTOR_ALL_BREAKPOINTS för varför regeln bara gäller det fallet.
+        Körs före tolkningen så att ingen skrapa behöver känna till den.
+        """
+        for element in soup.select('[class*=elementor-hidden-]'):
+            classes = set(element.get('class', []))
+            if self.ELEMENTOR_ALL_BREAKPOINTS.issubset(classes):
+                element.decompose()
+        return soup
+
+
     def format_menu_item(self, food_type: str, dish: str, price: Optional[str] = None) -> str:
         """Format a menu item with food type, dish description, and optional price"""
         formatted_item = f"<strong>{food_type}</strong>: <span class='dish-description'>{dish}</span>"

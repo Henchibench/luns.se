@@ -1,7 +1,51 @@
 from ..base_scraper import BaseScraper
+import copy
 import re
 
 class KooperativetScraper(BaseScraper):
+    """Kooperativet publicerar veckans lunch i WordPress (Enfold-temat).
+
+    Varje veckodag är en <div id="monday">…"friday"> med ett avia_textblock.
+    Inuti det står en rätt per <p>, på formen
+
+        <p><strong>KÖTT</strong><br/>Rätten och dess beskrivning</p>
+
+    Fällan är att de skriver rubrikerna för hand och gör det slarvigt med jämna
+    mellanrum. 2026-08-10 stod måndagens KÖTT-rubrik mitt inne i det stycke som
+    innehöll den vegetariska rätten:
+
+        <p>”VEG Taco Bowl” –…tortilla<br/><strong><br/>KÖTT</strong><br/>
+           Kooperativets klassiska Köttbullemåndag…</p>
+
+    En igenkänning som kräver att stycket BÖRJAR med sin rubrik missar då både
+    rubriken och rätten: köttbullarna klistrades fast i slutet av den
+    vegetariska raden och blev osynliga för den som läser sajten. Därför delas
+    stycket numera vid varje rubrik, var den än står — se
+    _split_by_categories().
+
+    Två saker till som mätningen av sidan visade, och som styr designen:
+
+    - Rubriken kan sakna <strong> lika gärna som den kan sakna styckebrytning,
+      så den kända kategorilistan måste kunna hitta den på egen hand.
+    - Men listan räcker inte: fredagen hade EAST ASIA, en kategori som inte
+      står i listan och bara går att se på att den är fetstilt. Kandidaterna är
+      därför BÅDE den kända listan och sidans egna versala <strong>-rubriker.
+
+    Matchningen är versalkänslig och kräver hela ord. Det är inte kosmetika:
+    ingen kategori förekommer någonsin i versaler inne i en rättsbeskrivning
+    (mätt över alla fem dagarna), medan gemena "kött" och "fisk" gör det stup i
+    kvarten. Kravet på helt ord är det som hindrar "VEG Taco Bowl" från att
+    läsas som rubriken VEGETARISK.
+    """
+
+    # Kategorier vi vet att de använder. Matchas även utan <strong>.
+    # EAST ASIA observerades på fredagen 2026-08-10 och står med här för att
+    # den annars bara känns igen så länge de kommer ihåg att fetstila den.
+    KNOWN_CATEGORIES = [
+        'SALLADER', 'VECKANS SPECIAL', 'KÖTT', 'FISK', 'THAI', 'INDISK',
+        'VÄRLDEN', 'VEGETARISKT', 'VEGETARISK', 'EAST ASIA',
+    ]
+
     def __init__(self):
         # Initialize with restaurant info dictionary to match base scraper interface
         restaurant_info = {
@@ -123,42 +167,35 @@ class KooperativetScraper(BaseScraper):
     def _extract_daily_menu(self, day_section, day_name):
         """Extract menu items for a specific day"""
         daily_items = []
-        
+
         try:
+            # Rubrikkandidaterna samlas för hela dagen, inte per stycke: hamnar
+            # en fetstilt rubrik i fel stycke ska den ändå kännas igen där.
+            headings = self._collect_headings(day_section)
+
             # Find all textblocks in this day section
             textblocks = day_section.find_all('div', class_='avia_textblock')
-            
+
             for textblock in textblocks:
                 paragraphs = textblock.find_all('p')
                 current_category = None
-                
+
                 for p in paragraphs:
                     # Skip empty paragraphs
                     if not p.get_text().strip():
                         continue
-                    
-                    # Check if this paragraph contains a category
-                    strong_tag = p.find('strong')
-                    if strong_tag:
-                        category_text = strong_tag.get_text().strip()
-                        
-                        # If the strong tag is at the beginning, it's a category header
-                        if p.get_text().strip().startswith(category_text):
-                            current_category = category_text
-                            
-                            # Check if there's menu text after the category
-                            remaining_text = p.get_text().replace(category_text, '').strip()
-                            if remaining_text and remaining_text not in ['–', ':', '']:
-                                # Clean up the text
-                                remaining_text = remaining_text.lstrip('–').lstrip(':').strip()
-                                if remaining_text:
-                                    formatted_item = self.format_menu_item(current_category, remaining_text)
-                                    daily_items.append(f"{day_name}|{formatted_item}")
+
+                    # Ett stycke kan innehålla flera rätter om de glömt
+                    # styckebrytningen. Texten före en rubrik hör till
+                    # föregående kategori, texten efter till den nya.
+                    for category, segment in self._split_by_categories(self._paragraph_text(p), headings):
+                        if category:
+                            current_category = category
+
+                        item_text = segment.strip().lstrip('–').lstrip(':').strip()
+                        if not item_text or item_text in ['–', '..', '.']:
                             continue
-                    
-                    # Regular menu item text
-                    item_text = p.get_text().strip()
-                    if item_text and item_text not in ['–', '..', '.']:
+
                         # Handle special cases
                         if 'stängt' in item_text.lower() or 'closed' in item_text.lower():
                             daily_items.append(f"{day_name}|<strong>Stängt</strong> - {item_text}")
@@ -168,11 +205,70 @@ class KooperativetScraper(BaseScraper):
                         else:
                             # No category, treat as general item
                             daily_items.append(f"{day_name}|{self.clean_text(item_text)}")
-        
+
         except Exception as e:
             self.log_error(f"Error extracting daily menu for {day_name}: {str(e)}")
-        
+
         return daily_items
+
+    def _paragraph_text(self, p):
+        """Styckets text med <br> som radbrytning.
+
+        get_text() klistrar annars ihop raderna, och det är just på en <br> som
+        en felplacerad rubrik brukar sitta.
+        """
+        clone = copy.copy(p)
+        for br in clone.find_all('br'):
+            br.replace_with('\n')
+        return clone.get_text()
+
+    def _collect_headings(self, day_section):
+        """Rubrikkandidater: kända kategorier plus dagens versala <strong>."""
+        headings = list(self.KNOWN_CATEGORIES)
+
+        for strong in day_section.find_all('strong'):
+            text = self.clean_text(strong.get_text())
+            # En rubrik är kort och skriven i versaler. Fetstilar de en hel
+            # rätt ska den inte börja dela stycken.
+            if not text or len(text) > 30:
+                continue
+            letters = [c for c in text if c.isalpha()]
+            if letters and all(c.isupper() for c in letters) and text not in headings:
+                headings.append(text)
+
+        return headings
+
+    def _split_by_categories(self, text, headings):
+        """Dela styckets text vid varje kategorirubrik, var den än står.
+
+        Returnerar (kategori, text)-par i tur och ordning. Kategorin är None
+        för texten före den första rubriken — den hör till föregående kategori,
+        som anroparen håller reda på.
+        """
+        if not headings:
+            return [(None, text)]
+
+        # Längsta först, annars äter VEGETARISK upp VEGETARISKT. Blanksteg i en
+        # rubrik matchar även radbrytning, för de skriver "<strong><br/>KÖTT"
+        # och "FISK        " med släpande blanksteg.
+        alternatives = '|'.join(
+            r'\s+'.join(re.escape(word) for word in heading.split())
+            for heading in sorted(set(headings), key=len, reverse=True)
+        )
+        # (?<!\w)/(?!\w) kräver hela ord: "VEG Taco Bowl" är inte VEGETARISK.
+        pattern = re.compile(r'(?<!\w)(' + alternatives + r')(?!\w)')
+
+        segments = []
+        position = 0
+        category = None
+
+        for match in pattern.finditer(text):
+            segments.append((category, text[position:match.start()]))
+            category = self.clean_text(match.group(1))
+            position = match.end()
+
+        segments.append((category, text[position:]))
+        return segments
     
     def format_menu_item(self, category, description):
         """Format menu item with category and description"""

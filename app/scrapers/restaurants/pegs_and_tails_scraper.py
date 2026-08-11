@@ -7,19 +7,29 @@ from ..base_scraper import BaseScraper
 class PegsAndTailsScraper(BaseScraper):
     """Pegs & Tails, Universitetsvägen — Campus Valla, Linköping.
 
-    Sidan har två delar. Överst veckans egna rubriker — "Veckans fisk",
-    "Veckans green", "Eller prova någon av dessa!" — med rätter som bär pris.
-    Längre ner "Se hela veckans meny" med en rubrik per veckodag och rätterna
-    under, den gången utan pris.
+    Sidan har två delar. Överst en räcka rätter med pris, längre ner "Se hela
+    veckans meny" med en rubrik per veckodag och rätterna under, den gången
+    utan pris.
+
+    **Den övre delen har inga rubriker.** I markupen ligger fem stycken kvar —
+    "Dagens drive", "Veckans fisk", "Serveras från tisdag!", "Veckans green",
+    "Eller prova någon av dessa!" — men alla bär hela raden
+    elementor-hidden-desktop/-laptop/-tablet/-mobile och kan alltså aldrig
+    visas för någon. De är avställda rubriker restaurangen glömt radera.
+    BaseScraper rensar bort dem innan vi ser sidan, så de rätterna får sitt
+    eget namn som kategori i stället; att sätta "Veckans" vore att påstå något
+    ingen besökare kan läsa på sidan. Rätterna är däremot äkta och synliga.
 
     Rätterna byggs av shortcodes som märker delarna med egna klasser:
     meny-titel, meny-pris, meny-innehall och meny-allergi. De två sista står
     dubbelt i sidan, en gång per skärmstorlek, så bara den första av varje
-    sort behålls.
+    sort behålls. Den dubbleringen är responsiv — några av
+    elementor-hidden-klasserna, inte alla — och överlever rensningen.
 
-    "Dagens drive" hoppas över med flit. Rubriken låter som dagens rätt men
-    innehåller rätter som veckolistan lägger på olika dagar, och vilken dag de
-    egentligen hör till går inte att utläsa. Veckolistan täcker dem ändå.
+    De två första rätterna i den övre delen är samma mån- och tisdagsrätt som
+    veckolistan har, upprepade med pris. De läggs därför inte ut som
+    veckorätter: veckolistan säger vilken dag de serveras, och att samtidigt
+    lägga köttbullarna på fredag vore ett påstående sidan själv motsäger.
     """
 
     SWEDISH_DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
@@ -112,25 +122,34 @@ class PegsAndTailsScraper(BaseScraper):
                 self.log_error("No dishes found — page layout may have changed")
                 return {self.name: ["Ingen lunchmeny tillgänglig"]}
 
-            def line_for(day: str, category: str, entry: dict) -> str:
-                text = entry['name']
-                if entry['description']:
-                    text += f": {entry['description']}"
+            def line_for(day: str, category: str, body: str, entry: dict) -> str:
                 if entry['allergens']:
-                    text += f" ({entry['allergens']})"
-                line = f"{day}|<strong>{category}</strong> - {text}"
+                    body += f" ({entry['allergens']})"
+                line = f"{day}|<strong>{category}</strong> - {body}"
                 if entry['price']:
                     line += f" ({entry['price'].rstrip(':-')} kr)"
                 return line
 
             items: List[str] = []
             for day, entry in by_day:
-                items.append(line_for(day, 'Dagens', entry))
+                body = entry['name']
+                if entry['description']:
+                    body += f": {entry['description']}"
+                items.append(line_for(day, 'Dagens', body, entry))
 
-            # Veckans rätter gäller alla dagar och upprepas per dag.
+            # En rätt som veckolistan lägger på en bestämd dag gäller inte hela
+            # veckan, hur den än upprepas högre upp på sidan.
+            dagsratter = {entry['name'].casefold() for _, entry in by_day}
+
+            # Rätterna här står utan rubrik — se klassdocstringen. Rättens eget
+            # namn är kategorin, beskrivningen texten.
             for day in days_seen or self.SWEDISH_DAYS:
                 for entry in weekly:
-                    items.append(line_for(day, 'Veckans', entry))
+                    if entry['name'].casefold() in dagsratter:
+                        continue
+                    items.append(
+                        line_for(day, entry['name'], entry['description'], entry)
+                    )
 
             self.log_info(f"Found {len(items)} menu items for {', '.join(days_seen)}")
             return {self.name: items}

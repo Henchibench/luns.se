@@ -60,6 +60,14 @@ Uppslaget i `restaurant_data.py`:
 `instagram` är valfritt. Koordinaterna slår du upp i OpenStreetMap — de
 används för avståndssorteringen och ska peka på entrén, inte på kvarteret.
 
+**Nyckeln här måste vara exakt samma sträng som skrapans `name`.** Menyerna
+läggs upp under `scraper.name`, och `build_restaurants_response()` slår sedan
+upp metadatan på den strängen. Stämmer de inte hamnar restaurangen på sajten
+med `area: "Unknown"`, utan beskrivning och utan nål på kartan — och den räknas
+inte in i något område. Ingenting går sönder, det syns bara på fel ställe.
+Byter du visningsnamn: byt på båda ställena i samma commit, och kör
+`scrape_menus.py` och kontrollera att inget står som `Unknown`.
+
 `area` måste finnas i `LOCATIONS` högst upp i samma fil. Idag finns
 **Lindholmen** (Göteborg), **Tannefors** och **Mjärdevi** (Linköping). Ett nytt
 område kräver ett uppslag där också, annars hoppas restaurangen tyst över i
@@ -114,6 +122,48 @@ Kasta gärna undantag också; runnern fångar dem och gör samma sak.
 
 **Hitta aldrig på en rätt.** Kan du inte läsa menyn, returnera fellägena. Det
 här är en sajt folk väljer lunch efter.
+
+### Det tystaste felet: en rätt som hamnar i fel rad
+
+Fellägena ovan fångar att hämtningen sprack. De fångar inte att skrapan läste
+sidan, fick med all text, och lade en rätt på fel ställe. Då är rätten kvar i
+`menus.json` men osynlig för den som läser — ingen loggrad, inget larm.
+
+Källan är nästan alltid att någon skriver menyn för hand i en WordPress. Bygg
+därför aldrig igenkänningen på att texten är **snyggt formaterad**:
+
+- Kräv inte att ett stycke *börjar* med sin rubrik. Rubriken kan stå mitt i
+  stycket, och då hamnar rätten efter den under föregående kategori. Det var
+  precis det som hände Kooperativet 2026-08-10 — se klassdocstringen i
+  `kooperativet_scraper.py`, den beskriver mönstret och lösningen.
+- Lita inte på `<strong>`. De glömmer fetstilen lika gärna som
+  styckebrytningen. Ha en lista med kända kategorinamn som funkar på egen hand.
+- Men lita inte bara på listan heller: en ny kategori som inte står där går
+  annars förlorad. Ta rubrikkandidater från **båda** hållen.
+- Matcha kategorinamn versalkänsligt och på hela ord. Rubriker skrivs i
+  VERSALER medan "kött" och "fisk" står i var tredje rättsbeskrivning, och
+  ordkravet är det som skiljer `VEG Taco Bowl` från kategorin `VEGETARISK`.
+
+Kontrollen som avslöjar det: **räkna rätterna per dag före och efter** din
+ändring och diffa raderna. En dag som tappar en rad, eller en rad som blivit
+misstänkt lång, är en hopklistrad rätt.
+
+### Och det näst tystaste: en kategori du hittat på
+
+Kategorin är inte dekoration. `VEGETARISK` framför en rätt är ett påstående om
+maten, och den som läser sajten kan ha ett skäl att lita på det.
+
+Sätt därför bara en kategori du kan **peka på i källan** — en rubrik, en
+etikett, restaurangens egna ord. Att härleda den ur *ordningen* på raderna är
+alltid fel, hur konsekvent mönstret än ser ut den vecka du mäter. Östgöta Kök
+skriver "ny vegetarisk och ny animalisk rätt varje dag" och lade den
+vegetariska först alla fem dagarna 2026-08-10 — men de har aldrig lovat
+ordningen, och dagen de byter står det fel utan att något går sönder.
+
+Saknas rubrik finns två ärliga utvägar: `Dagens`, eller rättens eget namn
+(`ostgota_kok_scraper.py` delar raden vid snedstrecket som restaurangen själv
+skiljer rätt från tillbehör med). Blir den delningen fel är det en kosmetisk
+gräns — inte en osann uppgift om mat.
 
 ## Kolla plattformarna först
 
@@ -193,12 +243,46 @@ Använd `self.get_page_content(url=None)`. Den sköter
 - retry med backoff på 500/502/503/504,
 - IPv4-tvång (Actions-runners får annars slumpmässiga timeouts på IPv6),
 - teckenkodning — utan `charset` i svaret gissar `requests` fel och å ä ö blir
-  Ã¥ Ã¤ Ã¶, så bytesen skickas till BeautifulSoup i stället.
+  Ã¥ Ã¤ Ã¶, så bytesen skickas till BeautifulSoup i stället,
+- rensning av innehåll som är dolt på samtliga brytpunkter, se nedan.
 
-Gör aldrig ett eget `requests.get`. Du får tillbaka alla tre problemen.
+Gör aldrig ett eget `requests.get`. Du får tillbaka alla fyra problemen.
 
 `self.clean_text()` normaliserar blanksteg. `log_info/log_warning/log_error`
 prefixar med restaurangnamnet.
+
+### Dolt på alla brytpunkter är innehåll som inte finns
+
+En skrapa läser rå HTML och ser därför ingen skillnad på det som visas och det
+som är avstängt. Elementor är vanligt bland restaurangsidorna, och det de
+stänger av blir liggande kvar i markupen. Pegs & Tails hade fem rubriker kvar
+som ingen besökare kan se — "Dagens drive", "Veckans fisk", "Veckans green" —
+och skrapan byggde kategorier av dem. Nästa gång kan det vara hela förra årets
+meny, och då serverar vi den utan att något går sönder.
+
+`remove_always_hidden()` i `BaseScraper` tar därför bort element som bär
+**alla** brytpunktsklasserna samtidigt:
+
+```
+elementor-hidden-desktop  elementor-hidden-laptop
+elementor-hidden-tablet   elementor-hidden-mobile
+```
+
+Alla fyra betyder att ingen skärmbredd återstår där blocket kan visas.
+
+**Skillnaden mot responsivt dolt är hela poängen.** Bär blocket bara några av
+klasserna visas det för någon — ofta är det just mobilvarianten som bär hela
+menytexten. Pegs & Tails har 38 block med `elementor-hidden-*`; bara sex är
+döda. Vidga aldrig regeln till "har någon hidden-klass".
+
+Av samma skäl rör rensningen **inte** vanlig `display:none`. Menysidor bygger
+dragspel och flikar där dagarna ligger dolda tills man klickar, och den som
+rensar dem raderar menyer. Regeln gäller bara det vi kan bevisa ur markupen
+ensam. Kan du inte bevisa att något aldrig kan visas: låt det vara.
+
+Utvidgar du regeln: kör hela `scrape_menus.py` före och efter och diffa
+`menus.json` per restaurang och dag. Ändringen sitter i basklassen och slår
+tyst mot alla restauranger på en gång.
 
 ## Spaning: `scripts/spana.py`
 
@@ -242,14 +326,55 @@ for rad in DinScraper().scrape()['Ditt Namn']: print(rad)
 Rätter på flera veckodagar är rimligt. Noll rätter, eller hela veckan på en dag,
 är det inte.
 
-Sedan hela vägen:
+## Testservern — sista steget innan du lämnar över
+
+`scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
+**<http://10.0.1.34:3002/>** (dev01). Det är där Henrik tittar på ditt jobb
+innan han slår ihop Dev med main, och därför är **inget kort klart förrän
+servern kör och adressen står i rapporten**.
 
 ```bash
-python scripts/scrape_menus.py          # skriver JSON till nextjs-luns-se/public/data/
-cd nextjs-luns-se && npm ci && npm run build
+scripts/testserver.sh                 # skrapa, bygg, (om)starta servern
+scripts/testserver.sh --utan-skrap    # bygg bara om frontenden
+scripts/testserver.sh status          # kör den, och vad visar den?
+scripts/testserver.sh stopp
 ```
 
-Kontrollera att restaurangen dyker upp under rätt område.
+Den ersätter `scrape_menus.py` + `npm run build` som du körde för hand: samma
+kommandon i samma ordning, plus tre saker de inte gjorde.
+
+**Den kör i ett venv utan playwright.** `.venv-prod` byggs ur
+`requirements.txt` och speglar det workflowet installerar. Har din skrapa råkat
+importera playwright faller den *här*, direkt, i stället för tyst i Actions tre
+dagar senare. Det är den enda platsen den fällan faktiskt fångas.
+
+**Den sammanfattar skrapningen** med `scripts/menylage.py`: rätter per veckodag,
+en rad per restaurang, med de två felsträngarna utskrivna som fel. Läs tabellen
+— det är där du ser att din restaurang fick mat på fem dagar och inte allt på
+måndag. Vill du jämföra före och efter din ändring: kopiera undan
+`nextjs-luns-se/public/data/menus.json` innan du kör, och kör `menylage.py` mot
+kopian efteråt.
+
+**Den märker sidan** med ett gult band överst — gren, commit, byggtid, och om
+arbetsträdet har okommittade ändringar. Bandet är ett CSS-pseudoelement på
+`html` och injiceras i `out/`, som är gitignorerad. Det kan alltså varken följa
+med en commit eller hamna på den riktiga sajten. En `<div>` gick inte: React
+hydrerar hela dokumentet och rensar bort noder den inte känner igen, så bandet
+försvann efter en sekund och sidan såg skarp ut precis när man började läsa den.
+
+Går något fel avbryter skriptet och rör **inte** den körande servern. En gammal
+version uppe är bättre än en trasig sida, och bandet visar när den byggdes.
+
+Låt servern stå kvar när du är klar — Henrik ska kunna titta i morgon bitti utan
+att starta något. Nästa kort bygger om och startar om den. Efter en omstart av
+dev01 är den borta, med flit: en gammal sajt utan avsändare är sämre än ingen.
+
+Två saker som ser ut som fel och inte är det: sidan frågar efter område första
+gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
+`stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
+
+Kontrollera i webbläsaren att restaurangen dyker upp under rätt område. Att den
+står under fel område, eller som `Unknown`, syns inte i skrapans utdata.
 
 ## Körningen i produktion
 
@@ -290,3 +415,20 @@ person som står inför att sidan slutat fungera ska slippa göra om utredningen
 Väljer du en selektor på `data-kind` i stället för på klassnamn: skriv varför
 (byggaren hashar sina CSS-moduler). Det är den sortens anteckning som är värd
 plats.
+
+## Selektorer som ser stabila ut och inte är det
+
+Två mönster går att känna igen på håll, och båda ger en skrapa som fungerar
+idag och tystnar utan förvarning:
+
+- **`data-v-…` på varje element** är Vue/Nuxt scopade CSS. Hashen byts när de
+  bygger om frontenden. Använd komponentens eget klassnamn i stället — se
+  `saab_arena_scraper.py`, som ankrar på `html-render-container` och
+  väljer rätt block genom att räkna veckodagar i det.
+- **Numrerade klasser i WordPress-teman**, som Divis `et_pb_text_2_tb_body`,
+  räknar moduler i sidordning och flyttar sig när någon lägger till en modul
+  ovanför. Leta efter ett handskrivet `id` i stället — Östgöta Köks meny står
+  i `<div id="menyblock">`, och det är sidans enda fasta punkt.
+
+Regeln bakom båda: fäst i något en **människa** har skrivit, inte i något en
+byggare har genererat.
