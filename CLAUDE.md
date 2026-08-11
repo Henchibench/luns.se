@@ -144,9 +144,19 @@ därför aldrig igenkänningen på att texten är **snyggt formaterad**:
   VERSALER medan "kött" och "fisk" står i var tredje rättsbeskrivning, och
   ordkravet är det som skiljer `VEG Taco Bowl` från kategorin `VEGETARISK`.
 
+- Jämför aldrig en **dagrubrik** med `==`. Sidor märker gärna innevarande dag
+  med en badge *inuti* rubriken — Nordrests castit lägger ett andra span med
+  texten "Idag" i samma `h3`, så rubriktexten blir "Tisdag Idag". En exakt
+  jämförelse missar då alltid precis den dag besökaren är ute efter, medan
+  resten av veckan syns och allt ser friskt ut. Universitetsklubben tappade
+  dagens meny varje dag av det skälet fram till 2026-08-11. Plocka dagnamnet ur
+  det element som bär just dagen, och matcha annars veckodagen som **helt ord**
+  i rubriken i stället för på hela strängen.
+
 Kontrollen som avslöjar det: **räkna rätterna per dag före och efter** din
 ändring och diffa raderna. En dag som tappar en rad, eller en rad som blivit
-misstänkt lång, är en hopklistrad rätt.
+misstänkt lång, är en hopklistrad rätt. Att alla dagar utom en har mat är inte
+heller normalt — kontrollera den dag som fattas mot sidan innan du släpper.
 
 ### Och det näst tystaste: en kategori du hittat på
 
