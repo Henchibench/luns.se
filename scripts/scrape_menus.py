@@ -45,6 +45,7 @@ from app.scrapers.restaurants.pinocchio_scraper import PinocchioScraper
 from app.scrapers.restaurants.saab_arena_scraper import SaabArenaScraper
 from app.scrapers.restaurants.seven_seasons_scraper import SevenSeasonsScraper
 from app.scrapers.restaurants.skyline_scraper import SkylineScraper
+from app.scrapers.restaurants.stangs_matlador_scraper import StangsMatladorScraper
 from app.scrapers.restaurants.stangs_mjardevi_scraper import StangsMjardeviScraper
 from app.scrapers.restaurants.sukaldari_scraper import SukaldariScraper
 from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
@@ -138,6 +139,7 @@ def scrape_all_menus(previous_menus):
         SaabArenaScraper(),
         SevenSeasonsScraper(),
         SkylineScraper(),
+        StangsMatladorScraper(),
         StangsMjardeviScraper(),
         SukaldariScraper(),
         TerrassenScraper(),

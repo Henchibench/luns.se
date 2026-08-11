@@ -63,7 +63,7 @@ class StangsMjardeviScraper(BaseScraper):
     # Egennamn som annars förlorar sin versal. API:et skriver hela namnet i
     # versaler, så det finns inget i källan som avslöjar vad som är egennamn —
     # listan får växa när vi ser fler.
-    PROPER_NOUNS = {'östergötland', 'sverige'}
+    PROPER_NOUNS = {'östergötland', 'sverige', 'basunda'}
 
     @classmethod
     def _sentence_case(cls, text: str) -> str:

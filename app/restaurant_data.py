@@ -262,6 +262,19 @@ restaurant_locations = {
         "area": "Mjärdevi",
         "lunch_hours": "Mån–fre 11.00–14.00"
     },
+    "Stångs Matlådor": {
+        "description": "Stångs Mjärdevis matlådor ur de obemannade varukylarna på kontoren i området — Stångs Express i deras egna ord. Man tar en låda ur kylen och betalar med QR-kod, kort eller Swish. Sortimentet nedan är alla kylars tillsammans; alla alternativ finns inte i alla kylar.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=St%C3%A5ngs+Mj%C3%A4rdevi%2C+Teknikringen+7%2C+583+30+Link%C3%B6ping",
+        # Kylarna står utspridda hos företagen och det finns ingen publik
+        # förteckning över var. Punkten sätts därför på köket i Collegium,
+        # som är det enda stället matlådorna säkert går att få tag på.
+        "latitude": 58.3935717,
+        "longitude": 15.5585668,
+        "website": "https://stangsmjardevi.se/stangs-express/",
+        "area": "Mjärdevi",
+        # En varukyl har inga lunchtider — den står så länge kontoret gör det,
+        # och hur länge varierar med huset. Fältet utelämnas hellre än gissas.
+    },
     "Sukaldari": {
         "description": "Foodtruck med hemgjorda burgare och dressingar, uppkallad efter baskiskans ord för kock. Står vid Dataton på Teknikringen måndag till onsdag och på fredagar — på torsdagar är den vid Saab på Ensbovägen, och då står ingen meny här. Menyn är fast, inte veckovis.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Sukaldari%2C+Teknikringen+22%2C+583+35+Link%C3%B6ping",
