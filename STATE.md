@@ -17,23 +17,57 @@ exporteras statiskt och publiceras på GitHub Pages via
 Verifieringskommandot är `npm run build`; det finns ingen testsvit. Fixar för
 transitiva npm-beroenden görs via `overrides`-blocket i `package.json`.
 
-## Tooling note
+## Tooling note — `npm audit` räcker inte, och det är inte en detalj
 
 Dependabots **alerts-API är fortfarande inte nåbart härifrån** — `gh` finns
-inte installerat och ingen token är satt. Dependabot hämtar sin data ur GitHub
-Advisory Database, och `npm audit` / `pip-audit` frågar samma källa, så de
-används som skanning. Det innebär att antalet fynd här kan skilja sig från
-antalet rader på repots säkerhetsflik: en alert som redan är åtgärdad men inte
-stängd, eller en som gäller något utanför de fyra manifesten, syns inte i en
-lokal audit. Vill man matcha listan exakt behöver `gh` eller en token finnas.
+inte installerat och ingen token är satt.
+
+Den tidigare antagandet i den här filen, att `npm audit` frågar samma källa som
+Dependabot, **stämmer inte**. `npm audit` läser npm-registrets egen spegling av
+GitHub Advisory Database, och den speglingen släpar. Den här omgången hade
+GitHub två high-varningar medan `npm audit` visade en. Den som saknades
+(`js-yaml`, publicerad fem dagar tidigare) fanns inte i npm-registrets data alls
+— den syntes alltså inte som "moderate" eller "fixad", utan som ingenting.
+
+**Använd GitHubs advisory-API i stället.** Det är publikt och kräver ingen
+token, till skillnad från alerts-API:t:
+
+```bash
+cd nextjs-luns-se
+jq -r '.packages | to_entries[] | select(.key != "" and .value.version)
+       | "\(.key | sub("^.*node_modules/";""))@\(.value.version)"' \
+  package-lock.json | sort -u > /tmp/pkgs.txt
+cd /tmp && split -l 40 pkgs.txt chunk_
+for f in chunk_*; do
+  curl -s --get --data-urlencode "affects=$(paste -sd, "$f")" \
+    'https://api.github.com/advisories?ecosystem=npm&per_page=100' \
+    | jq -r '.[] | "\(.severity)\t\(.ghsa_id)\t\(.summary)"'
+done | sort -u
+```
+
+`affects` tar en kommaseparerad lista `paket@version` och svarar med exakt de
+advisories vars sårbara intervall täcker versionen. 423 paket blir elva anrop,
+väl under de 60/timme man får utan token. Kör `npm audit` också — men lita på
+listan ovan när de två inte är överens.
+
+**Push-utdata är en gratis kontrollsiffra.** `git push` skriver ut hur många
+varningar GitHub ser på default-grenen. Stämmer inte den siffran med vad du
+hittat har du inte hittat allt. Det var precis så den andra varningen upptäcktes
+den här gången.
 
 ## Open Alerts
 
 ### npm (`nextjs-luns-se`)
 
+Båda var **high**, vilket matchar de två varningar GitHub rapporterade på
+default-grenen.
+
 | # | Paket | Allvarlighet | Advisory | Typ | Sårbart intervall | Fix |
 |---|---|---|---|---|---|---|
 | 1 | `nanoid` | **High** (CVSS 5.9, CWE-835) | GHSA-2v37-7h3g-55p8 — egna generatorer kan loopa oändligt när `size` är noll | transitiv, **produktion** (`next` → `postcss` → `nanoid`, installerad 3.3.16) | `<3.3.17` | `nanoid@3.3.17` |
+| 2 | `js-yaml` | **High** (CVSS 7.5) | GHSA-5p4m-2wfm-xmqj / CVE-2026-59870 — kvadratisk CPU-förbrukning vid `!!omap`-upplösning, publicerad 2026-08-06 | transitiv, **dev** (`eslint` → `@eslint/eslintrc` → `js-yaml`, installerad 4.3.0) | `>=4.0.0, <4.3.1` | `js-yaml@4.3.1` |
+
+**Varning nr 2 syntes inte i `npm audit`** — se tooling-noten ovan.
 
 ### Python
 
@@ -47,7 +81,7 @@ lokal audit. Vill man matcha listan exakt behöver `gh` eller en token finnas.
 
 ### Totalt
 
-Critical: 0 · **High: 1** · Moderate: 0 · Low: 0
+Critical: 0 · **High: 2** · Moderate: 0 · Low: 0
 
 ## Triage
 
@@ -62,7 +96,7 @@ Critical: 0 · **High: 1** · Moderate: 0 · Low: 0
   Allvarlighetsgraden är hög men angreppsytan här är noll.
 - **Uppgraderingsrisk:** mycket låg.
 
-### Vald åtgärd
+#### Vald åtgärd
 
 Fixen togs **uppströms i stället för genom att pinna barnet**: `postcss@8.5.26`
 kräver redan `nanoid ^3.3.17`, så `postcss`-overriden höjdes `^8.5.23` →
@@ -72,8 +106,29 @@ hinder den dag något dev-beroende vill ha nanoid 5, som är ESM-only.
 
 Efter `npm install` löser trädet `postcss@8.5.26` → `nanoid@3.3.18`.
 
+### Alert 2 — js-yaml (High, GHSA-5p4m-2wfm-xmqj)
+
+- **Patchad version finns?** Ja, `js-yaml@4.3.1`. Advisoryn noterar att fixen
+  för CVE-2026-59870 inte backportades, men det gäller 3.x — 4.x-linjen har
+  4.3.1.
+- **Nåbar i det här projektet?** Nej. `js-yaml` är ett **dev-only** transitivt
+  beroende via `eslint` → `@eslint/eslintrc`, som läser eslint-konfiguration
+  från repot självt. Angreppet kräver att man matar in fientlig YAML med
+  `!!omap`; här läses bara våra egna konfigfiler, och paketet följer inte med i
+  den statiska exporten.
+- **Uppgraderingsrisk:** mycket låg, patchversion.
+
+#### Vald åtgärd
+
+Overriden höjdes `^4.3.0` → `^4.3.1`. Notera mönstret: overriden stod på
+`^4.3.0` och den versionen var precis den sårbara — **ett override som redan
+finns skyddar inte, det låser fast**. Samma sak hände i juni, då `^4.1.1`
+pekade rakt på det sårbara `4.1.1`. Läs alltid av vilken version som faktiskt
+hamnade i lockfilen, inte vad intervallet ser ut att tillåta.
+
 ## Verifiering
 
+- **GitHubs advisory-API mot alla 423 paket i lockfilen** → noll träffar.
 - `npm audit` → **found 0 vulnerabilities**.
 - `pip-audit` mot båda requirements-filerna → rent.
 - `scripts/testserver.sh` → skrapning av 29 restauranger utan fel, `npm ci` +
@@ -81,11 +136,15 @@ Efter `npm install` löser trädet `postcss@8.5.26` → `nanoid@3.3.18`.
 
 ## Status
 
-Juni-omgångens `js-yaml` (GHSA-h67p-54hq-rp68) är löst sedan tidigare;
-overriden står på `^4.3.0`.
+Juni-omgångens `js-yaml`-varning (GHSA-h67p-54hq-rp68, moderate) är en **annan**
+advisory än nr 2 ovan och är löst sedan tidigare.
+
+Kvar att ta ställning till, utanför den här omgången: `.github/security-loop.md`
+säger fortfarande åt den schemalagda agenten att använda `npm audit` som
+auktoritativ skanning, och att bara åtgärda critical/high automatiskt. Den
+första punkten är nu känt otillräcklig — se tooling-noten.
 
 ## DONE
 
-Alla fynd som går att se ur advisory-databasen är åtgärdade, `npm audit` och
-`pip-audit` rena och bygget grönt. Kvarstår att jämföra mot den faktiska
-alert-listan på GitHub, vilket kräver `gh` eller en token.
+Båda high-varningarna åtgärdade, advisory-API:t, `npm audit` och `pip-audit`
+rena och bygget grönt.
