@@ -72,6 +72,19 @@ Committa och pusha dit. `main` är det som är publicerat, och dit går arbetet
 när **Henrik** släpper det — han har en knapp i hubben som slår ihop Dev med
 main. Gör det aldrig själv, och committa aldrig direkt på main.
 
+Knappen i hubben dyker upp när Dev ligger före main, alltså när det finns något
+osläppt — den är en grind, inte ett larm. Vad som väntar syns här:
+
+```bash
+git fetch origin main
+git log --oneline origin/main..Dev      # vad väntar på att släppas
+git diff --stat origin/main..Dev        # vilka filer det rör
+```
+
+Att main har fler commits än Dev betyder ingenting: varje släpp lägger en
+merge-commit på main som aldrig går tillbaka. Det är bara `origin/main..Dev`
+som säger om något är osläppt.
+
 ## Testservern — sista steget innan du lämnar över
 
 `scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
