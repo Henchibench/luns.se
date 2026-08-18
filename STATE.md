@@ -1,6 +1,6 @@
 # Security Loop State — luns.se
 
-_Last updated: 2026-08-18_
+_Last updated: 2026-08-19_
 _Branch: `Dev`_
 
 ## Repo summary
@@ -34,6 +34,28 @@ den som genererar mailen Henrik får. Börja här: det ger svar på "finns det n
 
 Code scanning och secret scanning svarar däremot `403` med den här token — de
 går inte att kontrollera härifrån.
+
+**Ett Dependabot-mail besvaras med larmnumret, inte med paketnamnet.** Mailen
+Henrik får länkar till *advisory-sidan* (`github.com/advisories/GHSA-…`), och den
+beskriver sårbarheten i paketet för hela världen. Den finns kvar för alltid och
+säger ingenting om det här repot — klickar man dit ser det ut som att felet står
+kvar även när det lagades för veckor sedan. Repots status står på en annan sida:
+
+```bash
+# hitta larmet ur mailets CVE eller GHSA
+gh api repos/Henchibench/luns.se/dependabot/alerts --paginate \
+  -q '.[] | select(.security_advisory.cve_id=="CVE-…")
+      | "#\(.number) \(.state) inkom \(.created_at) stängt \(.fixed_at) — \(.html_url)"'
+```
+
+`state` och `fixed_at` är svaret. Öppna larm, och bara de, listas på
+<https://github.com/Henchibench/luns.se/security/dependabot?q=is%3Aopen>.
+
+**Samma paket kan larma om och om igen på nya CVE:n.** `fast-uri` har fått fem
+high-advisories under 2026 — CVE-2026-6321, -6322, -13676, -16221 och -18446, alla
+varianter av samma host confusion, med patcharna 3.1.1, 3.1.2, 3.1.3, 3.1.4 och
+3.1.5 i tur och ordning. "Vi lagade fast-uri i juli" duger därför inte som svar
+på ett mail om fast-uri. Läs vilket CVE mailet gäller och slå upp *det* larmet.
 
 **2. Advisory-API:t ser mer än alerts-API:t, och det är inte teoretiskt.**
 `nanoid@3.3.16` (GHSA-2v37-7h3g-55p8, high) åtgärdades 2026-08-11. Den varningen
@@ -78,16 +100,22 @@ en rad bort är det den sårbara kopian du tappade.
 
 ## Open Alerts
 
-**Inga.** Skanning 2026-08-18:
+**Inga.** Skanning 2026-08-19:
 
 | Källa | Omfattning | Resultat |
 |---|---|---|
 | Dependabot alerts-API | hela repot, alla states | 72 larm totalt, **samtliga `fixed`** — 0 öppna, 0 dismissade |
-| GitHubs advisory-API | 423 `paket@version` ur `package-lock.json`, 11 anrop | alla `http=200`, **0 träffar** (kontrollprov gav träff som väntat) |
+| GitHubs advisory-API | 423 `paket@version` ur `package-lock.json`, 11 anrop | alla `http=200`, **0 träffar** (kontrollprov `fast-uri@3.1.3` gav 2 träffar som väntat) |
+| GitHubs advisory-API | 9 `paket@version` ur `.venv-prod` (ecosystem `pip`) | **0 träffar** (kontrollprov `requests@2.31.0` gav 3 träffar) |
 | `npm audit` | `nextjs-luns-se` | `found 0 vulnerabilities` |
-| `pip-audit` | `requirements.txt` | inga kända sårbarheter |
-| `pip-audit` | `requirements-dev.txt` (playwright) | inga kända sårbarheter |
 | GitHub Actions | `checkout@v5`, `setup-python@v6`, `setup-node@v5`, `upload-pages-artifact@v5`, `deploy-pages@v5` | alla på aktuell major |
+
+`pip-audit` finns inte installerat på dev01 och är inget som ska in i
+`requirements-dev.txt` — Python-sidan skannas i stället mot advisory-API:t med
+`ecosystem=pip`, samma metod som npm-sidan. Skanna de faktiskt installerade
+versionerna ur `.venv-prod/bin/pip list --format=freeze`, inte
+`requirements.txt`: den är opinnad (`beautifulsoup4`, `requests`, `lxml` utan
+versioner), så filen säger ingenting om vad som kör.
 
 Nyckelversioner i lockfilen: `next@15.5.22`, `js-yaml@4.3.1`, `nanoid@3.3.18`,
 `sharp@0.35.3`, `fast-uri@3.1.5`, `brace-expansion@5.0.9`, `postcss@8.5.26`.
@@ -105,9 +133,36 @@ Nyckelversioner i lockfilen: `next@15.5.22`, `js-yaml@4.3.1`, `nanoid@3.3.18`,
 Senaste **critical** var GHSA-9qr9-h5gf-34mp (`next`, RCE i React flight
 protocol), inkom 2025-12-03 och åtgärdades 2025-12-16. Ingen critical sedan dess.
 
+### Mailet om CVE-2026-16221 (`fast-uri`) — utrett 2026-08-19
+
+Henrik fick ett mail om `fast-uri vulnerable to host confusion via literal
+backslash authority delimiter` och såg sårbarheten stå kvar när han klickade.
+Larmet är **#83, stängt sedan 2026-07-28 09:15:29**. Kedjan, för att den är
+lärorik:
+
+| När | Vad |
+|---|---|
+| 2026-07-19 | lockfilen bär `fast-uri@3.1.2` |
+| 2026-07-21 | GHSA-v2hh-gcrm-f6hx publiceras: sårbart `>= 3.0.0, <= 3.1.3`, patch `3.1.4` |
+| 2026-07-25 | Dependabot öppnar larm #83 → **mailet skickas här** |
+| 2026-07-28 09:15:23 | PR #65 *Fix 6 high-severity npm advisories* mergas, `fast-uri` → `3.1.4` |
+| 2026-07-28 09:15:29 | larm #83 stängs, sex sekunder efter mergen |
+| 2026-08-05 | ny advisory (CVE-2026-18446), larm #87, `fast-uri` → `3.1.5`, stängt samma dag |
+
+Två saker att ta med sig. **Ingen automatik lagade det** — det finns ingen
+`.github/dependabot.yml`, så Dependabot larmar men öppnar aldrig
+uppdaterings-PR. Varje fix i tabellen ovan är en PR som någon skrev. Och **inget
+larm skapades eller ändrades den 18 augusti**; sista larmaktiviteten i repot är
+`js-yaml` den 11 augusti. Ett mail daterat senare än larmet är en notis om
+något som redan var stängt, inte ett nytt larm — kontrollera alltid `created_at`
+på larmet i stället för att lita på mailets datum.
+
+`fast-uri` är dessutom `dev: true` och dras in av `ajv`. Den följer aldrig med i
+den statiska exporten, alltså har den aldrig kunnat nå en besökare på sajten.
+
 ## Triage
 
-Ingenting att triagera — inget öppet i någon av de fem källorna ovan.
+Ingenting att triagera — inget öppet i någon av källorna ovan.
 
 Två mönster från de senaste omgångarna är värda att ha kvar, eftersom båda
 kostade tid när de missades:
@@ -131,10 +186,16 @@ om och beskriver nu advisory-API-metoden. Kvar i den står fortfarande att
 alerts-API:t inte är nåbart utan token; se punkt 1 i tooling-avsnittet ovan, det
 gäller inte längre på dev01.
 
+Att det saknas `.github/dependabot.yml` är ett aktivt val att bekräfta: utan den
+larmar Dependabot men lagar aldrig själv. Hittills har varje fix skrivits för
+hand eller av den här rutinen, vilket fungerat — men det förklarar också varför
+ett larm kan stå öppet i tre dygn innan någon rör det.
+
 Ingen åtgärd behövs. Inga grenar eller PR skapade.
 
 ## DONE
 
-Noll öppna sårbarheter. Alerts-API:t, advisory-API:t mot samtliga 423 paket,
-`npm audit`, `pip-audit` mot båda requirements-filerna och Actions-versionerna
-är alla rena.
+Noll öppna sårbarheter. Alerts-API:t, advisory-API:t mot samtliga 423
+npm-paket och de 9 Python-paketen i `.venv-prod`, `npm audit` och
+Actions-versionerna är alla rena. Larmet bakom mailet om CVE-2026-16221 är
+spårat och stängt sedan 2026-07-28; se avsnittet ovan.
