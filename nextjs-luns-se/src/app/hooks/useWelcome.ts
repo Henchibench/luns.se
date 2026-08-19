@@ -13,7 +13,14 @@ const STORAGE_KEY = 'luns-welcome-seen';
 /** Höj när rundan ändras så mycket att den är värd att visa igen. */
 export const WELCOME_VERSION = 1;
 
-function alreadySeen(): boolean {
+/**
+ * Exporterad för nyhetsnotisen, som är den andra halvan av samma regel: den
+ * som ännu inte sett rundan är ny och ska se rundan, ingenting annat. Testet
+ * måste vara ett och samma på båda ställena — en höjd WELCOME_VERSION gör
+ * gamla besökare nya igen, och då ska nyheterna hålla tyst precis som vid ett
+ * förstabesök.
+ */
+export function welcomeSeen(): boolean {
   if (typeof window === 'undefined') return true;
   try {
     return Number(localStorage.getItem(STORAGE_KEY)) >= WELCOME_VERSION;
@@ -30,7 +37,7 @@ export function useWelcome(blocked: boolean) {
   useEffect(() => {
     if (blocked || checked) return;
     setChecked(true);
-    if (alreadySeen()) return;
+    if (welcomeSeen()) return;
 
     // Markeras som sedd när den öppnas, inte när den avslutas. Den som
     // stänger rundan direkt har gjort sitt val och ska slippa den igen.

@@ -34,6 +34,9 @@ interface Props {
   watchedDishes: FavoriteDish[];
   onRemoveWatched: (restaurant: string, signature: string) => void;
   onRestartTour: () => void;
+  onOpenNews: () => void;
+  /** Prickens tvilling: samma oläst-läge som kugghjulet bär, en rad in. */
+  newsUnread: boolean;
   onOpenStats: () => void;
   onOpenPrivacy: () => void;
 }
@@ -93,10 +96,13 @@ function Switch({
 function LinkRow({
   title,
   hint,
+  dot,
   onClick,
 }: {
   title: string;
   hint: string;
+  /** Liten markör framför rubriken, samma betydelse som pricken på kugghjulet. */
+  dot?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -105,7 +111,18 @@ function LinkRow({
       className="flex w-full items-center gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5 text-left cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-13 font-semibold text-[var(--ink)]">{title}</span>
+        <span className="flex items-center gap-2 text-13 font-semibold text-[var(--ink)]">
+          {/* Pricken sitter före rubriken och inte efter: den ska hittas av
+              blicken som just följt pricken på kugghjulet hit, inte letas upp
+              i slutet av en rad vars längd varierar. */}
+          {dot && (
+            <span
+              aria-hidden="true"
+              className="h-[7px] w-[7px] flex-none rounded-full bg-[var(--acc)]"
+            />
+          )}
+          {title}
+        </span>
         <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">{hint}</span>
       </span>
       <span aria-hidden="true" className="flex-none text-13 text-[var(--mut)]">
@@ -169,9 +186,11 @@ function CloseButton() {
  */
 function Rows({
   onRestartTour,
+  onOpenNews,
+  newsUnread,
   onOpenStats,
   onOpenPrivacy,
-}: Pick<Props, 'onRestartTour' | 'onOpenStats' | 'onOpenPrivacy'>) {
+}: Pick<Props, 'onRestartTour' | 'onOpenNews' | 'newsUnread' | 'onOpenStats' | 'onOpenPrivacy'>) {
   const close = useOverlayClose();
   const handoff = (open: () => void) => () => {
     close();
@@ -180,6 +199,14 @@ function Rows({
 
   return (
     <div className="flex flex-col gap-2">
+      {/* Överst i avsnittet: det är den enda raden här som kan ha ändrats
+          sedan besökaren var här sist, och den enda pricken pekar på. */}
+      <LinkRow
+        title="Nytt på luns.se"
+        hint="Det som tillkommit sedan sist, med det senaste överst."
+        dot={newsUnread}
+        onClick={handoff(onOpenNews)}
+      />
       <LinkRow
         title="Visa rundan igen"
         hint="Genomgången av vad som är nytt och var sakerna sitter."
@@ -211,6 +238,8 @@ export default function SettingsOverlay({
   watchedDishes,
   onRemoveWatched,
   onRestartTour,
+  onOpenNews,
+  newsUnread,
   onOpenStats,
   onOpenPrivacy,
 }: Props) {
@@ -269,6 +298,8 @@ export default function SettingsOverlay({
           <SectionLabel>INFORMATION</SectionLabel>
           <Rows
             onRestartTour={onRestartTour}
+            onOpenNews={onOpenNews}
+            newsUnread={newsUnread}
             onOpenStats={onOpenStats}
             onOpenPrivacy={onOpenPrivacy}
           />

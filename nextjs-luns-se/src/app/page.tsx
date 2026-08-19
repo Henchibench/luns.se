@@ -9,6 +9,7 @@ import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
+import NewsNote from './components/board/NewsNote';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
 import { ChipSpec } from './components/board/Chips';
@@ -19,6 +20,7 @@ import { useTheme } from './hooks/useTheme';
 import { useTextSize } from './hooks/useTextSize';
 import { useWeather } from './hooks/useWeather';
 import { useWelcome } from './hooks/useWelcome';
+import { useNews } from './hooks/useNews';
 import {
   DAYS,
   categoryColor,
@@ -132,6 +134,7 @@ export default function LunchBoard() {
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [newsOpen, setNewsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -157,6 +160,10 @@ export default function LunchBoard() {
   // Rundan väntar tills data finns och platsvalet är gjort — annars pekar
   // den på en tom sida bakom välkomstrutan.
   const welcome = useWelcome(loading || needsChoice || restaurants.length === 0);
+  // Nyhetsnotisen blockeras inte på samma sätt: den avgör sitt läge vid
+  // montering, innan rundan hunnit sätta sin nyckel, och det är just det som
+  // gör att en ny besökare får rundan och aldrig pricken. Se useNews.
+  const news = useNews();
   const weather = useWeather(location?.latitude, location?.longitude);
 
   useEffect(() => {
@@ -173,8 +180,8 @@ export default function LunchBoard() {
   }, []);
 
   /**
-   * Statistiken och integritetsinfon är undersidor till inställningarna, och
-   * kugghjulet är enda vägen in till dem. Att stänga en av dem lämnar därför
+   * Statistiken, integritetsinfon och nyhetslistan är undersidor till
+   * inställningarna, och kugghjulet är enda vägen in. Att stänga en av dem lämnar därför
    * alltid tillbaka dit i stället för att kasta ut besökaren till menylistan,
    * precis som en bakåtknapp. Öppnas de någon gång från ett annat håll får det
    * bli ett val i stället för en regel.
@@ -526,6 +533,7 @@ export default function LunchBoard() {
         view={view}
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         onOpenSettings={() => setSettingsOpen(true)}
+        newsUnread={news.unread}
       />
       </div>
 
@@ -661,10 +669,17 @@ export default function LunchBoard() {
           watchedDishes={watchedDishes}
           onRemoveWatched={removeDishFavorite}
           onRestartTour={welcome.restart}
+          onOpenNews={() => {
+            news.markSeen();
+            setNewsOpen(true);
+          }}
+          newsUnread={news.unread}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}
         />
       )}
+
+      {newsOpen && <NewsNote onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />

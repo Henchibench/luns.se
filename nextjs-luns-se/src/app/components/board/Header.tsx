@@ -23,6 +23,8 @@ interface Props {
   onToggleView: () => void;
 
   onOpenSettings: () => void;
+  /** Finns det något oläst i nyhetslistan? Tänder pricken på kugghjulet. */
+  newsUnread: boolean;
 }
 
 const CONTROL =
@@ -45,6 +47,7 @@ export default function Header({
   view,
   onToggleView,
   onOpenSettings,
+  newsUnread,
 }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 pt-3 pb-2 wide:px-7 wide:pt-4 wide:pb-2.5">
@@ -136,11 +139,24 @@ export default function Header({
       <button
         onClick={onOpenSettings}
         data-tour="settings"
-        title="Inställningar och info"
-        aria-label="Inställningar och info"
-        className={`${ICON_BUTTON} order-2 text-[15px] wide:order-none`}
+        title={newsUnread ? 'Inställningar och info — något är nytt' : 'Inställningar och info'}
+        aria-label={
+          newsUnread ? 'Inställningar och info, något är nytt' : 'Inställningar och info'
+        }
+        className={`${ICON_BUTTON} relative order-2 text-[15px] wide:order-none`}
       >
         ⚙
+        {/* Pricken ligger innanför knappens hörn och inte utanför kanten:
+            innanför har den alltid knappens egen bakgrund bakom sig, medan
+            headern utanför är glas med suddad mesh-gradient — där hade den
+            behövt en ring i en färg som inte finns. Att den bara syns och
+            aldrig hörs är avsikten, så aria-label bär samma besked. */}
+        {newsUnread && (
+          <span
+            aria-hidden="true"
+            className="absolute right-[5px] top-[5px] h-1.5 w-1.5 rounded-full bg-[var(--acc)]"
+          />
+        )}
       </button>
     </header>
   );

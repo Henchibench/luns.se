@@ -44,6 +44,14 @@ raderna ligger under `["menus"][namn]`, inte direkt på namnet.
 | `src/app/lib/stats.ts` | besöksstatistiken, hämtas först när rutan öppnas |
 | `src/app/hooks/` | favoriter, plats, tema, väder, rundturen |
 
+**Bygger du något besökaren ser: lägg en rad i nyhetslistan.** Den bor i
+`src/app/lib/news.ts`, är kurerad för hand och skrivs aldrig ur git — 248 av
+commitarna är skrapor och paketbumpar. Ny post överst, och höj `NEWS_VERSION` i
+samma fil: det är höjningen som tänder pricken på kugghjulet, en post utan den
+syns bara för den som ändå öppnar rutan. Regeln som håller notisen isär från
+rundan står i `src/app/hooks/useNews.ts` — en ny besökare får rundan och aldrig
+pricken, ingen ser båda.
+
 Textstorlekar skrivs **aldrig** som `text-[13px]`. Designens nio steg heter
 `text-10` … `text-30`, är definierade i `tailwind.config.js` och pekar på
 `--fs-*` i `globals.css`. Inställningen "Större text" byter bara variablerna,

@@ -93,7 +93,7 @@ export default function PrivacyNote({
           <li>· vilken restaurang som favoritmarkeras eller rätt som bevakas</li>
           <li>· vilket sugen på-filter som slås på</li>
           <li>· att sökfältet användes, aldrig vad som skrevs i det</li>
-          <li>· att temat byttes eller introduktionen öppnades</li>
+          <li>· att temat byttes, eller att introduktionen eller nyhetslistan öppnades</li>
         </ul>
         {/* Sista stycket i rutan nu, så det bär avståndet ner till knappen
             som avsnittet under tidigare gjorde. */}
