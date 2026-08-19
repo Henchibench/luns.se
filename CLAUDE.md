@@ -59,6 +59,17 @@ så en storlek som står rakt i klassen står utanför den och blir liten kvar n
 allt annat växer. Detsamma gäller en fast bredd på en kolumn som håller text:
 ange den i `em`, som kategorikolumnen i menylistan.
 
+Skraporna skriver emoji först på sina INFO-rader — 💰 på priser, 🕐 på tider,
+någon enstaka annan. De ligger kvar i `menus.json` med flit och plockas bort
+vid visning, av `stripInfoEmoji()` i `lib/menu.ts`. Två skäl: strippningen
+gäller direkt även för data som redan ligger där, och 🕐 är inte dekor —
+`INFO_STATES_HOURS` i `page.tsx` läser den för att se om raden redan har
+öppettider, så `lunch_hours` inte skrivs ut en gång till. **Ordningen i
+`page.tsx` är därför regeln: testa dubbletten på råtexten, strippa sedan.**
+Byter man plats på dem står tiderna två gånger, och inget ser trasigt ut.
+Skulle skraporna själva sluta sätta emoji faller testet ner på orden, som är
+en svagare signal.
+
 Besöksstatistiken hämtas från Umami **vid bygget** (`scripts/fetch_stats.py`),
 inte i besökarens webbläsare. Sajten anropar därför ingen analystjänst när
 någon öppnar den, och ingen nyckel når ut. Behåll den ordningen.

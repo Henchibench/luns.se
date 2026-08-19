@@ -28,6 +28,7 @@ import {
   currentDayIndex,
   dateForDay,
   loadMenuData,
+  stripInfoEmoji,
   type LunsLocation,
   type Restaurant,
 } from './lib/menu';
@@ -274,12 +275,16 @@ export default function LunchBoard() {
 
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
-        const info = (restaurant.info[day] ?? []).join('  ·  ');
+        const infoRows = restaurant.info[day] ?? [];
+        // Dubbletttestet körs på råtexten, visningen på den strippade: 🕐 är
+        // signalen INFO_STATES_HOURS letar efter, och den finns bara kvar så
+        // länge emojin inte plockats bort först. Ordningen här är avsiktlig.
+        const rawInfo = infoRows.join('  ·  ');
 
         return {
           name: restaurant.name,
-          meta: INFO_STATES_HOURS.test(info) ? '' : restaurant.meta.lunch_hours ?? '',
-          info,
+          meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
+          info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.

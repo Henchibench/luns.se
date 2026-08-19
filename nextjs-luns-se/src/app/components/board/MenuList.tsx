@@ -69,7 +69,7 @@ function emptyMessage(section: Section, dayOffset: number, day: string): string 
   const lower = day.toLowerCase();
 
   if (dayOffset > 0) {
-    return `${section.name} lägger bara ut dagens meny. Kom tillbaka på ${lower} 🙂`;
+    return `${section.name} lägger bara ut dagens meny. Kom tillbaka på ${lower}.`;
   }
   return `${section.name} lägger bara ut dagens meny, och ${lower}ens hann tas ner.`;
 }
