@@ -33,7 +33,7 @@ function CloseButton({ label }: { label: string }) {
   return (
     <button
       onClick={close}
-      className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+      className="mt-1 flex-none rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-12 font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
       {label}
     </button>
@@ -44,7 +44,7 @@ function CloseButton({ label }: { label: string }) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-[var(--line)] pt-4">
-      <h3 className="mb-3 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">{label}</h3>
+      <h3 className="mb-3 font-mono text-10 tracking-[.15em] text-[var(--mut)]">{label}</h3>
       {children}
     </section>
   );
@@ -58,10 +58,10 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 function Figure({ value, label }: { value: string; label: string }) {
   return (
     <div className="min-w-0">
-      <div className="font-heading text-[24px] font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
+      <div className="font-heading text-24 font-bold leading-none tracking-[-.02em] text-[var(--acc)]">
         {value}
       </div>
-      <div className="mt-1.5 font-mono text-[10px] tracking-[.1em] text-[var(--mut)]">{label}</div>
+      <div className="mt-1.5 font-mono text-10 tracking-[.1em] text-[var(--mut)]">{label}</div>
     </div>
   );
 }
@@ -112,10 +112,10 @@ export default function StatsOverlay({
         {/* Rubriken måste vara helt täckande — innehållet rullar under den. */}
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--line)] bg-[var(--bg)] px-6 pb-4 pt-6">
           <div className="min-w-0">
-            <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
+            <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
             <h2
               id="luns-stats-title"
-              className="m-0 mt-1 font-heading text-2xl font-bold tracking-[-.02em] text-[var(--ink)]"
+              className="m-0 mt-1 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]"
             >
               Så används sajten
             </h2>
@@ -128,13 +128,13 @@ export default function StatsOverlay({
 
         <div className="px-6 pb-6 pt-5">
           {failed && (
-            <p className="m-0 text-[13px] text-[var(--ink2)]">
+            <p className="m-0 text-13 text-[var(--ink2)]">
               Statistiken gick inte att hämta just nu.
             </p>
           )}
 
           {!stats && !failed && (
-            <p className="m-0 font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+            <p className="m-0 font-mono text-11 tracking-[.15em] text-[var(--mut)]">
               HÄMTAR SIFFROR…
             </p>
           )}
@@ -142,7 +142,7 @@ export default function StatsOverlay({
           {stats && busiestDay && (
             <>
               {stats.sample && (
-                <p className="mb-5 rounded-xl border border-[var(--star)] bg-[var(--chip)] px-4 py-3 text-[12px] leading-[1.5] text-[var(--ink2)]">
+                <p className="mb-5 rounded-xl border border-[var(--star)] bg-[var(--chip)] px-4 py-3 text-12 leading-[1.5] text-[var(--ink2)]">
                   <strong className="text-[var(--ink)]">Exempeldata.</strong> Siffrorna nedan är
                   påhittade och finns bara för att visa hur rutan ser ut. De byts mot riktiga när
                   insamlingen är igång.
@@ -199,7 +199,7 @@ export default function StatsOverlay({
 
                 {showSearches && (
                   <Section label="SÖK">
-                    <p className="m-0 text-[13px] leading-[1.6] text-[var(--ink2)]">
+                    <p className="m-0 text-13 leading-[1.6] text-[var(--ink2)]">
                       {stats.searches === 0 ? (
                         'Ingen har använt sökfältet under perioden.'
                       ) : (
@@ -253,7 +253,7 @@ export default function StatsOverlay({
                     tre tal, och den som undrade varför fick inget svar. */}
                 {!hasChoices && (
                   <Section label="VAD FOLK VÄLJER">
-                    <p className="m-0 text-[13px] leading-[1.6] text-[var(--ink2)]">
+                    <p className="m-0 text-13 leading-[1.6] text-[var(--ink2)]">
                       Här kommer det stå vilka restauranger som favoritmarkeras oftast, vilka rätter
                       som bevakas, vilka sugen på-filter som används och hur ofta någon söker. Det
                       kräver att någon hunnit klicka, och att siffrorna hämtats sedan dess.
@@ -262,7 +262,7 @@ export default function StatsOverlay({
                 )}
               </div>
 
-              <p className="mb-0 mt-6 border-t border-[var(--line)] pt-4 text-[11px] leading-[1.6] text-[var(--mut)]">
+              <p className="mb-0 mt-6 border-t border-[var(--line)] pt-4 text-11 leading-[1.6] text-[var(--mut)]">
                 Allt är ihopräknat, ingen rad handlar om en enskild besökare. Siffrorna hämtas när
                 sajten byggs och inte när rutan öppnas. Uppdaterad{' '}
                 {new Date(stats.generated).toLocaleDateString('sv-SE', {

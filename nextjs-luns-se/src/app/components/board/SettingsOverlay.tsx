@@ -28,17 +28,22 @@ interface Props {
   favoriteCount: number;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  largeText: boolean;
+  onToggleLargeText: (value: boolean) => void;
   /** Bevakade rätter, som bara går att ta bort härifrån de dagar de inte serveras. */
   watchedDishes: FavoriteDish[];
   onRemoveWatched: (restaurant: string, signature: string) => void;
   onRestartTour: () => void;
+  onOpenNews: () => void;
+  /** Prickens tvilling: samma oläst-läge som kugghjulet bär, en rad in. */
+  newsUnread: boolean;
   onOpenStats: () => void;
   onOpenPrivacy: () => void;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-2 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">{children}</h3>
+    <h3 className="mb-2 font-mono text-10 tracking-[.15em] text-[var(--mut)]">{children}</h3>
   );
 }
 
@@ -67,9 +72,9 @@ function Switch({
       className="flex w-full items-start gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5 text-left cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-semibold text-[var(--ink)]">{title}</span>
+        <span className="block text-13 font-semibold text-[var(--ink)]">{title}</span>
         {hint && (
-          <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">{hint}</span>
+          <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">{hint}</span>
         )}
       </span>
 
@@ -91,10 +96,13 @@ function Switch({
 function LinkRow({
   title,
   hint,
+  dot,
   onClick,
 }: {
   title: string;
   hint: string;
+  /** Liten markör framför rubriken, samma betydelse som pricken på kugghjulet. */
+  dot?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -103,10 +111,21 @@ function LinkRow({
       className="flex w-full items-center gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5 text-left cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-semibold text-[var(--ink)]">{title}</span>
-        <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">{hint}</span>
+        <span className="flex items-center gap-2 text-13 font-semibold text-[var(--ink)]">
+          {/* Pricken sitter före rubriken och inte efter: den ska hittas av
+              blicken som just följt pricken på kugghjulet hit, inte letas upp
+              i slutet av en rad vars längd varierar. */}
+          {dot && (
+            <span
+              aria-hidden="true"
+              className="h-[7px] w-[7px] flex-none rounded-full bg-[var(--acc)]"
+            />
+          )}
+          {title}
+        </span>
+        <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">{hint}</span>
       </span>
-      <span aria-hidden="true" className="flex-none text-[13px] text-[var(--mut)]">
+      <span aria-hidden="true" className="flex-none text-13 text-[var(--mut)]">
         →
       </span>
     </button>
@@ -132,14 +151,14 @@ function MailRow({ address }: { address: string }) {
       className="flex w-full items-center gap-3.5 rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5 text-left no-underline cursor-pointer transition-colors hover:bg-[var(--hi)]"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-semibold text-[var(--ink)]">
+        <span className="block text-13 font-semibold text-[var(--ink)]">
           Tyck till om sajten
         </span>
-        <span className="mt-0.5 block text-[12px] leading-[1.5] text-[var(--mut)]">
+        <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">
           Saknas en restaurang, eller är något fel? Mejla {address}.
         </span>
       </span>
-      <span aria-hidden="true" className="flex-none text-[13px] text-[var(--mut)]">
+      <span aria-hidden="true" className="flex-none text-13 text-[var(--mut)]">
         ↗
       </span>
     </a>
@@ -151,7 +170,7 @@ function CloseButton() {
   return (
     <button
       onClick={close}
-      className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-[12px] font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
+      className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
     >
       Stäng
     </button>
@@ -167,9 +186,11 @@ function CloseButton() {
  */
 function Rows({
   onRestartTour,
+  onOpenNews,
+  newsUnread,
   onOpenStats,
   onOpenPrivacy,
-}: Pick<Props, 'onRestartTour' | 'onOpenStats' | 'onOpenPrivacy'>) {
+}: Pick<Props, 'onRestartTour' | 'onOpenNews' | 'newsUnread' | 'onOpenStats' | 'onOpenPrivacy'>) {
   const close = useOverlayClose();
   const handoff = (open: () => void) => () => {
     close();
@@ -178,6 +199,14 @@ function Rows({
 
   return (
     <div className="flex flex-col gap-2">
+      {/* Överst i avsnittet: det är den enda raden här som kan ha ändrats
+          sedan besökaren var här sist, och den enda pricken pekar på. */}
+      <LinkRow
+        title="Nytt på luns.se"
+        hint="Det som tillkommit sedan sist, med det senaste överst."
+        dot={newsUnread}
+        onClick={handoff(onOpenNews)}
+      />
       <LinkRow
         title="Visa rundan igen"
         hint="Genomgången av vad som är nytt och var sakerna sitter."
@@ -204,9 +233,13 @@ export default function SettingsOverlay({
   favoriteCount,
   theme,
   onToggleTheme,
+  largeText,
+  onToggleLargeText,
   watchedDishes,
   onRemoveWatched,
   onRestartTour,
+  onOpenNews,
+  newsUnread,
   onOpenStats,
   onOpenPrivacy,
 }: Props) {
@@ -216,10 +249,10 @@ export default function SettingsOverlay({
         className="luns-panel luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7"
         onClick={e => e.stopPropagation()}
       >
-        <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
+        <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
         <h2
           id="luns-settings-title"
-          className="mt-2 mb-5 font-heading text-2xl font-bold tracking-[-.02em] text-[var(--ink)]"
+          className="mt-2 mb-5 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]"
         >
           Inställningar och info
         </h2>
@@ -227,6 +260,15 @@ export default function SettingsOverlay({
         <SectionLabel>INSTÄLLNINGAR</SectionLabel>
         <div className="flex flex-col gap-2">
           <Switch checked={theme === 'dark'} onChange={onToggleTheme} title="Mörkt läge" />
+
+          {/* Reglaget står näst överst, ovanför favoritvalet: den som letar
+              efter det gör det för att texten är för liten att leta i. */}
+          <Switch
+            checked={largeText}
+            onChange={onToggleLargeText}
+            title="Större text"
+            hint="Rätter, namn och etiketter växer ett steg. Listan rymmer lika många restauranger — det är bokstäverna som blir större, inte raderna."
+          />
 
           <div>
             <Switch
@@ -236,7 +278,7 @@ export default function SettingsOverlay({
               hint="Sajten öppnas med favoritfiltret på, så bara de hjärtmarkerade restaurangerna syns. Filtret går att stänga av som vanligt sedan."
             />
             {favoriteCount === 0 && (
-              <p className="mt-2 mb-0 text-[12px] leading-[1.5] text-[var(--mut)]">
+              <p className="mt-2 mb-0 text-12 leading-[1.5] text-[var(--mut)]">
                 Det finns inga favoriter än. Hjärtat bredvid en restaurang sparar den, och då börjar
                 inställningen gälla.
               </p>
@@ -256,6 +298,8 @@ export default function SettingsOverlay({
           <SectionLabel>INFORMATION</SectionLabel>
           <Rows
             onRestartTour={onRestartTour}
+            onOpenNews={onOpenNews}
+            newsUnread={newsUnread}
             onOpenStats={onOpenStats}
             onOpenPrivacy={onOpenPrivacy}
           />

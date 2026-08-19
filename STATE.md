@@ -1,6 +1,6 @@
 # Security Loop State — luns.se
 
-_Last updated: 2026-08-11_
+_Last updated: 2026-08-19_
 _Branch: `Dev`_
 
 ## Repo summary
@@ -17,134 +17,185 @@ exporteras statiskt och publiceras på GitHub Pages via
 Verifieringskommandot är `npm run build`; det finns ingen testsvit. Fixar för
 transitiva npm-beroenden görs via `overrides`-blocket i `package.json`.
 
-## Tooling note — `npm audit` räcker inte, och det är inte en detalj
+## Tooling — tre källor, och de säger inte samma sak
 
-Dependabots **alerts-API är fortfarande inte nåbart härifrån** — `gh` finns
-inte installerat och ingen token är satt.
+**1. Dependabots alerts-API är nåbart nu.** Tidigare omgångar noterade motsatsen
+(`gh` saknades, ingen token). Det stämmer inte längre — `gh` finns på dev01 och
+dess token räcker för alerts:
 
-Den tidigare antagandet i den här filen, att `npm audit` frågar samma källa som
-Dependabot, **stämmer inte**. `npm audit` läser npm-registrets egen spegling av
-GitHub Advisory Database, och den speglingen släpar. Den här omgången hade
-GitHub två high-varningar medan `npm audit` visade en. Den som saknades
-(`js-yaml`, publicerad fem dagar tidigare) fanns inte i npm-registrets data alls
-— den syntes alltså inte som "moderate" eller "fixad", utan som ingenting.
+```bash
+gh api repos/Henchibench/luns.se/dependabot/alerts --paginate
+```
 
-**Använd GitHubs advisory-API i stället.** Det är publikt och kräver ingen
-token, till skillnad från alerts-API:t:
+Det är den auktoritativa listan över vad GitHub faktiskt larmar om, och det är
+den som genererar mailen Henrik får. Börja här: det ger svar på "finns det något
+öppet?" på en sekund, i stället för elva curl-anrop. `state`-fältet är
+`open`/`fixed`/`dismissed`. Fältet `fixed_at` säger när det stängdes.
+
+Code scanning och secret scanning svarar däremot `403` med den här token — de
+går inte att kontrollera härifrån.
+
+**Ett Dependabot-mail besvaras med larmnumret, inte med paketnamnet.** Mailen
+Henrik får länkar till *advisory-sidan* (`github.com/advisories/GHSA-…`), och den
+beskriver sårbarheten i paketet för hela världen. Den finns kvar för alltid och
+säger ingenting om det här repot — klickar man dit ser det ut som att felet står
+kvar även när det lagades för veckor sedan. Repots status står på en annan sida:
+
+```bash
+# hitta larmet ur mailets CVE eller GHSA
+gh api repos/Henchibench/luns.se/dependabot/alerts --paginate \
+  -q '.[] | select(.security_advisory.cve_id=="CVE-…")
+      | "#\(.number) \(.state) inkom \(.created_at) stängt \(.fixed_at) — \(.html_url)"'
+```
+
+`state` och `fixed_at` är svaret. Öppna larm, och bara de, listas på
+<https://github.com/Henchibench/luns.se/security/dependabot?q=is%3Aopen>.
+
+**Samma paket kan larma om och om igen på nya CVE:n.** `fast-uri` har fått fem
+high-advisories under 2026 — CVE-2026-6321, -6322, -13676, -16221 och -18446, alla
+varianter av samma host confusion, med patcharna 3.1.1, 3.1.2, 3.1.3, 3.1.4 och
+3.1.5 i tur och ordning. "Vi lagade fast-uri i juli" duger därför inte som svar
+på ett mail om fast-uri. Läs vilket CVE mailet gäller och slå upp *det* larmet.
+
+**2. Advisory-API:t ser mer än alerts-API:t, och det är inte teoretiskt.**
+`nanoid@3.3.16` (GHSA-2v37-7h3g-55p8, high) åtgärdades 2026-08-11. Den varningen
+har **aldrig funnits som Dependabot-larm** — noll träffar på `nanoid` i hela
+alerts-historiken. Den hittades genom att skanna lockfilen paket för paket mot
+advisory-API:t. Ett tomt alerts-API betyder alltså inte att lockfilen är ren, och
+det är skälet att köra hela skanningen även när GitHub är tyst.
+
+**3. `npm audit` är sist på listan.** Det läser npm-registrets egen spegling av
+advisory-databasen, och den släpar. 2026-08-11 visade GitHub två high och
+`npm audit` en: `js-yaml@4.3.0` (GHSA-5p4m-2wfm-xmqj, publicerad fem dagar
+tidigare) fanns inte i registerdatan alls — inte som "moderate", inte som
+"fixad", utan som ingenting. Kör det som andra åsikt; när källorna är oense
+vinner advisory-API:t.
+
+### Skanningen, och en kontroll man ska göra
 
 ```bash
 cd nextjs-luns-se
 jq -r '.packages | to_entries[] | select(.key != "" and .value.version)
        | "\(.key | sub("^.*node_modules/";""))@\(.value.version)"' \
   package-lock.json | sort -u > /tmp/pkgs.txt
-cd /tmp && split -l 40 pkgs.txt chunk_
-for f in chunk_*; do
+cd /tmp && split -l 40 pkgs.txt "chunk_$$_"
+for f in chunk_$$_*; do
   curl -s --get --data-urlencode "affects=$(paste -sd, "$f")" \
     'https://api.github.com/advisories?ecosystem=npm&per_page=100' \
     | jq -r '.[] | "\(.severity)\t\(.ghsa_id)\t\(.summary)"'
 done | sort -u
 ```
 
-`affects` tar en kommaseparerad lista `paket@version` och svarar med exakt de
-advisories vars sårbara intervall täcker versionen. 423 paket blir elva anrop,
-väl under de 60/timme man får utan token. Kör `npm audit` också — men lita på
-listan ovan när de två inte är överens.
+**Tomt svar och trasigt anrop ser likadana ut.** Loopen skriver ingenting både
+när allt är rent och när curl faller, `jq` får skräp eller kvoten (60/timme utan
+token) tar slut. Verifiera därför alltid två saker innan du tror på ett tomt
+resultat: att varje anrop gav `http=200`, och att ett kontrollprov med en känd
+sårbar version ger träff. `js-yaml@4.3.0` duger — den ska ge
+GHSA-5p4m-2wfm-xmqj, medan `js-yaml@4.3.1` ska ge tomt.
 
-**Push-utdata är en gratis kontrollsiffra.** `git push` skriver ut hur många
-varningar GitHub ser på default-grenen. Stämmer inte den siffran med vad du
-hittat har du inte hittat allt. Det var precis så den andra varningen upptäcktes
-den här gången.
+Deduplicera på `name@version`, **aldrig på namnet ensamt.** Lockfilen bär just nu
+`ansi-regex`, `ansi-styles`, `debug`, `emoji-regex`, `eslint-visitor-keys`,
+`fast-glob`, `glob-parent`, `ignore` och `picomatch` i två versioner var. Faller
+en rad bort är det den sårbara kopian du tappade.
 
 ## Open Alerts
 
-### npm (`nextjs-luns-se`)
+**Inga.** Skanning 2026-08-19:
 
-Båda var **high**, vilket matchar de två varningar GitHub rapporterade på
-default-grenen.
+| Källa | Omfattning | Resultat |
+|---|---|---|
+| Dependabot alerts-API | hela repot, alla states | 72 larm totalt, **samtliga `fixed`** — 0 öppna, 0 dismissade |
+| GitHubs advisory-API | 423 `paket@version` ur `package-lock.json`, 11 anrop | alla `http=200`, **0 träffar** (kontrollprov `fast-uri@3.1.3` gav 2 träffar som väntat) |
+| GitHubs advisory-API | 9 `paket@version` ur `.venv-prod` (ecosystem `pip`) | **0 träffar** (kontrollprov `requests@2.31.0` gav 3 träffar) |
+| `npm audit` | `nextjs-luns-se` | `found 0 vulnerabilities` |
+| GitHub Actions | `checkout@v5`, `setup-python@v6`, `setup-node@v5`, `upload-pages-artifact@v5`, `deploy-pages@v5` | alla på aktuell major |
 
-| # | Paket | Allvarlighet | Advisory | Typ | Sårbart intervall | Fix |
-|---|---|---|---|---|---|---|
-| 1 | `nanoid` | **High** (CVSS 5.9, CWE-835) | GHSA-2v37-7h3g-55p8 — egna generatorer kan loopa oändligt när `size` är noll | transitiv, **produktion** (`next` → `postcss` → `nanoid`, installerad 3.3.16) | `<3.3.17` | `nanoid@3.3.17` |
-| 2 | `js-yaml` | **High** (CVSS 7.5) | GHSA-5p4m-2wfm-xmqj / CVE-2026-59870 — kvadratisk CPU-förbrukning vid `!!omap`-upplösning, publicerad 2026-08-06 | transitiv, **dev** (`eslint` → `@eslint/eslintrc` → `js-yaml`, installerad 4.3.0) | `>=4.0.0, <4.3.1` | `js-yaml@4.3.1` |
+`pip-audit` finns inte installerat på dev01 och är inget som ska in i
+`requirements-dev.txt` — Python-sidan skannas i stället mot advisory-API:t med
+`ecosystem=pip`, samma metod som npm-sidan. Skanna de faktiskt installerade
+versionerna ur `.venv-prod/bin/pip list --format=freeze`, inte
+`requirements.txt`: den är opinnad (`beautifulsoup4`, `requests`, `lxml` utan
+versioner), så filen säger ingenting om vad som kör.
 
-**Varning nr 2 syntes inte i `npm audit`** — se tooling-noten ovan.
+Nyckelversioner i lockfilen: `next@15.5.22`, `js-yaml@4.3.1`, `nanoid@3.3.18`,
+`sharp@0.35.3`, `fast-uri@3.1.5`, `brace-expansion@5.0.9`, `postcss@8.5.26`.
 
-### Python
+### De senaste larmen — alla stängda
 
-- `requirements.txt` — `pip-audit`: inga kända sårbarheter.
-- `requirements-dev.txt` (playwright) — `pip-audit`: inga kända sårbarheter.
+| # | Paket | Grad | Advisory | Larm inkom | Åtgärdat |
+|---|---|---|---|---|---|
+| 88 | `js-yaml` (dev, transitiv) | high | GHSA-5p4m-2wfm-xmqj | 2026-08-11 | 2026-08-11 |
+| 87 | `fast-uri` (dev, transitiv) | high | GHSA-7p8r-x3mc-p8w7 | 2026-08-05 | 2026-08-05 |
+| 86 | `brace-expansion` (dev, transitiv) | high | GHSA-rgw5-rvv9-x895 | 2026-08-04 | 2026-08-05 |
+| 85 | `next` (produktion, direkt) | medium | GHSA-q8wf-6r8g-63ch | 2026-07-27 | 2026-07-28 |
+| 84 | `sharp` (produktion, transitiv) | high | GHSA-f88m-g3jw-g9cj | 2026-07-26 | 2026-07-28 |
 
-### GitHub Actions
+Senaste **critical** var GHSA-9qr9-h5gf-34mp (`next`, RCE i React flight
+protocol), inkom 2025-12-03 och åtgärdades 2025-12-16. Ingen critical sedan dess.
 
-`actions/checkout@v5`, `setup-python@v6`, `setup-node@v5`,
-`upload-pages-artifact@v5`, `deploy-pages@v5` — alla på aktuell major.
+### Mailet om CVE-2026-16221 (`fast-uri`) — utrett 2026-08-19
 
-### Totalt
+Henrik fick ett mail om `fast-uri vulnerable to host confusion via literal
+backslash authority delimiter` och såg sårbarheten stå kvar när han klickade.
+Larmet är **#83, stängt sedan 2026-07-28 09:15:29**. Kedjan, för att den är
+lärorik:
 
-Critical: 0 · **High: 2** · Moderate: 0 · Low: 0
+| När | Vad |
+|---|---|
+| 2026-07-19 | lockfilen bär `fast-uri@3.1.2` |
+| 2026-07-21 | GHSA-v2hh-gcrm-f6hx publiceras: sårbart `>= 3.0.0, <= 3.1.3`, patch `3.1.4` |
+| 2026-07-25 | Dependabot öppnar larm #83 → **mailet skickas här** |
+| 2026-07-28 09:15:23 | PR #65 *Fix 6 high-severity npm advisories* mergas, `fast-uri` → `3.1.4` |
+| 2026-07-28 09:15:29 | larm #83 stängs, sex sekunder efter mergen |
+| 2026-08-05 | ny advisory (CVE-2026-18446), larm #87, `fast-uri` → `3.1.5`, stängt samma dag |
+
+Två saker att ta med sig. **Ingen automatik lagade det** — det finns ingen
+`.github/dependabot.yml`, så Dependabot larmar men öppnar aldrig
+uppdaterings-PR. Varje fix i tabellen ovan är en PR som någon skrev. Och **inget
+larm skapades eller ändrades den 18 augusti**; sista larmaktiviteten i repot är
+`js-yaml` den 11 augusti. Ett mail daterat senare än larmet är en notis om
+något som redan var stängt, inte ett nytt larm — kontrollera alltid `created_at`
+på larmet i stället för att lita på mailets datum.
+
+`fast-uri` är dessutom `dev: true` och dras in av `ajv`. Den följer aldrig med i
+den statiska exporten, alltså har den aldrig kunnat nå en besökare på sajten.
 
 ## Triage
 
-### Alert 1 — nanoid (High, GHSA-2v37-7h3g-55p8)
+Ingenting att triagera — inget öppet i någon av källorna ovan.
 
-- **Patchad version finns?** Ja, `nanoid@3.3.17`.
-- **Nåbar i det här projektet?** Nej i praktiken. `nanoid` dras in av `postcss`
-  under bygget, och den sårbara koden kräver att en **egen** generator anropas
-  med `size = 0`. Postcss enda anrop är `nanoid(6)` i `lib/input.js` (för att
-  namnge en css-input) — fast storlek, ingen egen generator, ingenting som
-  kommer från indata. Inget i den exporterade sajten kör nanoid.
-  Allvarlighetsgraden är hög men angreppsytan här är noll.
-- **Uppgraderingsrisk:** mycket låg.
+Två mönster från de senaste omgångarna är värda att ha kvar, eftersom båda
+kostade tid när de missades:
 
-#### Vald åtgärd
-
-Fixen togs **uppströms i stället för genom att pinna barnet**: `postcss@8.5.26`
-kräver redan `nanoid ^3.3.17`, så `postcss`-overriden höjdes `^8.5.23` →
-`^8.5.26` (och samma bump i `devDependencies`, så de två inte glider isär). Ett
-eget `nanoid`-override hade tvingat hela trädet till 3.x-serien och blivit ett
-hinder den dag något dev-beroende vill ha nanoid 5, som är ESM-only.
-
-Efter `npm install` löser trädet `postcss@8.5.26` → `nanoid@3.3.18`.
-
-### Alert 2 — js-yaml (High, GHSA-5p4m-2wfm-xmqj)
-
-- **Patchad version finns?** Ja, `js-yaml@4.3.1`. Advisoryn noterar att fixen
-  för CVE-2026-59870 inte backportades, men det gäller 3.x — 4.x-linjen har
-  4.3.1.
-- **Nåbar i det här projektet?** Nej. `js-yaml` är ett **dev-only** transitivt
-  beroende via `eslint` → `@eslint/eslintrc`, som läser eslint-konfiguration
-  från repot självt. Angreppet kräver att man matar in fientlig YAML med
-  `!!omap`; här läses bara våra egna konfigfiler, och paketet följer inte med i
-  den statiska exporten.
-- **Uppgraderingsrisk:** mycket låg, patchversion.
-
-#### Vald åtgärd
-
-Overriden höjdes `^4.3.0` → `^4.3.1`. Notera mönstret: overriden stod på
-`^4.3.0` och den versionen var precis den sårbara — **ett override som redan
-finns skyddar inte, det låser fast**. Samma sak hände i juni, då `^4.1.1`
-pekade rakt på det sårbara `4.1.1`. Läs alltid av vilken version som faktiskt
+**Ett override som redan finns skyddar inte, det låser fast.** `js-yaml`-raden
+stod på `^4.3.0` och just 4.3.0 var den sårbara versionen; i juni pekade `^4.1.1`
+på samma sätt rakt på sårbara 4.1.1. Läs alltid av vilken version som faktiskt
 hamnade i lockfilen, inte vad intervallet ser ut att tillåta.
 
-## Verifiering
-
-- **GitHubs advisory-API mot alla 423 paket i lockfilen** → noll träffar.
-- `npm audit` → **found 0 vulnerabilities**.
-- `pip-audit` mot båda requirements-filerna → rent.
-- `scripts/testserver.sh` → skrapning av 29 restauranger utan fel, `npm ci` +
-  `npm run build` gick igenom, statisk export av alla sidor.
+**Ta fixen uppströms när det går.** `nanoid` löstes genom att höja
+`postcss`-overriden till `^8.5.26` (som själv kräver `nanoid ^3.3.17`) i stället
+för att pinna `nanoid` direkt — ett eget nanoid-override hade låst hela trädet
+till 3.x-serien och blivit ett hinder den dag ett dev-beroende vill ha nanoid 5,
+som är ESM-only.
 
 ## Status
 
-Juni-omgångens `js-yaml`-varning (GHSA-h67p-54hq-rp68, moderate) är en **annan**
-advisory än nr 2 ovan och är löst sedan tidigare.
+Punkten som stod öppen i förra omgången — att `.github/security-loop.md`
+utpekade `npm audit` som auktoritativ skanning — **är löst.** Prompten har skrivits
+om och beskriver nu advisory-API-metoden. Kvar i den står fortfarande att
+alerts-API:t inte är nåbart utan token; se punkt 1 i tooling-avsnittet ovan, det
+gäller inte längre på dev01.
 
-Kvar att ta ställning till, utanför den här omgången: `.github/security-loop.md`
-säger fortfarande åt den schemalagda agenten att använda `npm audit` som
-auktoritativ skanning, och att bara åtgärda critical/high automatiskt. Den
-första punkten är nu känt otillräcklig — se tooling-noten.
+Att det saknas `.github/dependabot.yml` är ett aktivt val att bekräfta: utan den
+larmar Dependabot men lagar aldrig själv. Hittills har varje fix skrivits för
+hand eller av den här rutinen, vilket fungerat — men det förklarar också varför
+ett larm kan stå öppet i tre dygn innan någon rör det.
+
+Ingen åtgärd behövs. Inga grenar eller PR skapade.
 
 ## DONE
 
-Båda high-varningarna åtgärdade, advisory-API:t, `npm audit` och `pip-audit`
-rena och bygget grönt.
+Noll öppna sårbarheter. Alerts-API:t, advisory-API:t mot samtliga 423
+npm-paket och de 9 Python-paketen i `.venv-prod`, `npm audit` och
+Actions-versionerna är alla rena. Larmet bakom mailet om CVE-2026-16221 är
+spårat och stängt sedan 2026-07-28; se avsnittet ovan.

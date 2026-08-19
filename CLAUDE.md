@@ -44,6 +44,32 @@ raderna ligger under `["menus"][namn]`, inte direkt på namnet.
 | `src/app/lib/stats.ts` | besöksstatistiken, hämtas först när rutan öppnas |
 | `src/app/hooks/` | favoriter, plats, tema, väder, rundturen |
 
+**Bygger du något besökaren ser: lägg en rad i nyhetslistan.** Den bor i
+`src/app/lib/news.ts`, är kurerad för hand och skrivs aldrig ur git — 248 av
+commitarna är skrapor och paketbumpar. Ny post överst, och höj `NEWS_VERSION` i
+samma fil: det är höjningen som tänder pricken på kugghjulet, en post utan den
+syns bara för den som ändå öppnar rutan. Regeln som håller notisen isär från
+rundan står i `src/app/hooks/useNews.ts` — en ny besökare får rundan och aldrig
+pricken, ingen ser båda.
+
+Textstorlekar skrivs **aldrig** som `text-[13px]`. Designens nio steg heter
+`text-10` … `text-30`, är definierade i `tailwind.config.js` och pekar på
+`--fs-*` i `globals.css`. Inställningen "Större text" byter bara variablerna,
+så en storlek som står rakt i klassen står utanför den och blir liten kvar när
+allt annat växer. Detsamma gäller en fast bredd på en kolumn som håller text:
+ange den i `em`, som kategorikolumnen i menylistan.
+
+Skraporna skriver emoji först på sina INFO-rader — 💰 på priser, 🕐 på tider,
+någon enstaka annan. De ligger kvar i `menus.json` med flit och plockas bort
+vid visning, av `stripInfoEmoji()` i `lib/menu.ts`. Två skäl: strippningen
+gäller direkt även för data som redan ligger där, och 🕐 är inte dekor —
+`INFO_STATES_HOURS` i `page.tsx` läser den för att se om raden redan har
+öppettider, så `lunch_hours` inte skrivs ut en gång till. **Ordningen i
+`page.tsx` är därför regeln: testa dubbletten på råtexten, strippa sedan.**
+Byter man plats på dem står tiderna två gånger, och inget ser trasigt ut.
+Skulle skraporna själva sluta sätta emoji faller testet ner på orden, som är
+en svagare signal.
+
 Besöksstatistiken hämtas från Umami **vid bygget** (`scripts/fetch_stats.py`),
 inte i besökarens webbläsare. Sajten anropar därför ingen analystjänst när
 någon öppnar den, och ingen nyckel når ut. Behåll den ordningen.

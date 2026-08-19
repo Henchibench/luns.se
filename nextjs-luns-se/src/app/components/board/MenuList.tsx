@@ -69,7 +69,7 @@ function emptyMessage(section: Section, dayOffset: number, day: string): string 
   const lower = day.toLowerCase();
 
   if (dayOffset > 0) {
-    return `${section.name} lägger bara ut dagens meny. Kom tillbaka på ${lower} 🙂`;
+    return `${section.name} lägger bara ut dagens meny. Kom tillbaka på ${lower}.`;
   }
   return `${section.name} lägger bara ut dagens meny, och ${lower}ens hann tas ner.`;
 }
@@ -102,7 +102,7 @@ export default function MenuList({
               title={section.favorite ? 'Ta bort favorit' : 'Favoritmarkera'}
               aria-label={section.favorite ? `Ta bort ${section.name} som favorit` : `Favoritmarkera ${section.name}`}
               aria-pressed={section.favorite}
-              className="flex-none border-0 bg-transparent p-0 text-[14px] leading-none cursor-pointer transition-transform active:scale-90"
+              className="flex-none border-0 bg-transparent p-0 text-14 leading-none cursor-pointer transition-transform active:scale-90"
               style={{ color: section.favorite ? 'var(--acc)' : 'var(--mut)' }}
             >
               {section.favorite ? '♥' : '♡'}
@@ -111,7 +111,7 @@ export default function MenuList({
             {/* Namnet var mindre än rätterna under det, alltså listans minsta
                 text trots att det är dess rubrik. Vid scroll gick gränsen
                 mellan två restauranger obemärkt förbi. */}
-            <span className="whitespace-nowrap font-mono text-[14px] font-semibold tracking-[.1em] text-[var(--acc)]">
+            <span className="whitespace-nowrap font-mono text-14 font-semibold tracking-[.1em] text-[var(--acc)]">
               {section.name.toUpperCase()}
             </span>
 
@@ -121,13 +121,13 @@ export default function MenuList({
             {/* Länkarna stod i --mut, samma dämpade ton som priser och
                 allergener. De är saker man klickar på, inte fotnoter, så de
                 får samma läsbarhet som rätterna. */}
-            <div className="flex flex-none gap-3 font-mono text-[11px] font-medium text-[var(--ink2)]">
+            <div className="flex flex-none gap-3 font-mono text-11 font-medium text-[var(--ink2)]">
               {/* Kartan fälls ut här nere i stället för att kasta iväg
                   besökaren till Google Maps i en ny flik. */}
               <button
                 onClick={() => setOpenMap(prev => (prev === section.name ? null : section.name))}
                 aria-expanded={openMap === section.name}
-                className={`${LINK_CLASS} border-0 bg-transparent p-0 font-mono text-[11px] font-medium cursor-pointer`}
+                className={`${LINK_CLASS} border-0 bg-transparent p-0 font-mono text-11 font-medium cursor-pointer`}
                 style={{ color: openMap === section.name ? 'var(--acc)' : undefined }}
               >
                 KARTA {openMap === section.name ? '↑' : '↓'}
@@ -162,7 +162,7 @@ export default function MenuList({
                 />
               ) : (
                 <div className="flex flex-col items-center gap-2 rounded-2xl border border-[var(--glassBrd)] py-8">
-                  <span className="font-mono text-[10px] tracking-[.1em] text-[var(--mut)]">
+                  <span className="font-mono text-10 tracking-[.1em] text-[var(--mut)]">
                     VI VET INTE VAR DEN LIGGER ÄN
                   </span>
                   {section.maps && (
@@ -170,7 +170,7 @@ export default function MenuList({
                       href={section.maps}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-mono text-[10px] text-[var(--acc)] hover:underline"
+                      className="font-mono text-10 text-[var(--acc)] hover:underline"
                     >
                       SÖK PÅ GOOGLE MAPS ↗
                     </a>
@@ -188,13 +188,13 @@ export default function MenuList({
               läsaren är det senare samma sak och står därför på samma rad,
               med klocka på tiderna så de matchar skrapans stil. */}
           {section.description && (
-            <p className="m-0 mb-1 max-w-[70ch] text-[12px] leading-[1.5] text-[var(--ink2)]">
+            <p className="m-0 mb-1 max-w-[70ch] text-12 leading-[1.5] text-[var(--ink2)]">
               {section.description}
             </p>
           )}
 
           {(section.meta || section.info) && (
-            <p className="m-0 mb-1.5 text-[12px] text-[var(--mut)]">
+            <p className="m-0 mb-1.5 text-12 text-[var(--mut)]">
               {[section.meta && `🕐 ${section.meta}`, section.info]
                 .filter(Boolean)
                 .join('  ·  ')}
@@ -202,7 +202,7 @@ export default function MenuList({
           )}
 
           {section.empty && (
-            <p className="mt-0.5 mb-2 text-[12px] italic text-[var(--mut)]">
+            <p className="mt-0.5 mb-2 text-12 italic text-[var(--mut)]">
               {emptyMessage(section, dayOffset, day)}
             </p>
           )}
@@ -225,19 +225,24 @@ export default function MenuList({
                     varje rad, för de fåtal rader som behöver det. */}
                 <div className="flex min-w-0 flex-1 flex-col wide:flex-row wide:items-baseline wide:gap-3.5">
                   <span
-                    className="font-mono text-[10px] leading-[1.35] tracking-[.08em] hyphens-auto break-words wide:w-[92px] wide:flex-none"
+                    // Bredden är 9.2em och inte 92px, alltså samma sak i
+                    // standardläget men relativ till kolumnens egen text. Med
+                    // fasta pixlar blev "KRÄMIG TRATTKANTARELLRISOTTO MED
+                    // VÄSTERBOTTENOST" sex avstavade rader så fort man valde
+                    // större text, medan rätten bredvid stod på en.
+                    className="font-mono text-10 leading-[1.35] tracking-[.08em] hyphens-auto break-words wide:w-[9.2em] wide:flex-none"
                     lang="sv"
                     style={{ color: dish.categoryColor }}
                   >
                     {dish.category.toUpperCase()}
                   </span>
 
-                  <span className="flex-1 text-[13px] leading-[1.55] text-[var(--ink2)]">
+                  <span className="flex-1 text-13 leading-[1.55] text-[var(--ink2)]">
                     <Highlight text={dish.description} terms={searchTerms} />
                   </span>
                 </div>
 
-                <span className="flex-none w-9 text-right font-mono text-[11px] font-medium text-[var(--ink2)] wide:w-14">
+                <span className="flex-none w-9 text-right font-mono text-11 font-medium text-[var(--ink2)] wide:w-14">
                   {dish.price}
                 </span>
 
@@ -247,7 +252,7 @@ export default function MenuList({
                   title={dish.starred ? 'Sluta bevaka rätten' : 'Bevaka rätt, du ser det direkt när den serveras igen'}
                   aria-label={dish.starred ? `Sluta bevaka ${dish.description}` : `Bevaka ${dish.description}`}
                   aria-pressed={dish.starred}
-                  className="flex-none border-0 bg-transparent px-0.5 text-[13px] leading-none cursor-pointer transition-transform active:scale-90"
+                  className="flex-none border-0 bg-transparent px-0.5 text-13 leading-none cursor-pointer transition-transform active:scale-90"
                   style={{ color: dish.starred ? 'var(--star)' : 'var(--mut)' }}
                 >
                   {dish.starred ? '★' : '☆'}

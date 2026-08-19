@@ -9,6 +9,7 @@ import RestaurantMap, { MapPoint } from './components/board/RestaurantMap';
 import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
+import NewsNote from './components/board/NewsNote';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
 import { ChipSpec } from './components/board/Chips';
@@ -16,8 +17,10 @@ import { useFavorites } from './hooks/useFavorites';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
+import { useTextSize } from './hooks/useTextSize';
 import { useWeather } from './hooks/useWeather';
 import { useWelcome } from './hooks/useWelcome';
+import { useNews } from './hooks/useNews';
 import {
   DAYS,
   categoryColor,
@@ -25,6 +28,7 @@ import {
   currentDayIndex,
   dateForDay,
   loadMenuData,
+  stripInfoEmoji,
   type LunsLocation,
   type Restaurant,
 } from './lib/menu';
@@ -131,6 +135,7 @@ export default function LunchBoard() {
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [newsOpen, setNewsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -152,9 +157,14 @@ export default function LunchBoard() {
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
   const { theme, toggle: toggleTheme } = useTheme();
+  const { large: largeText, setLarge: setLargeText } = useTextSize();
   // Rundan väntar tills data finns och platsvalet är gjort — annars pekar
   // den på en tom sida bakom välkomstrutan.
   const welcome = useWelcome(loading || needsChoice || restaurants.length === 0);
+  // Nyhetsnotisen blockeras inte på samma sätt: den avgör sitt läge vid
+  // montering, innan rundan hunnit sätta sin nyckel, och det är just det som
+  // gör att en ny besökare får rundan och aldrig pricken. Se useNews.
+  const news = useNews();
   const weather = useWeather(location?.latitude, location?.longitude);
 
   useEffect(() => {
@@ -171,8 +181,8 @@ export default function LunchBoard() {
   }, []);
 
   /**
-   * Statistiken och integritetsinfon är undersidor till inställningarna, och
-   * kugghjulet är enda vägen in till dem. Att stänga en av dem lämnar därför
+   * Statistiken, integritetsinfon och nyhetslistan är undersidor till
+   * inställningarna, och kugghjulet är enda vägen in. Att stänga en av dem lämnar därför
    * alltid tillbaka dit i stället för att kasta ut besökaren till menylistan,
    * precis som en bakåtknapp. Öppnas de någon gång från ett annat håll får det
    * bli ett val i stället för en regel.
@@ -265,12 +275,16 @@ export default function LunchBoard() {
 
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
-        const info = (restaurant.info[day] ?? []).join('  ·  ');
+        const infoRows = restaurant.info[day] ?? [];
+        // Dubbletttestet körs på råtexten, visningen på den strippade: 🕐 är
+        // signalen INFO_STATES_HOURS letar efter, och den finns bara kvar så
+        // länge emojin inte plockats bort först. Ordningen här är avsiktlig.
+        const rawInfo = infoRows.join('  ·  ');
 
         return {
           name: restaurant.name,
-          meta: INFO_STATES_HOURS.test(info) ? '' : restaurant.meta.lunch_hours ?? '',
-          info,
+          meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
+          info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
@@ -441,7 +455,7 @@ export default function LunchBoard() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+        <span className="font-mono text-11 tracking-[.15em] text-[var(--mut)]">
           HÄMTAR MENYER…
         </span>
       </div>
@@ -451,8 +465,8 @@ export default function LunchBoard() {
   if (error) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-[16px] font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
-        <p className="text-[13px] text-[var(--mut)]">{error}</p>
+        <p className="text-16 font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
+        <p className="text-13 text-[var(--mut)]">{error}</p>
       </div>
     );
   }
@@ -524,6 +538,7 @@ export default function LunchBoard() {
         view={view}
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         onOpenSettings={() => setSettingsOpen(true)}
+        newsUnread={news.unread}
       />
       </div>
 
@@ -553,7 +568,7 @@ export default function LunchBoard() {
                 className="min-h-0 flex-1"
               />
               {unmappedCount > 0 && (
-                <span className="flex-none font-mono text-[10px] text-[var(--mut)]">
+                <span className="flex-none font-mono text-10 text-[var(--mut)]">
                   {unmappedCount} restaurang{unmappedCount === 1 ? '' : 'er'} saknar position och
                   syns inte på kartan
                 </span>
@@ -567,19 +582,19 @@ export default function LunchBoard() {
           {view === 'list' && (
           <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
-            <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
+            <h1 className="m-0 font-heading text-24 font-bold tracking-[-.02em] wide:text-30">
               {heading}
             </h1>
             {/* Antalet dolda stod här bredvid, med en väg in till matprofilen
                 som gömde dem. Nu finns ingenting som tar bort rätter i tysthet:
                 filtren syns på skärmen medan de gäller. */}
-            <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
+            <span className="font-mono text-11 text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
             </span>
           </div>
 
           {starredToday.length > 0 && (
-            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-[12px] font-semibold text-[var(--accStrong)]">
+            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-12 font-semibold text-[var(--accStrong)]">
               <span className="text-[var(--star)]">★</span>
               Bevakad rätt idag: {starredToday.join(' · ')}
             </div>
@@ -587,10 +602,10 @@ export default function LunchBoard() {
 
           {isEmpty && (
             <div className="py-[70px] text-center text-[var(--mut)]">
-              <p className="mb-1.5 text-[16px] font-semibold text-[var(--ink2)]">
+              <p className="mb-1.5 text-16 font-semibold text-[var(--ink2)]">
                 Inga rätter matchar
               </p>
-              <p className="mb-4 text-[13px]">Prova en annan dag eller rensa sök och filter</p>
+              <p className="mb-4 text-13">Prova en annan dag eller rensa sök och filter</p>
               <button
                 onClick={() => {
                   setSearch('');
@@ -598,7 +613,7 @@ export default function LunchBoard() {
                   setActiveCravings([]);
                   setShowOnlyFavorites(false);
                 }}
-                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-12 font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
               >
                 Rensa allt
               </button>
@@ -635,7 +650,7 @@ export default function LunchBoard() {
       />
 
       {toast && (
-        <div className="luns-toast fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-[10px] bg-[var(--ink)] px-[18px] py-2.5 text-[13px] font-semibold text-[var(--bg)] shadow-[0_8px_24px_rgba(0,0,0,.25)]">
+        <div className="luns-toast fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-[10px] bg-[var(--ink)] px-[18px] py-2.5 text-13 font-semibold text-[var(--bg)] shadow-[0_8px_24px_rgba(0,0,0,.25)]">
           {toast}
         </div>
       )}
@@ -654,13 +669,22 @@ export default function LunchBoard() {
           favoriteCount={favorites.length}
           theme={theme}
           onToggleTheme={toggleTheme}
+          largeText={largeText}
+          onToggleLargeText={setLargeText}
           watchedDishes={watchedDishes}
           onRemoveWatched={removeDishFavorite}
           onRestartTour={welcome.restart}
+          onOpenNews={() => {
+            news.markSeen();
+            setNewsOpen(true);
+          }}
+          newsUnread={news.unread}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}
         />
       )}
+
+      {newsOpen && <NewsNote onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />

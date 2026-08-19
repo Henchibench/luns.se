@@ -47,19 +47,19 @@ export default function LocationWelcome({
 
         <h2
           id="luns-welcome-title"
-          className="mt-4 mb-2 font-heading text-2xl font-bold leading-[1.15] tracking-[-.02em] text-[var(--ink)]"
+          className="mt-4 mb-2 font-heading text-24 font-bold leading-[1.15] tracking-[-.02em] text-[var(--ink)]"
         >
           Välkommen till nya luns.se
         </h2>
-        <p className="mb-6 text-[13px] leading-[1.55] text-[var(--ink2)]">
+        <p className="mb-6 text-13 leading-[1.55] text-[var(--ink2)]">
           Sidan är ombyggd från grunden. Samma menyer som förut, men lättare att läsa, med karta,
           favoriter och bevakning av rätter du vill äta igen.
         </p>
 
-        <h3 className="mb-1 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
+        <h3 className="mb-1 font-mono text-10 tracking-[.15em] text-[var(--mut)]">
           VAR ÄTER DU LUNCH?
         </h3>
-        <p className="mb-3 text-[12px] leading-[1.5] text-[var(--mut)]">
+        <p className="mb-3 text-12 leading-[1.5] text-[var(--mut)]">
           Vi kommer ihåg valet till nästa gång.
         </p>
 
@@ -70,8 +70,8 @@ export default function LocationWelcome({
               onClick={() => onSelect(location.id)}
               className="flex w-full items-baseline justify-between gap-3 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[var(--hi)]"
             >
-              <span className="text-[16px] font-semibold text-[var(--ink)]">{location.label}</span>
-              <span className="font-mono text-[10px] text-[var(--mut)] whitespace-nowrap">
+              <span className="text-16 font-semibold text-[var(--ink)]">{location.label}</span>
+              <span className="font-mono text-10 text-[var(--mut)] whitespace-nowrap">
                 {location.city} · {location.restaurantCount ?? 0} st
               </span>
             </button>

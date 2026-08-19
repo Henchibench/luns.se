@@ -32,22 +32,22 @@ export interface Craving {
 export const CRAVINGS: Craving[] = [
   {
     id: 'hamburgare',
-    label: '🍔 BURGARE',
+    label: 'BURGARE',
     terms: ['burger', 'hamburgare', 'högrevsburgare', 'cheeseburger', 'veggieburger', 'veganburger', 'halloumiburger', 'kycklingburgare', 'smashed burger'],
   },
   {
     id: 'pasta',
-    label: '🍝 PASTA',
+    label: 'PASTA',
     terms: ['pasta', 'spaghetti', 'penne', 'carbonara', 'bolognese', 'marinara', 'pesto', 'nudlar', 'lasagne', 'tortellini'],
   },
   {
     id: 'pommes',
-    label: '🍟 POMMES',
+    label: 'POMMES',
     terms: ['pommes', 'fries', 'klyftpotatis', 'wedges', 'pommes frites'],
   },
   {
     id: 'mos',
-    label: '🥔 MOS',
+    label: 'MOS',
     terms: ['mos', 'potatismos', 'potatispure', 'potatispuré', 'smashed potatoes', 'krossad potatis'],
   },
 ];

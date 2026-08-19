@@ -98,6 +98,35 @@ function parseDish(raw: string): Dish | null {
 
 const INFO_LINE = /^INFO:([^\s-]+)\s*-\s*Restaurant Info:\s*(.*)$/;
 
+/**
+ * Emojierna skraporna inleder sina inforader med — 💰 på priser, 🕐 på tider,
+ * och en handfull enstaka (📧 🍽️ 💡 🚚 🧊 💳).
+ *
+ * Intervallet i stället för \p{Extended_Pictographic}: den kräver ES2018 och
+ * tsconfig står på ES2017. Blocken nedan täcker allt skraporna faktiskt
+ * skriver, plus FE0F som gör 🍽 till 🍽️.
+ */
+const DECORATIVE_EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu;
+
+/**
+ * Rensar emoji ur en inforad före visning.
+ *
+ * Strippningen sker i sajten och inte i skraporna, av två skäl: den gäller
+ * direkt även för data som redan ligger i menus.json, och emojin finns kvar i
+ * datan som signal. En skrapa som fallerar behåller förra körningens rader, så
+ * en ändring i skraporna hade dröjt kvar i gammal data hur länge som helst.
+ *
+ * VIKTIGT: 🕐 är inte bara dekor. INFO_STATES_HOURS i page.tsx läser den för
+ * att avgöra om raden redan innehåller öppettider, så lunch_hours inte skrivs
+ * ut en andra gång. Kör den här funktionen därför ALLTID efter det testet.
+ *
+ * Anropas per inforad, inte på den hopslagna strängen: raderna fogas ihop med
+ * "  ·  " och den dubbla mellanrymden hade kollapsat här.
+ */
+export function stripInfoEmoji(text: string): string {
+  return text.replace(DECORATIVE_EMOJI, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 export function parseRestaurants(
   menus: Record<string, string[]>,
   metaByName: Record<string, RestaurantMeta>

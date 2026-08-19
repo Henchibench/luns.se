@@ -23,10 +23,12 @@ interface Props {
   onToggleView: () => void;
 
   onOpenSettings: () => void;
+  /** Finns det något oläst i nyhetslistan? Tänder pricken på kugghjulet. */
+  newsUnread: boolean;
 }
 
 const CONTROL =
-  'flex-none rounded-lg text-[12px] font-bold cursor-pointer whitespace-nowrap transition-colors';
+  'flex-none rounded-lg text-12 font-bold cursor-pointer whitespace-nowrap transition-colors';
 
 /** Kvadratisk knapp utan text, i samma storlek som fältet bredvid. */
 const ICON_BUTTON =
@@ -45,6 +47,7 @@ export default function Header({
   view,
   onToggleView,
   onOpenSettings,
+  newsUnread,
 }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 pt-3 pb-2 wide:px-7 wide:pt-4 wide:pb-2.5">
@@ -64,13 +67,13 @@ export default function Header({
           height={36}
           className="flex-none h-8 w-8 object-contain wide:h-9 wide:w-9"
         />
-        <span className="font-mono text-[16px] font-semibold tracking-[.04em] text-[var(--acc)] wide:text-[18px]">
+        <span className="font-mono text-16 font-semibold tracking-[.04em] text-[var(--acc)] wide:text-18">
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
         {/* Vädret avgör om man går ut och äter, så det står bredvid namnet. */}
         <span
-          className="flex-none font-mono text-[11px] text-[var(--mut)] whitespace-nowrap"
+          className="flex-none font-mono text-11 text-[var(--mut)] whitespace-nowrap"
           title={weather.description}
         >
           {weather.emoji}
@@ -94,7 +97,7 @@ export default function Header({
               key={day}
               onClick={() => onSelectDay(day)}
               aria-pressed={active}
-              className="flex-none rounded-lg border px-[13px] py-[7px] text-[12px] cursor-pointer transition-colors"
+              className="flex-none rounded-lg border px-[13px] py-[7px] text-12 cursor-pointer transition-colors"
               style={{
                 background: active ? 'var(--acc)' : 'transparent',
                 color: active ? 'var(--bg)' : 'var(--ink2)',
@@ -113,7 +116,7 @@ export default function Header({
         onChange={e => onSearch(e.target.value)}
         placeholder="⌕  Sök rätt eller restaurang…"
         aria-label="Sök rätt eller restaurang"
-        className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
+        className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-13 text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
       />
 
       <button
@@ -136,11 +139,24 @@ export default function Header({
       <button
         onClick={onOpenSettings}
         data-tour="settings"
-        title="Inställningar och info"
-        aria-label="Inställningar och info"
-        className={`${ICON_BUTTON} order-2 text-[15px] wide:order-none`}
+        title={newsUnread ? 'Inställningar och info — något är nytt' : 'Inställningar och info'}
+        aria-label={
+          newsUnread ? 'Inställningar och info, något är nytt' : 'Inställningar och info'
+        }
+        className={`${ICON_BUTTON} relative order-2 text-[15px] wide:order-none`}
       >
         ⚙
+        {/* Pricken ligger innanför knappens hörn och inte utanför kanten:
+            innanför har den alltid knappens egen bakgrund bakom sig, medan
+            headern utanför är glas med suddad mesh-gradient — där hade den
+            behövt en ring i en färg som inte finns. Att den bara syns och
+            aldrig hörs är avsikten, så aria-label bär samma besked. */}
+        {newsUnread && (
+          <span
+            aria-hidden="true"
+            className="absolute right-[5px] top-[5px] h-1.5 w-1.5 rounded-full bg-[var(--acc)]"
+          />
+        )}
       </button>
     </header>
   );
