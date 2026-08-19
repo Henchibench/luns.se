@@ -39,7 +39,7 @@ export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-08-03',
     title: 'Bevaka en rätt',
-    body: 'Stjärnan bredvid en rätt bevakar den. Serveras den igen står den överst på dagen, även om restaurangen skrivit om den lite.',
+    body: 'Stjärnan bredvid en rätt bevakar den. Serveras den igen står det högst upp på dagen, även om restaurangen skrivit om den lite.',
   },
   {
     date: '2026-07-28',
