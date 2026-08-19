@@ -22,8 +22,8 @@ export default function Chips({
 }) {
   const sizing =
     size === 'touch'
-      ? 'rounded-[9px] px-3.5 py-[9px] text-[12px]'
-      : 'rounded-md px-2.5 py-[5px] text-[11px]';
+      ? 'rounded-[9px] px-3.5 py-[9px] text-12'
+      : 'rounded-md px-2.5 py-[5px] text-11';
 
   return (
     <div className={`flex flex-wrap ${size === 'touch' ? 'gap-[7px]' : 'gap-1.5'}`}>
@@ -48,6 +48,6 @@ export default function Chips({
 
 export function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">{children}</span>
+    <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">{children}</span>
   );
 }

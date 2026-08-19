@@ -32,7 +32,7 @@ export default function BarList({
   layout?: 'stacked' | 'inline';
 }) {
   if (items.length === 0) {
-    return <p className="m-0 text-[13px] text-[var(--mut)]">Inget att visa än.</p>;
+    return <p className="m-0 text-13 text-[var(--mut)]">Inget att visa än.</p>;
   }
 
   const max = Math.max(...items.map(item => item.value), 1);
@@ -64,11 +64,14 @@ export default function BarList({
           >
             {/* Hela etiketten, inte tre bokstäver. Komponenten ska inte veta
                 att den råkar rita veckodagar. */}
-            <span className="w-[58px] flex-none truncate font-mono text-[10px] tracking-[.08em] text-[var(--mut)]">
+            {/* 5.8em, inte 58px: kolumnen klipper med truncate, och en fast
+                bredd hade börjat kapa bokstäver ur etiketten så fort texten
+                skalades upp ett steg. */}
+            <span className="w-[5.8em] flex-none truncate font-mono text-10 tracking-[.08em] text-[var(--mut)]">
               {item.label.toUpperCase()}
             </span>
             {bar(item.value, i)}
-            <span className="w-8 flex-none text-right font-mono text-[11px] text-[var(--ink2)]">
+            <span className="w-8 flex-none text-right font-mono text-11 text-[var(--ink2)]">
               {formatNumber(item.value)}
             </span>
           </li>
@@ -82,13 +85,13 @@ export default function BarList({
       {items.map((item, i) => (
         <li key={`${item.label}-${i}`} aria-label={`${item.label}: ${item.value} ${unit}`}>
           <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0 text-[13px] font-semibold text-[var(--ink)]">
+            <span className="min-w-0 text-13 font-semibold text-[var(--ink)]">
               {item.label}
               {item.sub && (
-                <span className="ml-2 text-[11px] font-normal text-[var(--mut)]">{item.sub}</span>
+                <span className="ml-2 text-11 font-normal text-[var(--mut)]">{item.sub}</span>
               )}
             </span>
-            <span className="flex-none font-mono text-[12px] font-medium text-[var(--ink2)]">
+            <span className="flex-none font-mono text-12 font-medium text-[var(--ink2)]">
               {formatNumber(item.value)}
             </span>
           </div>

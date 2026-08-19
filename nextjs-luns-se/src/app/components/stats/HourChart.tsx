@@ -76,7 +76,7 @@ export default function HourChart({ hours }: { hours: number[] }) {
           className="pointer-events-none absolute flex -translate-x-1/2 -translate-y-full flex-col items-center gap-1"
           style={{ left: `${(peak / (hours.length - 1)) * 100}%`, top: `${(y(max) / VIEW_H) * 100}%` }}
         >
-          <span className="font-mono text-[10px] tracking-[.08em] whitespace-nowrap text-[var(--acc)]">
+          <span className="font-mono text-10 tracking-[.08em] whitespace-nowrap text-[var(--acc)]">
             KL {peak}
           </span>
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--acc)]" />
@@ -87,7 +87,7 @@ export default function HourChart({ hours }: { hours: number[] }) {
           placeras på sin egen timme i stället för att fördelas jämnt. Med
           justify-between hamnade varje siffra en bit från punkten den gällde,
           och toppmarkören ovanför stod då inte över sin egen tid. */}
-      <div className="relative mt-1.5 h-3 font-mono text-[10px] text-[var(--mut)]">
+      <div className="relative mt-1.5 h-3 font-mono text-10 text-[var(--mut)]">
         {[0, 3, 6, 9, 12, 15, 18, 21].map(hour => (
           <span
             key={hour}

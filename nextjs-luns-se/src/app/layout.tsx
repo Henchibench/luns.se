@@ -68,6 +68,13 @@ export default function RootLayout({
                 if (theme === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
+                /* Textstorleken läses här av samma skäl som temat: sätts den
+                   först när React kommit igång ritas sidan liten och hoppar
+                   upp ett ögonblick senare, mitt framför den som valt stor
+                   text just för att den lilla var jobbig att läsa. */
+                if (localStorage.getItem('luns-text-size') === 'stor') {
+                  document.documentElement.setAttribute('data-textsize', 'stor');
+                }
               })();
             `,
           }}

@@ -16,6 +16,7 @@ import { useFavorites } from './hooks/useFavorites';
 import { useDishFavorites } from './hooks/useDishFavorites';
 import { useLocation } from './hooks/useLocation';
 import { useTheme } from './hooks/useTheme';
+import { useTextSize } from './hooks/useTextSize';
 import { useWeather } from './hooks/useWeather';
 import { useWelcome } from './hooks/useWelcome';
 import {
@@ -152,6 +153,7 @@ export default function LunchBoard() {
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
   const { theme, toggle: toggleTheme } = useTheme();
+  const { large: largeText, setLarge: setLargeText } = useTextSize();
   // Rundan väntar tills data finns och platsvalet är gjort — annars pekar
   // den på en tom sida bakom välkomstrutan.
   const welcome = useWelcome(loading || needsChoice || restaurants.length === 0);
@@ -441,7 +443,7 @@ export default function LunchBoard() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+        <span className="font-mono text-11 tracking-[.15em] text-[var(--mut)]">
           HÄMTAR MENYER…
         </span>
       </div>
@@ -451,8 +453,8 @@ export default function LunchBoard() {
   if (error) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center">
-        <p className="text-[16px] font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
-        <p className="text-[13px] text-[var(--mut)]">{error}</p>
+        <p className="text-16 font-semibold text-[var(--ink)]">Kunde inte läsa menydata</p>
+        <p className="text-13 text-[var(--mut)]">{error}</p>
       </div>
     );
   }
@@ -553,7 +555,7 @@ export default function LunchBoard() {
                 className="min-h-0 flex-1"
               />
               {unmappedCount > 0 && (
-                <span className="flex-none font-mono text-[10px] text-[var(--mut)]">
+                <span className="flex-none font-mono text-10 text-[var(--mut)]">
                   {unmappedCount} restaurang{unmappedCount === 1 ? '' : 'er'} saknar position och
                   syns inte på kartan
                 </span>
@@ -567,19 +569,19 @@ export default function LunchBoard() {
           {view === 'list' && (
           <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
-            <h1 className="m-0 font-heading text-2xl font-bold tracking-[-.02em] wide:text-[30px]">
+            <h1 className="m-0 font-heading text-24 font-bold tracking-[-.02em] wide:text-30">
               {heading}
             </h1>
             {/* Antalet dolda stod här bredvid, med en väg in till matprofilen
                 som gömde dem. Nu finns ingenting som tar bort rätter i tysthet:
                 filtren syns på skärmen medan de gäller. */}
-            <span className="font-mono text-[11px] text-[var(--mut)] whitespace-nowrap">
+            <span className="font-mono text-11 text-[var(--mut)] whitespace-nowrap">
               {dishTotal} RÄTTER
             </span>
           </div>
 
           {starredToday.length > 0 && (
-            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-[12px] font-semibold text-[var(--accStrong)]">
+            <div className="mt-2.5 mb-1 flex items-center gap-2.5 rounded-lg bg-[var(--accBg)] px-3.5 py-2.5 text-12 font-semibold text-[var(--accStrong)]">
               <span className="text-[var(--star)]">★</span>
               Bevakad rätt idag: {starredToday.join(' · ')}
             </div>
@@ -587,10 +589,10 @@ export default function LunchBoard() {
 
           {isEmpty && (
             <div className="py-[70px] text-center text-[var(--mut)]">
-              <p className="mb-1.5 text-[16px] font-semibold text-[var(--ink2)]">
+              <p className="mb-1.5 text-16 font-semibold text-[var(--ink2)]">
                 Inga rätter matchar
               </p>
-              <p className="mb-4 text-[13px]">Prova en annan dag eller rensa sök och filter</p>
+              <p className="mb-4 text-13">Prova en annan dag eller rensa sök och filter</p>
               <button
                 onClick={() => {
                   setSearch('');
@@ -598,7 +600,7 @@ export default function LunchBoard() {
                   setActiveCravings([]);
                   setShowOnlyFavorites(false);
                 }}
-                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
+                className="rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-12 font-semibold text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]"
               >
                 Rensa allt
               </button>
@@ -635,7 +637,7 @@ export default function LunchBoard() {
       />
 
       {toast && (
-        <div className="luns-toast fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-[10px] bg-[var(--ink)] px-[18px] py-2.5 text-[13px] font-semibold text-[var(--bg)] shadow-[0_8px_24px_rgba(0,0,0,.25)]">
+        <div className="luns-toast fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-[10px] bg-[var(--ink)] px-[18px] py-2.5 text-13 font-semibold text-[var(--bg)] shadow-[0_8px_24px_rgba(0,0,0,.25)]">
           {toast}
         </div>
       )}
@@ -654,6 +656,8 @@ export default function LunchBoard() {
           favoriteCount={favorites.length}
           theme={theme}
           onToggleTheme={toggleTheme}
+          largeText={largeText}
+          onToggleLargeText={setLargeText}
           watchedDishes={watchedDishes}
           onRemoveWatched={removeDishFavorite}
           onRestartTour={welcome.restart}

@@ -30,8 +30,8 @@ export function RailButton({
 }) {
   const sizing =
     size === 'touch'
-      ? 'rounded-[10px] px-3.5 py-3 text-[14px]'
-      : 'mx-2.5 rounded-lg px-3 py-2 text-[13px]';
+      ? 'rounded-[10px] px-3.5 py-3 text-14'
+      : 'mx-2.5 rounded-lg px-3 py-2 text-13';
 
   return (
     <button
@@ -50,7 +50,7 @@ export function RailButton({
     >
       <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{item.name}</span>
       {item.favorite && (
-        <span className="flex-none text-[11px] text-[var(--acc)]" aria-label="favorit">
+        <span className="flex-none text-11 text-[var(--acc)]" aria-label="favorit">
           ♥
         </span>
       )}
@@ -67,7 +67,7 @@ export default function Rail({
   return (
     <nav data-tour="rail" className="hidden wide:flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--glass2)] mb-[18px] ml-[18px] mt-1">
       <div className="luns-scroll luns-mask-rail flex flex-1 flex-col overflow-y-auto pt-3.5 pb-[18px]">
-        <span className="px-5 pt-1 pb-2 font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
+        <span className="px-5 pt-1 pb-2 font-mono text-10 tracking-[.15em] text-[var(--mut)]">
           RESTAURANGER · {items.length}
         </span>
 

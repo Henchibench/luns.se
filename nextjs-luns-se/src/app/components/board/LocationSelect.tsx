@@ -90,7 +90,7 @@ export default function LocationSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Välj plats"
-        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-[11px] text-[var(--ink)] transition-colors hover:bg-[var(--hi)]"
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-11 text-[var(--ink)] transition-colors hover:bg-[var(--hi)]"
       >
         {nuvarande?.label}
         <span aria-hidden="true" className="text-[9px] text-[var(--mut)]">
@@ -114,7 +114,7 @@ export default function LocationSelect({
                   aria-selected={vald}
                   onClick={() => välj(loc.id)}
                   onMouseEnter={() => setAktiv(i)}
-                  className="flex w-full cursor-pointer items-baseline justify-between gap-4 whitespace-nowrap rounded-lg border-0 px-2.5 py-1.5 text-left font-mono text-[11px] transition-colors"
+                  className="flex w-full cursor-pointer items-baseline justify-between gap-4 whitespace-nowrap rounded-lg border-0 px-2.5 py-1.5 text-left font-mono text-11 transition-colors"
                   style={{
                     background: i === aktiv ? 'var(--hi)' : 'transparent',
                     color: vald ? 'var(--accStrong)' : 'var(--ink2)',
@@ -122,7 +122,7 @@ export default function LocationSelect({
                   }}
                 >
                   {loc.label}
-                  <span className="text-[10px] text-[var(--mut)]">{loc.city}</span>
+                  <span className="text-10 text-[var(--mut)]">{loc.city}</span>
                 </button>
               </li>
             );

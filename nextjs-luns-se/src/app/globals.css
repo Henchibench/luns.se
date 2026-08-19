@@ -75,12 +75,60 @@ html.dark {
      14  framhävd rad: restaurangnamn, listval man klickar
      16  små rubriker och tydliga val
      18  logotyp på bred skärm
-     24  rubriker (text-2xl)
+     24  rubriker
      30  dagrubriken och stora siffror
 
    Behöver något en egen storlek är svaret nästan alltid att det ska ha en
    annan vikt, färg eller versalisering i stället.
+
+   Stegen används som text-10 … text-30, aldrig som en px-storlek i klassen.
+   Klasserna är
+   definierade i tailwind.config.js och pekar hit, för att inställningen
+   "Större text" ska kunna flytta hela trappan på ett ställe. En storlek som
+   skrivs rakt in i klassen står utanför den och blir liten kvar när resten
+   växer.
 --------------------------------------------------------------------------- */
+:root {
+  --fs-10: 10px;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-24: 24px;
+  --fs-30: 30px;
+}
+
+/* Större text. Attributet sätts av useTextSize och av skriptet i layout.tsx,
+   som läser valet innan sidan målas — annars hade sidan ritats liten och
+   hoppat upp i storlek en bråkdel senare.
+
+   Trappan skalas inte med en och samma faktor. Brödtexten är det man faktiskt
+   sitter och läser och får mest (13 -> 15, +15 %), medan versaletiketterna och
+   de stora rubrikerna får mindre (+10 %). Skalar man allt lika mycket växer
+   30-rubriken med tre pixlar per steg och trycker undan innehållet, samtidigt
+   som skillnaden på brödtexten fortfarande knappt syns. Hierarkin ska komma
+   närmare varandra när texten blir stor, inte dras isär.
+
+   Layouten står still: padding, ikoner och radhöjder är kvar i px. Det är med
+   flit — listan ska rymma lika många restauranger, det är bokstäverna som ska
+   bli lättare att läsa. Undantaget är de två textkolumner som har en egen
+   bredd, kategorin i menylistan och etiketten i statistiken: de är angivna i
+   em och växer med sin egen text, annars avstavas eller kapas de sönder.
+   Halvpixeln på 12-steget är avsiktlig; 13 var för nära brödtexten och 14
+   gjorde chipsen bredare än raden de sitter i. */
+html[data-textsize='stor'] {
+  --fs-10: 11px;
+  --fs-11: 12px;
+  --fs-12: 13.5px;
+  --fs-13: 15px;
+  --fs-14: 16px;
+  --fs-16: 18px;
+  --fs-18: 20px;
+  --fs-24: 27px;
+  --fs-30: 33px;
+}
 
 html,
 body {
@@ -342,9 +390,12 @@ html.dark .leaflet-popup-tip {
   margin: 12px 16px;
 }
 
+/* Popupen är text man läser och följer därför textstorleken, till skillnad
+   från nåletiketterna ovanför: de ligger tätt intill varandra på kartan och
+   börjar överlappa så fort de växer. */
 .luns-pp-name {
   margin: 0 0 2px;
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 700;
 }
 
@@ -361,7 +412,7 @@ html.dark .leaflet-popup-tip {
   border-radius: 8px;
   background: #0D5B6E;
   color: #fff;
-  font: 600 12px var(--font-body), system-ui, sans-serif;
+  font: 600 var(--fs-12) var(--font-body), system-ui, sans-serif;
   cursor: pointer;
 }
 

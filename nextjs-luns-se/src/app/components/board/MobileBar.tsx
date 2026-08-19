@@ -18,7 +18,7 @@ interface Props {
 }
 
 const BAR_BUTTON =
-  'flex-1 rounded-[14px] border border-[var(--glassBrd)] px-2.5 py-[13px] text-[13px] font-bold text-[var(--ink)] cursor-pointer';
+  'flex-1 rounded-[14px] border border-[var(--glassBrd)] px-2.5 py-[13px] text-13 font-bold text-[var(--ink)] cursor-pointer';
 
 export default function MobileBar({
   sheet,
@@ -90,12 +90,12 @@ export default function MobileBar({
             style={{ boxShadow: '0 -12px 50px rgba(0,10,14,.35)' }}
           >
             <div className="flex items-center justify-between px-5 pt-4 pb-2">
-              <span className="font-mono text-[11px] tracking-[.15em] text-[var(--mut)]">
+              <span className="font-mono text-11 tracking-[.15em] text-[var(--mut)]">
                 {sheet === 'rest' ? `RESTAURANGER · ${items.length}` : 'FILTER'}
               </span>
               <button
                 onClick={onClose}
-                className="rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-[12px] font-semibold text-[var(--ink2)] cursor-pointer"
+                className="rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-12 font-semibold text-[var(--ink2)] cursor-pointer"
               >
                 Stäng
               </button>

@@ -181,25 +181,25 @@ export default function WelcomeTour({
             : { top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: CARD_WIDTH }
         }
       >
-        <h2 className="m-0 mb-1.5 font-heading text-[18px] font-bold tracking-[-.01em] text-[var(--ink)]">
+        <h2 className="m-0 mb-1.5 font-heading text-18 font-bold tracking-[-.01em] text-[var(--ink)]">
           {step.title}
         </h2>
-        <p className="m-0 text-[13px] leading-[1.55] text-[var(--ink2)]">{step.body}</p>
+        <p className="m-0 text-13 leading-[1.55] text-[var(--ink2)]">{step.body}</p>
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="font-mono text-[10px] tracking-[.15em] text-[var(--mut)]">
+          <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">
             {index + 1} / {total}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={finish}
-              className="rounded-lg border-0 bg-transparent px-2 py-1.5 text-[12px] font-semibold text-[var(--mut)] cursor-pointer transition-colors hover:text-[var(--ink2)]"
+              className="rounded-lg border-0 bg-transparent px-2 py-1.5 text-12 font-semibold text-[var(--mut)] cursor-pointer transition-colors hover:text-[var(--ink2)]"
             >
               Hoppa över
             </button>
             <button
               onClick={next}
-              className="rounded-lg border-0 bg-[var(--acc)] px-3.5 py-1.5 text-[12px] font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
+              className="rounded-lg border-0 bg-[var(--acc)] px-3.5 py-1.5 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
             >
               {index >= total - 1 ? 'Klart' : 'Nästa'}
             </button>

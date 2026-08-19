@@ -31,7 +31,7 @@ export default function WatchedDishes({
         {dishes.map(dish => (
           <span
             key={`${dish.restaurant}-${dish.signature}`}
-            className="flex items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--chip)] px-2.5 py-[5px] text-[11px] text-[var(--ink2)]"
+            className="flex items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--chip)] px-2.5 py-[5px] text-11 text-[var(--ink2)]"
           >
             <span className="text-[var(--star)]">★</span>
             <span className="min-w-0 truncate">

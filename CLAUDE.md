@@ -44,6 +44,13 @@ raderna ligger under `["menus"][namn]`, inte direkt på namnet.
 | `src/app/lib/stats.ts` | besöksstatistiken, hämtas först när rutan öppnas |
 | `src/app/hooks/` | favoriter, plats, tema, väder, rundturen |
 
+Textstorlekar skrivs **aldrig** som `text-[13px]`. Designens nio steg heter
+`text-10` … `text-30`, är definierade i `tailwind.config.js` och pekar på
+`--fs-*` i `globals.css`. Inställningen "Större text" byter bara variablerna,
+så en storlek som står rakt i klassen står utanför den och blir liten kvar när
+allt annat växer. Detsamma gäller en fast bredd på en kolumn som håller text:
+ange den i `em`, som kategorikolumnen i menylistan.
+
 Besöksstatistiken hämtas från Umami **vid bygget** (`scripts/fetch_stats.py`),
 inte i besökarens webbläsare. Sajten anropar därför ingen analystjänst när
 någon öppnar den, och ingen nyckel når ut. Behåll den ordningen.
