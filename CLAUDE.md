@@ -171,6 +171,12 @@ det startar i ett tomt skal. Skriptet rensar därför båda innan bygget. Bygger
 du för hand med `npm run build`: kolla `env | grep -E 'TURBOPACK|NODE_ENV'`
 innan du felsöker något annat. Node-versionen har inget med saken att göra.
 
+Samma `NODE_ENV=production` förstör **`npm audit`**, och där syns det inte alls:
+npm läser den som `omit=dev`, hoppar över dev-beroendena och svarar `found 0
+vulnerabilities` utan att nämna vad den utelämnat. Alla sårbarheter repot haft
+har varit dev-transitiva, så svaret blir "rent" precis när det inte är det.
+Kör `env -u NODE_ENV npm audit`. Uppmätt 2026-09-02, mer i `STATE.md`.
+
 Två saker som ser ut som fel och inte är det: sidan frågar efter område första
 gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
 `stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
