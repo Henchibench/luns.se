@@ -111,6 +111,25 @@ Att main har fler commits än Dev betyder ingenting: varje släpp lägger en
 merge-commit på main som aldrig går tillbaka. Det är bara `origin/main..Dev`
 som säger om något är osläppt.
 
+**Hubbens kontroll läser main, inte Dev.** Ett paketkort larmar därför om igen
+så länge fixen ligger osläppt, och det ser ut som att åtgärden inte tog. Första
+kontrollen på ett sådant kort är alltså inte `npm ls` — det är om fixen redan
+står i `git log origin/main..Dev`. Gör den det är kortet besvarat och väntar på
+knappen; bygg inte om något. Uppmätt 2026-09-03: kontrollen larmade på fast-uri
+3.1.5, vilket är precis vad `origin/main` hade i låset medan Dev sedan dagen
+innan kört 3.1.7. Samma dag larmade den igen på samma paket under ett *annat*
+advisory-id (GHSA-jqff-g426-hqxp i stället för GHSA-5jgf-p345-68v8) — samma
+sårbara intervall och samma fixade version. Jämför därför **versionsintervallet**
+mot det som är installerat, inte id:t mot commit-meddelandet.
+
+**Brödtexten på ett kort behöver inte höra ihop med larmet.** Ett paketkort
+kom 2026-09-03 med hubbens menykorts-mall påklistrad — flera stycken om en
+stående meny vars källa ändrats, utan att namnge någon restaurang, medan
+`DETALJ` handlade uteslutande om fast-uri. Det är `DETALJ` som är kortet. Gå
+inte och leta efter en meny som ska läsas om innan du kontrollerat att någon
+faktiskt är utpekad; se `app/scrapers/CLAUDE.md` för hur man ser vilka stående
+menyer kontrollen ens bevakar.
+
 ## Testservern — sista steget innan du lämnar över
 
 `scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
@@ -170,6 +189,22 @@ faller på `Cannot find module 'tailwindcss'`. Actions ser ingetdera, eftersom
 det startar i ett tomt skal. Skriptet rensar därför båda innan bygget. Bygger
 du för hand med `npm run build`: kolla `env | grep -E 'TURBOPACK|NODE_ENV'`
 innan du felsöker något annat. Node-versionen har inget med saken att göra.
+
+Samma `NODE_ENV=production` förstör **`npm audit`**, och där syns det inte alls:
+npm läser den som `omit=dev`, hoppar över dev-beroendena och svarar `found 0
+vulnerabilities` utan att nämna vad den utelämnat. Alla sårbarheter repot haft
+har varit dev-transitiva, så svaret blir "rent" precis när det inte är det.
+Kör `env -u NODE_ENV npm audit`. Uppmätt 2026-09-02, mer i `STATE.md`.
+
+Och när kontrollen larmar på ett paket som redan står i `overrides` i
+`package.json`: **intervallet är inte det som är installerat.** `fast-uri`
+stod på `^3.1.4` och låg ändå kvar på sårbara 3.1.5 — `^` *tillåter* en fixad
+version, men `npm ci` installerar det `package-lock.json` säger, och lockfilen
+rörs inte förrän intervallet inte längre rymmer den låsta versionen. Höj därför
+golvet till den fixade versionen (`^3.1.6`) och kör `npm install`, så att låset
+tvingas flytta. Kontrollera med `npm ls <paket> --all --include=dev` att
+versionen faktiskt bytts — inte med att intervallet ser rätt ut. Uppmätt
+2026-09-03.
 
 Två saker som ser ut som fel och inte är det: sidan frågar efter område första
 gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och

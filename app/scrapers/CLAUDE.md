@@ -215,10 +215,31 @@ lägger den på `self.menu_data`. `mimolett.json` är förlagan:
   jämför, så att en meny som ändras upptäcks i stället för att ruttna.
   `spana.py` skriver ut hashen för varje bilaga den laddar ner.
 
-`kalla_hash` krävs för **nya** stående menyer. `mimolett.json` och
-`masala_lunch_all_weeks.json` skrevs innan fältet fanns och saknar det —
-kontrollen hoppar tyst över dem, så de bevakas inte. Läser du om någon av dem:
-lägg till fältet samtidigt.
+`kalla_hash` krävs för **nya** stående menyer. `mimolett.json` skrevs innan
+fältet fanns och saknar det än — kontrollen hoppar tyst över den, så den bevakas
+inte. Läser du om den: lägg till fältet samtidigt.
+
+Och eftersom kontrollen läser **main**, är det main:s version av filen som avgör
+om menyn är bevakad — inte den du har framför dig. En hash du just lagt till på
+Dev bevakar ingenting förrän Henrik tryckt på knappen. Vill du veta vad
+kontrollen faktiskt tittar på, fråga main och inte arbetsträdet:
+
+```bash
+git show origin/main:app/scrapers/data/<fil>.json | python3 -c \
+  "import json,sys; d=json.load(sys.stdin); print(d.get('captured'), d.get('kalla_hash'))"
+```
+
+Uppmätt 2026-09-03: båda filerna i `data/` saknade `kalla_hash` på main —
+Masalas hash fanns bara i den osläppta commiten — så inget stående meny-larm
+kunde komma därifrån över huvud taget.
+
+Är källan **flera** filer räcker inte ett fält. `masala_lunch_all_weeks.json`
+har därför en `kalla_hash` per vecka — sha256 över just den veckans bildfiler,
+i den ordning de står i `weeks[...].source` — och en på toppnivån som är sha256
+över de fyra veckohasharnas hex-strängar i ordning. Receptet står i filens eget
+`kalla_hash_metod`, för att den som räknar om hashen inte ska behöva gissa.
+Hasha inte lunchsidans HTML i ett sådant fall: den byter bild varje vecka när
+fliken roterar, och då larmar kontrollen på en meny som inte ändrats.
 
 Skriv av **exakt** vad som står. Översätt inte, snygga inte till, fyll inte i
 luckor, och skriv inte om en engelsk beskrivning till svenska — det är
@@ -335,6 +356,46 @@ eller en cookieruta får du skriva en engångssnutt med playwright som klickar
 fram den. Det som räknas är vad som blir kvar i repot.
 
 Spaningsutdata ska aldrig med i en commit.
+
+### Att läsa en SVG där texten är kurvor
+
+Masalas menyer är SVG utan en enda textnod — `<path>` hela vägen. Det finns
+inget att greppa i, filen måste renderas och läsas med ögonen. Varken
+`rsvg-convert`, `inkscape` eller `cairosvg` finns på dev01, så det blir
+playwright, och att bara `goto()` filen och ta `screenshot(full_page=True)`
+faller: skärmbilden blir aldrig skriven. Lägg SVG:n i en `<img>` i en liten
+HTML-fil bredvid, sätt bredden till en multipel av `viewBox`-bredden och
+fotografera elementet:
+
+```python
+html.write_text(f'<img src="{svg.name}" style="width:{288*3}px;display:block">')
+pg.goto(html.as_uri())
+pg.locator('img').screenshot(path=out)
+```
+
+3× räcker för att läsa rubrikerna, 8–10× för att avgöra enskilda ord. Zooma
+alltid in på det som ser ut som ett stavfel innan du "rättar" det: Masala
+skriver faktiskt "Famberade linser" och "DAL DHOKLIZ", och de orden ska stå
+kvar precis så.
+
+### Masalas fyra menybilder heter inte samma sak
+
+De fyra menyerna byttes ut styckevis. Meny 1 och 4 har det nya namnet
+(`lunch-menu4-MK-nov2025-2.svg`), meny 2 och 3 ligger kvar under det gamla
+(`lunch2-1.svg`, `lunch3-1.svg`) och finns inte alls i det nya. `MENU_NUMBER`
+i `masala_scraper.py` matchar bara det nya namnet, så vartannat varv faller
+skrapan tillbaka på veckonummer-aritmetiken utan att något ser fel ut.
+
+Hela uppsättningen syns via WordPress mediabibliotek, vilket är snabbare än att
+gissa filnamn:
+
+```
+curl -s 'https://masalakitchen.se/wp-json/wp/v2/media?search=lunch&per_page=100&_fields=source_url,modified'
+```
+
+`Last-Modified` på bilderna är dessutom det enda hederliga svaret på frågan
+"byter de meny varje vecka?". Ligger datumen månader tillbaka är menyn stående,
+hur mycket den än skiljer sig från det vi har sparat.
 
 ## Så testar du
 
