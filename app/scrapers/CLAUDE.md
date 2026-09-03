@@ -219,6 +219,20 @@ lägger den på `self.menu_data`. `mimolett.json` är förlagan:
 fältet fanns och saknar det än — kontrollen hoppar tyst över den, så den bevakas
 inte. Läser du om den: lägg till fältet samtidigt.
 
+Och eftersom kontrollen läser **main**, är det main:s version av filen som avgör
+om menyn är bevakad — inte den du har framför dig. En hash du just lagt till på
+Dev bevakar ingenting förrän Henrik tryckt på knappen. Vill du veta vad
+kontrollen faktiskt tittar på, fråga main och inte arbetsträdet:
+
+```bash
+git show origin/main:app/scrapers/data/<fil>.json | python3 -c \
+  "import json,sys; d=json.load(sys.stdin); print(d.get('captured'), d.get('kalla_hash'))"
+```
+
+Uppmätt 2026-09-03: båda filerna i `data/` saknade `kalla_hash` på main —
+Masalas hash fanns bara i den osläppta commiten — så inget stående meny-larm
+kunde komma därifrån över huvud taget.
+
 Är källan **flera** filer räcker inte ett fält. `masala_lunch_all_weeks.json`
 har därför en `kalla_hash` per vecka — sha256 över just den veckans bildfiler,
 i den ordning de står i `weeks[...].source` — och en på toppnivån som är sha256

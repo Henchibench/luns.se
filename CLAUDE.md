@@ -117,7 +117,18 @@ kontrollen på ett sådant kort är alltså inte `npm ls` — det är om fixen r
 står i `git log origin/main..Dev`. Gör den det är kortet besvarat och väntar på
 knappen; bygg inte om något. Uppmätt 2026-09-03: kontrollen larmade på fast-uri
 3.1.5, vilket är precis vad `origin/main` hade i låset medan Dev sedan dagen
-innan kört 3.1.7.
+innan kört 3.1.7. Samma dag larmade den igen på samma paket under ett *annat*
+advisory-id (GHSA-jqff-g426-hqxp i stället för GHSA-5jgf-p345-68v8) — samma
+sårbara intervall och samma fixade version. Jämför därför **versionsintervallet**
+mot det som är installerat, inte id:t mot commit-meddelandet.
+
+**Brödtexten på ett kort behöver inte höra ihop med larmet.** Ett paketkort
+kom 2026-09-03 med hubbens menykorts-mall påklistrad — flera stycken om en
+stående meny vars källa ändrats, utan att namnge någon restaurang, medan
+`DETALJ` handlade uteslutande om fast-uri. Det är `DETALJ` som är kortet. Gå
+inte och leta efter en meny som ska läsas om innan du kontrollerat att någon
+faktiskt är utpekad; se `app/scrapers/CLAUDE.md` för hur man ser vilka stående
+menyer kontrollen ens bevakar.
 
 ## Testservern — sista steget innan du lämnar över
 
