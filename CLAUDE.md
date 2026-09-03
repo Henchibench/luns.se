@@ -111,6 +111,14 @@ Att main har fler commits än Dev betyder ingenting: varje släpp lägger en
 merge-commit på main som aldrig går tillbaka. Det är bara `origin/main..Dev`
 som säger om något är osläppt.
 
+**Hubbens kontroll läser main, inte Dev.** Ett paketkort larmar därför om igen
+så länge fixen ligger osläppt, och det ser ut som att åtgärden inte tog. Första
+kontrollen på ett sådant kort är alltså inte `npm ls` — det är om fixen redan
+står i `git log origin/main..Dev`. Gör den det är kortet besvarat och väntar på
+knappen; bygg inte om något. Uppmätt 2026-09-03: kontrollen larmade på fast-uri
+3.1.5, vilket är precis vad `origin/main` hade i låset medan Dev sedan dagen
+innan kört 3.1.7.
+
 ## Testservern — sista steget innan du lämnar över
 
 `scripts/testserver.sh` kör hela produktionskedjan och servar utfallet på
