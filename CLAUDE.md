@@ -177,6 +177,16 @@ vulnerabilities` utan att nämna vad den utelämnat. Alla sårbarheter repot haf
 har varit dev-transitiva, så svaret blir "rent" precis när det inte är det.
 Kör `env -u NODE_ENV npm audit`. Uppmätt 2026-09-02, mer i `STATE.md`.
 
+Och när kontrollen larmar på ett paket som redan står i `overrides` i
+`package.json`: **intervallet är inte det som är installerat.** `fast-uri`
+stod på `^3.1.4` och låg ändå kvar på sårbara 3.1.5 — `^` *tillåter* en fixad
+version, men `npm ci` installerar det `package-lock.json` säger, och lockfilen
+rörs inte förrän intervallet inte längre rymmer den låsta versionen. Höj därför
+golvet till den fixade versionen (`^3.1.6`) och kör `npm install`, så att låset
+tvingas flytta. Kontrollera med `npm ls <paket> --all --include=dev` att
+versionen faktiskt bytts — inte med att intervallet ser rätt ut. Uppmätt
+2026-09-03.
+
 Två saker som ser ut som fel och inte är det: sidan frågar efter område första
 gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
 `stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
