@@ -210,6 +210,13 @@ versionen faktiskt bytts — inte med att intervallet ser rätt ut. Uppmätt
 Samma åtgärd, samma kontroll. Låset landar gärna över golvet du satte —
 15.5.25, inte 15.5.24 — och det är rätt, det är `npm ls` som avgör.
 
+Står paketet inte alls i `package.json` är det samma sak med ett steg till:
+lägg ett **nytt** `overrides`-golv på den fixade versionen. Uppmätt 2026-09-10
+på `@humanfs/node` (via eslint) och `postcss-selector-parser` (via tailwindcss)
+— båda uppströmsintervallen, `^0.16.6` och `^6.1.2`, rymde redan fixen, så
+ingenting i trädet tvingade låset att flytta. Det är därför `npm audit` kan
+larma på ett paket där varenda intervall ser rätt ut.
+
 Två saker som ser ut som fel och inte är det: sidan frågar efter område första
 gången (välj Lindholmen eller Mjärdevi, annars står det "0 rätter"), och
 `stats.json` ger 404 lokalt eftersom besöksstatistiken bara hämtas i Actions.
