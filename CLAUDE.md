@@ -59,6 +59,23 @@ så en storlek som står rakt i klassen står utanför den och blir liten kvar n
 allt annat växer. Detsamma gäller en fast bredd på en kolumn som håller text:
 ange den i `em`, som kategorikolumnen i menylistan.
 
+Kartans tiles kommer från CARTO och **kräver en nyckel sedan 2026-09**. Den
+står i klartext som `CARTO_KEY` i `components/board/RestaurantMap.tsx`, och
+det är rätt plats: tile-anropen görs av besökarens webbläsare i en statisk
+export, så nyckeln är läsbar ändå. En byggtidsvariabel hade bara gömt den för
+oss och gett tomma kartor i Actions den dag någon glömde sätta den. Begränsa
+den hos CARTO i stället, på domän.
+
+Utan nyckel går ingenting sönder — CARTO bränner in "API KEY REQUIRED"
+i själva PNG-tilen, så kartan renderas som vanligt och ser vandaliserad ut.
+Kravet gäller i dag bara raster-tiles (`light_all`/`dark_all`), och CARTO
+säger att vector följer efter utan datum; samma nyckel ska in då. Kontrollera
+nyckeln genom att hämta en tile och *titta* på den, med `curl` och `Read` —
+inte genom att läsa statuskoden, som är 200 i båda fallen. Mätt på
+`light_all/12/2185/1127.png`: 6943 byte utan nyckel, 5927 med. Både
+webbläsaren och CDN:en cachar tiles, så ladda om hårt innan du tror att
+fixen inte tog.
+
 Skraporna skriver emoji först på sina INFO-rader — 💰 på priser, 🕐 på tider,
 någon enstaka annan. De ligger kvar i `menus.json` med flit och plockas bort
 vid visning, av `stripInfoEmoji()` i `lib/menu.ts`. Två skäl: strippningen

@@ -29,6 +29,26 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * CARTO:s nyckel för raster-basemaps.
+ *
+ * CARTO började 2026-09 bränna in "API KEY REQUIRED" i själva PNG-tilen för
+ * anrop utan nyckel — inget gick sönder, kartan såg bara vandaliserad ut.
+ * Nyckeln läggs på som `key`-parameter efter filändelsen, och då försvinner
+ * texten. Uppmätt på light_all 12/2185/1127: 6943 byte utan nyckel,
+ * 5927 med.
+ *
+ * Den står i klartext med flit. Sajten är en statisk export och tile-anropen
+ * görs av besökarens webbläsare, så nyckeln är läsbar i nätverksfliken hur vi
+ * än bygger den — en byggtidsvariabel hade bara gömt den för oss själva och
+ * gett tomma kartor i Actions den dagen någon glömmer sätta den. Vill man
+ * begränsa användningen görs det hos CARTO, på domän, inte här.
+ *
+ * Gäller bara raster. CARTO säger att kravet är på väg till vector-basemaps
+ * också men inte är live ännu; den dagen är det samma nyckel som ska in.
+ */
+const CARTO_KEY = 'cb1_3gtg_1_c8b92530617dbc940485ca92';
+
 /** Avstånd från prickens mitt till etiketten. */
 const LABEL_GAP = 11;
 /** Prickens radie, för att räkna ut vilken yta den upptar. */
@@ -134,7 +154,7 @@ export default function RestaurantMap({
       map = L.map(containerRef.current, { zoomControl: true, attributionControl: true });
 
       const style = theme === 'dark' ? 'dark_all' : 'light_all';
-      L.tileLayer(`https://basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`, {
+      L.tileLayer(`https://basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`, {
         attribution: '© OpenStreetMap contributors © CARTO',
         maxZoom: 20,
       }).addTo(map);
