@@ -18,9 +18,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 1;
+export const NEWS_VERSION = 2;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-09-11',
+    title: 'Kartan är ren igen',
+    body: 'Karttjänsten hade lagt texten "API key required" tvärs över rutorna. Den är borta nu — gator och nålar syns utan skräp framför. Ser du den kvar ligger en gammal bild i webbläsarens minne, ladda om sidan.',
+  },
   {
     date: '2026-08-19',
     title: 'Större text',
