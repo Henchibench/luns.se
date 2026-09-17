@@ -1,0 +1,331 @@
+{
+  "sources": [
+    {
+      "original": "CLAUDE.md",
+      "archive": "docs/historik/repo-2026-09-17.md",
+      "sha256": "8a24f9c5ab591a7bf19e1f472a14c1a3fd7074a166b62804ec92ce358657b1af"
+    },
+    {
+      "original": "app/scrapers/CLAUDE.md",
+      "archive": "docs/historik/skrapor-2026-09-17.md",
+      "sha256": "c6fbb63c0208accdf82ece8ad2aab587c9020b0c985cb6b9297dd340b0c8edbc"
+    },
+    {
+      "original": "STATE.md",
+      "archive": "docs/historik/sakerhet-2026-09-17.md",
+      "sha256": "1cec6c81d036bd966bb097b17ad7929186b814d5cf11d1c9fd7211b9ee20a4e2"
+    }
+  ],
+  "entries": [
+    {
+      "file": "docs/minne/repo-01.md",
+      "title": "luns.se — repots karta",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 1,
+      "sourceEnd": 13,
+      "startLine": 7,
+      "endLine": 19,
+      "sha256": "e1ede3ed84635280d7284a82290ebb96555283f0fe107f0d49ee0a0fcedff836"
+    },
+    {
+      "file": "docs/minne/repo-02.md",
+      "title": "De två halvorna",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 14,
+      "sourceEnd": 93,
+      "startLine": 7,
+      "endLine": 86,
+      "sha256": "431f6129c14842912ac021771939a57ff01a06ac03c5910409cda557f388214b"
+    },
+    {
+      "file": "docs/minne/repo-03.md",
+      "title": "Ska du röra en skrapa?",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 94,
+      "sourceEnd": 105,
+      "startLine": 7,
+      "endLine": 18,
+      "sha256": "207b8e6d608883546dd3c462a0dd709f043c27d3ea5fb0e96c3067aa61e47751"
+    },
+    {
+      "file": "docs/minne/repo-04.md",
+      "title": "Grenen är Dev",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 106,
+      "sourceEnd": 149,
+      "startLine": 7,
+      "endLine": 50,
+      "sha256": "1297e24254dd823bc49f5bc47cb25a7d74d21b4a41009f35e45f911fa3e73014"
+    },
+    {
+      "file": "docs/minne/repo-05.md",
+      "title": "Testservern — sista steget innan du lämnar över",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 150,
+      "sourceEnd": 243,
+      "startLine": 7,
+      "endLine": 100,
+      "sha256": "68be9c0bf113cf5222ab10f4cee51865a51d96875222b92a8ce1a8de3de29eb0"
+    },
+    {
+      "file": "docs/minne/repo-06.md",
+      "title": "Körningen i produktion",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 244,
+      "sourceEnd": 261,
+      "startLine": 7,
+      "endLine": 24,
+      "sha256": "bee03471cc72659a7aa069cf8ea2c755b271035fe79a07a18d9389aa44309e18"
+    },
+    {
+      "file": "docs/minne/repo-07.md",
+      "title": "Hårda regler",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 262,
+      "sourceEnd": 275,
+      "startLine": 7,
+      "endLine": 20,
+      "sha256": "9dde870145f8cdcb9afcb478b3cb8d307c887ee121d381c356e92fc0d57e589b"
+    },
+    {
+      "file": "docs/minne/repo-08.md",
+      "title": "Stil",
+      "source": "docs/historik/repo-2026-09-17.md",
+      "sourceStart": 276,
+      "sourceEnd": 282,
+      "startLine": 7,
+      "endLine": 13,
+      "sha256": "daf03d27ae6dce18a7c78455b1e99d056c8ada84bd65c071025906737e5a17d7"
+    },
+    {
+      "file": "docs/minne/skrapor-01.md",
+      "title": "Skrapkontraktet — för den som rör en skrapa",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 1,
+      "sourceEnd": 10,
+      "startLine": 7,
+      "endLine": 16,
+      "sha256": "c65e1f75ab083a782396d16e6f62a1ec38d31e242d0ea2159dca9964d9bee8ed"
+    },
+    {
+      "file": "docs/minne/skrapor-02.md",
+      "title": "Först av allt: vad slags menykälla är det?",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 11,
+      "sourceEnd": 35,
+      "startLine": 7,
+      "endLine": 31,
+      "sha256": "43dd203b9f0aec136714b97cb6ff3355996910dd468dec5cb9f7f0ecf053bf26"
+    },
+    {
+      "file": "docs/minne/skrapor-03.md",
+      "title": "Att lägga till en restaurang är tre filer",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 36,
+      "sourceEnd": 75,
+      "startLine": 7,
+      "endLine": 46,
+      "sha256": "57f68867e7c866b3a04d2c2d6320cbd5cdd8037546cbfd6ee5ba2ceb107b04d8"
+    },
+    {
+      "file": "docs/minne/skrapor-04.md",
+      "title": "Kontraktet: `scrape()`",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 76,
+      "sourceEnd": 177,
+      "startLine": 7,
+      "endLine": 108,
+      "sha256": "856c34235a54e909937c4214aebc344236833c9ca1d518bd2c88595d40bdc062"
+    },
+    {
+      "file": "docs/minne/skrapor-05.md",
+      "title": "Kolla plattformarna först",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 178,
+      "sourceEnd": 192,
+      "startLine": 7,
+      "endLine": 21,
+      "sha256": "ddc9bc2ba5e3856c75bc868b5d301ddcd3b8ad51fbf35f622c61f6371b3994f3"
+    },
+    {
+      "file": "docs/minne/skrapor-06.md",
+      "title": "Stående menyer (steg 3)",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 193,
+      "sourceEnd": 265,
+      "startLine": 7,
+      "endLine": 79,
+      "sha256": "2fd9221178a5b0e7bcb61bb557da8ab7779dd7634f9487530e523965e29e5972"
+    },
+    {
+      "file": "docs/minne/skrapor-07.md",
+      "title": "Beroenden — den viktigaste regeln i filen",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 266,
+      "sourceEnd": 283,
+      "startLine": 7,
+      "endLine": 24,
+      "sha256": "b6ab194a60ae5970577c9ffe96fe6d027468d4de5f997dabdf11ce6669310f17"
+    },
+    {
+      "file": "docs/minne/skrapor-08.md",
+      "title": "`BaseScraper` gör redan det jobbiga",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 284,
+      "sourceEnd": 331,
+      "startLine": 7,
+      "endLine": 54,
+      "sha256": "b9ea73bda95e1daf5ec62f1011c6a360327958d9665a8cbb3e86b27a873e958d"
+    },
+    {
+      "file": "docs/minne/skrapor-09.md",
+      "title": "Spaning: `scripts/spana.py`",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 332,
+      "sourceEnd": 399,
+      "startLine": 7,
+      "endLine": 74,
+      "sha256": "ad73d3ead2b7d86737296ddf8b1bb6014bd23695be67339e3b9be78b10515810"
+    },
+    {
+      "file": "docs/minne/skrapor-10.md",
+      "title": "Så testar du",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 400,
+      "sourceEnd": 434,
+      "startLine": 7,
+      "endLine": 41,
+      "sha256": "a89b489add09a4c883319fc324b9d14fb626ea631e2f1f69c3bef427e6efb11b"
+    },
+    {
+      "file": "docs/minne/skrapor-11.md",
+      "title": "Vad ett skrapkort inte ska svälla ut till",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 435,
+      "sourceEnd": 445,
+      "startLine": 7,
+      "endLine": 17,
+      "sha256": "6423ae857e87c614bc36adf6829f19e1603352c7a96135e92250ea973c115426"
+    },
+    {
+      "file": "docs/minne/skrapor-12.md",
+      "title": "Stil",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 446,
+      "sourceEnd": 456,
+      "startLine": 7,
+      "endLine": 17,
+      "sha256": "14bb57ff9e6506d7ad282dfc137a56d674cdebf84db265298a6761f828b9b05c"
+    },
+    {
+      "file": "docs/minne/skrapor-13.md",
+      "title": "Selektorer som ser stabila ut och inte är det",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 457,
+      "sourceEnd": 481,
+      "startLine": 7,
+      "endLine": 31,
+      "sha256": "1b9ac225b72cf682d16558c861559860f228e298ec14e1914ef23ff60b1d462f"
+    },
+    {
+      "file": "docs/minne/skrapor-14.md",
+      "title": "En foodtruck är inte en restaurang med adress",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 482,
+      "sourceEnd": 494,
+      "startLine": 7,
+      "endLine": 19,
+      "sha256": "1e8a388107ca300207549a304f2ffffe1544902dfdc25411ce6823575e90a05a"
+    },
+    {
+      "file": "docs/minne/skrapor-15.md",
+      "title": "Vad som faktiskt finns i Mjärdevi",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 495,
+      "sourceEnd": 509,
+      "startLine": 7,
+      "endLine": 21,
+      "sha256": "f69200a874b63a6a80a6d405836ab09f44f117a7de8ecb9944e4d60e1876fb66"
+    },
+    {
+      "file": "docs/minne/skrapor-16.md",
+      "title": "En kyl på ett kontor är också ett lunchställe",
+      "source": "docs/historik/skrapor-2026-09-17.md",
+      "sourceStart": 510,
+      "sourceEnd": 534,
+      "startLine": 7,
+      "endLine": 31,
+      "sha256": "3ce24e7c6fd0735e7bf2f1e1a1a7afdd717bcf3309997e10840a0e54a68624cc"
+    },
+    {
+      "file": "docs/minne/sakerhet-01.md",
+      "title": "Security Loop State — luns.se",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 1,
+      "sourceEnd": 5,
+      "startLine": 7,
+      "endLine": 11,
+      "sha256": "ad3aee0985e678bc4809466f8baafc2841242caa34f4fcdf9e404c9cacba3d5f"
+    },
+    {
+      "file": "docs/minne/sakerhet-02.md",
+      "title": "Repo summary",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 6,
+      "sourceEnd": 19,
+      "startLine": 7,
+      "endLine": 20,
+      "sha256": "c2b96ab9045f3ac69be303e6b845917d68962ca903caa4375b7aec0270378869"
+    },
+    {
+      "file": "docs/minne/sakerhet-03.md",
+      "title": "Tooling — tre källor, och de säger inte samma sak",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 20,
+      "sourceEnd": 128,
+      "startLine": 7,
+      "endLine": 115,
+      "sha256": "69786d83be67e8759422d882c6ed264ba97cd19c988617013ed50398bdfc1609"
+    },
+    {
+      "file": "docs/minne/sakerhet-04.md",
+      "title": "Open Alerts",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 129,
+      "sourceEnd": 231,
+      "startLine": 7,
+      "endLine": 109,
+      "sha256": "7f89c02a6786309ece0ef204573ce92e78e40c6694cc9d5b0994defa2bad135f"
+    },
+    {
+      "file": "docs/minne/sakerhet-05.md",
+      "title": "Triage",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 232,
+      "sourceEnd": 256,
+      "startLine": 7,
+      "endLine": 31,
+      "sha256": "5de94cb0c2bea3732944e306c7fda783cde865f54c2e2244c5bbc334e1489e8f"
+    },
+    {
+      "file": "docs/minne/sakerhet-06.md",
+      "title": "Status",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 257,
+      "sourceEnd": 273,
+      "startLine": 7,
+      "endLine": 23,
+      "sha256": "9af614e8bce3014bd3895ef93959d036af92237f5f12c7eadaa4237b240e7e6c"
+    },
+    {
+      "file": "docs/minne/sakerhet-07.md",
+      "title": "DONE",
+      "source": "docs/historik/sakerhet-2026-09-17.md",
+      "sourceStart": 274,
+      "sourceEnd": 282,
+      "startLine": 7,
+      "endLine": 15,
+      "sha256": "e24733829febd34371302bdbdd6187f4c237c04d1b80c10019699c1a7c6bbf49"
+    }
+  ]
+}
