@@ -66,7 +66,7 @@ originaldokumenten; `pdftotext` ingår inte i produktionslösningen.
 | Silvis | Fem uttryckligt märkta stående rätter på egna sidan. Veckans rätter kommer från en JavaScript-laddad Facebook-widget och tas inte med. Den stående menyn är sparad med källhash. |
 | Poh-Keh Masthugget | Officiella sidan anger plats och tider men ingen meny. Införd med restaurangens aktuella externa Foodora-meny; nio maträtter, drycker uteslutna. |
 | Fula Hummern | Officiella sidan säger fortfarande sommarstängt och saknar aktuell meny. Införd med källstatus, inte med den gamla menybilden. |
-| Restaurang BO | Vecka 39 publiceras som bild. Införd med automatisk veckokontroll, källstatus och direkt MENY-länk; inga bildrätter skrivs av eller fryses. |
+| Restaurang BO | Vecka 39 publiceras som en fullt läsbar bild, visuellt verifierad 21 september. HTML och Squarespace-JSON saknar menytext. Skrapan visar bara veckokontroll, källstatus och direkt MENY-länk; automatisk bildavläsning är inte byggd. Se återkontrollen nedan. |
 | Heurlins | Den gamla PDF:en från 7 september ersattes under återkontrollen av en ny, ändrad 21 september 07.17 UTC. Två veckorätter per vardag hämtas nu med den nya indelningen mån–ons/tor–fre. Övriga alternativ finns via MENY. |
 | Kathmandu | Officiella lunchsidan stoppas fortfarande av Cloudflare, även i webbläsarkontrollen. Menydags är reservkälla men saknar vecka 39. Datumets ISO-år, vecka och veckodag kontrolleras innan rätter tas med. MENY leder till officiella lunchsidan. |
 | Bongo Göteborg | Vecka 39 är en textbärande PDF. Införd med tre rätter per vardag och kontroll mot aktuellt ISO-veckonummer. |
@@ -120,3 +120,42 @@ webbläsare, OCR, ny tjänst eller extra paket används i produktionsskraporna.
 Spaningen upptäckte också att `scripts/spana.py` kraschar på saknat `datum`
 efter blockerad råhämtning; sparad webbläsar-HTML kunde ändå inspekteras.
 Det separata verktygsfelet ändras inte inom detta kort.
+
+### BO:s bild och Kathmandus åtkomst, återkontroll 2026-09-21
+
+Symptom: BO finns på sajten men visar inga maträtter trots att restaurangen
+publicerat sin lunchmeny. Detta är en begränsning i vår inläsning, inte en
+oläsbar eller saknad källa. [Officiella lunchsidan](https://www.restaurangbo.se/lunchmat)
+och dess bild gav HTTP 200. Originalet `v.39.jpg` lästes visuellt: det har
+tydliga dagar, rätter och priser. Exempelvis anger måndagen nattbakad karré
+159 kr och ångad fisk 159 kr. Bildens veckomärkning är 39; den innehåller
+inget uttryckligt årtal. Sidans HTML saknar rätttext och bildens alt-text är
+tom. Squarespace-vyn `?format=json` gav också 200, men dess `mainContent`
+har samma bild och ingen menytext.
+
+Ingen bildimport infördes: det senaste kortets arbetsinstruktion säger
+uttryckligen ”Går menyn inte att läsa utan webbläsare, eller byts bilden
+varje vecka: bygg ingenting.” Att kunna läsa bilden vid en manuell kontroll
+ska därför inte beskrivas som en färdig lösning för kommande veckor.
+En möjlig fortsättning, inte genomförd eller verifierad, är en kontrollerad
+veckoinläsning via Codex CLI med käll-URL, bildhash, verifierad giltighetsperiod
+och spärr mot utgången eller ändrad källa. Den kräver att beställningen
+tillåter bildhantering och att återkommande inläsning ordnas; en engångsavskrift
+löser inte driften. Inga nya tjänster eller modell-API:er behövs för själva
+den manuella bildläsningen.
+
+[Kathmandus officiella lunchsida](https://www.kathmandurestaurang.se/sv/lunchmeny)
+gav fortsatt HTTP 403 med `cf-mitigated: challenge`. Detsamma gällde startsidan,
+robots.txt, sitemap.xml samt lunchadressen utan www och med avslutande
+snedstreck. Chromium stannade i ”Utför säkerhetsverifiering” efter väntan.
+Försök att nå verifieringsrutans checkbox via webbläsarens rollselektor
+gav timeout; ingen genomförd verifiering eller menyåtkomst påstås.
+Sökindex visade officiell startsida och à la carte, men inget verifierat
+aktuellt lunchunderlag. Det bevisar inte att Cloudflare är omöjligt att
+passera; ingen reproducerbar väg har verifierats här.
+[Menydags reservsida](https://www.menydags.se/restaurang/kathmandu/lunch)
+gav 200 men noll rättposter i datumblocken 21–25 september 2026.
+
+Verifiering: båda befintliga skraporna kördes med `.venv-prod` och gav
+0/0/0/0/0 rätter mån–fre, med befintlig källstatus. Ingen skrapa eller menydata
+ändrades. Bilagor och webbläsarbilder ligger endast i gitignorerad spaningskatalog.
