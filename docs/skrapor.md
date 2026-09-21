@@ -9,8 +9,10 @@ Läs app/scrapers/AGENTS.md också. Här ges inget utökat uppdragsmandat.
 1. HTML med menytext: använd BaseScraper och dess get_page_content.
 2. JS-byggd meny: identifiera underliggande JSON, inte en Playwright-skrapa.
 3. Stående meny: läs exakt, spara JSON och använd StaticMenuScraper.
-4. Veckovis bild/PDF: rapportera begränsningen; inför inte OCR eller statisk
-   ersättning utan separat beställning.
+4. Veckovis PDF med textlager: använd den smala standardbiblioteksläsaren i
+   `pdf_text.py`, kontrollera vecka eller källans ändringsdatum och stäng av
+   fallback till förra menyn. Veckovis bild: visa källstatus och direkt
+   menylänk; inför inte OCR eller statisk ersättning.
 
 Produktion har bara requests, beautifulsoup4, lxml utöver standardbiblioteket.
 Spaning med scripts/spana.py får ha utvecklingsberoenden; de får inte läcka in
@@ -26,6 +28,8 @@ i produktionsskrapan. Läs minne/skrapor-09.md när spaning behövs.
 - Felläge: "Ett fel uppstod vid hämtning av menyn" eller
   "Ingen lunchmeny tillgänglig"; logga med log_error. Runnern kan behålla
   föregående meny, så ett lyckat bygge bevisar inte att skrapningen är aktuell.
+  Veckovis växlande källor ska sätta `allow_previous_menu = False`; då blir
+  ett fel synligt i stället för att frysa förra veckans mat.
 - Kategori måste vara källbelagd. Ordningen på rätterna bevisar inte vegetarisk
   mat. Använd neutral kategori när underlag saknas, aldrig påhittade etiketter.
 - Stående JSON behöver source, captured och kalla_hash. Uppdatera datum och hash
@@ -44,24 +48,28 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
-## Järntorget/Linné — källinventering 2026-09-21
+## Järntorget/Linné — källinventering och införande 2026-09-21
 
 Källa och verifiering: restaurangernas officiella länkar i kortet kontrollerades
-med rå HTTP, renderad webbläsare, nätverkstrafik och hämtade menybilagor. Taj
-Mahal och Silvis provkördes därefter med produktionsberoendena.
+med rå HTTP, renderad webbläsare, nätverkstrafik och hämtade menybilagor. Efter
+chefens följdbeställning provkördes samtliga tio poster med
+produktionsberoendena. PDF-läsaren jämfördes med `pdftotext` på de tre
+originaldokumenten; `pdftotext` ingår inte i produktionslösningen.
 
 | Källa | Beslut 2026-09-21 |
 |---|---|
 | Taj Mahal | Stående veckomeny i rå HTML. Införd som vanlig skrapa. |
 | Silvis | Fem uttryckligt märkta stående rätter på egna sidan. Veckans rätter kommer från en JavaScript-laddad Facebook-widget och tas inte med. Den stående menyn är sparad med källhash. |
-| Poh-Keh Masthugget | Officiella sidan har ingen meny, bara hänvisning till beställning och Instagram. Inte införd. |
-| Fula Hummern | Sidan säger sommarstängt och menylänken saknar meny. Inte införd. |
-| Restaurang BO | Vecka 39 publiceras som bild. Veckovis bild, inte införd. |
-| Heurlins | Sidan säger att menyn byts varje vecka och länkar en PDF. Inte införd. |
-| Kathmandu | Officiella lunchsidan stoppade både requests och Chromium med Cloudflare-verifiering. Ingen produktionsbar källa hittades; inte införd. |
-| Bongo Göteborg | Vecka 39 publiceras som PDF. Inte införd. |
-| Byns Trattoria | Veckovis PDF, vid kontrollen fortfarande märkt vecka 38. Inte införd. |
-| Feskekörka | Sidan blandar flera restaurangers menyer och hade dessutom ett block märkt vecka 37. Ingen meny kan säkert tillskrivas en enda restaurangpost; inte införd. |
+| Poh-Keh Masthugget | Officiella sidan anger plats och tider men ingen meny. Införd med restaurangens aktuella externa Foodora-meny; nio maträtter, drycker uteslutna. |
+| Fula Hummern | Officiella sidan säger fortfarande sommarstängt och saknar aktuell meny. Införd med källstatus, inte med den gamla menybilden. |
+| Restaurang BO | Vecka 39 publiceras som bild. Införd med automatisk veckokontroll, källstatus och direkt MENY-länk; inga bildrätter skrivs av eller fryses. |
+| Heurlins | PDF:en har textlager men var senast ändrad 2026-09-07. Införd med färskhetskontroll och källstatus tills en aktuell PDF publiceras. |
+| Kathmandu | Officiella lunchsidan stoppas av Cloudflare. Införd med Menydags som uttrycklig reservkälla; vecka 39 var ännu inte publicerad vid kontrollen. |
+| Bongo Göteborg | Vecka 39 är en textbärande PDF. Införd med tre rätter per vardag och kontroll mot aktuellt ISO-veckonummer. |
+| Byns Trattoria | PDF:en hade textlager men var fortfarande märkt vecka 38. Införd med veckokontroll och källstatus; vecka 38 visas inte som vecka 39. |
+| Feskekörka | Två stående lunchsektioner finns i rå HTML för tis–tor respektive ons–tor. De infördes under samlingsposten Feskekörka; det gamla blocket märkt vecka 37 ignoreras. |
 
-Om någon av de avvisade källorna byter till menytext i HTML eller ett läsbart
-JSON-svar ska den bedömas på nytt. Frys inte den då aktuella bilden eller PDF:en.
+Veckomenyerna returnerar INFO-rader när aktuell mat saknas. Det gör att
+restaurangen och dess original-/reservlänk finns på sajten utan att gammal mat
+presenteras som dagens. `allow_previous_menu = False` hindrar dessutom runnern
+från att återanvända en tidigare vecka efter ett senare hämtfel.

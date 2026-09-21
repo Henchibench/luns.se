@@ -291,6 +291,7 @@ export default function LunchBoard() {
           empty: !filtering && !hasDayDishes,
           dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
+          menuUrl: restaurant.meta.menu_url,
           maps: restaurant.meta.maps,
           instagram: restaurant.meta.instagram,
           latitude: restaurant.meta.latitude,

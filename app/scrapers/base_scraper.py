@@ -15,6 +15,10 @@ def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
 socket.getaddrinfo = _ipv4_getaddrinfo
 
 class BaseScraper(ABC):
+    # Veckovis växlande källor sätter denna till False. Annars kan ett
+    # tillfälligt fel frysa förra veckans rätter på sajten utan synligt fel.
+    allow_previous_menu = True
+
     # Elementor märker responsivt dolda block med en klass per brytpunkt:
     # elementor-hidden-mobile, -tablet, -laptop, -desktop. Bär ett block ALLA
     # fyra samtidigt finns ingen skärmbredd kvar där det kan visas — det är

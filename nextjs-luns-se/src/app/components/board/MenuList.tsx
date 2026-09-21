@@ -26,6 +26,7 @@ export interface Section {
   /** Publicerar bara dagens meny. Tomma dagar är väntat, inte ett fel. */
   dailyOnly: boolean;
   website?: string;
+  menuUrl?: string;
   maps?: string;
   instagram?: string;
   latitude?: number | null;
@@ -135,6 +136,11 @@ export default function MenuList({
               {section.website && (
                 <a href={section.website} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
                   WWW ↗
+                </a>
+              )}
+              {section.menuUrl && (
+                <a href={section.menuUrl} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+                  MENY ↗
                 </a>
               )}
               {section.instagram && (

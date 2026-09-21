@@ -18,13 +18,13 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 3;
+export const NEWS_VERSION = 4;
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-09-21',
     title: 'Järntorget/Linné är med',
-    body: 'Göteborg har fått ett område till. Välj Järntorget/Linné för lunchmenyer från Taj Mahal och Silvis.',
+    body: 'Göteborg har fått ett område till. Välj Järntorget/Linné för tio lunchställen mellan Masthuggskajen, Långgatorna och Feskekörka.',
   },
   {
     date: '2026-09-11',

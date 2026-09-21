@@ -23,6 +23,7 @@ export interface RestaurantMeta {
   name: string;
   area: string;
   website?: string;
+  menu_url?: string;
   maps?: string;
   instagram?: string;
   lunch_hours?: string | null;

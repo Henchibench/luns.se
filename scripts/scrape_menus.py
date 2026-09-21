@@ -24,14 +24,19 @@ from app.scrapers.restaurants.bar_schiacciate_scraper import BarSchiacciateScrap
 from app.scrapers.restaurants.benne_pastabar_scraper import BennePastabarScraper
 from app.scrapers.restaurants.bistro3_scraper import Bistro3Scraper
 from app.scrapers.restaurants.bistrot_scraper import BistrotScraper
+from app.scrapers.restaurants.bongo_scraper import BongoScraper
 from app.scrapers.restaurants.brodernas_kok_scraper import BrodernasKokScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
 from app.scrapers.restaurants.chili_lime_scraper import ChiliLimeScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
+from app.scrapers.restaurants.feskekorka_scraper import FeskekorkaScraper
+from app.scrapers.restaurants.fula_hummern_scraper import FulaHummernScraper
+from app.scrapers.restaurants.heurlins_scraper import HeurlinsScraper
 from app.scrapers.restaurants.husman_scraper import HusmanScraper
 from app.scrapers.restaurants.jasons_matstuga_scraper import JasonsMatstugaScraper
 from app.scrapers.restaurants.kooperativet_scraper import KooperativetScraper
+from app.scrapers.restaurants.kathmandu_scraper import KathmanduScraper
 from app.scrapers.restaurants.la_fontana_scraper import LaFontanaScraper
 from app.scrapers.restaurants.krubbstugan_scraper import KrubbstuganScraper
 from app.scrapers.restaurants.masala_scraper import MasalaScraper
@@ -41,8 +46,10 @@ from app.scrapers.restaurants.oishii_scraper import OishiiScraper
 from app.scrapers.restaurants.ostgota_kok_scraper import OstgotaKokScraper
 from app.scrapers.restaurants.pegs_and_tails_scraper import PegsAndTailsScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
+from app.scrapers.restaurants.poh_keh_scraper import PohKehScraper
 from app.scrapers.restaurants.pinocchio_scraper import PinocchioScraper
 from app.scrapers.restaurants.saab_arena_scraper import SaabArenaScraper
+from app.scrapers.restaurants.restaurang_bo_scraper import RestaurangBOScraper
 from app.scrapers.restaurants.seven_seasons_scraper import SevenSeasonsScraper
 from app.scrapers.restaurants.skyline_scraper import SkylineScraper
 from app.scrapers.restaurants.stangs_matlador_scraper import StangsMatladorScraper
@@ -50,6 +57,7 @@ from app.scrapers.restaurants.stangs_mjardevi_scraper import StangsMjardeviScrap
 from app.scrapers.restaurants.sukaldari_scraper import SukaldariScraper
 from app.scrapers.restaurants.silvis_scraper import SilvisScraper
 from app.scrapers.restaurants.taj_mahal_scraper import TajMahalScraper
+from app.scrapers.restaurants.byns_trattoria_scraper import BynsTrattoriaScraper
 from app.scrapers.restaurants.terrassen_scraper import TerrassenScraper
 from app.scrapers.restaurants.uni3_scraper import Uni3Scraper
 from app.scrapers.restaurants.universitetsklubben_scraper import UniversitetsklubbenScraper
@@ -120,14 +128,19 @@ def scrape_all_menus(previous_menus):
         BennePastabarScraper(),
         Bistro3Scraper(),
         BistrotScraper(),
+        BongoScraper(),
         BrodernasKokScraper(),
         BombayBistroScraper(),
         ChiliLimeScraper(),
         DistrictOneScraper(),
         EncounterAsianScraper(),
+        FeskekorkaScraper(),
+        FulaHummernScraper(),
+        HeurlinsScraper(),
         HusmanScraper(),
         JasonsMatstugaScraper(),
         KooperativetScraper(),
+        KathmanduScraper(),
         KrubbstuganScraper(),
         LaFontanaScraper(),
         MasalaScraper(),
@@ -137,8 +150,10 @@ def scrape_all_menus(previous_menus):
         OstgotaKokScraper(),
         PegsAndTailsScraper(),
         Pier11Scraper(),
+        PohKehScraper(),
         PinocchioScraper(),
         SaabArenaScraper(),
+        RestaurangBOScraper(),
         SevenSeasonsScraper(),
         SkylineScraper(),
         StangsMatladorScraper(),
@@ -146,6 +161,7 @@ def scrape_all_menus(previous_menus):
         SukaldariScraper(),
         SilvisScraper(),
         TajMahalScraper(),
+        BynsTrattoriaScraper(),
         TerrassenScraper(),
         Uni3Scraper(),
         UniversitetsklubbenScraper(),
@@ -157,14 +173,15 @@ def scrape_all_menus(previous_menus):
             result = scrape_with_retry(scraper)
             items = result.get(scraper.name, [])
 
-            if is_scrape_failure(items) and scraper.name in previous_menus:
+            if (is_scrape_failure(items) and scraper.name in previous_menus
+                    and scraper.allow_previous_menu):
                 logger.warning(f"[FALLBACK] {scraper.name}: using previous data")
                 menus[scraper.name] = previous_menus[scraper.name]
             else:
                 menus.update(result)
                 logger.info(f"[OK] {scraper.name}: {len(items)} items")
         except Exception as e:
-            if scraper.name in previous_menus:
+            if scraper.name in previous_menus and scraper.allow_previous_menu:
                 logger.warning(f"[FALLBACK] {scraper.name}: {e} — using previous data")
                 menus[scraper.name] = previous_menus[scraper.name]
             else:
@@ -231,6 +248,7 @@ def build_restaurants_response(menus):
             "name": restaurant_name,
             "area": info.get("area", "Unknown"),
             "website": info.get("website"),
+            "menu_url": info.get("menu_url"),
             "maps": info.get("maps"),
             "instagram": info.get("instagram"),
             "review_score": info.get("review_score"),
