@@ -76,7 +76,7 @@ originaldokumenten; `pdftotext` ingår inte i produktionslösningen.
 | Heurlins | Den gamla PDF:en från 7 september ersattes under återkontrollen av en ny, ändrad 21 september 07.17 UTC. Två veckorätter per vardag hämtas nu med den nya indelningen mån–ons/tor–fre. Övriga alternativ finns via MENY. |
 | Kathmandu | Officiella lunchsidan stoppas fortfarande av Cloudflare, även i webbläsarkontrollen. Menydags är reservkälla men saknar vecka 39. Datumets ISO-år, vecka och veckodag kontrolleras innan rätter tas med. MENY leder till officiella lunchsidan. |
 | Bongo Göteborg | Vecka 39 är en textbärande PDF. Införd med tre rätter per vardag och kontroll mot aktuellt ISO-veckonummer. |
-| Byns Trattoria | PDF:en hade textlager men var fortfarande märkt vecka 38. Införd med veckokontroll och källstatus; vecka 38 visas inte som vecka 39. |
+| Byns Trattoria | PDF-läsningen fungerar: originalet och dess textlager anger vecka 38. Kontrollerad tolkning ger 5/5/5/5/5 alternativ för den veckan; aktuell vecka 39 får menybesked. Ny hämtning utan cache gav samma fil. Se återkontrollen nedan. |
 | Feskekörka | Två odaterade lunchsektioner finns i rå HTML och synlig webbläsare för tis–tor respektive ons–tor. De visas under samlingsposten Feskekörka; blocket märkt vecka 37 ignoreras. Mån/fre får ett förklarande menybesked, inte besked om stängd restaurang. Tidigare meny återanvänds inte efter hämtfel. |
 
 Veckomenyerna returnerar INFO-rader när aktuell mat saknas. Det gör att
@@ -108,9 +108,7 @@ ger hela dokumentet. Äldre odaterade dokument stoppas fortfarande av
 färskhetskontrollen; ett gammalt ändringsdatum bevisar inte att restaurangen
 saknar en ny meny någon annanstans.
 
-[Byns officiella sida](https://www.bynstrattoria.se/food/lunch) pekade fortsatt
-på `lunch/lunch.pdf`, märkt vecka 38 och ändrad 15 september, även utan cache.
-Menydags saknade också vecka 39. [Kathmandus officiella lunchsida](https://www.kathmandurestaurang.se/sv/lunchmeny)
+[Kathmandus officiella lunchsida](https://www.kathmandurestaurang.se/sv/lunchmeny)
 gav 403 i rå HTTP med/utan www, med avslutande snedstreck och via HTTP→HTTPS.
 Webbläsaren stannade i Cloudflares verifiering. [Menydags](https://www.menydags.se/restaurang/kathmandu/lunch)
 visade daterade men tomma dagar vecka 39. Pris- och rättformat kontrollerades
@@ -126,6 +124,31 @@ webbläsare, OCR, ny tjänst eller extra paket används i produktionsskraporna.
 Spaningen upptäckte också att `scripts/spana.py` kraschar på saknat `datum`
 efter blockerad råhämtning; sparad webbläsar-HTML kunde ändå inspekteras.
 Det separata verktygsfelet ändras inte inom detta kort.
+
+### Byns PDF-avläsning, återkontroll 2026-09-21
+
+Symptom: tomt restaurangkort uppfattades som att vi inte kunde läsa en bild
+eller PDF. [Officiella lunchsidan](https://www.bynstrattoria.se/food/lunch)
+länkar och bäddar in samma [textbärande PDF](https://www.bynstrattoria.se/lunch/lunch.pdf).
+Orsak: originalets synliga rubrik och textlager anger båda **VECKA 38**,
+inte aktuell vecka 39. HTTP gav 200 och Last-Modified 2026-09-15 10:16:32 GMT.
+Hämtning med unik cacheparameter, Cache-Control: no-cache och utan www gav
+samma SHA-256: `a269c3438b3d4f597ff82750457e44859cf74053cef9e6778e76eb3a2018690e`.
+Sidans bild `images/lunch.jpg` är inte den inbäddade veckomenyn.
+[Menydags](https://www.menydags.se/restaurang/byns-trattoria/lunch) kontrollerades
+som komplement eftersom officiella menyn gäller föregående vecka; datumblocken
+21–25 september saknar också rätter. Sökindex gav äldre versioner av samma
+PDF-adress och används därför inte som bevis för aktuell mat.
+
+Åtgärd och verifiering: originalet renderades lokalt och lästes visuellt.
+Befintlig produktionsskrapa provades med en tillfällig testklocka för vecka 38:
+5/5/5/5/5 alternativ, rätt fördelning mån–tis/ons–tors/fredag och 145 kr,
+kontrollerat mot PDF:en. Testklockan och arkivrätterna sparades inte i sajtdata.
+Verklig körning vecka 39 ger 0/0/0/0/0 rätter och ett förklarande menybesked
+varje dag. Ingen kodändring eller ny bildavskrift behövs för den här filen.
+En aktuell PDF med samma mall kan läsas automatiskt vid nästa skrapning;
+ändrad mall eller ny filadress måste verifieras innan det kan lovas.
+Veckospärren ska behållas. Bilagorna finns endast i ignorerad spaningskatalog.
 
 ### BO:s bild och Kathmandus åtkomst, återkontroll 2026-09-21
 
