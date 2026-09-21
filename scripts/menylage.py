@@ -35,11 +35,11 @@ STANDARDFIL = os.path.join(
 
 
 def rakna(rader):
-    """Rätter per veckodag. INFO-raderna räknas inte — de är inte mat."""
+    """Rätter per veckodag. Information och bildmetadata är inte mat."""
     per_dag = {dag: 0 for dag in DAGAR}
     okand = 0
     for rad in rader:
-        if rad.startswith("INFO:"):
+        if rad.startswith(("INFO:", "MENU_IMAGE:")):
             continue
         dag, _, _ = rad.partition("|")
         if dag in per_dag:
@@ -82,8 +82,11 @@ def main():
         # men missat veckouppdelningen. Den ser komplett ut i JSON:en.
         dagar_med_mat = sum(1 for d in DAGAR if per_dag[d])
         if summa == 0:
-            rad += "   <- noll rätter"
-            tomma.append(namn)
+            if any(r.startswith("MENU_IMAGE:") for r in rader):
+                rad += "   <- menybild, inga avlästa rätter"
+            else:
+                rad += "   <- noll rätter"
+                tomma.append(namn)
         elif dagar_med_mat == 1:
             rad += "   <- allt på en dag?"
         if okand:

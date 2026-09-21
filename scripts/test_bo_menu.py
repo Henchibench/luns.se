@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 import requests
 
 from app.scrapers.restaurants.restaurang_bo_scraper import RestaurangBOScraper
+from scripts.menylage import rakna
 
 
 class BOMenuTests(unittest.TestCase):
@@ -40,6 +41,14 @@ class BOMenuTests(unittest.TestCase):
         rows = self.scrape(image=b'new image')
         self.assertEqual(len(rows), 1)
         self.assertTrue(rows[0].startswith('MENU_IMAGE:'))
+
+    def test_report_counts_only_dishes_and_accepts_image_metadata(self):
+        counts, unknown = rakna(self.scrape())
+        self.assertEqual(list(counts.values()), [5,5,5,5,4])
+        self.assertEqual(unknown, 0)
+        counts, unknown = rakna(self.scrape(image=b'new image'))
+        self.assertEqual(sum(counts.values()), 0)
+        self.assertEqual(unknown, 0)
 
     def test_changed_url_with_identical_bytes_requires_new_verification(self):
         self.saved['image_url'] = self.url + '?old'

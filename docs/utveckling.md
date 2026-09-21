@@ -56,4 +56,5 @@ när gamla JSON-filer ligger kvar i ett statiskt bygge.
 Källa, datumkontroller, driftbegränsning och uppdateringsrutin finns i
 [skrapor](skrapor.md).
 Verifiering: `node --test scripts/bo-menu.test.mjs`; full testserverkedja
-och kontroll av text- och bildläge på mobil och dator vid leverans.
+och godkänd kontroll av text- och bildläge på mobil (390 px) och dator
+(1440 px), inklusive simulerat bildbyte, sökning och favoritläge.

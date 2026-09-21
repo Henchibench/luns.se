@@ -182,12 +182,16 @@ Bilder sparas bara i ignorerad `spana-*`, aldrig i git. Kör BO-testerna och
 kontrollera varje dag mot originalet före commit. Inga nya produktionspaket,
 modell-API:er, tjänster, serverinställningar eller workflows behövs.
 
-Verifiering: 17 Python-tester (`scripts.test_bo_menu` och
+Verifiering: 18 Python-tester (`scripts.test_bo_menu` och
 `scripts.test_jarntorget_menus`) och fem frontendtester
 (`node --test scripts/bo-menu.test.mjs`) kontrollerar bland annat bildbyte på
 samma URL, ny URL, nästa vecka, helg, årtal, ofullständig avskrift, nätfel och
 utgången frontenddata. Liveutfallet är 5/5/5/5/4 rätter jämfört med originalet.
-Full produktionskedja och webbläsarkontroll ingår i leveranskontrollen.
+Full skrapning och Next-bygge godkända. Webbläsarkontroll på 390 och 1440 px
+verifierade alla dagar, priser, sökning och originalbild. Simulerat bildbyte
+visade bilden utfälld utan gamla texträtter; namnsökning och favoritläge
+fungerade utan falska matträffar. Rapportverktyget `menylage.py` känner igen
+bildmetadata och skiljer bildmeny utan avskrift från saknad meny.
 
 ### Kathmandus åtkomst, oförändrad observation från tidigare kontroll
 
