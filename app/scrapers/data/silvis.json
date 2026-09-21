@@ -1,0 +1,33 @@
+{
+  "source": "https://silvis.nu/lunchmeny_i_linne_jarntorget/",
+  "captured": "2026-09-21",
+  "kalla_hash": "sha256:3cf6d91812f53962fd7a25a3c9f927b2037d93d93ad65cd191328ff3a3627c2e",
+  "kalla_hash_metod": "sha256 över UTF-8-raderna från rubriken STÅENDE RÄTTER till och med sista priset, i synlig ordning och med radbrytningen före 'och tzatziki' sammanfogad med föregående fortsättningsrad. Underlaget avslutas med radbrytning.",
+  "items": [
+    {
+      "name": "Långkokt högrev",
+      "description": "Serveras med friterad potatis och chili-pepparsås el. yoghurtsås",
+      "price": "145 kr"
+    },
+    {
+      "name": "Kycklingspett",
+      "description": "Serveras med friterad potatis och tzatziki",
+      "price": "145 kr"
+    },
+    {
+      "name": "Lammspett",
+      "description": "Serveras m. friterad potatis & yoghurtsås",
+      "price": "154 kr"
+    },
+    {
+      "name": "Ugnsbakad laxfilé",
+      "description": "Serveras med potatissallad",
+      "price": "145 kr"
+    },
+    {
+      "name": "Lammfärsbiffar med tomatsås",
+      "description": "Serveras med kryddat ris",
+      "price": "145 kr"
+    }
+  ]
+}

@@ -15,6 +15,13 @@ LOCATIONS = {
         "latitude": 57.7059,
         "longitude": 11.9359,
     },
+    "Järntorget/Linné": {
+        "label": "Järntorget/Linné",
+        "city": "Göteborg",
+        "map_query": "järntorget linné göteborg",
+        "latitude": 57.6998935,
+        "longitude": 11.9525030,
+    },
     "Tannefors": {
         "label": "Tannefors",
         "city": "Linköping",
@@ -176,6 +183,25 @@ restaurant_locations = {
         "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/seven-seasons/",
         "area": "Lindholmen",
         "lunch_hours": "Mån–fre 07.30–16.00"
+    },
+    "Taj Mahal": {
+        "description": "Indisk lunch på Första Långgatan med en vegetarisk eller vegansk tallrik och flera kyckling-, lamm- och nötköttsrätter på den stående veckomenyn.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Taj%20Mahal%2C%20F%C3%B6rsta%20L%C3%A5nggatan%2024%2C%20413%2028%20G%C3%B6teborg",
+        "latitude": 57.6996011,
+        "longitude": 11.9471068,
+        "website": "https://www.tajmahalgbg.se/lunch/",
+        "instagram": "https://www.instagram.com/tajmahalgbg/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.00–16.00"
+    },
+    "Silvis": {
+        "description": "Orientaliskt kök på Nordhemsgatan. Den stående lunchmenyn rymmer bland annat spett, långkokt högrev, lax och lammfärsbiffar.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Silvis%2C%20Nordhemsgatan%2018%2C%20413%2006%20G%C3%B6teborg",
+        "latitude": 57.6995209,
+        "longitude": 11.9493868,
+        "website": "https://silvis.nu/lunchmeny_i_linne_jarntorget/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Tis–fre 11.00–14.00"
     },
     "Terrassen": {
         "description": "Compass Group-restaurang vid Saab i Tannefors. Dagens rätt, dagens soppa och \"Snabbt & Gott\" i olika prislägen.",
