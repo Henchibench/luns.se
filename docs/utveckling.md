@@ -29,3 +29,16 @@ har tidigare orsakat fel. Detaljer finns i minne/repo-05.md.
 En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
+
+## Menybesked per dag, 2026-09-21
+
+Symptom: restaurangkorten visade samma generella tomrad även när skrapan
+kände orsaken, och ”idag” stod kvar vid val av en annan veckodag.
+`menu.ts` skiljer nu INFO-rader med prefixet `Menybesked: ` från tider och
+priser. Beskedet följer vald dag till `MenuList` och ersätter tomraden när
+rätter saknas. Vid andra tomma menyer skrivs vald veckodag ut. Rätter eller
+antal fylls aldrig ut med statusinformation; sök- och matfilter behåller sitt
+beteende. Källkontroller och begränsningar finns i [skrapor](skrapor.md).
+
+Verifiering: menyparsern provad med menybesked, vanlig INFO-rad och en rätt
+för nästa dag; beskedet hamnar varken bland rätter eller bland öppettider.

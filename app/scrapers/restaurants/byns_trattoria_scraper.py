@@ -43,7 +43,12 @@ class BynsTrattoriaScraper(WeeklyPdfScraper):
             compact = " ".join(lines)
             match = re.search(r"VECKA\s+(\d{1,2})", compact, re.I)
             if not match or int(match.group(1)) != self.current_week():
-                message = f"Senast publicerad meny är vecka {match.group(1) if match else '?'} · öppna MENY ovan"
+                message = (
+                    f"Menybesked: Den länkade lunchmenyn gäller vecka {match.group(1)}. "
+                    f"Ingen verifierad meny för vecka {self.current_week()}. Se MENY eller fråga restaurangen."
+                    if match else
+                    "Menybesked: Lunchmenyn saknar läsbart veckonummer. Se MENY eller fråga restaurangen."
+                )
                 return {self.name: self.info_for_all_days(message)}
 
             monday_heading = lines.index("MÅNDAG & TISDAG")

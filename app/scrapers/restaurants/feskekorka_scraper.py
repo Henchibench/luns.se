@@ -7,6 +7,8 @@ from ..base_scraper import BaseScraper
 
 
 class FeskekorkaScraper(BaseScraper):
+    allow_previous_menu = False
+
     def __init__(self):
         super().__init__({
             "name": "Feskekörka",
@@ -67,6 +69,12 @@ class FeskekorkaScraper(BaseScraper):
             )
             if not rows:
                 raise ValueError("inga rätter hittades")
+            for day in ["Måndag", "Fredag"]:
+                rows.append(
+                    f"INFO:{day} - Restaurant Info: Menybesked: "
+                    f"Ingen verifierad lunchmeny för {day.lower()}. De odaterade lunchmenyerna "
+                    "på restaurangens sida gäller tisdag–torsdag. Se MENY för övriga serveringar."
+                )
             self.log_info(f"Found {len(rows)} day/dish rows")
             return {self.name: rows}
         except Exception as error:

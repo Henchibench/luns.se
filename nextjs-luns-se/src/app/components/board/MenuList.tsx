@@ -19,6 +19,8 @@ export interface Section {
   meta: string;
   /** Inforader för vald dag, ihopslagna. */
   info: string;
+  /** Förklaring från menykällan när rätter saknas för vald dag. */
+  menuStatus: string;
   /** Handskriven mening om vad stället är. */
   description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
@@ -62,8 +64,10 @@ const LINK_CLASS = 'whitespace-nowrap transition-colors hover:text-[var(--acc)]'
  * fråga om fredagens lunch på en tisdag hjälper ingen.
  */
 function emptyMessage(section: Section, dayOffset: number, day: string): string {
+  if (section.menuStatus) return section.menuStatus;
+
   if (!section.dailyOnly || dayOffset === 0) {
-    return 'Ingen meny idag. Kolla direkt med restaurangen via länkarna ovan';
+    return `Ingen meny för ${day.toLowerCase()}. Kolla direkt med restaurangen via länkarna ovan`;
   }
 
   // Alla svenska veckodagar slutar på -dag, så genitivformen blir -dagens.

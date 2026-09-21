@@ -42,6 +42,8 @@ export interface Restaurant {
   dishes: Dish[];
   /** Inforader per dag. */
   info: Record<string, string[]>;
+  /** Källans besked när rätter saknas, skilt från tider och priser. */
+  menuStatus: Record<string, string>;
   meta: RestaurantMeta;
 }
 
@@ -135,13 +137,19 @@ export function parseRestaurants(
   return Object.entries(menus).map(([name, rows]) => {
     const dishes: Dish[] = [];
     const info: Record<string, string[]> = {};
+    const menuStatus: Record<string, string> = {};
 
     rows.forEach(row => {
       if (row.startsWith('INFO:')) {
         const match = row.match(INFO_LINE);
         if (match) {
           const day = match[1];
-          info[day] = [...(info[day] ?? []), match[2].trim()];
+          const text = match[2].trim();
+          if (text.startsWith('Menybesked: ')) {
+            menuStatus[day] = text.slice('Menybesked: '.length);
+          } else {
+            info[day] = [...(info[day] ?? []), text];
+          }
         }
         return;
       }
@@ -155,6 +163,7 @@ export function parseRestaurants(
       area: meta.area || 'Lindholmen',
       dishes,
       info,
+      menuStatus,
       meta,
     };
   });

@@ -226,12 +226,12 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.30–14.00"
     },
     "Kathmandu": {
-        "description": "Nepalesiska och indiska rätter på Första Långgatan. Den officiella sidan skyddas av Cloudflare, så veckomenyn hämtas från reservkällan Menydags.",
+        "description": "Nepalesiska och indiska rätter på Första Långgatan. Lunchmenyn hämtas från Menydags när restaurangens egen lunchsida inte går att läsa.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Kathmandu%2C%20F%C3%B6rsta%20L%C3%A5nggatan%2014%2C%20413%2003%20G%C3%B6teborg",
         "latitude": 57.6998394,
         "longitude": 11.9498280,
         "website": "https://www.kathmandurestaurang.se/sv",
-        "menu_url": "https://www.menydags.se/restaurang/kathmandu/lunch",
+        "menu_url": "https://www.kathmandurestaurang.se/sv/lunchmeny",
         "area": "Järntorget/Linné",
         "lunch_hours": "Mån–fre 11.00–15.00"
     },

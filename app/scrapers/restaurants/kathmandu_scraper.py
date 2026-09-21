@@ -1,5 +1,7 @@
 import re
+from datetime import date, datetime
 from typing import Dict, List
+from zoneinfo import ZoneInfo
 
 from bs4 import Tag
 
@@ -20,9 +22,9 @@ class KathmanduScraper(BaseScraper):
             "menu_url": "https://www.menydags.se/restaurang/kathmandu/lunch",
         })
 
-    @classmethod
-    def _info(cls, message: str) -> List[str]:
-        return [f"INFO:{day} - Restaurant Info: {message}" for day in cls.DAYS]
+    @staticmethod
+    def _today() -> date:
+        return datetime.now(ZoneInfo("Europe/Stockholm")).date()
 
     @staticmethod
     def _category(tags: List[str]) -> str:
@@ -46,7 +48,8 @@ class KathmanduScraper(BaseScraper):
             allergen = next((tag for tag in tags if tag.casefold().startswith("innehåller:")), "")
             if allergen:
                 details.append(allergen)
-            price = re.search(r"(\d+)\s*(?::?-|kr)", entry.get_text(" ", strip=True), re.I)
+            price = next((match for tag in tags
+                          if (match := re.fullmatch(r"(\d+)\s*(?::?-|kr)", tag, re.I))), None)
             text = name + (f" - {'. '.join(details)}" if details else "")
             if price:
                 text += f" ({price.group(1)} kr)"
@@ -58,16 +61,28 @@ class KathmanduScraper(BaseScraper):
         if not soup:
             return {self.name: ["Ett fel uppstod vid hämtning av menyn"]}
         rows: List[str] = []
+        current_week = self._today().isocalendar()[:2]
         for block in soup.select("div[id]"):
             if not self.DATE_ID.match(block.get("id", "")):
                 continue
+            try:
+                menu_date = date.fromisoformat(block["id"])
+            except ValueError:
+                continue
+            if menu_date.isocalendar()[:2] != current_week or menu_date.weekday() > 4:
+                continue
             heading = block.find("h3")
             heading_text = heading.get_text(" ", strip=True) if heading else ""
-            day = next((value for value in self.DAYS if heading_text.startswith(value)), None)
-            if day:
+            day = self.DAYS[menu_date.weekday()]
+            if heading_text.startswith(day):
                 rows.extend(self._dishes(block, day))
-        if not rows:
-            message = "Ingen meny för veckan publicerad i reservkällan än · öppna MENY ovan"
-            return {self.name: self._info(message)}
         self.log_info(f"Found {len(rows)} dishes via reserve source Menydags")
+        available_days = {row.split("|", 1)[0] for row in rows}
+        for day in self.DAYS:
+            if day not in available_days:
+                rows.append(
+                    f"INFO:{day} - Restaurant Info: Menybesked: "
+                    f"Ingen verifierad lunchmeny för {day.lower()} hos reservkällan Menydags. "
+                    "Vi kan inte läsa restaurangens egen lunchsida. Prova MENY eller fråga restaurangen."
+                )
         return {self.name: rows}

@@ -285,6 +285,7 @@ export default function LunchBoard() {
           name: restaurant.name,
           meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
           info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
+          menuStatus: restaurant.menuStatus[day] ?? '',
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.

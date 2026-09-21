@@ -28,7 +28,10 @@ class SilvisScraper(StaticMenuScraper):
 
     def scrape(self) -> Dict[str, List[str]]:
         try:
-            items: List[str] = []
+            items: List[str] = [
+                'INFO:Måndag - Restaurant Info: Menybesked: '
+                'Ingen lunchservering på måndagar. Silvis serverar lunch tisdag–fredag 11.00–14.00.'
+            ]
             for day in self.DAYS:
                 for dish in self.menu_data['items']:
                     items.append(self.format_static_item(
@@ -39,7 +42,7 @@ class SilvisScraper(StaticMenuScraper):
                         dish.get('price', ''),
                     ))
 
-            if not items:
+            if not self.menu_data['items']:
                 return {self.name: ['Ingen lunchmeny tillgänglig']}
 
             self.log_info(f'Hittade {len(self.menu_data["items"])} stående rätter')

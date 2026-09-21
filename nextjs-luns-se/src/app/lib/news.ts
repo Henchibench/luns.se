@@ -18,9 +18,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 4;
+export const NEWS_VERSION = 5;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-09-21',
+    title: 'Tydligare besked när lunchmenyn saknas',
+    body: 'I Järntorget/Linné ser du nu varför en meny saknas när vi vet orsaken. Silvis har exempelvis ingen måndagslunch. Välj tisdag–fredag för deras stående rätter.',
+  },
   {
     date: '2026-09-21',
     title: 'Järntorget/Linné är med',
