@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Highlight from './Highlight';
 import RestaurantMap from './RestaurantMap';
+import type { MenuImage } from '../../lib/menu';
 
 export interface SectionDish {
   key: string;
@@ -21,6 +22,7 @@ export interface Section {
   info: string;
   /** Förklaring från menykällan när rätter saknas för vald dag. */
   menuStatus: string;
+  menuImage?: MenuImage;
   /** Handskriven mening om vad stället är. */
   description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
@@ -215,6 +217,27 @@ export default function MenuList({
             <p className="mt-0.5 mb-2 text-12 italic text-[var(--mut)]">
               {emptyMessage(section, dayOffset, day)}
             </p>
+          )}
+
+          {section.menuImage && (
+            <details key={section.menuImage.url} open={section.dishes.length === 0}
+              className="my-2 max-w-2xl text-12 text-[var(--ink2)]">
+              <summary className="cursor-pointer text-[var(--acc)]">
+                Restaurangens menybild · vecka {section.menuImage.week}
+              </summary>
+              {section.dishes.length === 0 && (
+                <p className="my-2">Hela veckans meny visas nedan. Välj {day.toLowerCase()} i bilden.
+                  Rätterna i bilden går ännu inte att söka eller filtrera.</p>
+              )}
+              <a href={section.menuImage.url} target="_blank" rel="noopener noreferrer"
+                className="mt-2 block" aria-label={`Öppna ${section.name}s menybild i full storlek`}>
+                {/* Originalet ska kunna läsas utan bildoptimering eller ny bildtjänst. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={section.menuImage.url} loading="lazy" className="h-auto w-full bg-white"
+                  alt={`${section.name}s lunchmeny för vecka ${section.menuImage.week}. Öppna bilden i full storlek för att förstora.`} />
+                <span className="mt-1 block underline">Öppna menybilden i full storlek ↗</span>
+              </a>
+            </details>
           )}
 
           <div className="flex flex-col gap-0.5 pb-1.5">

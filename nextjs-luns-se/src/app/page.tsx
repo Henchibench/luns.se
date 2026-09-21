@@ -286,10 +286,11 @@ export default function LunchBoard() {
           meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
           info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
           menuStatus: restaurant.menuStatus[day] ?? '',
+          menuImage: restaurant.menuImage,
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
-          empty: !filtering && !hasDayDishes,
+          empty: !filtering && !hasDayDishes && !restaurant.menuImage,
           dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
           menuUrl: restaurant.meta.menu_url,
@@ -301,8 +302,11 @@ export default function LunchBoard() {
           dishes,
         };
       })
-      .filter(section => section.dishes.length > 0 || section.empty);
-  }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering]);
+      .filter(section => section.dishes.length > 0 || section.empty || (
+        section.menuImage && activeTypes.length === 0 && activeCravings.length === 0 &&
+        (!search.trim() || section.name.toLocaleLowerCase('sv').includes(search.trim().toLocaleLowerCase('sv')))
+      ));
+  }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering, activeTypes, activeCravings, search]);
 
   const dishTotal = sections.reduce((sum, s) => sum + s.dishes.length, 0);
 

@@ -5,8 +5,9 @@ Läs rotens AGENTS.md och docs/skrapor.md före menyarbete.
 - Produktionsberoenden: requests, beautifulsoup4 och lxml. Inte Playwright.
   Playwright får användas för spaning, aldrig i den färdiga skrapan.
 - Avgör källa först: HTML → vanlig skrapa; JS → underliggande JSON;
-  verkligt stående meny → sparad JSON; veckovis bild/PDF → rapportera,
-  bygg inte en statisk meny som blir fel nästa vecka.
+  verkligt stående meny → sparad JSON; veckovis PDF → textlager;
+  veckovis bild → daterad, källkontrollerad avläsning och aktuell originalbild.
+  Veckomat får aldrig sparas som en stående meny; se docs/skrapor.md.
 - Hitta aldrig på mat eller härled kategori/allergen ur ordningsföljden.
   Använd bara uttryckligt källunderlag. Gissa inte.
 - Ärv BaseScraper, använd get_page_content och befintliga basplattformar.

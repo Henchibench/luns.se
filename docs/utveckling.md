@@ -42,3 +42,18 @@ beteende. Källkontroller och begränsningar finns i [skrapor](skrapor.md).
 
 Verifiering: menyparsern provad med menybesked, vanlig INFO-rad och en rätt
 för nästa dag; beskedet hamnar varken bland rätter eller bland öppettider.
+
+## BO:s originalbild i menylistan, 2026-09-21
+
+Symptom: bildmenyer gav ett tomt kort trots läsbar officiell meny.
+`MENU_IMAGE:` tolkas nu som separat metadata med URL, vecka och datum.
+`MenuList` visar bilden utfällbar tillsammans med verifierade texträtter,
+eller utfälld om aktuell avskrift saknas. Bilden räknas inte som en rätt
+och ger inga påhittade träffar i matfilter. Favoritfilter och restaurangnamn
+fungerar också för bildkort. Parsern döljer utgången bild och avskrift även
+när gamla JSON-filer ligger kvar i ett statiskt bygge.
+
+Källa, datumkontroller, driftbegränsning och uppdateringsrutin finns i
+[skrapor](skrapor.md).
+Verifiering: `node --test scripts/bo-menu.test.mjs`; full testserverkedja
+och kontroll av text- och bildläge på mobil och dator vid leverans.

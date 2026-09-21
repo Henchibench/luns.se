@@ -1,0 +1,164 @@
+{
+  "source": "https://www.restaurangbo.se/lunchmat",
+  "image_url": "https://images.squarespace-cdn.com/content/v1/689216c705832c3b2db52372/36b24ba0-08ef-46d3-863a-21aba5085fb5/v.39.jpg",
+  "sha256": "b17f33864efa41d7b5b389e597c3f271d64bce74edb3bc3eb980bbf7682e75c5",
+  "captured": "2026-09-21",
+  "valid_from": "2026-09-21",
+  "valid_until": "2026-09-25",
+  "verification": "Visuellt avläst från originalbildens samtliga lunchblock i Codex. Bilden anger vecka 39; året kommer från hämtningen, inte från bildtexten.",
+  "days": {
+    "Måndag": [
+      {
+        "category": "Dagens",
+        "description": "Nattbakad karré – potatispuré, rostad pumpa & katrinplommonsky",
+        "price": 159
+      },
+      {
+        "category": "Dagens",
+        "description": "Ångad fisk – syrad sommarpotatis, gräslökshollandaise & silverlök",
+        "price": 159
+      },
+      {
+        "category": "Veckans gröna",
+        "description": "Tagliatelle – vitlöksrostad pumpa, krämig sås på rosmarin & mejram",
+        "price": 159
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad räkor – handskalade räkor, krutonger & grana padano",
+        "price": 179
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad kyckling – örtbakad kyckling, krutonger & grana padano",
+        "price": 169
+      }
+    ],
+    "Tisdag": [
+      {
+        "category": "Dagens",
+        "description": "Örtmarinerad kyckling – vitlökstekt potatis, stekta morötter & smörad kycklingsky",
+        "price": 159
+      },
+      {
+        "category": "Dagens",
+        "description": "Halstrad kummel – BO’s skagenröra, gurksallad med dill & senapsfrön",
+        "price": 169
+      },
+      {
+        "category": "Veckans gröna",
+        "description": "Tagliatelle – vitlöksrostad pumpa, krämig sås på rosmarin & mejram",
+        "price": 159
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad räkor – handskalade räkor, krutonger & grana padano",
+        "price": 179
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad kyckling – örtbakad kyckling, krutonger & grana padano",
+        "price": 169
+      }
+    ],
+    "Onsdag": [
+      {
+        "category": "Dagens",
+        "description": "Helstekt fläskfilé – brynta champinjoner, haricot verts, svartvinbärsgelé & grönpepparsås",
+        "price": 169
+      },
+      {
+        "category": "Dagens",
+        "description": "Persiljebakad kummel – tomat, kapris, citron, oliv & krossad potatis",
+        "price": 159
+      },
+      {
+        "category": "Veckans gröna",
+        "description": "Tagliatelle – vitlöksrostad pumpa, krämig sås på rosmarin & mejram",
+        "price": 159
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad räkor – handskalade räkor, krutonger & grana padano",
+        "price": 179
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad kyckling – örtbakad kyckling, krutonger & grana padano",
+        "price": 169
+      }
+    ],
+    "Torsdag": [
+      {
+        "category": "Dagens",
+        "description": "Ragu på högrev – varmrökt sidfläsk, tagiatelle & riven grana padano",
+        "price": 159
+      },
+      {
+        "category": "Dagens",
+        "description": "Havets wallenbergare – potatispuré, sockerärtor & vitvinsås",
+        "price": 169
+      },
+      {
+        "category": "Veckans gröna",
+        "description": "Tagliatelle – vitlöksrostad pumpa, krämig sås på rosmarin & mejram",
+        "price": 159
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad räkor – handskalade räkor, krutonger & grana padano",
+        "price": 179
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad kyckling – örtbakad kyckling, krutonger & grana padano",
+        "price": 169
+      }
+    ],
+    "Fredag": [
+      {
+        "category": "Dagens",
+        "description": "Rödvinsbräserad högrev – stekt svamp, gröna bönor, rödvinsås & potatisgratäng",
+        "price": 189
+      },
+      {
+        "category": "Veckans gröna",
+        "description": "Tagliatelle – vitlöksrostad pumpa, krämig sås på rosmarin & mejram",
+        "price": 159
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad räkor – handskalade räkor, krutonger & grana padano",
+        "price": 179
+      },
+      {
+        "category": "Sallad",
+        "description": "Caesarsallad kyckling – örtbakad kyckling, krutonger & grana padano",
+        "price": 169
+      }
+    ]
+  },
+  "info": {
+    "Måndag": [
+      "Alltid med liten sallad, kaffe & kaka",
+      "Reservation för att vissa ändringar kan förekomma"
+    ],
+    "Tisdag": [
+      "Alltid med liten sallad, kaffe & kaka",
+      "Reservation för att vissa ändringar kan förekomma"
+    ],
+    "Onsdag": [
+      "Alltid med liten sallad, kaffe & kaka",
+      "Reservation för att vissa ändringar kan förekomma"
+    ],
+    "Torsdag": [
+      "Alltid med liten sallad, kaffe & kaka",
+      "Reservation för att vissa ändringar kan förekomma"
+    ],
+    "Fredag": [
+      "Alltid med liten sallad, kaffe & kaka",
+      "Reservation för att vissa ändringar kan förekomma",
+      "Fredagsdessert = björnbärsockerkaka"
+    ]
+  }
+}

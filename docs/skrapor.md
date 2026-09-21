@@ -11,8 +11,14 @@ Läs app/scrapers/AGENTS.md också. Här ges inget utökat uppdragsmandat.
 3. Stående meny: läs exakt, spara JSON och använd StaticMenuScraper.
 4. Veckovis PDF med textlager: använd den smala standardbiblioteksläsaren i
    `pdf_text.py`, kontrollera vecka eller källans ändringsdatum och stäng av
-   fallback till förra menyn. Veckovis bild: visa källstatus och direkt
-   menylänk; inför inte OCR eller statisk ersättning.
+   fallback till förra menyn.
+5. Veckovis bild: läs originalet och spara verifierad text med käll-URL,
+   bildens SHA-256 och uttryckliga giltighetsdatum. Kontrollera aktuell bild
+   vid varje skrapning; utgången eller ändrad bild får inte återanvända
+   avskriften. Visa den nya originalbilden på sajten tills den lästs av.
+   Bildläsning i Codex-sessionen är tillåten; produktionsskrapan behöver
+   varken AI, OCR eller webbläsare. Automatisk återkommande textavläsning
+   får inte påstås utan att den faktiskt finns.
 
 Produktion har bara requests, beautifulsoup4, lxml utöver standardbiblioteket.
 Spaning med scripts/spana.py får ha utvecklingsberoenden; de får inte läcka in
@@ -66,7 +72,7 @@ originaldokumenten; `pdftotext` ingår inte i produktionslösningen.
 | Silvis | Fem uttryckligt märkta stående rätter på egna sidan. Veckans rätter kommer från en JavaScript-laddad Facebook-widget och tas inte med. Den stående menyn är sparad med källhash. |
 | Poh-Keh Masthugget | Officiella sidan anger plats och tider men ingen meny. Införd med restaurangens aktuella externa Foodora-meny; nio maträtter, drycker uteslutna. |
 | Fula Hummern | Officiella sidan säger fortfarande sommarstängt och saknar aktuell meny. Införd med källstatus, inte med den gamla menybilden. |
-| Restaurang BO | Vecka 39 publiceras som en fullt läsbar bild, visuellt verifierad 21 september. HTML och Squarespace-JSON saknar menytext. Skrapan visar bara veckokontroll, källstatus och direkt MENY-länk; automatisk bildavläsning är inte byggd. Se återkontrollen nedan. |
+| Restaurang BO | Bildmenyn är avläst och verifierad för 21–25 september: 5/5/5/5/4 lunchalternativ. Avskriften kräver samma originalbild och giltighetsdatum. Vid bildbyte visas den nya veckobilden direkt på kortet, utan den gamla texten. Se bildhanteringen nedan. |
 | Heurlins | Den gamla PDF:en från 7 september ersattes under återkontrollen av en ny, ändrad 21 september 07.17 UTC. Två veckorätter per vardag hämtas nu med den nya indelningen mån–ons/tor–fre. Övriga alternativ finns via MENY. |
 | Kathmandu | Officiella lunchsidan stoppas fortfarande av Cloudflare, även i webbläsarkontrollen. Menydags är reservkälla men saknar vecka 39. Datumets ISO-år, vecka och veckodag kontrolleras innan rätter tas med. MENY leder till officiella lunchsidan. |
 | Bongo Göteborg | Vecka 39 är en textbärande PDF. Införd med tre rätter per vardag och kontroll mot aktuellt ISO-veckonummer. |
@@ -133,16 +139,57 @@ inget uttryckligt årtal. Sidans HTML saknar rätttext och bildens alt-text är
 tom. Squarespace-vyn `?format=json` gav också 200, men dess `mainContent`
 har samma bild och ingen menytext.
 
-Ingen bildimport infördes: det senaste kortets arbetsinstruktion säger
-uttryckligen ”Går menyn inte att läsa utan webbläsare, eller byts bilden
-varje vecka: bygg ingenting.” Att kunna läsa bilden vid en manuell kontroll
-ska därför inte beskrivas som en färdig lösning för kommande veckor.
-En möjlig fortsättning, inte genomförd eller verifierad, är en kontrollerad
-veckoinläsning via Codex CLI med käll-URL, bildhash, verifierad giltighetsperiod
-och spärr mot utgången eller ändrad källa. Den kräver att beställningen
-tillåter bildhantering och att återkommande inläsning ordnas; en engångsavskrift
-löser inte driften. Inga nya tjänster eller modell-API:er behövs för själva
-den manuella bildläsningen.
+### BO:s bildhantering och ersatt stoppregel, 2026-09-21
+
+Orsak till det tidigare stoppet: historiska
+[minne/skrapor-02.md](minne/skrapor-02.md) krävde ”bygg ingenting” eftersom
+veckovis OCR inte var byggt. Syftet var att undvika fryst, felaktig mat.
+Chefens följdbeställning ersätter det generella förbudet. Aktiva regler i
+`app/scrapers/AGENTS.md` och denna ämnesfil tillåter nu verifierad bildhantering
+med datum- och källspärr. De frysta importerna lämnas orörda för spårbarhet.
+
+Lösning: `restaurang_bo.json` innehåller visuellt kontrollerade rätter, priser,
+information, käll-URL, bild-URL, SHA-256 och giltighet 2026-09-21–2026-09-25.
+BO:s källrubriker ”Veckans gröna” och ”Sallad” behålls. Dagrätterna får den
+neutrala etiketten ”Dagens”; inga allergener eller kött-/fiskkategorier gissas.
+Fredagens dessert är information, inte en extra lunchrätt. Drycker tas inte
+med. Källans stavning behålls, bland annat ”tagiatelle” och ”haricot verts”.
+
+Vid varje skrapning hämtas lunchsidan och dess veckobild med requests. Ett fast
+`Accept: image/jpeg` behövs: Squarespace levererar annars olika bildformat
+med olika hash från samma adress. Endast samma URL, bildhash och exakt
+måndag–fredag med årtal får använda avskriften. Förra menyn återanvänds aldrig.
+Bildens eget veckonummer ska stämma med veckan som sajten visar; på helgen
+är det kommande vecka. Två olika bilder med samma veckonummer stoppas som
+oklart underlag. Bilden anger inget årtal, så dess år knyts till hämtveckan;
+avskriftens årtal är uttryckligt och kan inte återanvändas ett år senare.
+
+Den nya raden `MENU_IMAGE:{...}` bär URL, vecka och giltighetsdatum genom
+befintlig JSON. Den är varken INFO-text eller en maträtt och ändrar inte
+maträkningen. Originalet finns utfällbart på restaurangkortet. Saknas en
+verifierad avskrift visas bilden utfälld, med länk för förstoring och besked
+att bildens rätter inte kan sökas eller filtreras. Favoriter och namnsökning
+kan fortfarande visa bildkortet; matfilter tilldelar det inga gissade träffar.
+Frontenden spärrar även text och bild från ett gammalt bygge vid veckobyte.
+
+Det återkommande automatiska stödet är hämtning och visning av originalbilden.
+Ny sökbar text kräver fortfarande en verifierad avläsning i en Codex-session;
+ingen automatisk OCR eller schemalagd AI-körning har införts. Vid uppdatering:
+hämta bilden med `RestaurangBOScraper.fetch_image`, läs den visuellt och ersätt
+avskriftens samtliga dagar, information, käll-URL, bild-URL, SHA-256, captured,
+valid_from och valid_until tillsammans. Hasha exakt de hämtade bildbyten.
+Bilder sparas bara i ignorerad `spana-*`, aldrig i git. Kör BO-testerna och
+kontrollera varje dag mot originalet före commit. Inga nya produktionspaket,
+modell-API:er, tjänster, serverinställningar eller workflows behövs.
+
+Verifiering: 17 Python-tester (`scripts.test_bo_menu` och
+`scripts.test_jarntorget_menus`) och fem frontendtester
+(`node --test scripts/bo-menu.test.mjs`) kontrollerar bland annat bildbyte på
+samma URL, ny URL, nästa vecka, helg, årtal, ofullständig avskrift, nätfel och
+utgången frontenddata. Liveutfallet är 5/5/5/5/4 rätter jämfört med originalet.
+Full produktionskedja och webbläsarkontroll ingår i leveranskontrollen.
+
+### Kathmandus åtkomst, oförändrad observation från tidigare kontroll
 
 [Kathmandus officiella lunchsida](https://www.kathmandurestaurang.se/sv/lunchmeny)
 gav fortsatt HTTP 403 med `cf-mitigated: challenge`. Detsamma gällde startsidan,
@@ -156,6 +203,6 @@ passera; ingen reproducerbar väg har verifierats här.
 [Menydags reservsida](https://www.menydags.se/restaurang/kathmandu/lunch)
 gav 200 men noll rättposter i datumblocken 21–25 september 2026.
 
-Verifiering: båda befintliga skraporna kördes med `.venv-prod` och gav
-0/0/0/0/0 rätter mån–fre, med befintlig källstatus. Ingen skrapa eller menydata
-ändrades. Bilagor och webbläsarbilder ligger endast i gitignorerad spaningskatalog.
+Den tidigare åtkomstkontrollen gav 0/0/0/0/0 rätter för Kathmandu. Kathmandu
+ändras inte i BO-kortet. Bilagor och webbläsarbilder ligger endast i
+gitignorerad spaningskatalog.

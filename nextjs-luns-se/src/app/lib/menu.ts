@@ -44,7 +44,41 @@ export interface Restaurant {
   info: Record<string, string[]>;
   /** Källans besked när rätter saknas, skilt från tider och priser. */
   menuStatus: Record<string, string>;
+  /** Restaurangens veckobild; räknas aldrig som en sökbar maträtt. */
+  menuImage?: MenuImage;
   meta: RestaurantMeta;
+}
+
+export interface MenuImage {
+  url: string;
+  week: number;
+  valid_from: string;
+  valid_until: string;
+}
+
+function parseMenuImage(raw: string): MenuImage | undefined {
+  try {
+    const data = JSON.parse(raw) as MenuImage;
+    const url = new URL(data.url);
+    if (url.protocol !== 'https:' || url.hostname !== 'images.squarespace-cdn.com' ||
+        !Number.isInteger(data.week) || data.week < 1 || data.week > 53 ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(data.valid_from) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(data.valid_until)) return undefined;
+    return data;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Även ett gammalt statiskt bygge ska sluta visa förra veckans BO-mat. */
+export function menuImageIsCurrent(image: MenuImage, now: Date = new Date()): boolean {
+  const stockholm = now.toLocaleDateString('sv-SE', { timeZone: 'Europe/Stockholm' });
+  const monday = dateForDay('Måndag', new Date(`${stockholm}T12:00:00`));
+  const stamp = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+  const friday = new Date(monday);
+  friday.setDate(friday.getDate() + 4);
+  const end = `${friday.getFullYear()}-${String(friday.getMonth() + 1).padStart(2, '0')}-${String(friday.getDate()).padStart(2, '0')}`;
+  return image.valid_from === stamp && image.valid_until === end;
 }
 
 export interface LunsLocation {
@@ -132,14 +166,20 @@ export function stripInfoEmoji(text: string): string {
 
 export function parseRestaurants(
   menus: Record<string, string[]>,
-  metaByName: Record<string, RestaurantMeta>
+  metaByName: Record<string, RestaurantMeta>,
+  now: Date = new Date()
 ): Restaurant[] {
   return Object.entries(menus).map(([name, rows]) => {
     const dishes: Dish[] = [];
     const info: Record<string, string[]> = {};
     const menuStatus: Record<string, string> = {};
+    let menuImage: MenuImage | undefined;
 
     rows.forEach(row => {
+      if (row.startsWith('MENU_IMAGE:')) {
+        menuImage = parseMenuImage(row.slice('MENU_IMAGE:'.length));
+        return;
+      }
       if (row.startsWith('INFO:')) {
         const match = row.match(INFO_LINE);
         if (match) {
@@ -157,6 +197,16 @@ export function parseRestaurants(
       if (dish) dishes.push(dish);
     });
 
+    if (rows.some(row => row.startsWith('MENU_IMAGE:')) &&
+        (!menuImage || !menuImageIsCurrent(menuImage, now))) {
+      dishes.length = 0;
+      menuImage = undefined;
+      DAYS.forEach(day => {
+        delete info[day];
+        menuStatus[day] = 'Den sparade menybilden gäller inte veckan som visas. Se MENY för restaurangens senaste meny.';
+      });
+    }
+
     const meta = metaByName[name] ?? ({ name, area: 'Lindholmen' } as RestaurantMeta);
     return {
       name,
@@ -164,6 +214,7 @@ export function parseRestaurants(
       dishes,
       info,
       menuStatus,
+      menuImage,
       meta,
     };
   });

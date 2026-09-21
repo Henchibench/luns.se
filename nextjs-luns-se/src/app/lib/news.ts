@@ -18,9 +18,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 5;
+export const NEWS_VERSION = 6;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-09-21',
+    title: 'BO:s lunchmeny går att läsa här',
+    body: 'Nu finns BO:s lunchrätter och priser på rätt veckodag. När restaurangen byter menybild visas det nya originalet direkt på kortet tills rätterna har lästs av.',
+  },
   {
     date: '2026-09-21',
     title: 'Tydligare besked när lunchmenyn saknas',
