@@ -22,3 +22,21 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
+
+## `brace-expansion` 5.0.9, 2026-09-30
+
+Symptom: Kontrollens mätning på Dev pekade ut tre DoS-rådgivningar i den
+dev-transitiva `brace-expansion@5.0.9`: GHSA-qhr7-859c-m2p7,
+GHSA-6j4f-fj2g-mc7p och GHSA-q2hr-2g5m-vwhr. Egen mätning med
+`npm ls brace-expansion --all --include=dev` bekräftade samma version i kedjan
+`eslint` → `minimatch` → `brace-expansion`.
+
+Orsak och lösning: lockfilen höll kvar 5.0.9 och repots override tillät den
+med `^5.0.8`. Override-gränsen höjdes till `^5.0.12`, vilket flyttade den enda
+installerade kopian till 5.0.12 utan andra paketändringar.
+
+Källa: Kontrollens paketkort 2026-09-30 och npm-registret samma datum, där
+5.0.12 var aktuell senaste version. Verifiering: `npm ls` visade endast
+5.0.12; `env -u NODE_ENV npm audit --include=dev` gav ingen träff på
+`brace-expansion`. Auditens enda kvarvarande träff var en separat moderate i
+`fast-uri`, GHSA-hrr3-gc8f-f4qj, som låg utanför detta kort och inte ändrades.
