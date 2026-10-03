@@ -23,6 +23,28 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `braces` 3.0.3, 2026-10-03
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-vfj7-8cjw-p6xm /
+CVE-2026-93687, en stackutmattnings-DoS vid djupt nästlade mönster.
+Egen mätning med `npm ls braces --all --include=dev` bekräftade en deduplicerad
+`braces@3.0.3`. `npm explain braces` visade konsumenter under både Tailwind och
+ESLint, via `chokidar`, `micromatch` och `fast-glob`.
+
+Status och exponering: Ingen rättad paketversion fanns. GitHubs advisory angav
+`<= 3.0.3` som sårbart och saknade `first_patched_version`; npm-registrets
+senaste publicerade version var 3.0.3. Paketet är endast ett
+dev-beroende (`npm ls braces --omit=dev` var tomt), används vid byggens
+globmatchning och följer inte med den statiska sajten. Repots globbmönster är
+fasta i versionsstyrd konfiguration, inte indata från webbtrafik. Ingen
+paketändring gjordes: en större verktygsmigrering eller en egen fork är inte en
+upstream-patch och skulle kräva separat risk- och kompatibilitetsarbete.
+
+Källa: Kontrollens paketkort samt GitHubs advisory och upstream-ärende #70,
+kontrollerade 2026-10-03. Verifiering: `npm audit --include=dev` gav high-träff
+på advisoryn och `fixAvailable` pekade på en semver-major av Tailwind, medan
+`npm view braces version versions --json` fortfarande slutade på 3.0.3.
+
 ## `brace-expansion` 5.0.9, 2026-09-30
 
 Symptom: Kontrollens mätning på Dev pekade ut tre DoS-rådgivningar i den
