@@ -23,6 +23,25 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `source-map-js` 1.2.2, 2026-10-06
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-68fv-2mgg-jv7q /
+CVE-2026-93749, en event-loop-DoS via sektionsoffsetar i indexerade source maps.
+Egen mätning med `npm ls source-map-js --all --include=dev` bekräftade
+`source-map-js@1.2.1` via `postcss@8.5.26`. Kopian ingick även i
+produktionsberoendena genom Next.
+
+Orsak och lösning: `postcss` tillät fortfarande den sårbara versionen och
+lockfilen höll kvar 1.2.1. En riktad override till `^1.2.2` flyttade den enda
+installerade kopian till den första rättade versionen 1.2.2.
+
+Källa: Kontrollens paketkort, GitHubs advisory-API och npm-registret,
+kontrollerade 2026-10-06. GitHub angav `>= 1.0.0, < 1.2.2` som sårbart och
+1.2.2 som första rättade version; npm-registret hade 1.2.2 som senaste version.
+Verifiering: `npm ls` med både `--all --include=dev` och `--omit=dev` visade
+endast 1.2.2. `env -u NODE_ENV npm audit --include=dev` saknade därefter träff
+på `source-map-js`; auditens andra, separata träffar ändrades inte inom kortet.
+
 ## `braces` 3.0.3, 2026-10-03
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-vfj7-8cjw-p6xm /
