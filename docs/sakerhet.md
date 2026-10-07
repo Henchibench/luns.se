@@ -23,6 +23,26 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `sharp` 0.35.5, 2026-10-07
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-wq5f-xc86-pv6w, en
+minnesrelaterad sårbarhet i `sharp`-binärernas librsvg som under vissa
+förutsättningar kan ge kodkörning på glibc-baserad Linux. Egen mätning med
+`npm ls sharp --all --include=dev` bekräftade `sharp@0.35.4` via Next. Samma
+version fanns i produktionsträdet enligt `npm ls sharp --omit=dev`.
+
+Orsak och lösning: Repots override hade miniminivån `^0.35.4` och lockfilen
+höll kvar 0.35.4. Override-gränsen höjdes till `^0.35.5`, vilket flyttade
+`sharp`, plattformsbinärerna och deras libvips-paket till utgåvorna som hör
+till 0.35.5.
+
+Källa: Kontrollens paketkort, GitHubs granskade advisory och npm-registret,
+kontrollerade 2026-10-07. GitHub angav `< 0.35.5` som sårbart och 0.35.5 som
+första rättade version; npm-registret hade 0.35.5 som senaste version.
+Verifiering: `npm ls` med både `--all --include=dev` och `--omit=dev` visade
+endast 0.35.5. Den installerade modulen rapporterade librsvg 2.63.2 och
+`env -u NODE_ENV npm audit --omit=dev` gav noll produktionssårbarheter.
+
 ## `source-map-js` 1.2.2, 2026-10-06
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-68fv-2mgg-jv7q /
