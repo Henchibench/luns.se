@@ -23,6 +23,24 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `next` 15.5.27, 2026-10-08
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-4jqv-mc3x-m676 /
+CVE-2026-94543 och GHSA-mcj8-r9mp-w47p / CVE-2026-94484, två moderate
+cache poisoning-sårbarheter i Nexts SSG/ISR-rendering. Egen mätning med
+`npm ls next --all --include=dev` och `npm ls next --omit=dev` bekräftade
+`next@15.5.25` som direkt produktionsberoende.
+
+Orsak och lösning: Paketintervallet började på `^15.5.24` och lockfilen
+höll kvar 15.5.25. Miniminivån höjdes till `^15.5.27`, vilket uppdaterade
+Next och dess versionsbundna `@next/env`- och SWC-paket till 15.5.27.
+
+Källa: Kontrollens paketkort och GitHubs granskade advisories, kontrollerade
+2026-10-08. Båda angav `>= 15.0.0, < 15.5.27` som sårbart och 15.5.27 som
+första rättade 15.x-version. Verifiering: båda `npm ls`-mätningarna visade
+endast 15.5.27, GitHubs advisory-API gav noll träffar för `next@15.5.27` och
+`env -u NODE_ENV npm audit --omit=dev` gav noll produktionssårbarheter.
+
 ## `sharp` 0.35.5, 2026-10-07
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-wq5f-xc86-pv6w, en
