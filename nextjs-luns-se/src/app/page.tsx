@@ -730,7 +730,14 @@ export default function LunchBoard() {
 
       {contactConfig && contactContext && <ContactForm config={contactConfig} context={contactContext} theme={theme} onClose={() => setContactContext(null)} />}
 
-      {newsOpen && <NewsNote contactEnabled={!!contactConfig} onClose={() => setNewsOpen(false)} onCloseStart={newsFromSettings ? backToSettings : undefined} />}
+      {newsOpen && <NewsNote contactEnabled={!!contactConfig}
+        onOpenContact={contactConfig ? () => {
+          setNewsOpen(false);
+          setNewsFromSettings(false);
+          setSettingsOpen(false);
+          setContactContext({ area: location?.label });
+        } : undefined}
+        onClose={() => setNewsOpen(false)} onCloseStart={newsFromSettings ? backToSettings : undefined} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />

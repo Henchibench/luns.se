@@ -17,6 +17,7 @@ export interface NewsItem {
   title: string;
   body: string;
   requiresContact?: boolean;
+  action?: 'contact';
   image?: { src: string; alt: string; width: number; height: number };
 }
 
@@ -27,8 +28,9 @@ export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-20',
     title: 'Tjôta med Luns',
-    body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
+    body: 'Via Tjôta med Luns i menyn högst upp kan du tipsa om ett lunchställe, dela en idé eller bara skicka ett glatt hej. Du behöver inte ange namn eller e-post. Är en meny fel finns också Rapportera fel under varje restaurang.',
     requiresContact: true,
+    action: 'contact',
     image: { src: '/images/news/help-me-help-you.png', alt: 'Meme med texten: Help me help you.', width: 696, height: 404 },
   },
   {

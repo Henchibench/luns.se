@@ -3,6 +3,11 @@
 Beställt och byggt 2026-10-19 med valfri e-post och Turnstile.
 Formuläret heter sedan 2026-10-20 ”Tjôta med Luns” på Henriks begäran.
 Namnet används i formulärrubriken, sidhuvudet, inställningarna och nyheten.
+Nyhetstexten pekar ut knappen i menyn högst upp och bjuder även in till ett
+glatt hej. Nyhetskortets ”Skriv till oss” öppnar samma formulär med valt
+område. Nyheter och eventuella inställningar stängs vid övergången, så
+formuläret inte hamnar bakom en annan ruta. Knappen finns även om kortet
+senare hamnar bland äldre nyheter och döljs när kontakt är avstängt.
 Verifiering av namnbytet: minnestest, bygge och visuell kontroll på testservern.
 Sajten förblir statiskt exporterad på GitHub Pages. En separat Cloudflare
 Worker verifierar inskickningen och har stöd för att skicka via Resend.

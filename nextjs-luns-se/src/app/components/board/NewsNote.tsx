@@ -45,7 +45,7 @@ function formatDate(iso: string): string {
   return `${Number(day)} ${name} ${year}`;
 }
 
-function Entry({ item }: { item: NewsItem }) {
+function Entry({ item, onOpenContact }: { item: NewsItem; onOpenContact?: () => void }) {
   return (
     <li className="rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5">
       <span className="block font-mono text-10 tracking-[.1em] text-[var(--mut)]">
@@ -53,6 +53,12 @@ function Entry({ item }: { item: NewsItem }) {
       </span>
       <h3 className="mt-1 font-heading text-16 font-semibold text-[var(--ink)]">{item.title}</h3>
       <p className="mt-1 text-13 leading-[1.5] text-[var(--ink2)]">{item.body}</p>
+      {item.action === 'contact' && onOpenContact && (
+        <button type="button" onClick={onOpenContact}
+          className="mt-3 min-h-11 rounded-lg bg-[var(--acc)] px-4 py-2 text-13 font-semibold text-[var(--bg)] cursor-pointer hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]">
+          Skriv till oss
+        </button>
+      )}
       {item.image && (
         <Image src={item.image.src} alt={item.image.alt} width={item.image.width} height={item.image.height}
           unoptimized className="mt-3 h-auto w-full rounded-lg" />
@@ -78,9 +84,11 @@ export default function NewsNote({
   onClose,
   onCloseStart,
   contactEnabled = false,
+  onOpenContact,
 }: {
   onClose: () => void;
   contactEnabled?: boolean;
+  onOpenContact?: () => void;
   /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
   onCloseStart?: () => void;
 }) {
@@ -105,7 +113,7 @@ export default function NewsNote({
 
         <div className="luns-scroll min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
           <ul aria-label="Senaste nyheterna" className="grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4">
-            {latest.map(item => <Entry key={`${item.date}-${item.title}`} item={item} />)}
+            {latest.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
           </ul>
 
           {older.length > 0 && (
@@ -121,7 +129,7 @@ export default function NewsNote({
               </button>
               <ul id="luns-older-news" aria-label="Äldre nyheter" hidden={!showOlder}
                 className={showOlder ? 'mt-4 grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4' : 'hidden'}>
-                {older.map(item => <Entry key={`${item.date}-${item.title}`} item={item} />)}
+                {older.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
               </ul>
             </div>
           )}
