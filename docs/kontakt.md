@@ -9,6 +9,11 @@ Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend är ännu inte anslut
 
 - `workers/contact/worker.mjs` är mottagaren, utan npm-beroenden.
 - `workers/contact/wrangler.jsonc` gäller **bara testmiljön**.
+- `workers/contact/wrangler.production.jsonc` gäller `luns-contact`, skapad
+  2026-10-19 som separat mottagare för riktiga mejl. Den är avstängd
+  (`CONTACT_MODE=disabled`, ingen workers.dev-adress aktiverad).
+  Resend-nyckeln läggs där under Settings → Variables and Secrets → Add,
+  Type Secret, namnet `RESEND_API_KEY`. Inget mejl skickas av att nyckeln sparas.
 - Test-Worker: `luns-contact-preview`, kontot `8ce9451d9f605299a2384ec40a009581`.
 - Endpoint: `https://luns-contact-preview.luns-se-hench.workers.dev/contact`.
 - Turnstile: Managed, no_clearance, bara `10.0.1.34`, `localhost`, `127.0.0.1`.
@@ -22,8 +27,8 @@ Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend är ännu inte anslut
   Den befintliga mejllänken under inställningar finns då kvar. Nyhetsposten
   för kontakt visas bara där formuläret är aktiverat.
 
-Ändra aldrig test-Worker till live. Produktionskopplingen ska vara en separat
-Worker och Turnstile-widget med enbart `luns.se`/`www.luns.se` som förväntade
+Ändra aldrig test-Worker till live. Produktionskopplingen använder den separata Workern `luns-contact`
+och ska få en separat Turnstile-widget med enbart `luns.se`/`www.luns.se` som förväntade
 hostnames. Kopiera inte de lokala origin-värdena till produktion.
 Att pusha Dev eller köra Actions uppdaterar inte Worker-koden automatiskt.
 Den levereras separat genom Cloudflare MCP eller autentiserad Wrangler med
@@ -32,7 +37,7 @@ bevara befintliga secrets; skriv aldrig ut dem.
 
 ## Vad Henrik behöver ordna för mejl
 
-1. Skapa konto på Resend. Lägg till en avsändardomän, gärna `kontakt.luns.se`,
+1. Kontot och API-nyckeln är enligt Henrik skapade 2026-10-19. Lägg till en avsändardomän, gärna `kontakt.luns.se`,
    och de exakta DNS-poster Resend visar hos domänens DNS-leverantör.
    Inga befintliga MX-poster för vanlig inkommande e-post ska ersättas.
 2. Vänta på status Verified i Resend. Välj avsändare, exempelvis
