@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Highlight from './Highlight';
 import RestaurantMap from './RestaurantMap';
-import type { MenuImage } from '../../lib/menu';
+import type { MenuImage, ReferenceMenu } from '../../lib/menu';
 
 export interface SectionDish {
   key: string;
@@ -23,6 +23,7 @@ export interface Section {
   /** Förklaring från menykällan när rätter saknas för vald dag. */
   menuStatus: string;
   menuImage?: MenuImage;
+  referenceMenu?: ReferenceMenu;
   /** Handskriven mening om vad stället är. */
   description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
@@ -216,6 +217,28 @@ export default function MenuList({
             <p className="mt-0.5 mb-2 text-12 italic text-[var(--mut)]">
               {emptyMessage(section, dayOffset, day)}
             </p>
+          )}
+
+          {section.referenceMenu && (
+            <details open className="my-2 rounded-lg border border-[var(--line)] bg-[var(--hi)] p-3 text-12 text-[var(--ink2)]">
+              <summary className="cursor-pointer font-semibold text-[var(--acc)]">
+                {section.referenceMenu.label}
+              </summary>
+              <p role="note" className="my-2 max-w-[75ch] font-semibold leading-relaxed">
+                {section.referenceMenu.warning}
+              </p>
+              <p className="my-2 text-[var(--mut)]">{day} enligt den publicerade menyn — ingår inte i dagens antal rätter.</p>
+              <ul className="m-0 list-none space-y-2 p-0">
+                {section.referenceMenu.dishes.map((dish, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-3">
+                    <span className="text-13 leading-relaxed">{dish.description}</span>
+                    <span className="shrink-0 font-mono text-11">{dish.price}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href={section.referenceMenu.url} target="_blank" rel="noopener noreferrer"
+                className="mt-3 inline-block text-[var(--acc)] underline">Öppna restaurangens PDF ↗</a>
+            </details>
           )}
 
           {section.menuImage && (

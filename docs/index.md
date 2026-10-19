@@ -11,6 +11,7 @@ uppdrag. Importerade avsnitt beskriver tidigare observationer, inte nuläget.
 | Actions/publicering | [utveckling](utveckling.md) | [produktion](minne/repo-06.md) |
 | Ny restaurang, trasig skrapa | [skrapregler](../app/scrapers/AGENTS.md), [skrapor](skrapor.md) | [källtyp](minne/skrapor-02.md), [tre filer](minne/skrapor-03.md), [kontrakt](minne/skrapor-04.md) |
 | BO:s textmeny, Kathmandus udda/jämna veckor | [aktuella källor och datumspärr](skrapor.md) | [tidigare bildregel](minne/skrapor-02.md) |
+| Silvis flöde, Feskekörka, Byns/Heurlins PDF och datumvarning | [aktuella källor](skrapor.md), [separat menyvisning](utveckling.md) | [källinventering](skrapor.md) |
 | Stående meny, källa ändrad | [skrapor](skrapor.md) | [stående menyer](minne/skrapor-06.md) |
 | Selektorer, dolt innehåll, spaning | [skrapor](skrapor.md) | [BaseScraper](minne/skrapor-08.md), [spaning](minne/skrapor-09.md), [selektorer](minne/skrapor-13.md) |
 | Säkerhetsmail, paket, Dependabot | [säkerhet](sakerhet.md) | [äldre metod och incidenter](minne/register.md) |

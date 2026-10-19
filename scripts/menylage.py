@@ -15,7 +15,7 @@ och kör skriptet mot båda.
     python scripts/menylage.py /tmp/menus-innan.json  # en sparad kopia
 
 Bara standardbiblioteket, av samma skäl som skraporna: filen ska gå att köra i
-en miljö som bara har produktionens tre paket.
+en miljö som bara har produktionspaketen.
 """
 
 import json
@@ -39,7 +39,16 @@ def rakna(rader):
     per_dag = {dag: 0 for dag in DAGAR}
     okand = 0
     for rad in rader:
-        if rad.startswith(("INFO:", "MENU_IMAGE:", "MENU_VALIDITY:")):
+        if rad.startswith("MENU_WEEKLY:"):
+            try:
+                extra, unknown = rakna(json.loads(rad.split(":", 1)[1])["rows"])
+                for dag in DAGAR:
+                    per_dag[dag] += extra[dag]
+                okand += unknown
+            except (ValueError, KeyError, TypeError):
+                okand += 1
+            continue
+        if rad.startswith(("INFO:", "MENU_IMAGE:", "MENU_VALIDITY:", "MENU_REFERENCE:")):
             continue
         dag, _, _ = rad.partition("|")
         if dag in per_dag:
@@ -84,6 +93,8 @@ def main():
         if summa == 0:
             if any(r.startswith("MENU_IMAGE:") for r in rader):
                 rad += "   <- menybild, inga avlästa rätter"
+            elif any(r.startswith("MENU_REFERENCE:") for r in rader):
+                rad += "   <- publicerad meny visas separat med datumvarning"
             else:
                 rad += "   <- noll rätter"
                 tomma.append(namn)

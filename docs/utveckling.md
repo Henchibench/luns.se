@@ -60,6 +60,22 @@ måndag–fredag kl. 11.30–13.30. Node-test täcker källans format, reservtex
 tid och äldre rådata med emoji; byggd förhandsvisning kontrolleras utan
 dubblett och synlig klock-emoji.
 
+## Datumvarnad meny och veckotillägg, 2026-10-19
+
+`MENU_REFERENCE` håller en läsbar men obekräftad PDF-meny skild från dagens
+rätter. Metadata måste ha rubrik, varning, HTTPS-länk och giltiga matrader.
+Frontend visar vald dags rader i en utfälld ruta med varning och källänk.
+De ingår inte i maträkning, matsökning eller matfilter; restaurangnamn och
+favoritfilter fungerar. Byns vecka 41 och Heurlins odaterade PDF använder
+detta på Henriks beställning, utan att anta att gammal mat fortfarande gäller.
+
+`MENU_WEEKLY` har egna `valid_from`/`valid_until` och rader. Silvis använder
+det för daterade veckorätter ovanpå sin stående meny. Bara aktuellt tillägg
+tas med i mat, sökning och antal. Ett gammalt bygge visar fortfarande den
+stående menyn när tillägget löpt ut. Skadat tillägg avvisas som helhet.
+`menylage.py` räknar veckotilläggen och märker separat datumvarnad meny.
+Verifiering: Python-källtester och `node --test scripts/bo-menu.test.mjs`.
+
 ## BO:s textmeny och daterad rotation, 2026-10-19
 
 BO skickar inte längre `MENU_IMAGE`. Veckokontrollerad OCR av BO:s original och Kathmandus

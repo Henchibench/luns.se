@@ -1,81 +1,102 @@
 import re
-from typing import Dict, List, Tuple
+from typing import List, Tuple
+from urllib.parse import urljoin, urldefrag
 
 from ..weekly_pdf_scraper import WeeklyPdfScraper
+from ..menu_reference import reference_row
+from ..menu_week import menu_monday, validity_row
 
 
 class BynsTrattoriaScraper(WeeklyPdfScraper):
-    PDF_URL = "https://www.bynstrattoria.se/lunch/lunch.pdf"
-
     def __init__(self):
         super().__init__({
-            "name": "Byns Trattoria",
-            "website": "https://www.bynstrattoria.se/",
-            "menu_url": "https://www.bynstrattoria.se/food/lunch",
+            'name': 'Byns Trattoria',
+            'website': 'https://www.bynstrattoria.se/',
+            'menu_url': 'https://www.bynstrattoria.se/food/lunch',
         })
 
     @staticmethod
     def _is_title(lines: List[str], index: int) -> bool:
         value = lines[index]
-        return value == "SALLAD" or value.endswith("-") or (
-            index + 1 < len(lines) and lines[index + 1].startswith("-")
+        if value == '-':
+            return False
+        return value == 'SALLAD' or value.endswith('-') or (
+            index + 1 < len(lines) and lines[index + 1].startswith('-')
         )
 
     def _entries(self, lines: List[str]) -> List[Tuple[str, str]]:
-        entries: List[Tuple[str, str]] = []
-        title = ""
-        details: List[str] = []
+        entries = []
+        title, details = '', []
         for index, value in enumerate(lines):
             if self._is_title(lines, index):
                 if title:
-                    entries.append((title.rstrip(" -"), " ".join(details).lstrip("- ")))
+                    entries.append((title.rstrip(' -'), ' '.join(details).lstrip('- ')))
                 title, details = value, []
             elif title:
                 details.append(value)
+            else:
+                raise ValueError('text före första rättnamnet')
         if title:
-            entries.append((title.rstrip(" -"), " ".join(details).lstrip("- ")))
+            entries.append((title.rstrip(' -'), ' '.join(details).lstrip('- ')))
         return entries
 
-    def scrape(self) -> Dict[str, List[str]]:
+    def parse_week(self, text):
+        lines = [self.compact(line) for line in text.splitlines() if self.compact(line)]
+        week = re.fullmatch(r'VECKA (\d{1,2})', lines[0])
+        if not week or not 1 <= int(week[1]) <= 53:
+            raise ValueError('veckonummer saknas')
+        title = lines.index('LUNCHMENY')
+        monday = lines.index('MÅNDAG & TISDAG')
+        if lines[monday:monday+3] != ['MÅNDAG & TISDAG', 'ONSDAG & TORSDAG', 'FREDAGSGÖTT!!!']:
+            raise ValueError('okänd ordning på dagsrubriker')
+        # I den visuellt kontrollerade oktobermallen skrivs ons–tor och fredag
+        # först i PDF-strömmen. Mån–tis ligger efter dokumentrubriken.
+        # Den gamla skrapan antog tvärtom och tappade dessutom första rätten.
+        early = self._entries(lines[1:title])
+        groups, group = [], []
+        for entry in early:
+            group.append(entry)
+            if entry[0] == 'SALLAD':
+                groups.append(group)
+                group = []
+        if group or len(groups) != 2:
+            raise ValueError('förväntade två dagsgrupper före dokumentrubriken')
+        groups.insert(0, self._entries(lines[title+1:monday]))
+        for group in groups:
+            if (len(group) != 5 or [entry[0] for entry in group[-3:]] != ['PIZZA','PASTA','SALLAD']
+                    or any(not name or not description for name, description in group)):
+                raise ValueError('ofullständig dagsgrupp')
+        footer = lines[monday+3:]
+        if len(footer) < 2 or not re.fullmatch(r'\d{2}:\d{2} - \d{2}:\d{2}', footer[0]):
+            raise ValueError('lunchprisets placering har ändrats')
+        price = re.fullmatch(r'(\d{2,3})KR', footer[1])
+        if not price:
+            raise ValueError('lunchpriset saknas efter serveringstiden')
+        rows = []
+        for days, group in zip([self.DAYS[:2], self.DAYS[2:4], self.DAYS[4:]], groups):
+            for name, description in group:
+                category = name.title() if name in ('PIZZA','PASTA','SALLAD') else 'Lunch'
+                rows.extend(f'{day}|<strong>{category}</strong> - {name} - {description} ({price[1]} kr)' for day in days)
+        return int(week[1]), rows
+
+    def scrape(self):
         try:
-            text, _ = self.fetch_pdf_text(self.PDF_URL)
-            lines = [self.compact(line) for line in text.splitlines() if self.compact(line)]
-            compact = " ".join(lines)
-            match = re.search(r"VECKA\s+(\d{1,2})", compact, re.I)
-            if not match or int(match.group(1)) != self.current_week():
-                message = (
-                    f"Menybesked: Den länkade lunchmenyn gäller vecka {match.group(1)}. "
-                    f"Ingen verifierad meny för vecka {self.current_week()}. Se MENY eller fråga restaurangen."
-                    if match else
-                    "Menybesked: Lunchmenyn saknar läsbart veckonummer. Se MENY eller fråga restaurangen."
-                )
-                return {self.name: self.info_for_all_days(message)}
-
-            monday_heading = lines.index("MÅNDAG & TISDAG")
-            friday_heading = lines.index("FREDAGSGÖTT!!!")
-            footer = next((i for i, value in enumerate(lines) if re.fullmatch(r"\d{2}:\d{2} - \d{2}:\d{2}", value)), len(lines))
-            all_entries = self._entries(lines[2:monday_heading] + lines[friday_heading + 1:footer])
-            groups: List[List[Tuple[str, str]]] = []
-            group: List[Tuple[str, str]] = []
-            for entry in all_entries:
-                group.append(entry)
-                if entry[0] == "SALLAD":
-                    groups.append(group)
-                    group = []
-            if len(groups) != 3:
-                raise ValueError(f"förväntade tre dagsgrupper, fick {len(groups)}")
-
-            rows: List[str] = []
-            schedules = [(["Måndag", "Tisdag"], groups[0]), (["Onsdag", "Torsdag"], groups[1]), (["Fredag"], groups[2])]
-            for days, entries in schedules:
-                for title, description in entries:
-                    category = title if title in ("PIZZA", "PASTA", "SALLAD") else "Lunch"
-                    text_value = title + (f" - {description}" if description else "")
-                    for day in days:
-                        rows.append(f"{day}|<strong>{category.title()}</strong> - {text_value}")
-                for day in days:
-                    rows.append(f"INFO:{day} - Restaurant Info: 💰 Lunch 145 kr")
-            return {self.name: rows}
+            soup = self.get_page_content()
+            frame = soup.select_one('#lunch-pdf iframe[src]') if soup else None
+            if frame is None:
+                raise ValueError('lunchsidans PDF-länk saknas')
+            url = urldefrag(urljoin(self.menu_url, frame['src']))[0]
+            text, modified = self.fetch_pdf_text(url)
+            week, rows = self.parse_week(text)
+            monday = menu_monday()
+            if week == monday.isocalendar().week and self.is_recent(modified):
+                return {self.name: rows + [validity_row(monday)]}
+            stamp = f' PDF-filen ändrades {modified:%Y-%m-%d}.' if modified else ''
+            warning = (f'Menyn är märkt vecka {week} och är inte bekräftad för veckan som visas. '
+                       f'Rätter och priser kan vara inaktuella. Kontrollera med restaurangen.{stamp}')
+            return {self.name: self.info_for_all_days('Menybesked: Ingen bekräftad meny för den här veckan.') + [
+                reference_row(f'Publicerad meny · vecka {week}', warning, url, rows),
+            ]}
         except Exception as error:
-            self.log_error(f"Error parsing PDF menu: {error}")
-            return {self.name: ["Ett fel uppstod vid hämtning av menyn"]}
+            self.log_error(f'Kunde inte läsa lunch-PDF: {error}')
+            return {self.name: ['Ett fel uppstod vid hämtning av menyn']}

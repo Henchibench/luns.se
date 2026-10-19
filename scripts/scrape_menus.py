@@ -32,7 +32,6 @@ from app.scrapers.restaurants.cuckoos_nest_scraper import CuckoosNestScraper
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
 from app.scrapers.restaurants.feskekorka_scraper import FeskekorkaScraper
-from app.scrapers.restaurants.fula_hummern_scraper import FulaHummernScraper
 from app.scrapers.restaurants.heurlins_scraper import HeurlinsScraper
 from app.scrapers.restaurants.husman_scraper import HusmanScraper
 from app.scrapers.restaurants.jasons_matstuga_scraper import JasonsMatstugaScraper
@@ -137,7 +136,6 @@ def scrape_all_menus(previous_menus):
         DistrictOneScraper(),
         EncounterAsianScraper(),
         FeskekorkaScraper(),
-        FulaHummernScraper(),
         HeurlinsScraper(),
         HusmanScraper(),
         JasonsMatstugaScraper(),

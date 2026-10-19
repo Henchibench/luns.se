@@ -18,9 +18,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 8;
+export const NEWS_VERSION = 9;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-10-19',
+    title: 'Fler lunchmenyer i Järntorget/Linné',
+    body: 'Silvis visar nu även veckans rätter och Feskekörkas lunchdagar är uppdaterade. Byns och Heurlins publicerade menyer går att läsa med en tydlig varning när giltigheten är osäker. Fula Hummern har tagits bort eftersom lunchmenyn inte uppdaterats.',
+  },
   {
     date: '2026-10-19',
     title: 'Textmenyer hos BO och Kathmandu',

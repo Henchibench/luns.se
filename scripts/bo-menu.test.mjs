@@ -72,3 +72,36 @@ test('skadad giltighet för text får inte visa odaterad mat', () => {
     assert.equal(parse([dish,'MENU_VALIDITY:'+raw]).dishes.length,0);
   }
 });
+
+test('äldre meny är läsbar separat och blir aldrig dagens maträtter', () => {
+  const reference = { label: 'Publicerad meny · vecka 41', warning: 'Kan vara inaktuell',
+    url: 'https://www.bynstrattoria.se/lunch/lunch.pdf', rows: [dish] };
+  const result = parse(['MENU_REFERENCE:'+JSON.stringify(reference)]);
+  assert.equal(result.dishes.length, 0);
+  assert.equal(result.referenceMenu.dishes[0].price, '159:-');
+  assert.equal(result.referenceMenu.warning, reference.warning);
+  const later = parse(['MENU_REFERENCE:'+JSON.stringify(reference)], '2027-02-01T12:00:00Z');
+  assert.equal(later.dishes.length,0);
+  assert.equal(later.referenceMenu.label,reference.label);
+});
+
+test('referensmeny kräver varning, säker länk och giltiga rättfält', () => {
+  const reference = {label:'Vecka 41',warning:'Osäker',url:'https://example.com/menu.pdf',rows:[dish]};
+  for (const data of [{...reference,warning:''},{...reference,url:'javascript:alert(1)'},
+    {...reference,rows:[null]},{...reference,rows:[dish.replace('Måndag','Lördag')]}]) {
+    assert.equal(parse(['MENU_REFERENCE:'+JSON.stringify(data)]).referenceMenu,undefined);
+  }
+});
+
+test('utgångna veckotillägg döljs medan stående Silvis-rätter finns kvar', () => {
+  const extra = {...image,rows:[dish.replace('Test av rätt','Veckans rätt')]};
+  const rows = [dish,'MENU_WEEKLY:'+JSON.stringify(extra)];
+  assert.equal(parse(rows).dishes.length,2);
+  for (const date of ['2026-09-26T12:00:00Z','2027-09-21T12:00:00Z']) {
+    const result = parse(rows,date);
+    assert.equal(result.dishes.length,1);
+    assert.equal(result.dishes[0].description,'Test av rätt');
+  }
+  assert.equal(parse([dish,'MENU_WEEKLY:{']).dishes.length,1);
+  assert.equal(parse([dish,'MENU_WEEKLY:'+JSON.stringify({...extra,rows:[null]})]).dishes.length,1);
+});

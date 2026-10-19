@@ -206,16 +206,6 @@ restaurant_locations = {
         "area": "Järntorget/Linné",
         "lunch_hours": "Mån–fre 11.00–15.00"
     },
-    "Fula Hummern": {
-        "description": "Fisk- och skaldjursrestaurang i Brickhuset på Masthuggskajen. Den officiella sidan uppger för närvarande sommarstängt.",
-        "maps": "https://www.google.com/maps/search/?api=1&query=Fula%20Hummern%2C%20Masthamnsgatan%205%2C%20G%C3%B6teborg",
-        "latitude": 57.7006462,
-        "longitude": 11.9492170,
-        "website": "https://fulahummern.se/",
-        "menu_url": "https://fulahummern.se/meny/",
-        "instagram": "https://www.instagram.com/fulahummern/",
-        "area": "Järntorget/Linné"
-    },
     "Restaurang BO": {
         "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckans rätter läses automatiskt från restaurangens egen menybild.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang%20BO%2C%20Masthamnsgatan%2015%2C%20413%2029%20G%C3%B6teborg",
@@ -234,7 +224,7 @@ restaurant_locations = {
         "menu_url": "https://heurlinsgbg.se/lunch",
         "instagram": "https://www.instagram.com/heurlinsgbg/",
         "area": "Järntorget/Linné",
-        "lunch_hours": "Mån–fre 11.30–14.00"
+        "lunch_hours": "Ons–fre 11.30–14.00"
     },
     "Kathmandu": {
         "description": "Nepalesiska och indiska rätter på Första Långgatan. Stående lunchmeny för udda och jämna veckor, med momo som dagligt alternativ.",

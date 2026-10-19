@@ -26,6 +26,7 @@ Svara på svenska. Ett kort ger mandat inom kortets omfattning, inte mer.
 3. Sajt/byggkedja: läs docs/utveckling.md. Paketkort: docs/sakerhet.md.
    BO:s lokala OCR och Kathmandus stående udda/jämna rotation beskrivs i
    docs/skrapor.md; båda använder menu_week.py och frontendens datumspärr.
+   Där beskrivs också Silvis inbäddade flöde och datumvarnade PDF-menyer.
 4. Sök tidigare fall i docs/minne/ med rg; docs/minne/register.md är kartan.
    Det är historik, inte dagens läge. Läs inte alla avsnitt vid varje start.
 5. CLAUDE.md och STATE.md är hänvisningar. Originalen i docs/historik/ är

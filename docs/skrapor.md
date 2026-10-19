@@ -59,6 +59,56 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Järntorget/Linné — kompletterade menyer 2026-10-19
+
+**Feskekörka:** första lunchsektionen på den egna sidan har ändrats från
+tis–tor till tis–lör. Skrapan läser nu dagintervallet ur respektive rubrik.
+Endast huvudrätterna mellan VARMRÄTTER/DESSERT respektive MAT/EFTER MATEN
+tas med; det separat veckomärkta, äldre blocket utesluts. Kontrollerat utfall
+mån–fre är 0/3/9/9/3. Prisintervallet för soppan bevaras.
+
+**Byns Trattoria:** följ iframe-länken i `#lunch-pdf`, inte första PDF-länken
+på sidan. Originalet är fortfarande vecka 41, ändrat 2026-10-03. Henrik har
+beställt visning med varning. `MENU_REFERENCE` innehåller menyn separat från
+dagens sökbara mat, med veckonummer, ändringsdatum och uppmaning att kontrollera
+med restaurangen. En aktuell veckomärkt, nyligen ändrad fil återgår automatiskt
+till vanlig meny. PDF:ens textordning är ons–tor, fredag, dokumentrubrik,
+mån–tis, sedan dagsrubrikerna. Tidigare tolkning satte rätter på fel dagar
+och tappade första namnet. Alla fem alternativ per dag kontrollerades mot
+den synliga original-PDF:en; en ändrad/ofullständig mall avvisas.
+
+**Heurlins:** följ länken med texten ”Meny lunch”, så att filbyten upptäcks.
+Oktobermallen har lunch ons–fre: två veckorätter, Fish and chips och tre
+prissatta Caesarsallader. Menyfilen är ändrad 2026-10-14 men saknar utskrivet
+veckodatum. Den visas därför separat med datumvarning för veckan 19–23 oktober,
+inte som bekräftad aktuell mat. Om filen uppdateras inom visningsveckans
+datumfönster används vanlig meny med `MENU_VALIDITY`. Dagintervall, priser
+och textordning kontrollerades visuellt. Annonsen efter ”Boka brunch” utesluts.
+De två tidigare septembermallarna stöds fortfarande.
+
+**Silvis:** den lilla fördröjt laddade rutan på restaurangens lunchsida är
+deras eget Facebook-flöde i Fouita-widgeten `0x111b3d`. Följ samma publika
+JSON-anrop som widgeten: `api2.fouita.com/v1/q/widget` ger flödeskonfiguration,
+`social-api.fouita.com/social/fb/get-page-data` ger inläggen. Bara sid-ID
+`254527854405580` (Silvis Lunch) får användas. Flödets publika nyckel hämtas
+dynamiskt; inga Facebook-tokens används eller sparas. Svaren innehåller mer
+än menytext: behåll endast `message` och `created_time`, logga inte råsvaren.
+Veckonummer och publiceringsdatum inklusive år måste matcha visningsveckan.
+Fyra fullständiga rubrik-/prisblock krävs; nätfel eller ny mall lämnar bara
+den källkontrollerade stående menyn. Det är restaurangens eget publicerade
+flöde, inte en annan lunchskrapares databas. Vecka 43 ger fyra veckorätter
+plus fem stående, alltså 0/9/9/9/9. `MENU_WEEKLY` låter tillägget löpa ut i
+frontend utan att stående mat försvinner. Den stående texten återkontrollerades.
+
+**Fula Hummern:** borttagen ur restaurangregistret och skrapkörningen på
+Henriks begäran eftersom den publicerade menyn inte uppdaterats från vecka 25.
+
+Verifiering: direkt hämtning av alla fyra källor, visuellt kontrollerade
+original-PDF:er och Silvis veckoinlägg. `test_linne_menus.py` täcker dagordning,
+priser, gamla veckor/år, källknappar, ändrade mallar och nätfel. Frontendtest
+täcker separat referensmeny och att veckotillägg löper ut oberoende av stående
+mat. Hela produktionskedjan och webbläsarkontrollen körs vid leveransen.
+
 ## BO och Kathmandu — fungerande textmenyer 2026-10-19
 
 Detta ersätter BO:s bildreserv och Kathmandus Menydags-reserv från september

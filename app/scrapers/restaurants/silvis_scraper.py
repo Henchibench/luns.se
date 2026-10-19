@@ -1,19 +1,13 @@
 from typing import Dict, List
 
 from ..static_menu_scraper import StaticMenuScraper
+from ..silvis_weekly import fetch_posts, weekly_row
 
 
 class SilvisScraper(StaticMenuScraper):
-    """Silvis stående lunchmeny på Nordhemsgatan.
+    """Stående rätter och ett separat daterat tillägg från lunchsidans widget."""
 
-    Den officiella sidan har dels ett Facebook-flöde med veckans rätter, dels
-    ett eget avsnitt märkt "STÅENDE RÄTTER". Facebook-flödet kräver JavaScript
-    och en extern widgettjänst och går därför inte att använda i produktion.
-    De fem stående rätterna är däremot uttryckligen fasta och sparas ordagrant
-    i ``data/silvis.json``. Lunch serveras tisdag–fredag, så ingen meny läggs
-    ut på måndagen.
-    """
-
+    allow_previous_menu = False
     DAYS = ['Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
 
     def __init__(self):
@@ -44,6 +38,15 @@ class SilvisScraper(StaticMenuScraper):
 
             if not self.menu_data['items']:
                 return {self.name: ['Ingen lunchmeny tillgänglig']}
+
+            try:
+                weekly = weekly_row(fetch_posts())
+                if weekly:
+                    items.append(weekly)
+            except Exception as error:
+                # Fel i veckoflödet får inte frysa förra veckans rätter eller
+                # dölja den separat verifierade stående menyn.
+                self.log_warning(f'Veckoflödet kunde inte läsas ({type(error).__name__})')
 
             self.log_info(f'Hittade {len(self.menu_data["items"])} stående rätter')
             return {self.name: items}

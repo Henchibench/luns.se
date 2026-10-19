@@ -273,6 +273,9 @@ export default function LunchBoard() {
           info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
           menuStatus: restaurant.menuStatus[day] ?? '',
           menuImage: restaurant.menuImage,
+          referenceMenu: restaurant.referenceMenu && restaurant.referenceMenu.dishes.some(d => d.day === day)
+            ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day) }
+            : undefined,
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
@@ -289,7 +292,7 @@ export default function LunchBoard() {
         };
       })
       .filter(section => section.dishes.length > 0 || section.empty || (
-        section.menuImage && activeTypes.length === 0 && activeCravings.length === 0 &&
+        (section.menuImage || section.referenceMenu) && activeTypes.length === 0 && activeCravings.length === 0 &&
         (!search.trim() || section.name.toLocaleLowerCase('sv').includes(search.trim().toLocaleLowerCase('sv')))
       ));
   }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering, activeTypes, activeCravings, search]);

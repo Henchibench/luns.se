@@ -1,6 +1,7 @@
 """Regressioner för datum och dagsgrupper; all källtext nedan är syntetisk."""
 
 from datetime import date, datetime, timezone
+import json
 import unittest
 from unittest.mock import patch
 
@@ -68,12 +69,13 @@ class HeurlinsTests(unittest.TestCase):
         scraper = HeurlinsScraper()
         soup = BeautifulSoup('<a href="/menu.pdf">Meny lunch</a>', "html.parser")
         with patch.object(scraper, "get_page_content", return_value=soup), \
-                patch.object(scraper, "fetch_pdf_text", return_value=(NEW_TEMPLATE, None)), \
-                patch.object(scraper, "weekly_rows") as parse:
+                patch.object(scraper, "fetch_pdf_text", return_value=(NEW_TEMPLATE, None)):
             rows = scraper.scrape()[scraper.name]
-        parse.assert_not_called()
-        self.assertEqual(len(rows), 5)
-        self.assertTrue(all("Menybesked:" in row for row in rows))
+        self.assertEqual(sum(row.startswith('INFO:') for row in rows), 5)
+        self.assertEqual(sum(row.split('|')[0] in scraper.DAYS for row in rows), 0)
+        reference = json.loads(next(row.split(':', 1)[1] for row in rows if row.startswith('MENU_REFERENCE:')))
+        self.assertEqual(len(reference['rows']), 10)
+        self.assertIn('inte bekräftat', reference['warning'])
 
     def test_live_contract_and_relative_pdf_link(self):
         scraper = HeurlinsScraper()

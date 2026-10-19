@@ -46,7 +46,15 @@ export interface Restaurant {
   menuStatus: Record<string, string>;
   /** Restaurangens veckobild; räknas aldrig som en sökbar maträtt. */
   menuImage?: MenuImage;
+  referenceMenu?: ReferenceMenu;
   meta: RestaurantMeta;
+}
+
+export interface ReferenceMenu {
+  label: string;
+  warning: string;
+  url: string;
+  dishes: Dish[];
 }
 
 interface MenuValidity {
@@ -147,6 +155,21 @@ function parseDish(raw: string): Dish | null {
   return { day: match[1].trim(), category: match[2].trim(), description, price };
 }
 
+/** Äldre källmat hålls utanför dagens sökning, filter och antal. */
+function parseReferenceMenu(raw: string): ReferenceMenu | undefined {
+  try {
+    const data = JSON.parse(raw);
+    if (typeof data.label !== 'string' || !data.label.trim() ||
+        typeof data.warning !== 'string' || !data.warning.trim() ||
+        new URL(data.url).protocol !== 'https:' || !Array.isArray(data.rows)) return undefined;
+    const dishes = data.rows.map((row: unknown) => typeof row === 'string' ? parseDish(row) : null);
+    if (!dishes.length || dishes.some((dish: Dish | null) => !dish || !DAYS.includes(dish.day as Day))) return undefined;
+    return { label: data.label, warning: data.warning, url: data.url, dishes };
+  } catch {
+    return undefined;
+  }
+}
+
 const INFO_LINE = /^INFO:([^\s-]+)\s*-\s*Restaurant Info:\s*(.*)$/;
 
 /**
@@ -199,9 +222,29 @@ export function parseRestaurants(
     const info: Record<string, string[]> = {};
     const menuStatus: Record<string, string> = {};
     let menuImage: MenuImage | undefined;
+    let referenceMenu: ReferenceMenu | undefined;
     let validity: MenuValidity | undefined;
 
     rows.forEach(row => {
+      if (row.startsWith('MENU_REFERENCE:')) {
+        referenceMenu = parseReferenceMenu(row.slice('MENU_REFERENCE:'.length));
+        return;
+      }
+      if (row.startsWith('MENU_WEEKLY:')) {
+        // Veckotillägg ska löpa ut utan att den stående menyn försvinner.
+        try {
+          const raw = row.slice('MENU_WEEKLY:'.length);
+          const dated = parseMenuValidity(raw);
+          const data = JSON.parse(raw);
+          if (dated && menuImageIsCurrent(dated, now) && Array.isArray(data.rows)) {
+            const extra = data.rows.map((r: unknown) => typeof r === 'string' ? parseDish(r) : null);
+            if (extra.length && extra.every((dish: Dish | null) => dish && DAYS.includes(dish.day as Day))) {
+              dishes.push(...extra);
+            }
+          }
+        } catch { /* Skadad tilläggsdata får inte dölja stående rätter. */ }
+        return;
+      }
       if (row.startsWith('MENU_VALIDITY:')) {
         validity = parseMenuValidity(row.slice('MENU_VALIDITY:'.length));
         return;
@@ -247,6 +290,7 @@ export function parseRestaurants(
       info,
       menuStatus,
       menuImage,
+      referenceMenu,
       meta,
     };
   });
