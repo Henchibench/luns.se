@@ -266,7 +266,7 @@ rubrikrad utanför innehållets rullyta. På Henriks begäran ligger Stäng i
 fönsterbredd; inga dubbla fokusmål eller enhetsgissningar behövs.
 Henrik upplevde två separata knapprader på dator som rörigt. Visa/Dölj äldre
 nyheter ligger därför på samma fasta nedersta rad som Stäng, till vänster.
-På mobil ligger historikknappen kvar efter de senaste nyheterna. CSS döljer
+På mobil ligger historikknappen efter den synliga nyhetslistan. CSS döljer
 den alternativa historikknappen helt, så bara en är synlig och fokuserbar.
 Båda placeringarna för Stäng ligger utanför rullytan. Stäng är minst 44px hög,
 får fokus vid öppning och behåller befintlig stänganimation och återgång.
@@ -276,6 +276,12 @@ De fem senaste synliga nyheterna visas först efter kontaktfiltrering och
 datumsortering. Äldre poster ligger bakom Visa äldre nyheter med antal,
 `aria-expanded` och `aria-controls`. Historiken går att fälla ihop igen;
 varje ny öppning börjar hopfälld. Ingenting tas bort ur nyhetslistan.
+Efter Henriks återkoppling om skiljelinje och ojämna avstånd ligger alla
+synliga nyheter i ett gemensamt rutnät, utan avdelare före äldre poster.
+Tidigare gav `items-start` olika korthöjder inom samma rad och två separata
+listor lämnade en tom högerkolumn vid övergången. Korten sträcks nu till
+samma höjd inom varje rad och äldre poster fyller nästa lediga plats.
+Avståndet är genomgående 16px på dator och 12px på mobil.
 Dator får högst 960px bred panel och två kolumner från sajtens brytpunkt
 760px, mobil en kolumn. De två bildnyheterna ligger först vid samma datum,
 så bilderna visas bredvid varandra på dator. Brödtexten använder ink2

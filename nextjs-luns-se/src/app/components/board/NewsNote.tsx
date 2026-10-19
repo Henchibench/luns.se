@@ -90,7 +90,7 @@ function OlderNewsButton({ expanded, count, onToggle, className }: {
     <button
       type="button"
       aria-expanded={expanded}
-      aria-controls="luns-older-news"
+      aria-controls="luns-news-items"
       onClick={onToggle}
       className={`min-h-11 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-13 font-semibold text-[var(--ink)] cursor-pointer hover:bg-[var(--hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)] ${className}`}
     >
@@ -138,19 +138,13 @@ export default function NewsNote({
         </div>
 
         <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
-          <ul aria-label="Senaste nyheterna" className="grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4">
-            {latest.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
+          <ul id="luns-news-items" aria-label="Nyheter" className="grid list-none grid-cols-1 gap-3 p-0 wide:grid-cols-2 wide:gap-4">
+            {(showOlder ? sorted : latest).map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
           </ul>
 
           {older.length > 0 && (
-            <div className={showOlder ? 'mt-5 border-t border-[var(--line)] pt-4' : 'mt-5 border-t border-[var(--line)] pt-4 wide:hidden'}>
-              <OlderNewsButton expanded={showOlder} count={older.length}
-                onToggle={() => setShowOlder(value => !value)} className="wide:hidden" />
-              <ul id="luns-older-news" aria-label="Äldre nyheter" hidden={!showOlder}
-                className={showOlder ? 'mt-4 wide:mt-0 grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4' : 'hidden'}>
-                {older.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
-              </ul>
-            </div>
+            <OlderNewsButton expanded={showOlder} count={older.length}
+              onToggle={() => setShowOlder(value => !value)} className="mt-4 wide:hidden" />
           )}
         </div>
       </div>
