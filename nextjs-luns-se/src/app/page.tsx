@@ -10,6 +10,7 @@ import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
 import NewsNote from './components/board/NewsNote';
+import RestaurantNews from './components/board/RestaurantNews';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
 import { ChipSpec } from './components/board/Chips';
@@ -21,6 +22,8 @@ import { useTextSize } from './hooks/useTextSize';
 import { useWeather } from './hooks/useWeather';
 import { useWelcome } from './hooks/useWelcome';
 import { useNews } from './hooks/useNews';
+import { useRestaurantNews } from './hooks/useRestaurantNews';
+import type { RestaurantIdentity } from './lib/restaurantNews';
 import {
   DAYS,
   categoryColor,
@@ -109,6 +112,7 @@ const TOUR_STEPS: TourStep[] = [
 export default function LunchBoard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [locations, setLocations] = useState<LunsLocation[]>([]);
+  const [catalog, setCatalog] = useState<RestaurantIdentity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -142,6 +146,7 @@ export default function LunchBoard() {
   const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
     useDishFavorites();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
+  const restaurantNews = useRestaurantNews(catalog, location?.id, !loading && !error);
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
   const { theme, toggle: toggleTheme } = useTheme();
@@ -157,9 +162,10 @@ export default function LunchBoard() {
 
   useEffect(() => {
     loadMenuData()
-      .then(({ restaurants: parsed, locations: places }) => {
+      .then(({ restaurants: parsed, locations: places, catalog: registry }) => {
         setRestaurants(parsed);
         setLocations(places);
+        setCatalog(registry);
         setLoading(false);
       })
       .catch((err: Error) => {
@@ -578,6 +584,21 @@ export default function LunchBoard() {
               Leaflet-instans som ritar tiles man aldrig ser. */}
           {view === 'list' && (
           <div>
+          {location && !welcome.open && (
+            <RestaurantNews
+              area={location.label}
+              names={restaurantNews.names.filter(name => atLocation.some(r => r.name === name))}
+              onDismiss={() => restaurantNews.dismiss()}
+              onSelect={name => {
+                setSearch('');
+                setActiveTypes([]);
+                setActiveCravings([]);
+                setShowOnlyFavorites(false);
+                restaurantNews.dismiss(name);
+                scrollToRestaurant(name);
+              }}
+            />
+          )}
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
             <h1 className="m-0 font-heading text-24 font-bold tracking-[-.02em] wide:text-30">
               {heading}

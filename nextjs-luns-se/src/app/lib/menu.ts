@@ -8,6 +8,8 @@
  * för meddelanden som hör till en dag men inte är en rätt.
  */
 
+import type { RestaurantIdentity } from './restaurantNews';
+
 export const DAYS = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag'] as const;
 export type Day = (typeof DAYS)[number];
 
@@ -317,6 +319,7 @@ interface RestaurantsFile {
 export async function loadMenuData(): Promise<{
   restaurants: Restaurant[];
   locations: LunsLocation[];
+  catalog: RestaurantIdentity[];
 }> {
   const [menusData, restaurantsData] = await Promise.all([
     fetch('/data/menus.json').then(r => r.json() as Promise<MenusFile>),
@@ -343,5 +346,10 @@ export async function loadMenuData(): Promise<{
           restaurantCount: restaurants.filter(r => r.area === area).length,
         }));
 
-  return { restaurants, locations };
+  // Registret finns kvar även när en skrapa saknar matrader. Det är detta
+  // som avgör om en restaurang är nytillkommen, inte dagens menyresultat.
+  const catalog = Object.entries(restaurantsData.restaurants ?? {})
+    .filter(([, meta]) => typeof meta.area === 'string' && meta.area.length > 0)
+    .map(([name, meta]) => ({ name, area: meta.area }));
+  return { restaurants, locations, catalog };
 }

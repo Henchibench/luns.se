@@ -59,7 +59,8 @@ export default function PrivacyNote({
           Det finns inget konto på luns.se och ingen databas med besökare. Dina favoriter, dina
           bevakade rätter, ditt tema, din textstorlek och din valda plats ligger i din egen
           webbläsare. Rensar du webbläsardata är de borta, och de följer inte med till en annan
-          enhet.
+          enhet. Även vilka restauranger du redan sett i ett område sparas här, så att vi
+          kan visa en blänkare när nya tillkommer.
         </p>
 
         <h3 className="mb-1.5 font-mono text-10 tracking-[.15em] text-[var(--mut)]">

@@ -18,9 +18,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 9;
+export const NEWS_VERSION = 10;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-10-19',
+    title: 'Nya restauranger i ditt område',
+    body: 'När en restaurang tillkommer i ett område du besökt får du en liten blänkare ovanför lunchlistan. Tryck på namnet för att se menyn, eller stäng blänkaren. Cuckoo’s Nest finns nu med på Lindholmen.',
+  },
   {
     date: '2026-10-19',
     title: 'Fler lunchmenyer i Järntorget/Linné',

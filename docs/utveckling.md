@@ -30,6 +30,37 @@ En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
 
+## Nya restauranger per område, 2026-10-19
+
+Henrik beställde en blänkare för restauranger som tillkommit sedan förra
+besöket, exempelvis Cuckoo's Nest för den som valt Lindholmen.
+`useRestaurantNews` sparar namn och väntande nyheter per område under
+`luns-restaurants-seen:<område>` i localStorage. Underlaget kommer från
+restaurants.json, inte dagens matrader, filter eller favoriter. Ett tomt
+register eller en misslyckad inläsning får inte skriva över besökshistoriken.
+
+Första besöket i ett område sätter en tyst baslinje. Därefter annonseras
+nya namn ovanför lunchlistan. Oöppnade blänkare finns kvar efter omladdning;
+kryss stänger alla i området och klick på ett namn kvitterar bara den nyheten.
+Klicket rensar tillfälliga mat-/favoritfilter och visar restaurangens lista.
+Borttagna restauranger tas bort även från väntande nyheter. Områdena har
+separat historik. Ingen historik skickas till server eller analystjänst.
+Saknad/blockerad lagring ger ingen blänkare; rensad lagring kan inte återskapa
+tidigare besök. Ett namnbyte räknas som ett tillägg eftersom registret saknar
+separata stabila restaurang-ID:n.
+
+Övergången från äldre versioner saknar full besökshistorik: för en återkommande
+besökare med sparat Lindholmen och nyhetsversion under 10 annonseras enbart
+Cuckoo's Nest vid första inläsningen. Det är en uttrycklig startnyhet, inte
+ett påstående om exakt när personen sist såg stället. Nya besökare och andra
+standardområden får ingen sådan startnyhet. Framtida tillägg kräver ingen
+handredigerad nyhet. Integritetsrutan beskriver den lokala lagringen.
+
+Verifiering: `scripts/restaurant-news.test.mjs` täcker tillägg, flera nyheter,
+förstagångsbesök, omladdning, kvittering, områden, borttagning, återinförande,
+skadad lagring och ändrade menyresultat med oförändrat register. Kontrollera
+även blänkare och navigering i byggd testserver innan leverans.
+
 ## Menybesked per dag, 2026-09-21
 
 Symptom: restaurangkorten visade samma generella tomrad även när skrapan
