@@ -92,6 +92,17 @@ datumfönster används vanlig meny med `MENU_VALIDITY`. Dagintervall, priser
 och textordning kontrollerades visuellt. Annonsen efter ”Boka brunch” utesluts.
 De två tidigare septembermallarna stöds fortfarande.
 
+Den dynamiska kontrollen återverifierades på Henriks begäran 2026-10-19:
+varje skrapning följer lunchknappen och läser PDF-svarets `Last-Modified`.
+Eftersom PDF:en saknar veckonummer används datumet i Stockholm: från fredagen
+före visningsveckan till dess fredag. En aktuell fil tar bort både varning
+och besked om obekräftad meny. Detta fungerar vid ersättning på samma URL
+och vid nytt filnamn. Vid veckobyte blir en oförändrad äldre fil varnad igen.
+Datumet är en publiceringssignal, inte ett bevis för att själva maträtterna
+ändrats; om servern saknar tillförlitligt datum behålls varningen.
+Övergångstester täcker båda URL-fallen, veckobyte, saknat datum, okänd tidszon,
+gammalt år och framtida datum. Ingen meny eller varning hårdkodas.
+
 **Silvis:** den lilla fördröjt laddade rutan på restaurangens lunchsida är
 deras eget Facebook-flöde i Fouita-widgeten `0x111b3d`. Följ samma publika
 JSON-anrop som widgeten: `api2.fouita.com/v1/q/widget` ger flödeskonfiguration,

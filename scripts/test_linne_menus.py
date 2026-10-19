@@ -123,6 +123,48 @@ class LinneTests(unittest.TestCase):
         self.assertTrue(any('2026-10-14' in r for r in rows))
         self.assertTrue(any(r.startswith('INFO:Måndag') and 'onsdag–fredag' in r for r in rows))
 
+    def test_heurlins_warning_tracks_pdf_updates_and_week_changes(self):
+        scraper = HeurlinsScraper()
+        # Publiceringen kan ersätta filen på samma adress eller byta länken.
+        # Ingen varning eller maträtt från förra körningen får följa med.
+        cases = [
+            (date(2026,10,19), 'menu.pdf', datetime(2026,10,14,tzinfo=timezone.utc), True),
+            (date(2026,10,19), 'menu.pdf', datetime(2026,10,19,tzinfo=timezone.utc), False),
+            (date(2026,10,26), 'menu.pdf', datetime(2026,10,19,tzinfo=timezone.utc), True),
+            (date(2026,10,26), 'new-menu.pdf?v=2', datetime(2026,10,26,tzinfo=timezone.utc), False),
+        ]
+        for monday, filename, modified, warned in cases:
+            soup = BeautifulSoup(f'<a href="/{filename}">Meny lunch</a>', 'html.parser')
+            with self.subTest(monday=monday, filename=filename, modified=modified), \
+                 patch.object(scraper, 'get_page_content', return_value=soup), \
+                 patch.object(scraper, 'fetch_pdf_text', return_value=(HEURLINS, modified)) as fetch, \
+                 patch('app.scrapers.restaurants.heurlins_scraper.menu_monday', return_value=monday):
+                rows = scraper.scrape()[scraper.name]
+            fetch.assert_called_once_with(f'https://heurlinsgbg.se/{filename}')
+            references = [r for r in rows if r.startswith('MENU_REFERENCE:')]
+            self.assertEqual(bool(references), warned)
+            if warned:
+                reference = json.loads(references[0].split(':',1)[1])
+                self.assertIn(modified.strftime('%Y-%m-%d'), reference['warning'])
+                self.assertEqual(sum(rakna(rows)[0].values()), 0)
+            else:
+                self.assertEqual(list(rakna(rows)[0].values()), [0,0,6,6,6])
+                self.assertFalse(any('Ingen bekräftad meny' in r for r in rows))
+                self.assertEqual(json.loads(rows[-1].split(':',1)[1])['valid_from'], monday.isoformat())
+
+    def test_heurlins_uncertain_dates_keep_the_warning(self):
+        scraper = HeurlinsScraper()
+        soup = BeautifulSoup('<a href="/menu.pdf">Meny lunch</a>', 'html.parser')
+        for modified in [None, datetime(2026,10,19), datetime(2025,10,19,tzinfo=timezone.utc),
+                         datetime(2026,11,19,tzinfo=timezone.utc)]:
+            with self.subTest(modified=modified), \
+                 patch.object(scraper, 'get_page_content', return_value=soup), \
+                 patch.object(scraper, 'fetch_pdf_text', return_value=(HEURLINS, modified)), \
+                 patch('app.scrapers.restaurants.heurlins_scraper.menu_monday', return_value=date(2026,10,19)):
+                rows = scraper.scrape()[scraper.name]
+            self.assertTrue(any(r.startswith('MENU_REFERENCE:') for r in rows))
+            self.assertEqual(sum(rakna(rows)[0].values()), 0)
+
     def test_feskekorka_reads_changed_days_and_rejects_unpaired_rows(self):
         def block(days,extra=''):
             return '<section><h3>Lunchmeny serveras '+days+'</h3>'+''.join('<div data-testid="richTextElement">'+s+'</div>' for s in ['VARMRÄTTER','Källans rätt','165/245kr Beskrivning']+([extra] if extra else [])+['DESSERT','Sött 45kr'])+'</section>'
