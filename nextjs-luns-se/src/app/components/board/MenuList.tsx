@@ -160,7 +160,7 @@ export default function MenuList({
             </div>
           </div>
 
-          {onReport && <button onClick={() => onReport(section.name)} aria-label={`Rapportera fel hos ${section.name}`} className="self-start mb-2 border-0 bg-transparent p-0 text-11 text-[var(--mut)] underline underline-offset-2 hover:text-[var(--acc)]">Rapportera fel</button>}
+          {onReport && <button onClick={() => onReport(section.name)} aria-label={`Rapportera fel hos ${section.name}`} className="self-start mb-2 min-h-6 border-0 bg-transparent p-0 text-11 text-[var(--ink2)] underline underline-offset-2 hover:text-[var(--acc)]">Rapportera fel</button>}
 
           {openMap === section.name && (
             <div className="mb-2 mt-1">
