@@ -59,6 +59,23 @@ Den levereras separat genom Cloudflare MCP eller autentiserad Wrangler med
 exakt konfigurationsfil. Vid MCP-uppladdning ska `keep_bindings: ["secret_text"]`
 bevara befintliga secrets; skriv aldrig ut dem.
 
+## Släppkontroll, 2026-10-20
+
+För Dev `0c92d6f` byggdes ett separat produktionsbygge. Exporterad kontaktfil
+matchar produktionsfilen och har live-läge; ingen gul testbanner injicerades.
+Formuläret kontrollerades i webbläsare: inga testlägestexter, knappen heter
+”Skicka meddelande” och integritetstexten beskriver riktig leverans.
+Lokala förhandsvisningen användes bara för textkontroll, ingen inskickning;
+produktionswidgeten ska endast verifiera luns.se/www.luns.se.
+
+Cloudflare API bekräftade att driftsatt `luns-contact` är live, att Resend-
+och Turnstile-hemligheternas bindningar samt limiter finns och att avsändare,
+mottagare och domänbegränsningar matchar ovan. Inga hemliga värden lästes ut.
+Preflight gav 204 för luns.se och www.luns.se, 403 för testservern.
+Alla 26 Worker-tester passerade som del av 49 Node-tester. Slutligt riktigt
+mejltest från luns.se återstår efter publicering; inga meddelanden skickades
+under släppkontrollen.
+
 ## Publicering och återställning
 
 Ingen ytterligare Cloudflare- eller Resend-konfiguration behövs inför detta

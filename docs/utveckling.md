@@ -30,6 +30,24 @@ En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
 
+## Släppkontroll inför main, 2026-10-20
+
+Kontrollerad sajtkod: Dev `0c92d6f`. Simulerad merge med `git merge-tree`
+gav inga konflikter och samma filträd som Dev; main har inte ändrats.
+49 Node-tester och 35 Python-tester passerade. Ett separat rent
+produktionsbygge med rensad Next-/Node-miljö exporterades utan testband.
+Testservern visar fortfarande samma sajtkod och är frisk på port 3002.
+Menyöversikten kontrollerades från befintlig testdata (ingen ny källskrapning):
+BO 5/5/5/5/4, Kathmandu 4/4/4/4/4, Cuckoo's Nest 5 per dag,
+Silvis 0/9/9/9/9; Byns och Heurlins visas fortsatt med datumvarning.
+
+Kontaktens live-konfiguration och produktionsformulärets texter verifierades,
+se kontakt.md. npm-auditens kvarvarande byggberoenden redovisas i sakerhet.md.
+Efter Henriks merge behöver Scrape and Deploy köras på main, manuellt eller
+på ordinarie schema. Först efter publicering kan riktig Turnstile-verifiering
+och mejlleverans provas från luns.se. Kontrollen ändrade inga workflows,
+paket, Worker-inställningar eller produktionsresurser.
+
 ## Automatisk nyhetslogg, 2026-10-20
 
 Tidigare tändes bara pricken på kugghjulet när `NEWS_VERSION` höjdes.

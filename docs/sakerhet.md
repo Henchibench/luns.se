@@ -119,3 +119,21 @@ Källa: Kontrollens paketkort 2026-09-30 och npm-registret samma datum, där
 5.0.12; `env -u NODE_ENV npm audit --include=dev` gav ingen träff på
 `brace-expansion`. Auditens enda kvarvarande träff var en separat moderate i
 `fast-uri`, GHSA-hrr3-gc8f-f4qj, som låg utanför detta kort och inte ändrades.
+
+## Släppkontroll av npm-beroenden, 2026-10-20
+
+Mätt på Dev `0c92d6f` med rensat NODE_ENV. `npm audit --omit=dev --json`
+gav noll sårbarheter. `npm audit --include=dev --json` gav 15 berörda
+paketnoder (12 high, 3 moderate); detta är tre underliggande advisories med
+följdeffekter i beroendekedjan, inte 15 oberoende sårbarheter.
+Lockfilen markerar samtliga tre rotpaket som dev-only:
+
+- braces 3.0.3: GHSA-vfj7-8cjw-p6xm, stackutmattning via globbmönster.
+- fast-uri 3.1.7: GHSA-hrr3-gc8f-f4qj, inkonsekvent normalisering av värdnamn.
+- postcss-selector-parser 6.1.4: GHSA-rj75-hqrm-r3gf, hög CPU-kostnad vid parsning.
+
+Källa: npm audit-svar och package-lock.json vid kontrollen. Verktygen används
+i bygg-/lintkedjan, inte i den statiska webbplatsens runtime. Kontrollen
+bedömdes inte visa ett hinder för detta funktionssläpp, men larmen kvarstår
+som separat paketunderhåll. Inga automatiska major-uppgraderingar eller
+paketändringar gjordes. Ett rent Next-produktionsbygge passerade.
