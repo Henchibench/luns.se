@@ -159,6 +159,12 @@ body {
   max-height: 72dvh;
 }
 
+/* Rubrik och stängknapp ligger utanför nyheternas rullande innehåll. */
+.luns-news-panel {
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+}
+
 /* Filmkorn över hela sajten. Ligger över allt innehåll men släpper igenom
    klick, annars vore sidan omöjlig att använda. */
 body::after {

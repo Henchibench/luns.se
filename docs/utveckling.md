@@ -254,3 +254,24 @@ Asset type: landscape image for a news card announcing Järntorget/Linné on Lun
 Edit the supplied photograph into a cozy Gothenburg summer evening. Preserve the exact elevated viewpoint, framing, street alignment, tram tracks, all building positions, roof shapes, architectural details, skyline and wooded hills from the reference. This must clearly remain the same actual place, not a reimagined city.
 Change only lighting, sky and atmosphere: a long Nordic summer evening shortly after sunset, soft peach and pale pink near the horizon fading into gentle blue above, lingering warm light on red roofs, softly glowing windows in a natural scattered pattern, warm street lamps and inviting subtle café lighting at street level. Lush summer green trees, gentle atmospheric depth. Keep sufficient natural ambient light to read the architecture; cozy and calm, not dark nighttime. Photorealistic editorial photography, restrained color grading, realistic shadows, no excessive orange cast or fantasy effects. Preserve existing signs without adding text, no new landmarks, no watermarks. Maintain the wide approximately 3:2 composition.
 ```
+
+## Nyhetsruta på mobil och dator, 2026-10-20
+
+Henrik rapporterade att stängknappen krävde rullning genom hela historiken
+på mobil och att rutan var för smal på dator. `NewsNote` har nu en fast
+rubrikrad utanför innehållets rullyta. Stäng/Tillbaka är minst 44px hög,
+får fokus vid öppning och behåller befintlig stänganimation och återgång.
+Panelens maxhöjd följer dvh (vh som fallback), med luft runt rutan.
+
+De fem senaste synliga nyheterna visas först efter kontaktfiltrering och
+datumsortering. Äldre poster ligger bakom Visa äldre nyheter med antal,
+`aria-expanded` och `aria-controls`. Historiken går att fälla ihop igen;
+varje ny öppning börjar hopfälld. Ingenting tas bort ur nyhetslistan.
+Dator får högst 960px bred panel och två kolumner från sajtens brytpunkt
+760px, mobil en kolumn. De två bildnyheterna ligger först vid samma datum,
+så bilderna visas bredvid varandra på dator. Brödtexten använder ink2
+för tydligare läsning. Befintlig nyhet om nyhetsrutan förklarar historiken;
+version 13 behålls för förfiningen av samma ännu osläppta funktion.
+
+Verifiering: minnestest och testserverbygge, därefter mobil/dator-kontroll
+av rullning, kvarvarande stängknapp, fem senaste och utfälld historik.

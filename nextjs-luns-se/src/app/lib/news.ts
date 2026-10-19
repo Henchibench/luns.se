@@ -33,14 +33,14 @@ export const NEWS_ITEMS: NewsItem[] = [
   },
   {
     date: '2026-10-20',
-    title: 'Nyheter när du kommer tillbaka',
-    body: 'När något nytt har tillkommit öppnas den här rutan nästa gång du besöker Luns. Den visas en gång per uppdatering. Du kan alltid läsa nyheterna igen under Inställningar och info.',
-  },
-  {
-    date: '2026-10-20',
     title: 'Nytt område: Järntorget/Linné',
     body: 'Nu finns Järntorget/Linné i Göteborg på Luns! Välj området i platsväljaren för att se lunchmenyerna där.',
     image: { src: '/images/news/jarntorget-linne-sommarkvall.jpg', alt: 'Bearbetad vy över Linnégatan och kvarteren vid Järntorget i varmt sommarkvällsljus.', width: 1535, height: 1025 },
+  },
+  {
+    date: '2026-10-20',
+    title: 'Nyheter när du kommer tillbaka',
+    body: 'När något nytt har tillkommit öppnas den här rutan nästa gång du besöker Luns, en gång per uppdatering. De senaste nyheterna visas först och äldre går att fälla ut. Du hittar alltid nyheterna under Inställningar och info.',
   },
   {
     date: '2026-10-20',
