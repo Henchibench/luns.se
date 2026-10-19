@@ -43,6 +43,23 @@ beteende. Källkontroller och begränsningar finns i [skrapor](skrapor.md).
 Verifiering: menyparsern provad med menybesked, vanlig INFO-rad och en rätt
 för nästa dag; beskedet hamnar varken bland rätter eller bland öppettider.
 
+## Lunchtid utan dubblett eller emoji, 2026-10-19
+
+Symptom: Cuckoo's Nest visade lunchtiden två gånger och satte en klock-emoji
+framför reservtiden. Källans inforad använder formen `kl.11.30-13.30`, som den
+tidigare dubblettkontrollen inte kände igen, samtidigt som menykomponenten
+själv lade till emojin framför `lunch_hours`.
+
+Lösning: tidskontrollen känner nu även igen `kl.` följt av ett klockslag, så
+källans aktuella inforad ersätter reservtiden. Reservtider visas som vanlig
+text utan klock-emoji. Äldre emoji-signaler får finnas kvar i rå menydata för
+bakåtkompatibilitet men tas bort innan visning.
+
+Verifiering: den officiella lunchsidan kontrollerades 2026-10-19 och anger
+måndag–fredag kl. 11.30–13.30. Node-test täcker källans format, reservtext utan
+tid och äldre rådata med emoji; byggd förhandsvisning kontrolleras utan
+dubblett och synlig klock-emoji.
+
 ## BO:s originalbild i menylistan, 2026-09-21
 
 Symptom: bildmenyer gav ett tomt kort trots läsbar officiell meny.

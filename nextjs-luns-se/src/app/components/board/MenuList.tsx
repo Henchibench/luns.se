@@ -197,8 +197,7 @@ export default function MenuList({
 
               Beskrivningen är skriven för hand och ändras aldrig; tider och
               priser kommer dels från restaurangdatan, dels från skrapan. För
-              läsaren är det senare samma sak och står därför på samma rad,
-              med klocka på tiderna så de matchar skrapans stil. */}
+              läsaren är det senare samma sak och står därför på samma rad. */}
           {section.description && (
             <p className="m-0 mb-1 max-w-[70ch] text-12 leading-[1.5] text-[var(--ink2)]">
               {section.description}
@@ -207,7 +206,7 @@ export default function MenuList({
 
           {(section.meta || section.info) && (
             <p className="m-0 mb-1.5 text-12 text-[var(--mut)]">
-              {[section.meta && `🕐 ${section.meta}`, section.info]
+              {[section.meta, section.info]
                 .filter(Boolean)
                 .join('  ·  ')}
             </p>

@@ -164,6 +164,17 @@ export function stripInfoEmoji(text: string): string {
   return text.replace(DECORATIVE_EMOJI, '').replace(/\s{2,}/g, ' ').trim();
 }
 
+/**
+ * Avgör om en rå inforad redan innehåller serveringstider.
+ *
+ * Äldre skrapdata kan använda en klock-emoji som dold signal. Källor som
+ * Cuckoo's Nest skriver i stället "kl.11.30", så även den formen måste
+ * kännas igen innan lunch_hours läggs till som reservtext.
+ */
+export function infoStatesLunchHours(text: string): boolean {
+  return /🕐|öppet|öppettid|lunch\s+serveras|\bkl\.?\s*\d{1,2}(?:[.:]\d{2})?/i.test(text);
+}
+
 export function parseRestaurants(
   menus: Record<string, string[]>,
   metaByName: Record<string, RestaurantMeta>,

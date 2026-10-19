@@ -27,6 +27,7 @@ import {
   currentDay,
   currentDayIndex,
   dateForDay,
+  infoStatesLunchHours,
   loadMenuData,
   stripInfoEmoji,
   type LunsLocation,
@@ -49,20 +50,6 @@ const SPY_OFFSET = 70;
 const SCROLL_OFFSET = 52;
 /** Hur nära toppen sista restaurangen får komma. */
 const HARD_STOP = 56;
-/**
- * Känner igen att skrapans inforad redan innehåller öppettider.
- *
- * Tiderna kan komma från två håll: lunch_hours i restaurangdatan och INFO-rader
- * från skrapan. Har en restaurang båda hamnar de på samma rad och tiderna står
- * två gånger, med var sin klocka. Skrapans version vinner — den kommer från
- * restaurangens egen sida och uppdateras av sig själv.
- *
- * Klockan är signalen som räknas: skraporna sätter 🕐 på tider och 💰 på priser,
- * och det är just klockan som skulle dubbleras. Orden finns med som reserv om
- * någon skrapa slutar sätta emoji.
- */
-const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
-
 /**
  * Rundan tar bara upp det som är nytt och inte går att gissa sig till.
  * Dagflikar, sökfält och platsväljare förklarar sig själva och skulle bara
@@ -276,14 +263,13 @@ export default function LunchBoard() {
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
         const infoRows = restaurant.info[day] ?? [];
-        // Dubbletttestet körs på råtexten, visningen på den strippade: 🕐 är
-        // signalen INFO_STATES_HOURS letar efter, och den finns bara kvar så
-        // länge emojin inte plockats bort först. Ordningen här är avsiktlig.
+        // Dubbletttestet körs på råtexten eftersom äldre menydata kan bära en
+        // dold emoji-signal. Visningen använder alltid den strippade texten.
         const rawInfo = infoRows.join('  ·  ');
 
         return {
           name: restaurant.name,
-          meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
+          meta: infoStatesLunchHours(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
           info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
           menuStatus: restaurant.menuStatus[day] ?? '',
           menuImage: restaurant.menuImage,
