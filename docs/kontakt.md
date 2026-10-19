@@ -80,7 +80,12 @@ anonym/valfri e-post, felaktig indata, body-gräns, origin, rate limit, demo,
 Siteverify-fel, action/hostname, återspelning och Resend-fel utan riktiga mejl.
 Bygg frontenden och kör testservern. Verifiera dessutom demo med en riktig
 Turnstile-token genom formuläret och avvisa återspelning på den driftsatta
-endpointen. Slutlig mejlleverans kan inte verifieras innan Resend anslutits.
+endpointen. Uppmätt 2026-10-19 i Safari mot driftsatt test-Worker: Turnstile verifierade
+automatiskt, anonym inskickning fick demobekräftelse, en ny token med valfri
+e-post gav HTTP 200 och direkt återspelning av samma token gav HTTP 403.
+Codex inbyggda webbläsare fick interaktiv kontroll; ingen slutsats om generellt
+formulärfel dras av det. Ogiltig token/fel origin avvisades också via HTTP.
+Slutlig mejlleverans kan inte verifieras innan Resend anslutits.
 
 Källor: [Turnstile Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
 [Workers rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/),
