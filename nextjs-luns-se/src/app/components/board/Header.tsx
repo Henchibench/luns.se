@@ -147,9 +147,13 @@ export default function Header({
         aria-label={
           newsUnread ? 'Inställningar och info, något är nytt' : 'Inställningar och info'
         }
-        className={`${ICON_BUTTON} relative order-2 text-[15px] wide:order-none`}
+        className={`${ICON_BUTTON} relative order-2 inline-flex items-center justify-center wide:order-none`}
       >
-        ⚙
+        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9.5 3h5l.4 2.3 1.4.8 2.2-.8L21 9.7l-1.8 1.5v1.6l1.8 1.5-2.5 4.4-2.2-.8-1.4.8-.4 2.3h-5l-.4-2.3-1.4-.8-2.2.8L3 14.3l1.8-1.5v-1.6L3 9.7l2.5-4.4 2.2.8 1.4-.8Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
         {/* Pricken ligger innanför knappens hörn och inte utanför kanten:
             innanför har den alltid knappens egen bakgrund bakom sig, medan
             headern utanför är glas med suddad mesh-gradient — där hade den

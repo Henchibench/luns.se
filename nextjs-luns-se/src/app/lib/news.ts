@@ -12,7 +12,7 @@
  * En ny post utan höjd räknare syns bara för den som öppnar rutan manuellt.
  */
 export interface NewsItem {
-  /** ISO-datum, hämtat från när ändringen faktiskt gick in. */
+  /** ISO-datum för släppet där nyheten blir tillgänglig. */
   date: string;
   title: string;
   body: string;
@@ -25,7 +25,7 @@ export const NEWS_VERSION = 12;
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
-    date: '2026-10-19',
+    date: '2026-10-20',
     title: 'Tips & kontakt',
     body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
     requiresContact: true,
@@ -42,7 +42,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     body: 'Nu finns Järntorget/Linné i Göteborg på Luns! Välj området i platsväljaren för att se lunchmenyerna där.',
   },
   {
-    date: '2026-10-19',
+    date: '2026-10-20',
     title: 'Nya restauranger i ditt område',
     body: 'När en restaurang tillkommer i ett område du besökt får du en liten blänkare ovanför lunchlistan. Tryck på namnet för att se menyn, eller stäng blänkaren. Cuckoo’s Nest finns nu med på Lindholmen.',
   },

@@ -67,7 +67,14 @@ Posten från 20 oktober hamnade tidigare under 19 oktober eftersom komponenten
 följde den manuella listans ordning. Visningen sorterar nu en filtrerad kopia
 på ISO-datum, nyast först; samma datum behåller sin inbördes ordning.
 Nyhetsversion 12 behålls för denna redigering av samma ännu osläppta nyheter.
-Verifiering: minnestest, bygge och kontroll av den uppdaterade nyhetsrutan.
+Henrik förtydligade att nyheterna släpps tillsammans 20 oktober. Samtliga
+poster i det aktuella släppet har därför 2026-10-20 som datum, inklusive
+Tips & kontakt och restaurangblänkaren. Datum anger släpp, inte kodningsdag.
+
+Inställningsknappen använde texttecknet U+2699, vars utseende berodde på
+webbläsarens fontval och kunde bli emoji. Det ersattes med en dekorativ
+SVG i currentColor. Knappens etikett och olästmarkering är kvar.
+Verifiering: minnestest, bygge och visuell kontroll av nyhetsdatum och ikon.
 
 ## Nya restauranger per område, 2026-10-19
 
