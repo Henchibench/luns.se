@@ -49,8 +49,11 @@ Manuell öppning från inställningarna har Tillbaka och återgår dit.
 `news-open` skiljer automatisk och manuell öppning med en boolesk parameter.
 Nyhetsversion 12 inkluderar detta och kontaktformulärets ännu osläppta nyhet.
 
-Verifiering: minnestest, Next-bygge och webbläsarkontroll av första automatiska
-öppningen, stängning och omladdning före leverans.
+Verifierat 2026-10-20: minnestest och Next-bygge passerar. Safari öppnade
+version 12 automatiskt efter tidigare läst version 11. Stäng gick direkt
+till lunchlistan, och omladdning öppnade ingen ny ruta. Ett nytt privat
+fönster fick platsval och introduktion; ingen nyhetsruta efter att rundan
+stängts eller efter omladdning. Manuell öppning behöll Tillbaka-knappen.
 
 ## Nya restauranger per område, 2026-10-19
 
