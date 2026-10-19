@@ -146,6 +146,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* vh kan gå bakom mobilens adressfält. Skalet är också containing block
+   för den fasta knappraden genom sin backdrop-filter, så dess höjd måste
+   följa den synliga ytan. Första värdet är fallback för äldre webbläsare. */
+.luns-viewport {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.luns-mobile-sheet {
+  max-height: 72vh;
+  max-height: 72dvh;
+}
+
 /* Filmkorn över hela sajten. Ligger över allt innehåll men släpper igenom
    klick, annars vore sidan omöjlig att använda. */
 body::after {

@@ -184,3 +184,23 @@ Källa, datumkontroller, driftbegränsning och uppdateringsrutin finns i
 Verifiering: `node --test scripts/bo-menu.test.mjs`; full testserverkedja
 och godkänd kontroll av text- och bildläge på mobil (390 px) och dator
 (1440 px), inklusive simulerat bildbyte, sökning och favoritläge.
+
+## Mobilens nedersta knappar och adressfält, 2026-10-20
+
+Henrik rapporterade att Restauranger och Filter kunde hamna bakom mobilens
+adressfält. Appskalet använde `h-screen` (100vh), som kan motsvara höjden
+med infällda webbläsarverktyg även när adressfältet visas. Skalets
+`backdrop-filter` gör det dessutom till containing block för knappraden.
+Det är en identifierad risk i koden; felet har inte reproducerats på fysisk
+telefon i denna kontroll.
+
+Skalet använder nu `100dvh`, med `100vh` som fallback, så dess höjd följer
+webbläsarens dynamiska visningsyta. Knappradens befintliga 24px marginal
+plus safe-area behålls. De två panelerna begränsas till 72dvh och har även
+safe-area i sin nedre rullmarginal. Inga användaragenter eller hårdkodade
+mått för Safaris adressfält används.
+
+Underlag: WebKits dokumentation om dynamiska viewport-enheter:
+https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/.
+Verifiering: minnestest och testserverbygge samt visuell kontroll av knappar
+och paneler. Safaris expanderande adressfält behöver även provas på telefon.
