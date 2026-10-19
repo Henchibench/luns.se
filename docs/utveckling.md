@@ -72,6 +72,11 @@ Henrik förtydligade att nyheterna släpps tillsammans 20 oktober. Samtliga
 poster i det aktuella släppet har därför 2026-10-20 som datum, inklusive
 Tips & kontakt och restaurangblänkaren. Datum anger släpp, inte kodningsdag.
 
+Henrik tog 2026-10-20 bort den äldre nyheten om större text från 19 augusti.
+Restaurangnyheten förtydligar nu att blänkaren gäller en ny restaurang i
+besökarens förvalda område. Detta är textändringar i samma osläppta
+nyhetsversion 13; besökshistorikens logik är oförändrad.
+
 Inställningsknappen använde texttecknet U+2699, vars utseende berodde på
 webbläsarens fontval och kunde bli emoji. Det ersattes med en dekorativ
 SVG i currentColor. Knappens etikett och olästmarkering är kvar.

@@ -28,7 +28,7 @@ export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-20',
     title: 'Tjôta med Luns',
-    body: 'Via Tjôta med Luns i menyn högst upp kan du tipsa om ett lunchställe, dela en idé eller bara skicka ett glatt hej. Du behöver inte ange namn eller e-post. Är en meny fel finns också Rapportera fel under varje restaurang.',
+    body: 'Via Tjôta med Luns i menyn högst upp kan du tipsa om ett lunchställe, dela en idé eller bara skicka ett glatt ”hallå eller”. Du behöver inte ange namn eller e-post. Är en meny fel finns också Rapportera fel under varje restaurang.',
     requiresContact: true,
     action: 'contact',
     image: { src: '/images/news/help-me-help-you.png', alt: 'Meme med texten: Help me help you.', width: 696, height: 404 },
@@ -52,18 +52,13 @@ export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-20',
     title: 'Nya restauranger i ditt område',
-    body: 'När en restaurang tillkommer i ett område du besökt får du en liten blänkare ovanför lunchlistan. Tryck på namnet för att se menyn, eller stäng blänkaren. Cuckoo’s Nest finns nu med på Lindholmen.',
+    body: 'När en ny restaurang dyker upp i ditt förvalda område får du en liten blänkare ovanför lunchlistan nästa gång du besöker Luns. Tryck på namnet för att se menyn, eller stäng blänkaren. Cuckoo’s Nest finns nu med på Lindholmen.',
   },
 
   {
     date: '2026-09-11',
     title: 'Kartan är ren igen',
     body: 'Karttjänsten hade lagt texten "API key required" tvärs över rutorna. Den är borta nu — gator och nålar syns utan skräp framför. Ser du den kvar ligger en gammal bild i webbläsarens minne, ladda om sidan.',
-  },
-  {
-    date: '2026-08-19',
-    title: 'Större text',
-    body: 'Under Inställningar går texten att höja ett steg. Rätter, namn och etiketter växer, men listan rymmer lika många restauranger — det är bokstäverna som blir större, inte raderna.',
   },
   {
     date: '2026-08-04',

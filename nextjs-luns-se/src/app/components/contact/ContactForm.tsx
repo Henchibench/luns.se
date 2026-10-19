@@ -123,7 +123,7 @@ function Form({ config, context, theme }: Omit<Props, 'onClose'>) {
             </label>
           </div>
           <label className="block text-13 font-semibold">Ditt meddelande
-            <textarea disabled={pending} value={message} onChange={e => setMessage(e.target.value)} required minLength={10} maxLength={4000} rows={4} className={`${INPUT} min-h-[110px] resize-y`} placeholder="Berätta vad vi kan hjälpa till med…" />
+            <textarea disabled={pending} value={message} onChange={e => setMessage(e.target.value)} required minLength={10} maxLength={4000} rows={4} className={`${INPUT} min-h-[110px] resize-y`} placeholder="Start Tjôting..." />
             <span className="mt-1 block text-11 font-normal text-[var(--ink2)]">Minst 10 tecken. {message.length}/4000</span>
           </label>
           <label className="block text-13 font-semibold">E-post <span className="font-normal text-[var(--ink2)]">(valfritt)</span>
