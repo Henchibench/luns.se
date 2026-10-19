@@ -2,7 +2,8 @@
 
 Läs rotens AGENTS.md och docs/skrapor.md före menyarbete.
 
-- Produktionsberoenden: requests, beautifulsoup4 och lxml. Inte Playwright.
+- Produktionsberoenden: requests, beautifulsoup4, lxml och Pillow samt
+  Tesseract med svenska språkdata för BO. Inte Playwright.
   Playwright får användas för spaning, aldrig i den färdiga skrapan.
 - Avgör källa först: HTML → vanlig skrapa; JS → underliggande JSON;
   verkligt stående meny → sparad JSON; veckovis PDF → textlager;

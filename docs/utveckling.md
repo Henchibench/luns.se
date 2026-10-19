@@ -62,7 +62,7 @@ dubblett och synlig klock-emoji.
 
 ## BO:s textmeny och daterad rotation, 2026-10-19
 
-BO skickar inte längre `MENU_IMAGE`. Daterad text från Menydags och Kathmandus
+BO skickar inte längre `MENU_IMAGE`. Veckokontrollerad OCR av BO:s original och Kathmandus
 valda stående vecka skickar `MENU_VALIDITY` med måndag/fredag inklusive år.
 Frontend döljer rätter och info när datan gäller en annan visningsvecka,
 även om samma statiska bygge ligger kvar. Befintligt stöd för äldre

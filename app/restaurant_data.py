@@ -217,7 +217,7 @@ restaurant_locations = {
         "area": "Järntorget/Linné"
     },
     "Restaurang BO": {
-        "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckans texträtter hämtas via Menydags; MENY leder till restaurangens original.",
+        "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckans rätter läses automatiskt från restaurangens egen menybild.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang%20BO%2C%20Masthamnsgatan%2015%2C%20413%2029%20G%C3%B6teborg",
         "latitude": 57.7003257,
         "longitude": 11.9467919,

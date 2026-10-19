@@ -8,7 +8,7 @@
 #
 # Kedjan är med flit densamma som .github/workflows/scrape-and-deploy.yml:
 #
-#     pip install requests beautifulsoup4 lxml   ->  .venv-prod
+#     pip install -r requirements.txt          ->  .venv-prod
 #     python scripts/scrape_menus.py             ->  public/data/*.json
 #     npm ci && npm run build                    ->  out/
 #
@@ -132,12 +132,13 @@ mkdir -p "$KOR"
 # --- 1. produktionsvenvet ----------------------------------------------------
 
 if [ ! -x "$VENV/bin/python" ]; then
-  echo "== Skapar .venv-prod (samma tre paket som Actions installerar)"
+  echo "== Skapar .venv-prod (samma paket som Actions installerar)"
   python3 -m venv "$VENV" || avbryt "python3 -m venv föll. Saknas python3-venv?"
   "$VENV/bin/pip" install --quiet --upgrade pip || true
-  "$VENV/bin/pip" install --quiet -r "$ROT/requirements.txt" \
-    || avbryt "pip install -r requirements.txt föll"
 fi
+# Även ett befintligt venv måste få nya produktionsberoenden.
+"$VENV/bin/pip" install --quiet -r "$ROT/requirements.txt" \
+  || avbryt "pip install -r requirements.txt föll"
 
 # Spärren som gör venvet meningsfullt. Hamnar playwright här av misstag är
 # skriptet inte längre ett prov på produktionsmiljön, bara ett till skal.
@@ -148,6 +149,8 @@ fi
 # --- 2. skrapningen ----------------------------------------------------------
 
 if [ "$HOPPA_SKRAP" -eq 0 ]; then
+  command -v tesseract >/dev/null || avbryt "Tesseract saknas. Installera tesseract-ocr och tesseract-ocr-swe."
+  tesseract --list-langs 2>/dev/null | grep -qx swe || avbryt "Tesseracts svenska språkdata saknas."
   echo "== Kör skraporna (samma kommando som Actions, ~1-2 minuter)"
   "$VENV/bin/python" "$ROT/scripts/scrape_menus.py" || avbryt "scrape_menus.py föll"
   echo

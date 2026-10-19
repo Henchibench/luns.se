@@ -2,3 +2,4 @@
 beautifulsoup4
 requests
 lxml
+Pillow>=12.0,<13

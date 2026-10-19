@@ -18,13 +18,13 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 7;
+export const NEWS_VERSION = 8;
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-19',
     title: 'Textmenyer hos BO och Kathmandu',
-    body: 'BO:s veckomeny hämtas nu automatiskt som text via Menydags och går att söka. Kathmandu visar sin stående lunchmeny för udda eller jämna veckor, med rätt alternativ på varje dag.',
+    body: 'BO:s veckomeny läses nu automatiskt från restaurangens egen bild och går att söka. Kathmandu visar sin stående lunchmeny för udda eller jämna veckor, med rätt alternativ på varje dag.',
   },
   {
     date: '2026-09-21',

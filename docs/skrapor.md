@@ -12,15 +12,16 @@ Läs app/scrapers/AGENTS.md också. Här ges inget utökat uppdragsmandat.
 4. Veckovis PDF med textlager: använd den smala standardbiblioteksläsaren i
    `pdf_text.py`, kontrollera vecka eller källans ändringsdatum och stäng av
    fallback till förra menyn.
-5. Veckovis bild: kontrollera först om samma meny finns som daterad text hos
-   en verifierbar källa. BO läses sedan 2026-10-19 via Menydags; varje dags
-   ISO-datum måste ligga i visningsveckan. Finns bara bild behövs fortfarande
-   källkontrollerad avläsning; påstå inte att automatisk OCR finns.
+5. Veckovis bild: läs restaurangens eget original med lokal OCR när textlager
+   saknas. BO använder Tesseract med svenska språkdata och Pillow för radutsnitt.
+   Kräv aktuell vecka och hel menystruktur; feltolkad bild ger menybesked,
+   aldrig förra veckans rätter eller inbäddad bild.
 6. Stående rotation med uttryckliga udda/jämna veckor kan sparas med källa,
    datum och hash, precis som annan stående meny. Välj efter ISO-veckan,
    inte genom att växla var sjunde dag (vecka 53 och vecka 1 är båda udda).
 
-Produktion har bara requests, beautifulsoup4, lxml utöver standardbiblioteket.
+Produktion har requests, beautifulsoup4, lxml och Pillow utöver standardbiblioteket.
+BO kräver även Tesseract och svenska språkdata som systempaket.
 Spaning med scripts/spana.py får ha utvecklingsberoenden; de får inte läcka in
 i produktionsskrapan. Läs minne/skrapor-09.md när spaning behövs.
 
@@ -63,16 +64,37 @@ i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventer
 Detta ersätter BO:s bildreserv och Kathmandus Menydags-reserv från september
 nedan. Äldre kontroller är historik, inte nuvarande implementation.
 
-**BO:** [Menydags](https://www.menydags.se/restaurang/restaurang-bo/lunch)
-gav HTTP 200 och daterad HTML för vecka 43. Alla 24 rätter och priser
-jämfördes med [officiella bilden](https://www.restaurangbo.se/lunchmat):
-5/5/5/5/4 alternativ. Fredagsdessert är information. Skrapan hämtar nu text
-varje produktionskörning, kräver rätt datum inklusive år och matchande dagrubrik,
-och använder bara uttryckliga dietetiketter. Den sparade septemberavskriften
-har tagits bort. Ingen bild bäddas in, inte heller när textkällan saknar mat;
-då ges ett menybesked och MENY leder fortfarande till restaurangens original.
-Automatiken är beroende av Menydags publicering; ingen OCR, AI-tjänst, lokal
-veckokörning eller ändring av Actions krävs.
+**BO:** Menydags är borttagen som källa på Henriks begäran. Skrapan hämtar
+[BO:s lunchsida](https://www.restaurangbo.se/lunchmat) och väljer den entydiga
+originalbild vars filnamn anger visningsveckan. Veckonumret i själva bilden
+måste också stämma. Bilden anger inget år; kontrollen bevisar därför inte
+att en bild med samma veckonummer från ett äldre år är ny. Originalet hämtas
+på nytt vid varje körning och ingen sparad avskrift återanvänds.
+
+Tesseract (`swe`, sidläge 3) hittar rader och läser texten. BO:s tunna versaler
+förlorade accenter i helbildsläsningen trots hög OCR-konfidens. Därför läses
+varje rättnamn med pris igen från ett separat bildutsnitt (sidläge 7).
+Det återgav FLÄSKFILÉ, SMÅLÄNDSKA och RÄKOR korrekt utan ordlista eller gissade
+rättelser. Pillow gör endast utsnitten; ingen extern AI- eller OCR-tjänst används.
+Två läsningar måste ge samma pris. Alla fem dagar, Veckans gröna, Sallad och
+slutgränsen Lunchdryck måste finnas i rätt ordning. Rättnamn och beskrivning
+krävs, text med medelkonfidens under 70 avvisas. Konfidens är en felindikator,
+inte en garanti för korrekt text. Ny layout eller svårläst bild kan kräva
+anpassning; då visas ett menybesked och en länk till originalet.
+
+Vecka 43 jämfördes mot originalbilden: alla 24 rätter med priser och tillbehör,
+5/5/5/5/4 per dag. Fredagsdessert är information. Veckans gröna och sallader
+läggs på samtliga vardagar; diet- och allergenetiketter gissas inte.
+Livehämtning inklusive OCR tog cirka 5,5 sekunder på dev01 med Tesseract 5.5.0.
+Inga nedladdade bilder eller OCR-filer committas. Temporära bilder rensas.
+
+Henrik beställde uttryckligen Tesseract i testmiljön och GitHub Actions.
+Actions installerar `tesseract-ocr` och `tesseract-ocr-swe` med apt, och samma
+Pythonberoenden från requirements.txt som testservern. På dev01 installerades
+systempaketen av Henrik; testservern kontrollerar dem före skrapning och
+uppdaterar även ett befintligt produktionsvenv. Vid saknade paket avbryts
+bygget utan att den körande förhandssidan stoppas. På macOS behövs Tesseract
+med `swe` tillgängligt för den som vill köra hela skrapkedjan där.
 
 **Kathmandu:** vanlig HTTP gav fortfarande 403 med `cf-mitigated: challenge`,
 men den officiella sidan öppnades i vanlig webbläsare utan manuell verifiering.
@@ -101,7 +123,7 @@ bygge spärrar föregående veckas text/rotation. Ingen tidigare skrapning
 Verifiering: Python-tester för BO, Kathmandu och Järntorgets PDF-mallar;
 Node-tester för metadata, utgången text och oförändrade bildmetadata från äldre
 byggen. Produktionsvenv utan Playwright ger BO 5/5/5/5/4 och Kathmandu
-4/4/4/4/4. Nästa vecka, helg, ISO-årsskifte (53→1), ändrat pris, nätfel,
+4/4/4/4/4. Nästa vecka, helg, ISO-årsskifte (53→1), osäker/ofullständig OCR, nätfel,
 skadad sparad rotation och ändrad källstruktur är täckta. Full lokal
 produktionskedja och Next-bygge godkända. Webbläsaren verifierade rätt område,
 alla fem dagars antal, noll menybilder och sökning på BO:s pestopasta.
