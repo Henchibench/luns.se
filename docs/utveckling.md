@@ -260,7 +260,11 @@ Change only lighting, sky and atmosphere: a long Nordic summer evening shortly a
 
 Henrik rapporterade att stängknappen krävde rullning genom hela historiken
 på mobil och att rutan var för smal på dator. `NewsNote` har nu en fast
-rubrikrad utanför innehållets rullyta. Stäng är minst 44px hög,
+rubrikrad utanför innehållets rullyta. På Henriks begäran ligger Stäng i
+översta högra hörnet på mobil, men i en fast nederkant till höger från
+760px bredd. CSS Grid flyttar samma knapp mellan lägena, även vid ändrad
+fönsterbredd; inga dubbla fokusmål eller enhetsgissningar behövs.
+Båda placeringarna ligger utanför rullytan. Stäng är minst 44px hög,
 får fokus vid öppning och behåller befintlig stänganimation och återgång.
 Panelens maxhöjd följer dvh (vh som fallback), med luft runt rutan.
 

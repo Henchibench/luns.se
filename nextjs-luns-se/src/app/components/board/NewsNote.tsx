@@ -101,17 +101,20 @@ export default function NewsNote({
   return (
     <Overlay onClose={onClose} onCloseStart={onCloseStart} labelledBy="luns-news-title">
       <div
-        className="luns-panel luns-news-panel flex w-full max-w-[960px] flex-col overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)]"
+        className="luns-panel luns-news-panel grid w-full max-w-[960px] grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-4 wide:px-6">
+        <div className="col-start-1 row-start-1 flex items-center border-b border-[var(--line)] py-4 pl-4 wide:col-span-2 wide:px-6">
           <h2 id="luns-news-title" className="font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
             Nytt på luns.se
           </h2>
+        </div>
+
+        <div className="col-start-2 row-start-1 flex items-center justify-end border-b border-[var(--line)] py-4 pr-4 pl-3 wide:col-span-2 wide:col-start-1 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-6">
           <CloseButton />
         </div>
 
-        <div className="luns-scroll min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
+        <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
           <ul aria-label="Senaste nyheterna" className="grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4">
             {latest.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
           </ul>
