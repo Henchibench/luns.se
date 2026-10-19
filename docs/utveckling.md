@@ -279,12 +279,13 @@ varje ny öppning börjar hopfälld. Ingenting tas bort ur nyhetslistan.
 Henrik tyckte att två jämna kolumner gjorde kronologin otydlig och beställde
 istället en tidslinje med kort omlott. En ordnad lista behåller nyast först
 även för skärmläsare. Från 760px ligger linjen i mitten och korten växlar
-vänster/höger med 64px vertikal överlappning mellan kolumnerna. Minhöjd 160px
-gör att kort på samma sida alltid har minst 32px mellanrum. Varje nästa
+vänster/höger. Högerkortet börjar 96px längre ned i varje par; nästa par
+följer efter båda kortens höjd med 32px mellan raderna. Det ger mindre
+tomrum kring bildkorten än en nästan separat rad per nyhet. Varje nästa
 kort börjar längre ned; inga kort täcker varandra. Datumet ligger nära
 kopplingspunkten, första punkten är fylld och övriga är ringar.
 På mobil ligger linjen till vänster, korten i en kolumn med 20px avstånd
-och utan minhöjd. Linje och punkter är dekorativa CSS-element; datum har
+utan förskjutning. Linje och punkter är dekorativa CSS-element; datum har
 semantiska time-element. Äldre nyheter fortsätter på samma linje utan
 skiljestreck. Panelen behåller maxbredd 960px och befintliga färger och
 typsnitt. Brödtexten använder ink2

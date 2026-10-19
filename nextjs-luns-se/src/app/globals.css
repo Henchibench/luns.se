@@ -165,9 +165,8 @@ body {
   max-height: calc(100dvh - 4rem);
 }
 
-/* DOM-ordningen är alltid kronologisk; endast placeringen växlar sida.
-   64px omlott och minst 160px höga kort ger minst 32px mellan kort på
-   samma sida, även med kort text eller den mindre textinställningen. */
+/* DOM-ordningen är alltid kronologisk. Varannan punkt ligger 96px längre
+   ned i sin rad; nästa rad följer båda kortens höjd utan överlappning. */
 .luns-news-timeline {
   position: relative;
   display: flow-root;
@@ -212,14 +211,16 @@ body {
 }
 .luns-news-entry:first-child::after { background: var(--acc); }
 @media (min-width: 760px) {
-  .luns-news-timeline { padding-left: 0; }
-  .luns-news-timeline::before { left: calc(50% - 1px); }
-  .luns-news-entry {
-    width: calc(50% - 28px);
-    min-height: 160px;
-    margin-top: -64px;
+  .luns-news-timeline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px 56px;
+    padding-left: 0;
   }
-  .luns-news-entry:nth-child(even) { margin-left: auto; }
+  .luns-news-timeline::before { left: calc(50% - 1px); }
+  .luns-news-entry { margin-top: 0; }
+  .luns-news-entry:nth-child(even) { margin-top: 96px; }
   .luns-news-entry:nth-child(odd)::before {
     left: auto;
     right: -28px;
