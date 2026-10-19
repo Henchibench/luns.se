@@ -1,16 +1,17 @@
-// Förberedd mottagare. Aktiveras först när domän, Resend och Turnstile verifierats.
+// Produktion: separat Turnstile-widget och endast publika Luns-origins.
 {
   "name": "luns-contact",
   "main": "worker.mjs",
   "account_id": "8ce9451d9f605299a2384ec40a009581",
   "compatibility_date": "2026-10-19",
-  "workers_dev": false,
+  "workers_dev": true,
   "preview_urls": false,
   "vars": {
-    "CONTACT_MODE": "disabled",
+    "CONTACT_MODE": "live",
     "ALLOWED_ORIGINS": "https://luns.se,https://www.luns.se",
     "TURNSTILE_HOSTNAMES": "luns.se,www.luns.se",
-    "CONTACT_TO": "luns.se@outlook.com"
+    "CONTACT_TO": "luns.se@outlook.com",
+    "CONTACT_FROM": "Luns <formular@kontakt.luns.se>"
   },
   "ratelimits": [
     {

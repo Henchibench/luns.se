@@ -1,1 +1,5 @@
-{"mode":"disabled"}
+{
+  "mode": "live",
+  "endpoint": "https://luns-contact.luns-se-hench.workers.dev/contact",
+  "sitekey": "0x4AAAAAAFcHymVA-ct1e6oe"
+}

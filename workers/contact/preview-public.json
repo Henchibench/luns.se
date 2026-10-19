@@ -1,5 +1,5 @@
 {
-  "mode": "live",
-  "endpoint": "https://luns-contact.luns-se-hench.workers.dev/contact",
+  "mode": "demo",
+  "endpoint": "https://luns-contact-preview.luns-se-hench.workers.dev/contact",
   "sitekey": "0x4AAAAAAFcEmzXARfJbBm8d"
 }

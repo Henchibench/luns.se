@@ -11,60 +11,59 @@ efter att Henrik bekräftat Verified för `kontakt.luns.se` hos Resend.
 
 ## Test och produktion
 
-- `workers/contact/worker.mjs` är mottagaren, utan npm-beroenden.
-- `workers/contact/wrangler.jsonc` gäller **bara testmiljön**.
-- `workers/contact/wrangler.production.jsonc` gäller `luns-contact`, skapad
-  2026-10-19 som separat mottagare för riktiga mejl. Produktionsfilen är en
-  avstängd mall. Aktuell driftsättning följer i stället
-  `wrangler.mail-test.jsonc`: `CONTACT_MODE=mail-test`, workers.dev på,
-  enbart origin `http://10.0.1.34:3002`, testwidgetens secret och avsändaren
-  `Luns <formular@kontakt.luns.se>`. Produktionsorigins accepteras inte.
-  Resend-nyckeln läggs där under Settings → Variables and Secrets → Add,
-  Type Secret, namnet `RESEND_API_KEY`. Inget mejl skickas av att nyckeln sparas.
-- Test-Worker: `luns-contact-preview`, kontot `8ce9451d9f605299a2384ec40a009581`.
-- Demo-endpoint: `https://luns-contact-preview.luns-se-hench.workers.dev/contact`.
-- Testservern använder nu `https://luns-contact.luns-se-hench.workers.dev/contact`
-  med publik mode `live` eftersom inskickningar ger riktiga mejl.
-- Turnstile: Managed, no_clearance, bara `10.0.1.34`, `localhost`, `127.0.0.1`.
-  Secret ligger i Workerns krypterade binding `TURNSTILE_SECRET`, aldrig i git.
-- `CONTACT_MODE=demo` verifierar på riktigt men sparar eller mejlar inget.
-  Svaret innehåller `demo:true`; gränssnittet säger uttryckligen att inget skickats.
-- `scripts/testserver.sh --utan-skrap` kopierar `preview-public.json` enbart till
-  exporterade `out/contact-config.json`. Nyckeln där är publik, inte hemlig.
-- Källfilen `public/contact-config.json` har läget `disabled`. Ett vanligt
-  produktionsbygge döljer Kontakt och Rapportera fel tills kopplingen är klar.
-  Den befintliga mejllänken under inställningar finns då kvar. Nyhetsposten
-  för kontakt visas bara där formuläret är aktiverat.
+Produktionskopplingen förbereddes och driftsattes 2026-10-20 på Henriks
+beställning. Frontendändringen ligger på Dev och visas publikt först när
+Henrik släppt till main och sajtens publiceringsworkflow byggt den.
 
-Demo-Workern förblir demo. Mejltest sker på `luns-contact` i läget `mail-test`,
-som också i koden kräver exakt testserver-origin. Alla ordinarie kontroller
-(Turnstile, engångstoken, fast mottagare, rate limit och Resend) gäller.
-`live` avvisar fortfarande de lokala värdarna.
-Produktionskopplingen använder den separata Workern `luns-contact`
-och ska få en separat Turnstile-widget med enbart `luns.se`/`www.luns.se` som förväntade
-hostnames. Kopiera inte de lokala origin-värdena till produktion.
+- `workers/contact/worker.mjs` är mottagaren, utan npm-beroenden.
+- `wrangler.production.jsonc`: `luns-contact`, `CONTACT_MODE=live`, endpoint
+  `https://luns-contact.luns-se-hench.workers.dev/contact`, enbart origins
+  `https://luns.se` och `https://www.luns.se`. Siteverify måste returnera
+  motsvarande exakta hostname och action `contact`.
+- Produktionens Managed-widget har sitekey `0x4AAAAAAFcHymVA-ct1e6oe` och
+  domänerna `luns.se`/`www.luns.se`, med `no_clearance`.
+- Avsändare: `Luns <formular@kontakt.luns.se>`. Fast mottagare:
+  `luns.se@outlook.com`. Resend-domänen är Verified hos Resend; DNS finns
+  hos one.com. `RESEND_API_KEY` och produktionswidgetens `TURNSTILE_SECRET`
+  ligger som krypterade Worker-secrets, aldrig i git.
+- `wrangler.jsonc`: separat `luns-contact-preview` i läget `demo`, endpoint
+  `https://luns-contact-preview.luns-se-hench.workers.dev/contact`.
+  Widgeten `0x4AAAAAAFcEmzXARfJbBm8d` tillåter bara test-IP och loopback.
+  Demo verifierar riktiga token men mejlar och sparar inget; gränssnittet
+  säger detta uttryckligen. Denna Worker har ingen Resend-nyckel.
+- `public/contact-config.json` innehåller produktionsendpoint, publik sitekey
+  och `mode=live`. Kontakt, Rapportera fel och nyheten aktiveras vid släpp.
+- `scripts/testserver.sh --utan-skrap` ersätter enbart exporterade
+  `out/contact-config.json` med `preview-public.json`. Testservern återgick
+  därför till demo när produktionskopplingen förbereddes. Produktionsfilen
+  i källträdet påverkas inte av testbygget.
+
+Cloudflare-kontot är `8ce9451d9f605299a2384ec40a009581`. Produktionsorigin
+accepteras inte av demo-Workern och lokala origins accepteras inte av
+produktions-Workern. Det tidigare tillfälliga mejltestets konfigurationsfil
+är borttagen för att inte kunna skriva över produktionen av misstag.
+
 Att pusha Dev eller köra Actions uppdaterar inte Worker-koden automatiskt.
 Den levereras separat genom Cloudflare MCP eller autentiserad Wrangler med
 exakt konfigurationsfil. Vid MCP-uppladdning ska `keep_bindings: ["secret_text"]`
 bevara befintliga secrets; skriv aldrig ut dem.
 
-## Inför publicering
+## Publicering och återställning
 
-DNS-domänen `kontakt.luns.se` är Verified enligt Henrik 2026-10-20. Resends
-DNS-poster är tillagda hos one.com. API-nyckeln ligger som secret i
-`luns-contact` och bevaras vid leverans; inga nycklar finns i repot.
+Ingen ytterligare Cloudflare- eller Resend-konfiguration behövs inför detta
+släpp. Henrik slår ihop Dev till main och kör befintliga **Scrape and Deploy**
+via workflow_dispatch, eller låter nästa schemakörning publicera. En merge
+ensam publicerar inte sajten. Workflow-filerna har inte ändrats.
 
-Mejltestet använder befintlig testwidget och fast mottagare
-`luns.se@outlook.com`. För att publicera senare: skapa en separat
-produktionswidget för bara `luns.se` och `www.luns.se`, ersätt
-`TURNSTILE_SECRET`, sätt produktionskonfigurationens avsändare och mode `live`
-och aktivera dess workers.dev-adress. Uppdatera därefter den publika
-kontaktkonfigurationen med produktionswidgetens sitekey. Testservern behöver
-då återgå till demo eller få en separat mejltestmottagare; blanda inte de
-lokala origins med produktion. Henrik släpper själv Dev→main.
+Efter publicering: öppna Kontakt på luns.se och skicka ett testmeddelande.
+Riktig leverans till Henriks inkorg är redan bekräftad från testservern;
+produktionswidgetens automatiska verifiering kan slutkontrolleras från
+produktionsdomänen först när den nya sidan är publicerad.
 
-Ett lyckat Resend-svar betyder accepterat för leverans; kontrollera också
-leveransstatus eller att testmejlet kommer till inkorgen.
+Vid behov kan formuläret stängas på servern med `CONTACT_MODE=disabled`,
+vilket stoppar mejlsändning direkt. `public/contact-config.json` med
+`mode=disabled` döljer formulär och kontaktnyhet vid nästa sajtpublicering;
+den vanliga mejllänken under inställningar blir då kvar.
 
 ## Flöde och skydd
 
@@ -109,7 +108,12 @@ Bygget på testservern passerade. Driftsatt endpoint gav HTTP 204 för rätt
 preflight, HTTP 403 för produktionsorigin och HTTP 403 för ogiltig token.
 Henrik skickade därefter från Safari: formuläret visade riktig bekräftelse
 och Resend visade Delivered för mejlet till `luns.se@outlook.com` med ämnet
-`[Luns] Annat`. Inkorgens placering (vanlig inkorg/skräppost) är inte kontrollerad.
+`[Luns] Annat`. Henrik bekräftade därefter att inskickningen och mejlet fungerade.
+
+Produktionsförberedelse 2026-10-20: separat widget och serverhemlighet,
+konfiguration i Dev samt återgång till separat demo på testservern.
+Verifiering av driftsatta origins, nekad ogiltig token och bygge dokumenteras
+efter leverans. Fullständigt formulärtest från luns.se återstår efter publicering.
 
 Källor: [Turnstile Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
 [Workers rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/),
