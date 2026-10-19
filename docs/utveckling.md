@@ -276,15 +276,18 @@ De fem senaste synliga nyheterna visas först efter kontaktfiltrering och
 datumsortering. Äldre poster ligger bakom Visa äldre nyheter med antal,
 `aria-expanded` och `aria-controls`. Historiken går att fälla ihop igen;
 varje ny öppning börjar hopfälld. Ingenting tas bort ur nyhetslistan.
-Efter Henriks återkoppling om skiljelinje och ojämna avstånd ligger alla
-synliga nyheter i ett gemensamt rutnät, utan avdelare före äldre poster.
-Tidigare gav `items-start` olika korthöjder inom samma rad och två separata
-listor lämnade en tom högerkolumn vid övergången. Korten sträcks nu till
-samma höjd inom varje rad och äldre poster fyller nästa lediga plats.
-Avståndet är genomgående 16px på dator och 12px på mobil.
-Dator får högst 960px bred panel och två kolumner från sajtens brytpunkt
-760px, mobil en kolumn. De två bildnyheterna ligger först vid samma datum,
-så bilderna visas bredvid varandra på dator. Brödtexten använder ink2
+Henrik tyckte att två jämna kolumner gjorde kronologin otydlig och beställde
+istället en tidslinje med kort omlott. En ordnad lista behåller nyast först
+även för skärmläsare. Från 760px ligger linjen i mitten och korten växlar
+vänster/höger med 64px vertikal överlappning mellan kolumnerna. Minhöjd 160px
+gör att kort på samma sida alltid har minst 32px mellanrum. Varje nästa
+kort börjar längre ned; inga kort täcker varandra. Datumet ligger nära
+kopplingspunkten, första punkten är fylld och övriga är ringar.
+På mobil ligger linjen till vänster, korten i en kolumn med 20px avstånd
+och utan minhöjd. Linje och punkter är dekorativa CSS-element; datum har
+semantiska time-element. Äldre nyheter fortsätter på samma linje utan
+skiljestreck. Panelen behåller maxbredd 960px och befintliga färger och
+typsnitt. Brödtexten använder ink2
 för tydligare läsning. Befintlig nyhet om nyhetsrutan förklarar historiken;
 version 13 behålls för förfiningen av samma ännu osläppta funktion.
 

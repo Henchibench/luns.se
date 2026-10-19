@@ -47,10 +47,10 @@ function formatDate(iso: string): string {
 
 function Entry({ item, onOpenContact }: { item: NewsItem; onOpenContact?: () => void }) {
   return (
-    <li className="rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5">
-      <span className="block font-mono text-10 tracking-[.1em] text-[var(--mut)]">
+    <li className="luns-news-entry rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5">
+      <time dateTime={item.date} className="luns-news-date block font-mono text-10 tracking-[.1em] text-[var(--mut)]">
         {formatDate(item.date)}
-      </span>
+      </time>
       <h3 className="mt-1 font-heading text-16 font-semibold text-[var(--ink)]">{item.title}</h3>
       <p className="mt-1 text-13 leading-[1.5] text-[var(--ink2)]">{item.body}</p>
       {item.action === 'contact' && onOpenContact && (
@@ -138,9 +138,9 @@ export default function NewsNote({
         </div>
 
         <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
-          <ul id="luns-news-items" aria-label="Nyheter" className="grid list-none grid-cols-1 gap-3 p-0 wide:grid-cols-2 wide:gap-4">
+          <ol id="luns-news-items" role="list" aria-label="Nyheter, nyast först" className="luns-news-timeline">
             {(showOlder ? sorted : latest).map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
-          </ul>
+          </ol>
 
           {older.length > 0 && (
             <OlderNewsButton expanded={showOlder} count={older.length}
