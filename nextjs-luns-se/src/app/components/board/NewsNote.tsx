@@ -80,6 +80,25 @@ function CloseButton() {
   );
 }
 
+function OlderNewsButton({ expanded, count, onToggle, className }: {
+  expanded: boolean;
+  count: number;
+  onToggle: () => void;
+  className: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-expanded={expanded}
+      aria-controls="luns-older-news"
+      onClick={onToggle}
+      className={`min-h-11 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-13 font-semibold text-[var(--ink)] cursor-pointer hover:bg-[var(--hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)] ${className}`}
+    >
+      {expanded ? 'Dölj äldre nyheter' : `Visa äldre nyheter (${count})`}
+    </button>
+  );
+}
+
 export default function NewsNote({
   onClose,
   onCloseStart,
@@ -111,6 +130,10 @@ export default function NewsNote({
         </div>
 
         <div className="col-start-2 row-start-1 flex items-center justify-end border-b border-[var(--line)] py-4 pr-4 pl-3 wide:col-span-2 wide:col-start-1 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-6">
+          {older.length > 0 && (
+            <OlderNewsButton expanded={showOlder} count={older.length}
+              onToggle={() => setShowOlder(value => !value)} className="mr-auto hidden wide:block" />
+          )}
           <CloseButton />
         </div>
 
@@ -120,18 +143,11 @@ export default function NewsNote({
           </ul>
 
           {older.length > 0 && (
-            <div className="mt-5 border-t border-[var(--line)] pt-4">
-              <button
-                type="button"
-                aria-expanded={showOlder}
-                aria-controls="luns-older-news"
-                onClick={() => setShowOlder(value => !value)}
-                className="min-h-11 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-13 font-semibold text-[var(--ink)] cursor-pointer hover:bg-[var(--hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]"
-              >
-                {showOlder ? 'Dölj äldre nyheter' : `Visa äldre nyheter (${older.length})`}
-              </button>
+            <div className={showOlder ? 'mt-5 border-t border-[var(--line)] pt-4' : 'mt-5 border-t border-[var(--line)] pt-4 wide:hidden'}>
+              <OlderNewsButton expanded={showOlder} count={older.length}
+                onToggle={() => setShowOlder(value => !value)} className="wide:hidden" />
               <ul id="luns-older-news" aria-label="Äldre nyheter" hidden={!showOlder}
-                className={showOlder ? 'mt-4 grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4' : 'hidden'}>
+                className={showOlder ? 'mt-4 wide:mt-0 grid list-none grid-cols-1 items-start gap-3 p-0 wide:grid-cols-2 wide:gap-4' : 'hidden'}>
                 {older.map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
               </ul>
             </div>

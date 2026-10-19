@@ -264,7 +264,11 @@ rubrikrad utanför innehållets rullyta. På Henriks begäran ligger Stäng i
 översta högra hörnet på mobil, men i en fast nederkant till höger från
 760px bredd. CSS Grid flyttar samma knapp mellan lägena, även vid ändrad
 fönsterbredd; inga dubbla fokusmål eller enhetsgissningar behövs.
-Båda placeringarna ligger utanför rullytan. Stäng är minst 44px hög,
+Henrik upplevde två separata knapprader på dator som rörigt. Visa/Dölj äldre
+nyheter ligger därför på samma fasta nedersta rad som Stäng, till vänster.
+På mobil ligger historikknappen kvar efter de senaste nyheterna. CSS döljer
+den alternativa historikknappen helt, så bara en är synlig och fokuserbar.
+Båda placeringarna för Stäng ligger utanför rullytan. Stäng är minst 44px hög,
 får fokus vid öppning och behåller befintlig stänganimation och återgång.
 Panelens maxhöjd följer dvh (vh som fallback), med luft runt rutan.
 
