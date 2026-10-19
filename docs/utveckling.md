@@ -275,3 +275,23 @@ version 13 behålls för förfiningen av samma ännu osläppta funktion.
 
 Verifiering: minnestest och testserverbygge, därefter mobil/dator-kontroll
 av rullning, kvarvarande stängknapp, fem senaste och utfälld historik.
+
+## Läsbar textkontrast i båda teman, 2026-10-20
+
+Henrik upplevde att nyheter, inställningar och öppettider var svårlästa,
+framför allt i mörkt läge. Gemensamma `--mut` var #4F7680 i mörkt läge:
+beräknad kontrast mot kortens vita 6%-lager på #04252E var bara 2,74:1.
+Samma färg användes för datum, öppettider och förklaringar i inställningar.
+
+Mörkt läge använder nu `--mut: #A3C2C9` och `--ink2: #C5DDE2`.
+Det ger cirka 7,18:1 respektive 9,57:1 på nyhets-/inställningskortens
+komponerade bakgrund. Den ljusaste huvudtexten och bakgrunderna behålls.
+I ljust läge ändras `--mut` från #6E8B92 till #405C65, så sekundärtext
+blir mörkare. Ändringen sker i designtokens och når även öppettider,
+formulärhjälp, datum och etiketter utan lokala färgundantag.
+
+Verifiering: beräkning av relativa luminanser för text på solid panel och
+alfa-komponerat kort, minnestest, Next-bygge och visuell kontroll av nyheter,
+inställningar och lunchlistan i båda teman. Beräkningen omfattar dessa ytor,
+inte en fullständig tillgänglighetsgranskning av hela sajten. Metod:
+https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html.
