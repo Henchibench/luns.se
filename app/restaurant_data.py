@@ -92,6 +92,17 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/bombaybistrogbg/",
         "area": "Lindholmen"
     },
+    "Cuckoo's Nest": {
+        "description": "Restaurang, bar och mötesplats vid Lindholmspiren. Vardagslunchen består av dagens rätt, veckans vegetariska och tre lunchklassiker.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Cuckoo%27s%20Nest%2C%20Lindholmspiren%204%2C%20417%2056%20G%C3%B6teborg",
+        "latitude": 57.7077154,
+        "longitude": 11.9409213,
+        "website": "https://www.cuckoosnest.se/",
+        "menu_url": "https://www.cuckoosnest.se/menyer/lunch",
+        "instagram": "https://www.instagram.com/cuckoosnest_restaurant/",
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 11.30–13.30"
+    },
     "Encounter Asian": {
         "description": "Asiatiskt kök som spänner från koreansk bibimbap till kinesisk shaguo och japansk yakiniku. Sushi och nudelsoppor på samma meny.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Encounter%20Asian%2C%20Lindholmen%2C%20G%C3%B6teborg",

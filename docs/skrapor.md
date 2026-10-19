@@ -58,6 +58,29 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Cuckoo's Nest återinförd, 2026-10-19
+
+Symptom: restaurangen togs bort 2026-08-04 eftersom den då bara bedömdes
+servera à la carte och den gamla skrapan gav tomt resultat. Den officiella
+[lunchsidan](https://www.cuckoosnest.se/menyer/lunch) anger nu lunch måndag–
+fredag 11.30–13.30 och publicerar en uttryckligen veckomärkt meny.
+
+Källa och orsak: rå HTTP gav 200 med Drupal-genererad HTML. Vid kontrollen stod
+vecka 43 i den svenska `content-region`: en namnlös dagsrätt per vardag,
+"Veckans vegetariska" och tre namngivna lunchklassiker. En separat engelsk
+`sidebar-region` upprepar samma meny och ska inte läsas. Menyn är alltså
+veckovis HTML, inte den stående kategorimeny som den borttagna skrapan antog.
+
+Lösning: restaurangen och dess officiella menylänk är återinförda på
+Lindholmen. Skrapan läser endast den svenska kolumnen, använder neutral
+"Dagens" där källan saknar kategori och bevarar restaurangens rubriker och
+priser för övriga alternativ. Alla fem vardagar och aktuellt ISO-veckonummer
+krävs. `allow_previous_menu = False` hindrar förra veckans rätter från att
+ligga kvar efter ett källfel eller uteblivet menybyte.
+
+Verifiering: källan gav 5/5/5/5/5 rätter för vecka 43. Enhetstest täcker den
+svenska kolumnen, veckospärren, ofullständig vecka, kategorier och priser.
+
 ## Järntorget/Linné — källinventering och införande 2026-09-21
 
 Källa och verifiering: restaurangernas officiella länkar i kortet kontrollerades
