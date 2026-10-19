@@ -59,8 +59,12 @@ export async function handle(request, env, fetcher = fetch) {
   if (request.headers.get('Content-Type')?.split(';')[0].trim() !== 'application/json') return reply(415, { error: 'content_type' });
   const hostname = new URL(origin).hostname;
   const demo = env.CONTACT_MODE === 'demo';
-  if (!['demo', 'live'].includes(env.CONTACT_MODE) || !env.TURNSTILE_SECRET || !env.CONTACT_LIMITER || !list(env.TURNSTILE_HOSTNAMES).includes(hostname)) return reply(503, { error: 'unavailable' });
-  if (!demo && (!env.RESEND_API_KEY || !env.CONTACT_FROM || !env.CONTACT_TO || ['localhost', '127.0.0.1', '10.0.1.34'].includes(hostname))) return reply(503, { error: 'unavailable' });
+  if (!['demo', 'mail-test', 'live'].includes(env.CONTACT_MODE) || !env.TURNSTILE_SECRET || !env.CONTACT_LIMITER || !list(env.TURNSTILE_HOSTNAMES).includes(hostname)) return reply(503, { error: 'unavailable' });
+  if (!demo && (!env.RESEND_API_KEY || !env.CONTACT_FROM || !env.CONTACT_TO)) return reply(503, { error: 'unavailable' });
+  // Riktiga mejl från testservern kräver ett uttryckligt, separat driftläge.
+  // Läget kan inte användas på den publika sajten, även vid felaktig allowlist.
+  if (env.CONTACT_MODE === 'mail-test' && origin !== 'http://10.0.1.34:3002') return reply(503, { error: 'unavailable' });
+  if (env.CONTACT_MODE === 'live' && ['localhost', '127.0.0.1', '10.0.1.34'].includes(hostname)) return reply(503, { error: 'unavailable' });
 
   try {
     // CF sätter adressen vid kanten; godtycklig X-Forwarded-For används aldrig.
@@ -84,7 +88,7 @@ export async function handle(request, env, fetcher = fetch) {
   } catch { return reply(503, { error: 'verification_unavailable' }); }
   if (verification.success !== true || verification.action !== 'contact' || verification.hostname !== hostname) return reply(403, { error: 'verification' });
 
-  // Testmiljön verifierar riktiga Turnstile-token men sparar och mejlar inget.
+  // Demo verifierar riktiga Turnstile-token men sparar och mejlar inget.
   if (demo) return reply(200, { ok: true, demo: true });
   try {
     const response = await fetcher('https://api.resend.com/emails', {

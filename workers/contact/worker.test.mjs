@@ -25,3 +25,23 @@ test('rate limit och saknad limiter stänger', async () => { assert.equal((await
 test('nätfel hos Siteverify kan aldrig leda till mejl', async () => { assert.equal((await handle(request(), env, async () => { throw new Error('offline'); })).status, 503); });
 test('Resend-fel kan aldrig bli lyckat svar', async () => { const res = await handle(request(), env, async url => url.includes('siteverify') ? Response.json(verify) : Response.json({ error: 'rejected' }, { status: 500 })); assert.equal(res.status, 502); assert.equal((await res.json()).error, 'delivery'); });
 test('live kräver Resend och får inte använda lokal hostname', async () => { assert.equal((await handle(request(), { ...env, RESEND_API_KEY: '' })).status, 503); assert.equal((await handle(request(input, { headers: { Origin: 'http://localhost:3002' } }), { ...env, ALLOWED_ORIGINS: 'http://localhost:3002', TURNSTILE_HOSTNAMES: 'localhost' })).status, 503); });
+test('mail-test skickar från exakt testserver med riktig verifiering', async () => {
+  const origin = 'http://10.0.1.34:3002';
+  const testEnv = { ...env, CONTACT_MODE: 'mail-test', ALLOWED_ORIGINS: origin, TURNSTILE_HOSTNAMES: '10.0.1.34' };
+  const m = mock({ ...verify, hostname: '10.0.1.34' });
+  const res = await handle(request(input, { headers: { Origin: origin } }), testEnv, m.fetch);
+  assert.deepEqual(await res.json(), { ok: true, demo: false });
+  assert.equal(m.calls.length, 2);
+  assert.deepEqual(JSON.parse(m.calls[1].body).to, [env.CONTACT_TO]);
+  const bad = mock({ success: false });
+  assert.equal((await handle(request(input, { headers: { Origin: origin } }), testEnv, bad.fetch)).status, 403);
+  assert.equal(bad.calls.length, 1);
+  assert.equal((await handle(request(input, { headers: { Origin: origin } }), { ...testEnv, RESEND_API_KEY: '' }, m.fetch)).status, 503);
+});
+test('mail-test avvisar publik sajt och andra lokala origins även om allowlist felkonfigurerats', async () => {
+  const m = mock();
+  for (const origin of ['https://luns.se', 'http://localhost:3002', 'http://10.0.1.34:3003']) {
+    assert.equal((await handle(request(input, { headers: { Origin: origin } }), { ...env, CONTACT_MODE: 'mail-test', ALLOWED_ORIGINS: origin, TURNSTILE_HOSTNAMES: new URL(origin).hostname }, m.fetch)).status, 503);
+  }
+  assert.equal(m.calls.length, 0);
+});
