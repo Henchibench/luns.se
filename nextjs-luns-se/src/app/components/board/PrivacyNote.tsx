@@ -59,7 +59,8 @@ export default function PrivacyNote({
           Det finns inget konto på luns.se och ingen databas med besökare. Dina favoriter, dina
           bevakade rätter, ditt tema, din textstorlek och din valda plats ligger i din egen
           webbläsare. Rensar du webbläsardata är de borta, och de följer inte med till en annan
-          enhet.
+          enhet. Även vilka restauranger du redan sett i ett område sparas här, så att vi
+          kan visa en blänkare när nya tillkommer.
         </p>
 
         <h3 className="mb-1.5 font-mono text-10 tracking-[.15em] text-[var(--mut)]">
@@ -101,6 +102,16 @@ export default function PrivacyNote({
           Ihopräknat visas en del av det för alla under{' '}
           <span className="font-semibold text-[var(--ink2)]">Statistik</span>, aldrig per person,
           bara som summor.
+        </p>
+
+        <h3 className="mb-1.5 font-mono text-10 tracking-[.15em] text-[var(--mut)]">KONTAKTFORMULÄR</h3>
+        <p className="mb-5 text-13 leading-[1.6] text-[var(--ink2)]">
+          Kontaktformuläret kräver varken namn eller e-post. När det används behandlar
+          Cloudflare tekniska uppgifter för spamskydd och kontrollerar inskickningen.
+          I det aktiverade formuläret skickas meddelandet och eventuell e-post vidare
+          via Resend till vår inkorg, där vi kan läsa och besvara det. Innehållet går
+          inte till besöksstatistiken. I markerat testläge skickas inga mejl och
+          meddelandet sparas inte. Ingen automatisk kopia skickas till angiven e-post.
         </p>
 
         <div className="flex justify-end">

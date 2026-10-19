@@ -15,6 +15,13 @@ LOCATIONS = {
         "latitude": 57.7059,
         "longitude": 11.9359,
     },
+    "Järntorget/Linné": {
+        "label": "Järntorget/Linné",
+        "city": "Göteborg",
+        "map_query": "järntorget linné göteborg",
+        "latitude": 57.6998935,
+        "longitude": 11.9525030,
+    },
     "Tannefors": {
         "label": "Tannefors",
         "city": "Linköping",
@@ -84,6 +91,17 @@ restaurant_locations = {
         "website": "https://www.bombaybistro.se/",
         "instagram": "https://www.instagram.com/bombaybistrogbg/",
         "area": "Lindholmen"
+    },
+    "Cuckoo's Nest": {
+        "description": "Restaurang, bar och mötesplats vid Lindholmspiren. Vardagslunchen består av dagens rätt, veckans vegetariska och tre lunchklassiker.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Cuckoo%27s%20Nest%2C%20Lindholmspiren%204%2C%20417%2056%20G%C3%B6teborg",
+        "latitude": 57.7077154,
+        "longitude": 11.9409213,
+        "website": "https://www.cuckoosnest.se/",
+        "menu_url": "https://www.cuckoosnest.se/menyer/lunch",
+        "instagram": "https://www.instagram.com/cuckoosnest_restaurant/",
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 11.30–13.30"
     },
     "Encounter Asian": {
         "description": "Asiatiskt kök som spänner från koreansk bibimbap till kinesisk shaguo och japansk yakiniku. Sushi och nudelsoppor på samma meny.",
@@ -176,6 +194,98 @@ restaurant_locations = {
         "website": "https://www.compass-group.se/restauranger-och-menyer/ovriga-restauranger/seven-seasons/",
         "area": "Lindholmen",
         "lunch_hours": "Mån–fre 07.30–16.00"
+    },
+    "Poh-Keh Masthugget": {
+        "description": "Poké bowls och bibimbap på Masthuggskajen. Den officiella sidan hänvisar beställningar till restaurangens externa meny.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Poh-Keh%20Masthugget%2C%20Masthamnsgatan%205%2C%20413%2029%20G%C3%B6teborg",
+        "latitude": 57.7006653,
+        "longitude": 11.9494338,
+        "website": "https://www.poh-keh.se/",
+        "menu_url": "https://www.foodora.se/restaurant/ejtq/poh-keh-masthugget-ejtq",
+        "instagram": "https://www.instagram.com/eatpohkeh/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.00–15.00"
+    },
+    "Restaurang BO": {
+        "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckans rätter läses automatiskt från restaurangens egen menybild.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang%20BO%2C%20Masthamnsgatan%2015%2C%20413%2029%20G%C3%B6teborg",
+        "latitude": 57.7003257,
+        "longitude": 11.9467919,
+        "website": "https://www.restaurangbo.se/",
+        "menu_url": "https://www.restaurangbo.se/lunchmat",
+        "area": "Järntorget/Linné"
+    },
+    "Heurlins": {
+        "description": "Bistro och konditori vid Järntorget med veckans lunchrätter och hantverksbakade lunchmackor.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Heurlins%2C%20J%C3%A4rnb%C3%A4raregatan%206A%2C%20413%2030%20G%C3%B6teborg",
+        "latitude": 57.7014,
+        "longitude": 11.9536,
+        "website": "https://heurlinsgbg.se/",
+        "menu_url": "https://heurlinsgbg.se/lunch",
+        "instagram": "https://www.instagram.com/heurlinsgbg/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Ons–fre 11.30–14.00"
+    },
+    "Kathmandu": {
+        "description": "Nepalesiska och indiska rätter på Första Långgatan. Stående lunchmeny för udda och jämna veckor, med momo som dagligt alternativ.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Kathmandu%2C%20F%C3%B6rsta%20L%C3%A5nggatan%2014%2C%20413%2003%20G%C3%B6teborg",
+        "latitude": 57.6998394,
+        "longitude": 11.9498280,
+        "website": "https://www.kathmandurestaurang.se/sv",
+        "menu_url": "https://www.kathmandurestaurang.se/sv/lunchmeny",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.00–15.00"
+    },
+    "Bongo": {
+        "description": "Kvarterskrog på Andra Långgatan med dagens rätt samt veckans fisk och vegetariska rätt.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Bongo%2C%20Andra%20L%C3%A5nggatan%2015%2C%20413%2003%20G%C3%B6teborg",
+        "latitude": 57.6992609,
+        "longitude": 11.9490381,
+        "website": "https://goteborg.bongobar.se/",
+        "menu_url": "https://goteborg.bongobar.se/lunch",
+        "instagram": "https://www.instagram.com/bongo_gbg/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.30–14.00"
+    },
+    "Byns Trattoria": {
+        "description": "Italiensk trattoria på Tredje Långgatan med kött, fisk, pasta, pizza och sallad på vardagslunchen.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Byns%20Trattoria%2C%20Tredje%20L%C3%A5nggatan%2013%2C%20413%2003%20G%C3%B6teborg",
+        "latitude": 57.6987300,
+        "longitude": 11.9497150,
+        "website": "https://www.bynstrattoria.se/",
+        "menu_url": "https://www.bynstrattoria.se/food/lunch",
+        "instagram": "https://www.instagram.com/byns_trattoria/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.30–14.00"
+    },
+    "Feskekörka": {
+        "description": "Fiskhall och matdestination vid Rosenlundskanalen med flera restauranger och fisk och skaldjur i fokus.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Feskek%C3%B6rka%2C%20Fisktorget%204%2C%20411%2020%20G%C3%B6teborg",
+        "latitude": 57.7010468,
+        "longitude": 11.9574731,
+        "website": "https://www.feskekorka.se/",
+        "menu_url": "https://www.feskekorka.se/lunchmeny",
+        "instagram": "https://www.instagram.com/feskekorka_gbg/",
+        "area": "Järntorget/Linné"
+    },
+    "Taj Mahal": {
+        "description": "Indisk lunch på Första Långgatan med en vegetarisk eller vegansk tallrik och flera kyckling-, lamm- och nötköttsrätter på den stående veckomenyn.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Taj%20Mahal%2C%20F%C3%B6rsta%20L%C3%A5nggatan%2024%2C%20413%2028%20G%C3%B6teborg",
+        "latitude": 57.6996011,
+        "longitude": 11.9471068,
+        "website": "https://www.tajmahalgbg.se/lunch/",
+        "instagram": "https://www.instagram.com/tajmahalgbg/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.00–16.00"
+    },
+    "Silvis": {
+        "description": "Orientaliskt kök på Nordhemsgatan. Den stående lunchmenyn rymmer bland annat spett, långkokt högrev, lax och lammfärsbiffar.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Silvis%2C%20Nordhemsgatan%2018%2C%20413%2006%20G%C3%B6teborg",
+        "latitude": 57.6995209,
+        "longitude": 11.9493868,
+        "website": "https://silvis.nu/lunchmeny_i_linne_jarntorget/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Tis–fre 11.00–14.00"
     },
     "Terrassen": {
         "description": "Compass Group-restaurang vid Saab i Tannefors. Dagens rätt, dagens soppa och \"Snabbt & Gott\" i olika prislägen.",

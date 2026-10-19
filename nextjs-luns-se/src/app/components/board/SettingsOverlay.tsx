@@ -39,6 +39,7 @@ interface Props {
   newsUnread: boolean;
   onOpenStats: () => void;
   onOpenPrivacy: () => void;
+  onOpenContact?: () => void;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -48,8 +49,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Reglaget är en knapp och inte en kryssruta. Sajten har inga formulär, och
- * en checkbox hade behövt både egen normalisering och egen fokusstil för att
+ * Reglaget är en knapp och inte en kryssruta. En checkbox hade behövt både egen normalisering och egen fokusstil för att
  * se ut som resten.
  */
 function Switch({
@@ -132,18 +132,7 @@ function LinkRow({
   );
 }
 
-/**
- * Samma yta som raderna ovanför, men en länk som lämnar sajten.
- *
- * Ett formulär hade krävt någon som tar emot det, och sajten är en statisk
- * export utan server. Alternativet vore en tredjepartstjänst, alltså att
- * besökarens meddelande och IP går till någon annan — svårt att förena med
- * integritetsinfon två klick bort, som lovar att det som skrivs stannar i
- * webbläsaren. Mejlklienten är läsarens egen.
- *
- * Adressen står i klartext och inte bara bakom länken. Alla vill inte att en
- * mejlklient öppnar sig, en del vill kopiera den.
- */
+/** Mejladressen finns kvar som alternativ när formuläret är avstängt. */
 function MailRow({ address }: { address: string }) {
   return (
     <a
@@ -242,6 +231,7 @@ export default function SettingsOverlay({
   newsUnread,
   onOpenStats,
   onOpenPrivacy,
+  onOpenContact,
 }: Props) {
   return (
     <Overlay onClose={onClose} labelledBy="luns-settings-title">
@@ -309,7 +299,7 @@ export default function SettingsOverlay({
             ur sajten och handlar om att säga något, inte om att läsa något. */}
         <div className="mt-6">
           <SectionLabel>KONTAKT</SectionLabel>
-          <MailRow address={FEEDBACK_ADDRESS} />
+          {onOpenContact ? <LinkRow title="Tjôta med Luns" hint="Tipsa om ett lunchställe, rapportera ett fel eller skicka en idé. E-post är valfritt." onClick={onOpenContact} /> : <MailRow address={FEEDBACK_ADDRESS} />}
         </div>
 
         <div className="mt-6 flex justify-end">

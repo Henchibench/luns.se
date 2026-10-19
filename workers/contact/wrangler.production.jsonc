@@ -1,0 +1,37 @@
+// Produktion: separat Turnstile-widget och endast publika Luns-origins.
+{
+  "name": "luns-contact",
+  "main": "worker.mjs",
+  "account_id": "8ce9451d9f605299a2384ec40a009581",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "CONTACT_MODE": "live",
+    "ALLOWED_ORIGINS": "https://luns.se,https://www.luns.se",
+    "TURNSTILE_HOSTNAMES": "luns.se,www.luns.se",
+    "CONTACT_TO": "luns.se@outlook.com",
+    "CONTACT_FROM": "Luns <formular@kontakt.luns.se>"
+  },
+  "ratelimits": [
+    {
+      "name": "CONTACT_LIMITER",
+      "namespace_id": "1042",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.1
+    }
+  }
+}

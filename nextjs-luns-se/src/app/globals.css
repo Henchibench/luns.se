@@ -26,7 +26,7 @@
   --line: rgba(30, 80, 90, .22);
   --ink: #0E2229;
   --ink2: #31505A;
-  --mut: #6E8B92;
+  --mut: #405C65;
   --acc: #0D5B6E;
   --accStrong: #093F4D;
   --accBg: rgba(60, 150, 170, .24);
@@ -48,8 +48,8 @@ html.dark {
   --hi: rgba(255, 255, 255, .08);
   --line: rgba(255, 255, 255, .13);
   --ink: #DCEDF0;
-  --ink2: #A3C2C9;
-  --mut: #4F7680;
+  --ink2: #C5DDE2;
+  --mut: #A3C2C9;
   --acc: #54C2D8;
   --accStrong: #8ADCE8;
   --accBg: rgba(84, 194, 216, .15);
@@ -144,6 +144,92 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* vh kan gå bakom mobilens adressfält. Skalet är också containing block
+   för den fasta knappraden genom sin backdrop-filter, så dess höjd måste
+   följa den synliga ytan. Första värdet är fallback för äldre webbläsare. */
+.luns-viewport {
+  height: calc(100vh - var(--luns-preview-offset, 0px));
+  height: calc(100dvh - var(--luns-preview-offset, 0px));
+}
+
+.luns-mobile-sheet {
+  max-height: 72vh;
+  max-height: 72dvh;
+}
+
+/* Rubrik och stängknapp ligger utanför nyheternas rullande innehåll. */
+.luns-news-panel {
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+}
+
+/* DOM-ordningen är alltid kronologisk. Varannan punkt ligger 96px längre
+   ned i sin rad; nästa rad följer båda kortens höjd utan överlappning. */
+.luns-news-timeline {
+  position: relative;
+  display: flow-root;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 24px;
+}
+.luns-news-timeline::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 5px;
+  width: 2px;
+  background: var(--line);
+}
+.luns-news-entry {
+  position: relative;
+  margin-top: 20px;
+  overflow-wrap: anywhere;
+}
+.luns-news-entry:first-child { margin-top: 0; }
+.luns-news-entry::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: -19px;
+  width: 18px;
+  height: 1px;
+  background: var(--line);
+}
+.luns-news-entry::after {
+  content: "";
+  position: absolute;
+  top: 19px;
+  left: -24px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--acc);
+  border-radius: 50%;
+  background: var(--bg);
+}
+.luns-news-entry:first-child::after { background: var(--acc); }
+@media (min-width: 760px) {
+  .luns-news-timeline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px 56px;
+    padding-left: 0;
+  }
+  .luns-news-timeline::before { left: calc(50% - 1px); }
+  .luns-news-entry { margin-top: 0; }
+  .luns-news-entry:nth-child(even) { margin-top: 96px; }
+  .luns-news-entry:nth-child(odd)::before {
+    left: auto;
+    right: -28px;
+    width: 27px;
+  }
+  .luns-news-entry:nth-child(odd)::after { left: auto; right: -34px; }
+  .luns-news-entry:nth-child(even)::before { left: -28px; width: 27px; }
+  .luns-news-entry:nth-child(even)::after { left: -34px; }
+  .luns-news-entry:nth-child(odd) .luns-news-date { text-align: right; }
 }
 
 /* Filmkorn över hela sajten. Ligger över allt innehåll men släpper igenom

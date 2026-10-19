@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ContactForm from './components/contact/ContactForm';
+import { loadContactConfig, type ContactConfig, type ContactContext } from './lib/contact';
 import Header from './components/board/Header';
 import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
@@ -10,6 +12,7 @@ import LocationWelcome from './components/board/LocationWelcome';
 import WelcomeTour, { type TourStep } from './components/board/WelcomeTour';
 import PrivacyNote from './components/board/PrivacyNote';
 import NewsNote from './components/board/NewsNote';
+import RestaurantNews from './components/board/RestaurantNews';
 import SettingsOverlay from './components/board/SettingsOverlay';
 import StatsOverlay from './components/board/StatsOverlay';
 import { ChipSpec } from './components/board/Chips';
@@ -21,16 +24,20 @@ import { useTextSize } from './hooks/useTextSize';
 import { useWeather } from './hooks/useWeather';
 import { useWelcome } from './hooks/useWelcome';
 import { useNews } from './hooks/useNews';
+import { useRestaurantNews } from './hooks/useRestaurantNews';
+import type { RestaurantIdentity } from './lib/restaurantNews';
 import {
   DAYS,
   categoryColor,
   currentDay,
   currentDayIndex,
   dateForDay,
+  infoStatesLunchHours,
   loadMenuData,
   stripInfoEmoji,
   type LunsLocation,
   type Restaurant,
+  type Dish,
 } from './lib/menu';
 import {
   CRAVINGS,
@@ -49,20 +56,6 @@ const SPY_OFFSET = 70;
 const SCROLL_OFFSET = 52;
 /** Hur nära toppen sista restaurangen får komma. */
 const HARD_STOP = 56;
-/**
- * Känner igen att skrapans inforad redan innehåller öppettider.
- *
- * Tiderna kan komma från två håll: lunch_hours i restaurangdatan och INFO-rader
- * från skrapan. Har en restaurang båda hamnar de på samma rad och tiderna står
- * två gånger, med var sin klocka. Skrapans version vinner — den kommer från
- * restaurangens egen sida och uppdateras av sig själv.
- *
- * Klockan är signalen som räknas: skraporna sätter 🕐 på tider och 💰 på priser,
- * och det är just klockan som skulle dubbleras. Orden finns med som reserv om
- * någon skrapa slutar sätta emoji.
- */
-const INFO_STATES_HOURS = /🕐|öppet|öppettid|lunch\s+serveras/i;
-
 /**
  * Rundan tar bara upp det som är nytt och inte går att gissa sig till.
  * Dagflikar, sökfält och platsväljare förklarar sig själva och skulle bara
@@ -121,6 +114,7 @@ const TOUR_STEPS: TourStep[] = [
 export default function LunchBoard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [locations, setLocations] = useState<LunsLocation[]>([]);
+  const [catalog, setCatalog] = useState<RestaurantIdentity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,8 +130,19 @@ export default function LunchBoard() {
   const [animFlip, setAnimFlip] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
+  const [newsFromSettings, setNewsFromSettings] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
+  const [contactConfigLoaded, setContactConfigLoaded] = useState(false);
+  const [contactContext, setContactContext] = useState<ContactContext | null>(null);
+  useEffect(() => {
+    let active = true;
+    loadContactConfig().then(config => {
+      if (active) { setContactConfig(config); setContactConfigLoaded(true); }
+    });
+    return () => { active = false; };
+  }, []);
 
   const mainRef = useRef<HTMLElement | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -154,6 +159,7 @@ export default function LunchBoard() {
   const { dishes: watchedDishes, isDishFavorite, toggleDishFavorite, removeDishFavorite } =
     useDishFavorites();
   const { selected: location, needsChoice, selectLocation } = useLocation(locations);
+  const restaurantNews = useRestaurantNews(catalog, location?.id, !loading && !error);
   // mounted behövs inte längre: temaväxlaren bor i inställningsrutan, som
   // aldrig renderas på servern och därför inte kan visa fel ikon vid hydrering.
   const { theme, toggle: toggleTheme } = useTheme();
@@ -167,11 +173,23 @@ export default function LunchBoard() {
   const news = useNews();
   const weather = useWeather(location?.latitude, location?.longitude);
 
+  // Vänta in både platsval och kontaktkonfiguration så nyheten med formuläret
+  // finns med från början. Lägg inte nyhetsrutan över något besökaren öppnat.
+  useEffect(() => {
+    if (!news.unread || loading || error || needsChoice || !location || !contactConfigLoaded
+      || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
+    setNewsFromSettings(false);
+    setNewsOpen(true);
+    news.markSeen(true);
+  }, [news.unread, news.markSeen, loading, error, needsChoice, location, contactConfigLoaded,
+    welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
+
   useEffect(() => {
     loadMenuData()
-      .then(({ restaurants: parsed, locations: places }) => {
+      .then(({ restaurants: parsed, locations: places, catalog: registry }) => {
         setRestaurants(parsed);
         setLocations(places);
+        setCatalog(registry);
         setLoading(false);
       })
       .catch((err: Error) => {
@@ -182,10 +200,8 @@ export default function LunchBoard() {
 
   /**
    * Statistiken, integritetsinfon och nyhetslistan är undersidor till
-   * inställningarna, och kugghjulet är enda vägen in. Att stänga en av dem lämnar därför
-   * alltid tillbaka dit i stället för att kasta ut besökaren till menylistan,
-   * precis som en bakåtknapp. Öppnas de någon gång från ett annat håll får det
-   * bli ett val i stället för en regel.
+   * inställningarna när de öppnas därifrån. Den automatiska nyhetsrutan
+   * stängs däremot direkt till lunchlistan.
    *
    * Rundan räknas inte in. Den tar över hela sajten för att peka ut var
    * sakerna sitter, och att lägga en meny över den när den är slut vore att
@@ -264,33 +280,39 @@ export default function LunchBoard() {
 
     return list
       .map(restaurant => {
-        const dishes = visibleDishes(restaurant).map((dish, i) => ({
+        const displayDish = (dish: Dish, i: number) => ({
           key: `${restaurant.name}-${i}-${dish.description}`,
           category: dish.category,
           categoryColor: categoryColor(dish.category),
           description: dish.description,
           price: dish.price,
           starred: isDishFavorite(restaurant.name, dish.description),
-        }));
+        });
+        const dishes = visibleDishes(restaurant).map(displayDish);
 
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
         const infoRows = restaurant.info[day] ?? [];
-        // Dubbletttestet körs på råtexten, visningen på den strippade: 🕐 är
-        // signalen INFO_STATES_HOURS letar efter, och den finns bara kvar så
-        // länge emojin inte plockats bort först. Ordningen här är avsiktlig.
+        // Dubbletttestet körs på råtexten eftersom äldre menydata kan bära en
+        // dold emoji-signal. Visningen använder alltid den strippade texten.
         const rawInfo = infoRows.join('  ·  ');
 
         return {
           name: restaurant.name,
-          meta: INFO_STATES_HOURS.test(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
+          meta: infoStatesLunchHours(rawInfo) ? '' : restaurant.meta.lunch_hours ?? '',
           info: infoRows.map(stripInfoEmoji).filter(Boolean).join('  ·  '),
+          menuStatus: restaurant.menuStatus[day] ?? '',
+          menuImage: restaurant.menuImage,
+          referenceMenu: restaurant.referenceMenu && restaurant.referenceMenu.dishes.some(d => d.day === day)
+            ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day).map(displayDish) }
+            : undefined,
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter
           // på betyder tomt "inget matchade", och då är raden bara brus.
-          empty: !filtering && !hasDayDishes,
+          empty: !filtering && !hasDayDishes && !restaurant.menuImage,
           dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
+          menuUrl: restaurant.meta.menu_url,
           maps: restaurant.meta.maps,
           instagram: restaurant.meta.instagram,
           latitude: restaurant.meta.latitude,
@@ -299,8 +321,11 @@ export default function LunchBoard() {
           dishes,
         };
       })
-      .filter(section => section.dishes.length > 0 || section.empty);
-  }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering]);
+      .filter(section => section.dishes.length > 0 || section.empty || (
+        (section.menuImage || section.referenceMenu) && activeTypes.length === 0 && activeCravings.length === 0 &&
+        (!search.trim() || section.name.toLocaleLowerCase('sv').includes(search.trim().toLocaleLowerCase('sv')))
+      ));
+  }, [atLocation, showOnlyFavorites, isFavorite, visibleDishes, isDishFavorite, day, filtering, activeTypes, activeCravings, search]);
 
   const dishTotal = sections.reduce((sum, s) => sum + s.dishes.length, 0);
 
@@ -515,7 +540,7 @@ export default function LunchBoard() {
 
   return (
     <div
-      className="grid h-screen grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
+      className="luns-viewport grid grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
       <div className={shell}>
@@ -539,6 +564,7 @@ export default function LunchBoard() {
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         onOpenSettings={() => setSettingsOpen(true)}
         newsUnread={news.unread}
+        onOpenContact={contactConfig ? () => setContactContext({ area: location?.label }) : undefined}
       />
       </div>
 
@@ -581,6 +607,21 @@ export default function LunchBoard() {
               Leaflet-instans som ritar tiles man aldrig ser. */}
           {view === 'list' && (
           <div>
+          {location && !welcome.open && (
+            <RestaurantNews
+              area={location.label}
+              names={restaurantNews.names.filter(name => atLocation.some(r => r.name === name))}
+              onDismiss={() => restaurantNews.dismiss()}
+              onSelect={name => {
+                setSearch('');
+                setActiveTypes([]);
+                setActiveCravings([]);
+                setShowOnlyFavorites(false);
+                restaurantNews.dismiss(name);
+                scrollToRestaurant(name);
+              }}
+            />
+          )}
           <div className="mb-1.5 flex items-baseline justify-between gap-4 pt-3.5 pb-2">
             <h1 className="m-0 font-heading text-24 font-bold tracking-[-.02em] wide:text-30">
               {heading}
@@ -629,6 +670,7 @@ export default function LunchBoard() {
               theme={theme}
               onToggleFavorite={toggleFavorite}
               onToggleStar={handleToggleStar}
+              onReport={contactConfig ? restaurant => setContactContext({ restaurant, area: location?.label }) : undefined}
             />
           </div>
 
@@ -676,15 +718,26 @@ export default function LunchBoard() {
           onRestartTour={welcome.restart}
           onOpenNews={() => {
             news.markSeen();
+            setNewsFromSettings(true);
             setNewsOpen(true);
           }}
           newsUnread={news.unread}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}
+          onOpenContact={contactConfig ? () => { setSettingsOpen(false); setContactContext({ area: location?.label }); } : undefined}
         />
       )}
 
-      {newsOpen && <NewsNote onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
+      {contactConfig && contactContext && <ContactForm config={contactConfig} context={contactContext} theme={theme} onClose={() => setContactContext(null)} />}
+
+      {newsOpen && <NewsNote contactEnabled={!!contactConfig}
+        onOpenContact={contactConfig ? () => {
+          setNewsOpen(false);
+          setNewsFromSettings(false);
+          setSettingsOpen(false);
+          setContactContext({ area: location?.label });
+        } : undefined}
+        onClose={() => setNewsOpen(false)} onCloseStart={newsFromSettings ? backToSettings : undefined} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Highlight from './Highlight';
 import RestaurantMap from './RestaurantMap';
+import type { MenuImage, ReferenceMenu } from '../../lib/menu';
 
 export interface SectionDish {
   key: string;
@@ -19,6 +20,10 @@ export interface Section {
   meta: string;
   /** Inforader för vald dag, ihopslagna. */
   info: string;
+  /** Förklaring från menykällan när rätter saknas för vald dag. */
+  menuStatus: string;
+  menuImage?: MenuImage;
+  referenceMenu?: Omit<ReferenceMenu, 'dishes'> & { dishes: SectionDish[] };
   /** Handskriven mening om vad stället är. */
   description: string;
   /** Restaurangen finns med men har ingen meny för dagen. */
@@ -26,6 +31,7 @@ export interface Section {
   /** Publicerar bara dagens meny. Tomma dagar är väntat, inte ett fel. */
   dailyOnly: boolean;
   website?: string;
+  menuUrl?: string;
   maps?: string;
   instagram?: string;
   latitude?: number | null;
@@ -47,6 +53,7 @@ interface Props {
   searchTerms: string[];
   theme: 'light' | 'dark';
   onToggleFavorite: (name: string) => void;
+  onReport?: (name: string) => void;
   onToggleStar: (restaurant: string, description: string) => void;
 }
 
@@ -61,8 +68,10 @@ const LINK_CLASS = 'whitespace-nowrap transition-colors hover:text-[var(--acc)]'
  * fråga om fredagens lunch på en tisdag hjälper ingen.
  */
 function emptyMessage(section: Section, dayOffset: number, day: string): string {
+  if (section.menuStatus) return section.menuStatus;
+
   if (!section.dailyOnly || dayOffset === 0) {
-    return 'Ingen meny idag. Kolla direkt med restaurangen via länkarna ovan';
+    return `Ingen meny för ${day.toLowerCase()}. Kolla direkt med restaurangen via länkarna ovan`;
   }
 
   // Alla svenska veckodagar slutar på -dag, så genitivformen blir -dagens.
@@ -81,6 +90,7 @@ export default function MenuList({
   searchTerms,
   theme,
   onToggleFavorite,
+  onReport,
   onToggleStar,
 }: Props) {
   // Bara en karta åt gången. Flera utfällda kartor i samma lista blir både
@@ -137,6 +147,11 @@ export default function MenuList({
                   WWW ↗
                 </a>
               )}
+              {section.menuUrl && (
+                <a href={section.menuUrl} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+                  MENY ↗
+                </a>
+              )}
               {section.instagram && (
                 <a href={section.instagram} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
                   INSTA ↗
@@ -144,6 +159,8 @@ export default function MenuList({
               )}
             </div>
           </div>
+
+          {onReport && <button onClick={() => onReport(section.name)} aria-label={`Rapportera fel hos ${section.name}`} className="self-start mb-2 min-h-6 border-0 bg-transparent p-0 text-11 text-[var(--ink2)] underline underline-offset-2 hover:text-[var(--acc)]">Rapportera fel</button>}
 
           {openMap === section.name && (
             <div className="mb-2 mt-1">
@@ -185,8 +202,7 @@ export default function MenuList({
 
               Beskrivningen är skriven för hand och ändras aldrig; tider och
               priser kommer dels från restaurangdatan, dels från skrapan. För
-              läsaren är det senare samma sak och står därför på samma rad,
-              med klocka på tiderna så de matchar skrapans stil. */}
+              läsaren är det senare samma sak och står därför på samma rad. */}
           {section.description && (
             <p className="m-0 mb-1 max-w-[70ch] text-12 leading-[1.5] text-[var(--ink2)]">
               {section.description}
@@ -195,20 +211,50 @@ export default function MenuList({
 
           {(section.meta || section.info) && (
             <p className="m-0 mb-1.5 text-12 text-[var(--mut)]">
-              {[section.meta && `🕐 ${section.meta}`, section.info]
+              {[section.meta, section.info]
                 .filter(Boolean)
                 .join('  ·  ')}
             </p>
           )}
 
-          {section.empty && (
+          {section.empty && !section.referenceMenu && (
             <p className="mt-0.5 mb-2 text-12 italic text-[var(--mut)]">
               {emptyMessage(section, dayOffset, day)}
             </p>
           )}
 
+          {section.referenceMenu && (
+            <p role="note" className="mt-0.5 mb-2 max-w-[90ch] text-12 leading-relaxed text-[var(--mut)]">
+              <strong className="font-semibold text-[var(--acc)]">{section.referenceMenu.label}. </strong>
+              {section.referenceMenu.warning}
+            </p>
+          )}
+
+          {section.menuImage && (
+            <details key={section.menuImage.url} open={section.dishes.length === 0}
+              className="my-2 max-w-2xl text-12 text-[var(--ink2)]">
+              <summary className="cursor-pointer text-[var(--acc)]">
+                Restaurangens menybild · vecka {section.menuImage.week}
+              </summary>
+              {section.dishes.length === 0 && (
+                <p className="my-2">Hela veckans meny visas nedan. Välj {day.toLowerCase()} i bilden.
+                  Rätterna i bilden går ännu inte att söka eller filtrera.</p>
+              )}
+              <a href={section.menuImage.url} target="_blank" rel="noopener noreferrer"
+                className="mt-2 block" aria-label={`Öppna ${section.name}s menybild i full storlek`}>
+                {/* Originalet ska kunna läsas utan bildoptimering eller ny bildtjänst. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={section.menuImage.url} loading="lazy" className="h-auto w-full bg-white"
+                  alt={`${section.name}s lunchmeny för vecka ${section.menuImage.week}. Öppna bilden i full storlek för att förstora.`} />
+                <span className="mt-1 block underline">Öppna menybilden i full storlek ↗</span>
+              </a>
+            </details>
+          )}
+
           <div className="flex flex-col gap-0.5 pb-1.5">
-            {section.dishes.map(dish => (
+            {/* Äldre källmenyer använder samma rader; varningen ovan anger
+                osäkerheten utan en separat ruta som ser ut som en annan vy. */}
+            {[...section.dishes, ...(section.referenceMenu?.dishes ?? [])].map(dish => (
               <div
                 key={dish.key}
                 className="flex items-baseline gap-2 rounded-md px-2 py-[5px] transition-colors hover:bg-[var(--hi)] wide:gap-3.5"

@@ -86,7 +86,7 @@ export default function MobileBar({
             role="dialog"
             aria-modal="true"
             aria-label={sheet === 'rest' ? 'Restauranger' : 'Filter'}
-            className="luns-sheet fixed inset-x-0 bottom-0 z-[46] flex max-h-[72vh] flex-col rounded-t-[20px] border-t border-[var(--glassBrd)] bg-[var(--bg)]"
+            className="luns-sheet luns-mobile-sheet fixed inset-x-0 bottom-0 z-[46] flex flex-col rounded-t-[20px] border-t border-[var(--glassBrd)] bg-[var(--bg)]"
             style={{ boxShadow: '0 -12px 50px rgba(0,10,14,.35)' }}
           >
             <div className="flex items-center justify-between px-5 pt-4 pb-2">
@@ -101,7 +101,7 @@ export default function MobileBar({
               </button>
             </div>
 
-            <div className="luns-scroll overflow-y-auto px-3 pt-1 pb-6">
+            <div className="luns-scroll min-h-0 overflow-y-auto px-3 pt-1 pb-[calc(24px+env(safe-area-inset-bottom,0px))]">
               {sheet === 'rest' ? (
                 <div className="flex flex-col gap-0.5">
                   {items.map(item => (

@@ -1,16 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import Overlay, { useOverlayClose } from './Overlay';
 import { NEWS_ITEMS, type NewsItem } from '../../lib/news';
 
 /**
  * Vad som är nytt sedan sist.
  *
- * Rutan är avsiktligt tyst: den öppnas bara av den som klickar på raden i
- * inställningarna, och enda påminnelsen om att den finns är en prick på
- * kugghjulet. En sajt man besöker för att välja lunch ska inte möta en
- * ändringslogg när den laddar.
+ * Öppnas automatiskt en gång per ny version för återkommande besökare,
+ * eller manuellt från inställningarna. Nya besökare får introduktionen.
  *
  * Samma glasruta som integritetsinfon och statistiken, så den känns som en
  * undersida till inställningarna och inte som ett eget meddelande.
@@ -46,26 +45,56 @@ function formatDate(iso: string): string {
   return `${Number(day)} ${name} ${year}`;
 }
 
-function Entry({ item }: { item: NewsItem }) {
+function Entry({ item, onOpenContact }: { item: NewsItem; onOpenContact?: () => void }) {
   return (
-    <li className="rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5">
-      <span className="block font-mono text-10 tracking-[.1em] text-[var(--mut)]">
+    <li className="luns-news-entry rounded-xl border border-[var(--line)] bg-[var(--chip)] px-4 py-3.5">
+      <time dateTime={item.date} className="luns-news-date block font-mono text-10 tracking-[.1em] text-[var(--mut)]">
         {formatDate(item.date)}
-      </span>
-      <span className="mt-1 block text-13 font-semibold text-[var(--ink)]">{item.title}</span>
-      <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">{item.body}</span>
+      </time>
+      <h3 className="mt-1 font-heading text-16 font-semibold text-[var(--ink)]">{item.title}</h3>
+      <p className="mt-1 text-13 leading-[1.5] text-[var(--ink2)]">{item.body}</p>
+      {item.action === 'contact' && onOpenContact && (
+        <button type="button" onClick={onOpenContact}
+          className="mt-3 min-h-11 rounded-lg bg-[var(--acc)] px-4 py-2 text-13 font-semibold text-[var(--bg)] cursor-pointer hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]">
+          Tjôta here
+        </button>
+      )}
+      {item.image && (
+        <Image src={item.image.src} alt={item.image.alt} width={item.image.width} height={item.image.height}
+          unoptimized className="mt-3 h-auto w-full rounded-lg" />
+      )}
     </li>
   );
 }
 
-function CloseButton({ label }: { label: string }) {
+function CloseButton() {
   const close = useOverlayClose();
   return (
     <button
       onClick={close}
-      className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
+      autoFocus
+      className="min-h-11 shrink-0 rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]"
     >
-      {label}
+      Stäng
+    </button>
+  );
+}
+
+function OlderNewsButton({ expanded, count, onToggle, className }: {
+  expanded: boolean;
+  count: number;
+  onToggle: () => void;
+  className: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-expanded={expanded}
+      aria-controls="luns-news-items"
+      onClick={onToggle}
+      className={`min-h-11 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-4 py-2 text-13 font-semibold text-[var(--ink)] cursor-pointer hover:bg-[var(--hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)] ${className}`}
+    >
+      {expanded ? 'Dölj äldre nyheter' : `Visa äldre nyheter (${count})`}
     </button>
   );
 }
@@ -73,39 +102,50 @@ function CloseButton({ label }: { label: string }) {
 export default function NewsNote({
   onClose,
   onCloseStart,
+  contactEnabled = false,
+  onOpenContact,
 }: {
   onClose: () => void;
+  contactEnabled?: boolean;
+  onOpenContact?: () => void;
   /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
   onCloseStart?: () => void;
 }) {
+  const [showOlder, setShowOlder] = useState(false);
+  const sorted = NEWS_ITEMS.filter(item => !item.requiresContact || contactEnabled)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const latest = sorted.slice(0, 5);
+  const older = sorted.slice(5);
+
   return (
     <Overlay onClose={onClose} onCloseStart={onCloseStart} labelledBy="luns-news-title">
       <div
-        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7"
+        className="luns-panel luns-news-panel grid w-full max-w-[960px] grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
         onClick={e => e.stopPropagation()}
       >
-        <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
-        <h2
-          id="luns-news-title"
-          className="mt-2 mb-3 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]"
-        >
-          Nytt på luns.se
-        </h2>
+        <div className="col-start-1 row-start-1 flex items-center border-b border-[var(--line)] py-4 pl-4 wide:col-span-2 wide:px-6">
+          <h2 id="luns-news-title" className="font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
+            Nytt på luns.se
+          </h2>
+        </div>
 
-        <p className="mb-4 text-13 leading-[1.6] text-[var(--ink2)]">
-          Sajten byggs om lite i taget. Här står det som märks när du använder den, nyast först.
-        </p>
+        <div className="col-start-2 row-start-1 flex items-center justify-end border-b border-[var(--line)] py-4 pr-4 pl-3 wide:col-span-2 wide:col-start-1 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-6">
+          {older.length > 0 && (
+            <OlderNewsButton expanded={showOlder} count={older.length}
+              onToggle={() => setShowOlder(value => !value)} className="mr-auto hidden wide:block" />
+          )}
+          <CloseButton />
+        </div>
 
-        <ul className="mb-5 flex list-none flex-col gap-2 p-0">
-          {NEWS_ITEMS.map(item => (
-            <Entry key={`${item.date}-${item.title}`} item={item} />
-          ))}
-        </ul>
+        <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">
+          <ol id="luns-news-items" role="list" aria-label="Nyheter, nyast först" className="luns-news-timeline">
+            {(showOlder ? sorted : latest).map(item => <Entry key={`${item.date}-${item.title}`} item={item} onOpenContact={contactEnabled ? onOpenContact : undefined} />)}
+          </ol>
 
-        <div className="flex justify-end">
-          {/* onCloseStart finns bara när rutan öppnades från inställningarna,
-              och då leder knappen dit i stället för ut. */}
-          <CloseButton label={onCloseStart ? 'Tillbaka' : 'Stäng'} />
+          {older.length > 0 && (
+            <OlderNewsButton expanded={showOlder} count={older.length}
+              onToggle={() => setShowOlder(value => !value)} className="mt-4 wide:hidden" />
+          )}
         </div>
       </div>
     </Overlay>

@@ -1,0 +1,190 @@
+{
+  "source": "https://www.kathmandurestaurang.se/sv/lunchmeny",
+  "captured": "2026-10-19",
+  "kalla_hash": "b1e1f3376296f59e64cafdd45fdaab1817199c107509116363873016ea151e36",
+  "verification": "Båda stående veckorna och samtliga tio dagsval verifierade i den officiella webbläsarvyn. Hash av normaliserad meny-JSON (sort_keys=True, ensure_ascii=False).",
+  "menu": {
+    "introduction": "Välj udda eller jämn vecka och veckodag för att se dagens lunchrätter.",
+    "pricingMode": "shared",
+    "sharedPrice": 129,
+    "sharedPriceSupportingText": "Serveras vardagar 11–15. Inkl. sallad, naanbröd, myntasås, mango chutney, husets starka sås, ris och vanligt vatten. Momo 139:- (8 st per person) finns som stående alternativ. Te/kaffe 10:- extra.",
+    "primaryGroups": [
+      {
+        "groupTitle": "Udda veckor",
+        "monday": {
+          "dishes": [
+            {
+              "name": "Butter Chicken",
+              "description": "Marinerade kycklingfilébitar i en krämig sås av smör, russin och malda cashewnötter."
+            },
+            {
+              "name": "Lamm Vindaloo",
+              "description": "Grytbitar av lamm tillagade med röd chili, färsk vitlök, nejlikor och piri piri."
+            },
+            {
+              "name": "Soya Paneer Saag",
+              "description": "Färsk tofu med stuvad spenat, rostad lök, koriander och kokoskräm.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        },
+        "tuesday": {
+          "dishes": [
+            {
+              "name": "Garlic Chicken Tikka",
+              "description": "Grillad kycklingfilé marinerad med vitlök, ingefära, koriander, chili och lime. Serveras med tandoorisås."
+            },
+            {
+              "name": "Nepalesisk Pork Curry",
+              "description": "Fläskfilégryta med en bas av välstekt lök, tomat, färsk vitlök, ingefära och traditionella kryddor från Himalaya."
+            },
+            {
+              "name": "Malai Kofta",
+              "description": "Hemlagade grönsaksbollar med nepalesisk färskost och nötter i krämig kardemumma- och saffranssås.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        },
+        "wednesday": {
+          "dishes": [
+            {
+              "name": "Chicken Pokhreli",
+              "description": "Kycklingfilé tillagad i en stark tamarind- och kokossås, smaksatt med färska curryblad och koriander."
+            },
+            {
+              "name": "Rogan Josh",
+              "description": "Lammgryta med yoghurt, saffran, tomat, ingefära och koriander, toppad med mandel."
+            },
+            {
+              "name": "Panch Ratan Korma",
+              "description": "Blandning av fem olika sorters stuvade grönsaker med kokoskräm.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        },
+        "thursday": {
+          "dishes": [
+            {
+              "name": "Nauni Chicken",
+              "description": "Kycklingfilé i en fyllig, krämig smör- och gräddsås med milda kryddor."
+            },
+            {
+              "name": "Pork Sherpali",
+              "description": "Het fläskfilégryta med chili, ingefära, lök, libbsticka och koriander."
+            },
+            {
+              "name": "Chana Masala",
+              "description": "Kikärtsgryta med vitlök, gurkmeja, tomat, rostad lök och koriander.",
+              "dietaryLabel": "Vegan"
+            }
+          ]
+        },
+        "friday": {
+          "dishes": [
+            {
+              "name": "Chili Chicken Tikka",
+              "description": "Välkryddad kycklingfilé marinerad i sambal oelek och grillad i ugnen. Serveras med mild kormasås."
+            },
+            {
+              "name": "Lamm Saag",
+              "description": "Grytbitar av lammkött tillagade med stuvad spenat, tomat, rostad lök och koriander."
+            },
+            {
+              "name": "Butter Paneer",
+              "description": "Hemlagad färskost tillagad med en mild krämig sås av malda cashewnötter, saffran, smör och kardemumma.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        }
+      },
+      {
+        "groupTitle": "Jämna veckor",
+        "monday": {
+          "dishes": [
+            {
+              "name": "Chicken Tikka Masala",
+              "description": "Grillad kycklingfilé i en mild, krämig sås av grädde och torkad mynta."
+            },
+            {
+              "name": "Gorkhe Lamm",
+              "description": "Örtkryddad lammgryta med chili, sichuanpeppar, färsk ingefära, koriander och kokosmjölk."
+            },
+            {
+              "name": "Aloo Gobhi",
+              "description": "Lätt kryddad blomkål och potatisgryta med spiskummin, korianderfrön och ingefära.",
+              "dietaryLabel": "Vegan"
+            }
+          ]
+        },
+        "tuesday": {
+          "dishes": [
+            {
+              "name": "Chicken Sherpali",
+              "description": "Het kycklinggryta med chili, lök, vitlök, libbsticka och koriander."
+            },
+            {
+              "name": "Garlic Pork Tikka",
+              "description": "Grillad fläskfilé marinerad med vitlök, ingefära, mynta och lime. Serveras med mild tandoorisås."
+            },
+            {
+              "name": "Palak Paneer",
+              "description": "Lättbrynt hemgjord färskost tillredd med spenat, kummin och ingefära.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        },
+        "wednesday": {
+          "dishes": [
+            {
+              "name": "Chicken Mango",
+              "description": "Örtkryddad kycklingfilégryta i en mild, krämig mangosås."
+            },
+            {
+              "name": "Himalayan Lamm Curry",
+              "description": "Lammgryta tillagad i en stark sås med bockhornsklöver, spansk chili, koriander och ingefära."
+            },
+            {
+              "name": "Tofu Masala",
+              "description": "Tofu tillagad med kokoskräm, lök, tomat och exotiska milda kryddor.",
+              "dietaryLabel": "Vegan"
+            }
+          ]
+        },
+        "thursday": {
+          "dishes": [
+            {
+              "name": "Tandoori Chicken Tikka",
+              "description": "Kycklingfilé marinerad i yoghurt och tandoori masala. Serveras med tandoorisås."
+            },
+            {
+              "name": "Pork Vindaloo",
+              "description": "Grytbitar av fläskfilé tillagade med röd chili, färsk vitlök, nejlikor och piri piri."
+            },
+            {
+              "name": "Dal Bhat Tarkari",
+              "description": "En traditionell nepalesisk måltid med linser, ris och grönsaksgryta.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        },
+        "friday": {
+          "dishes": [
+            {
+              "name": "Lemon Chicken",
+              "description": "Kycklingfilé tillagad med chili, kryddig sås med limeblad, ingefära och kokos."
+            },
+            {
+              "name": "Keema Mutter",
+              "description": "Lammfärsgryta tillagad med ärtor, grön chili, lök, tomat och koriander."
+            },
+            {
+              "name": "Paneer Tauli",
+              "description": "Färska champinjoner, paprika, rödlök, spansk chili och basilika med hemlagad färskost.",
+              "dietaryLabel": "Vegetarisk"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

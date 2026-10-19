@@ -22,3 +22,147 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
+
+## `next` 15.5.27, 2026-10-08
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-4jqv-mc3x-m676 /
+CVE-2026-94543 och GHSA-mcj8-r9mp-w47p / CVE-2026-94484, två moderate
+cache poisoning-sårbarheter i Nexts SSG/ISR-rendering. Egen mätning med
+`npm ls next --all --include=dev` och `npm ls next --omit=dev` bekräftade
+`next@15.5.25` som direkt produktionsberoende.
+
+Orsak och lösning: Paketintervallet började på `^15.5.24` och lockfilen
+höll kvar 15.5.25. Miniminivån höjdes till `^15.5.27`, vilket uppdaterade
+Next och dess versionsbundna `@next/env`- och SWC-paket till 15.5.27.
+
+Källa: Kontrollens paketkort och GitHubs granskade advisories, kontrollerade
+2026-10-08. Båda angav `>= 15.0.0, < 15.5.27` som sårbart och 15.5.27 som
+första rättade 15.x-version. Verifiering: båda `npm ls`-mätningarna visade
+endast 15.5.27, GitHubs advisory-API gav noll träffar för `next@15.5.27` och
+`env -u NODE_ENV npm audit --omit=dev` gav noll produktionssårbarheter.
+
+## `sharp` 0.35.5, 2026-10-07
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-wq5f-xc86-pv6w, en
+minnesrelaterad sårbarhet i `sharp`-binärernas librsvg som under vissa
+förutsättningar kan ge kodkörning på glibc-baserad Linux. Egen mätning med
+`npm ls sharp --all --include=dev` bekräftade `sharp@0.35.4` via Next. Samma
+version fanns i produktionsträdet enligt `npm ls sharp --omit=dev`.
+
+Orsak och lösning: Repots override hade miniminivån `^0.35.4` och lockfilen
+höll kvar 0.35.4. Override-gränsen höjdes till `^0.35.5`, vilket flyttade
+`sharp`, plattformsbinärerna och deras libvips-paket till utgåvorna som hör
+till 0.35.5.
+
+Källa: Kontrollens paketkort, GitHubs granskade advisory och npm-registret,
+kontrollerade 2026-10-07. GitHub angav `< 0.35.5` som sårbart och 0.35.5 som
+första rättade version; npm-registret hade 0.35.5 som senaste version.
+Verifiering: `npm ls` med både `--all --include=dev` och `--omit=dev` visade
+endast 0.35.5. Den installerade modulen rapporterade librsvg 2.63.2 och
+`env -u NODE_ENV npm audit --omit=dev` gav noll produktionssårbarheter.
+
+## `source-map-js` 1.2.2, 2026-10-06
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-68fv-2mgg-jv7q /
+CVE-2026-93749, en event-loop-DoS via sektionsoffsetar i indexerade source maps.
+Egen mätning med `npm ls source-map-js --all --include=dev` bekräftade
+`source-map-js@1.2.1` via `postcss@8.5.26`. Kopian ingick även i
+produktionsberoendena genom Next.
+
+Orsak och lösning: `postcss` tillät fortfarande den sårbara versionen och
+lockfilen höll kvar 1.2.1. En riktad override till `^1.2.2` flyttade den enda
+installerade kopian till den första rättade versionen 1.2.2.
+
+Källa: Kontrollens paketkort, GitHubs advisory-API och npm-registret,
+kontrollerade 2026-10-06. GitHub angav `>= 1.0.0, < 1.2.2` som sårbart och
+1.2.2 som första rättade version; npm-registret hade 1.2.2 som senaste version.
+Verifiering: `npm ls` med både `--all --include=dev` och `--omit=dev` visade
+endast 1.2.2. `env -u NODE_ENV npm audit --include=dev` saknade därefter träff
+på `source-map-js`; auditens andra, separata träffar ändrades inte inom kortet.
+
+## `braces` 3.0.3, 2026-10-03
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-vfj7-8cjw-p6xm /
+CVE-2026-93687, en stackutmattnings-DoS vid djupt nästlade mönster.
+Egen mätning med `npm ls braces --all --include=dev` bekräftade en deduplicerad
+`braces@3.0.3`. `npm explain braces` visade konsumenter under både Tailwind och
+ESLint, via `chokidar`, `micromatch` och `fast-glob`.
+
+Status och exponering: Ingen rättad paketversion fanns. GitHubs advisory angav
+`<= 3.0.3` som sårbart och saknade `first_patched_version`; npm-registrets
+senaste publicerade version var 3.0.3. Paketet är endast ett
+dev-beroende (`npm ls braces --omit=dev` var tomt), används vid byggens
+globmatchning och följer inte med den statiska sajten. Repots globbmönster är
+fasta i versionsstyrd konfiguration, inte indata från webbtrafik. Ingen
+paketändring gjordes: en större verktygsmigrering eller en egen fork är inte en
+upstream-patch och skulle kräva separat risk- och kompatibilitetsarbete.
+
+Källa: Kontrollens paketkort samt GitHubs advisory och upstream-ärende #70,
+kontrollerade 2026-10-03. Verifiering: `npm audit --include=dev` gav high-träff
+på advisoryn och `fixAvailable` pekade på en semver-major av Tailwind, medan
+`npm view braces version versions --json` fortfarande slutade på 3.0.3.
+
+## `brace-expansion` 5.0.9, 2026-09-30
+
+Symptom: Kontrollens mätning på Dev pekade ut tre DoS-rådgivningar i den
+dev-transitiva `brace-expansion@5.0.9`: GHSA-qhr7-859c-m2p7,
+GHSA-6j4f-fj2g-mc7p och GHSA-q2hr-2g5m-vwhr. Egen mätning med
+`npm ls brace-expansion --all --include=dev` bekräftade samma version i kedjan
+`eslint` → `minimatch` → `brace-expansion`.
+
+Orsak och lösning: lockfilen höll kvar 5.0.9 och repots override tillät den
+med `^5.0.8`. Override-gränsen höjdes till `^5.0.12`, vilket flyttade den enda
+installerade kopian till 5.0.12 utan andra paketändringar.
+
+Källa: Kontrollens paketkort 2026-09-30 och npm-registret samma datum, där
+5.0.12 var aktuell senaste version. Verifiering: `npm ls` visade endast
+5.0.12; `env -u NODE_ENV npm audit --include=dev` gav ingen träff på
+`brace-expansion`. Auditens enda kvarvarande träff var en separat moderate i
+`fast-uri`, GHSA-hrr3-gc8f-f4qj, som låg utanför detta kort och inte ändrades.
+
+## Släppkontroll av npm-beroenden, 2026-10-20
+
+Mätt på Dev `0c92d6f` med rensat NODE_ENV. `npm audit --omit=dev --json`
+gav noll sårbarheter. `npm audit --include=dev --json` gav 15 berörda
+paketnoder (12 high, 3 moderate); detta är tre underliggande advisories med
+följdeffekter i beroendekedjan, inte 15 oberoende sårbarheter.
+Lockfilen markerar samtliga tre rotpaket som dev-only:
+
+- braces 3.0.3: GHSA-vfj7-8cjw-p6xm, stackutmattning via globbmönster.
+- fast-uri 3.1.7: GHSA-hrr3-gc8f-f4qj, inkonsekvent normalisering av värdnamn.
+- postcss-selector-parser 6.1.4: GHSA-rj75-hqrm-r3gf, hög CPU-kostnad vid parsning.
+
+Källa: npm audit-svar och package-lock.json vid kontrollen. Verktygen används
+i bygg-/lintkedjan, inte i den statiska webbplatsens runtime. Kontrollen
+bedömdes inte visa ett hinder för detta funktionssläpp, men larmen kvarstår
+som separat paketunderhåll. Inga automatiska major-uppgraderingar eller
+paketändringar gjordes. Ett rent Next-produktionsbygge passerade.
+
+## Granskning för publikt repo, 2026-10-20
+
+Gitleaks 8.30.1 kördes lokalt med maskerade resultat på Dev `c5118a2`:
+53 commits i origin/main..origin/Dev gav inga hemlighetsträffar. Export av
+samtliga spårade filer gav endast den befintliga CARTO Basemaps-nyckeln i
+webbläsarkoden. Den är klientanvänd och behöver hanteras med leverantörens
+begränsningar, inte betraktas som en dold serverhemlighet.
+
+Skanning av all lokalt tillgänglig Git-historik gav dessutom en äldre,
+separat credential-träff. Den fanns inte i dagens filträd eller det nya
+släppets commits. Historiska träffar måste utredas privat och vid behov
+spärras hos utfärdaren; att radera en fil är inte en återkallelse. Inga
+nyckelvärden eller skanningsrapporter har lagts i repot. Automatisk skanning
+är ingen garanti mot alla slags känsliga uppgifter.
+
+Resend/Turnstile-serverhemligheter finns som Worker-bindningar; publika
+sitekeys, endpoint, konto-ID, kontaktadress och vissa interna testadresser
+är däremot synliga i kod/dokumentation. Sitekey är avsiktligt publik enligt
+Cloudflare: https://developers.cloudflare.com/turnstile/get-started/.
+CARTO beskriver klientnycklar och begränsningar på
+https://www.carto.com/basemaps/apikey/.
+
+`.gitignore` täcker nu alla `.env.*` utom uttryckliga `.env.example` och
+`.env.*.example`, utöver befintliga `.dev.vars*`, `.wrangler/`, virtuella
+miljöer och testserverfiler. Exempelfiler får aldrig innehålla riktiga
+hemligheter. Kontrollerat med git check-ignore och minnestest. Ingen sajt-
+eller driftkod ändrades; föregående produktionsbygge och frisk testserver
+har identisk sajtkod.
