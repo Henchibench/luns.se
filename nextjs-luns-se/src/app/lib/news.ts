@@ -40,7 +40,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     date: '2026-10-20',
     title: 'Nytt område: Järntorget/Linné',
     body: 'Nu finns Järntorget/Linné i Göteborg på Luns! Välj området i platsväljaren för att se lunchmenyerna där.',
-    image: { src: '/images/news/jarntorget-linne.jpg', alt: 'Illustration inspirerad av Järntorget och Linné, med spårvagn, höstträd och uteserveringar.', width: 1536, height: 1024 },
+    image: { src: '/images/news/jarntorget-linne-sommarkvall.jpg', alt: 'Bearbetad vy över Linnégatan och kvarteren vid Järntorget i varmt sommarkvällsljus.', width: 1535, height: 1025 },
   },
   {
     date: '2026-10-20',

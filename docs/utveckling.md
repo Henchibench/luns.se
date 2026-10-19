@@ -222,17 +222,19 @@ före första målningen använder samma nyckel och tillämpar mindre text utan
 att invänta React. Nyheten förklarar reglaget under Inställningar.
 Nyhetsversionen är 13, med släppdatum 20 oktober.
 
-Områdesnyheten använder `public/images/news/jarntorget-linne.jpg` (1536×1024).
-Bilden är en konstnärlig tolkning, inte ett platsfoto eller en exakt kartbild.
-Den skapades med det inbyggda imagegen-verktyget, utan modell-API/nyckel,
-och sparades som JPEG för sajten. Alt-texten beskriver den som illustration.
+Områdesnyheten använder `public/images/news/jarntorget-linne-sommarkvall.jpg`
+(1535×1025). Henrik gav ett foto över Linnégatan och bad om en mysigare
+sommarkväll. Bilden bearbetades med det inbyggda imagegen-verktyget, utan
+modell-API/nyckel, och sparades som JPEG för sajten. Alt-texten beskriver
+den som bearbetad vy. Den ersätter den första fria illustrationen i nyheten;
+den tidigare filen finns kvar men refereras inte längre av nyhetslistan.
 
 Verifiering: körd kontroll av både HTML-skript och React-hook för saknat,
 normalt, stort och okänt sparat värde, inklusive gammalt `normal` utan v2
 och nytt `normal` i v2; minnestest och Next-bygge samt
 visuell kontroll av nyhet och inställningsreglage på testservern.
 
-Bildprompt (inbyggd bildgenerering):
+Första bildprompten (inbyggd bildgenerering, ersatt av fotobearbetningen):
 
 ```text
 Use case: illustration-story
@@ -242,4 +244,13 @@ Scene: the lively meeting of a city square and a leafy street, recognizable Goth
 Style: refined hand-painted travel illustration, gouache and subtle paper grain, confident architectural shapes, inviting and locally grounded. Not a photograph or a literal map; an artistic impression of the neighborhood. Muted petrol teal shadows echo the site's teal design, warm ochre and terracotta facades, soft green trees.
 Composition: wide landscape approximately 3:2, clear and readable at 350px wide, scene fills canvas, balanced depth, no border.
 Constraints: no text, no lettering, no logos, no watermark, no invented restaurant names or menus.
+```
+
+Slutlig bildprompt (inbyggd imagegen, Henriks bifogade foto som underlag):
+
+```text
+Use case: lighting-weather
+Asset type: landscape image for a news card announcing Järntorget/Linné on Luns.se.
+Edit the supplied photograph into a cozy Gothenburg summer evening. Preserve the exact elevated viewpoint, framing, street alignment, tram tracks, all building positions, roof shapes, architectural details, skyline and wooded hills from the reference. This must clearly remain the same actual place, not a reimagined city.
+Change only lighting, sky and atmosphere: a long Nordic summer evening shortly after sunset, soft peach and pale pink near the horizon fading into gentle blue above, lingering warm light on red roofs, softly glowing windows in a natural scattered pattern, warm street lamps and inviting subtle café lighting at street level. Lush summer green trees, gentle atmospheric depth. Keep sufficient natural ambient light to read the architecture; cozy and calm, not dark nighttime. Photorealistic editorial photography, restrained color grading, realistic shadows, no excessive orange cast or fantasy effects. Preserve existing signs without adding text, no new landmarks, no watermarks. Maintain the wide approximately 3:2 composition.
 ```
