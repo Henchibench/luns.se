@@ -66,8 +66,10 @@ dubblett och synlig klock-emoji.
 rätter. Metadata måste ha rubrik, varning, HTTPS-länk och giltiga matrader.
 Efter Henriks återkoppling 2026-10-19 visas vald dags rader med samma
 kategori-, text-, pris- och bevakningskolumner som övriga restauranger.
-Den separata utfällbara rutan är borttagen. Varning och källänk står direkt
-ovanför rätterna; dubbelt besked om saknad meny döljs när källmenyn visas.
+Den separata utfällbara rutan är borttagen. Varningen står direkt ovanför
+rätterna; dubbelt besked om saknad meny döljs när källmenyn visas.
+Den extra länken ”Originalmeny” är borttagen på Henriks begäran. Restaurangens
+vanliga MENY-länk finns kvar i rubriken.
 De ingår inte i maträkning, matsökning eller matfilter; restaurangnamn och
 favoritfilter fungerar. Byns vecka 41 och Heurlins odaterade PDF använder
 detta på Henriks beställning, utan att anta att gammal mat fortfarande gäller.

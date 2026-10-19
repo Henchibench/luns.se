@@ -72,7 +72,13 @@ på sidan. Originalet är fortfarande vecka 41, ändrat 2026-10-03. Henrik har
 beställt visning med varning. `MENU_REFERENCE` innehåller menyn separat från
 dagens sökbara mat, med veckonummer, ändringsdatum och uppmaning att kontrollera
 med restaurangen. En aktuell veckomärkt, nyligen ändrad fil återgår automatiskt
-till vanlig meny. PDF:ens textordning är ons–tor, fredag, dokumentrubrik,
+till vanlig meny. Veckonumret läses ur den hämtade PDF:en vid varje körning;
+41 är inte hårdkodat. Ett övergångstest följer gammal vecka 41 → aktuell 43
+→ inaktuell 43 vid veckobyte → aktuell 44. Varning och menybesked försvinner
+helt när aktuell meny tas in, och varningen följer PDF:ens nya veckonummer
+om den senare blir gammal. Filens ändringsdatum kontrolleras också för att
+inte godkänna samma veckonummer från ett tidigare år.
+PDF:ens textordning är ons–tor, fredag, dokumentrubrik,
 mån–tis, sedan dagsrubrikerna. Tidigare tolkning satte rätter på fel dagar
 och tappade första namnet. Alla fem alternativ per dag kontrollerades mot
 den synliga original-PDF:en; en ändrad/ofullständig mall avvisas.

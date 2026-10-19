@@ -77,6 +77,34 @@ class LinneTests(unittest.TestCase):
         for text in [BYNS.replace('MÅNDAG & TISDAG','Måndag'),BYNS.replace('SALLAD','Okänd'),BYNS.replace('145KR','Pris saknas')]:
             with self.assertRaises(ValueError): BynsTrattoriaScraper().parse_week(text)
 
+    def test_byns_warning_tracks_each_download_and_week_change(self):
+        scraper = BynsTrattoriaScraper()
+        soup = BeautifulSoup('<div id="lunch-pdf"><iframe src="/lunch.pdf"></iframe></div>', 'html.parser')
+        # Samma filadress kan byta innehåll. Prova den riktiga datumkontrollen
+        # och flera körningar så att en gammal varning inte kan bli kvar.
+        cases = [
+            (date(2026,10,19), 41, datetime(2026,10,3,tzinfo=timezone.utc), True),
+            (date(2026,10,19), 43, datetime(2026,10,19,tzinfo=timezone.utc), False),
+            (date(2026,10,26), 43, datetime(2026,10,19,tzinfo=timezone.utc), True),
+            (date(2026,10,26), 44, datetime(2026,10,26,tzinfo=timezone.utc), False),
+        ]
+        for monday, week, modified, warned in cases:
+            with self.subTest(monday=monday, week=week), \
+                 patch.object(scraper, 'get_page_content', return_value=soup), \
+                 patch.object(scraper, 'fetch_pdf_text', return_value=(BYNS.replace('VECKA 41', f'VECKA {week}'), modified)), \
+                 patch('app.scrapers.restaurants.byns_trattoria_scraper.menu_monday', return_value=monday), \
+                 patch('app.scrapers.weekly_pdf_scraper.datetime') as clock:
+                clock.now.return_value = datetime.combine(monday, datetime.min.time(), timezone.utc)
+                rows = scraper.scrape()[scraper.name]
+            references = [r for r in rows if r.startswith('MENU_REFERENCE:')]
+            self.assertEqual(bool(references), warned)
+            if warned:
+                self.assertIn(f'vecka {week}', json.loads(references[0].split(':',1)[1])['warning'])
+            else:
+                self.assertEqual(list(rakna(rows)[0].values()), [5]*5)
+                self.assertFalse(any('Menybesked:' in r for r in rows))
+                self.assertEqual(json.loads(rows[-1].split(':',1)[1])['valid_from'], monday.isoformat())
+
     def test_heurlins_october_has_six_dishes_only_wednesday_to_friday(self):
         rows=HeurlinsScraper().weekly_rows(HEURLINS)
         self.assertEqual(list(rakna(rows)[0].values()),[0,0,6,6,6])
