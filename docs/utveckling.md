@@ -200,6 +200,11 @@ plus safe-area behålls. De två panelerna begränsas till 72dvh och har även
 safe-area i sin nedre rullmarginal. Inga användaragenter eller hårdkodade
 mått för Safaris adressfält används.
 
+Vid kontrollen upptäcktes dessutom att testserverns banderoll flyttade ned
+skalet 30px utan att minska dess höjd: knapparnas nederkant låg på 670px i
+en 664px hög vy. Byggskriptet anger nu `--luns-preview-offset:30px`, som
+skalet drar bort från höjden. I produktion är detta avdrag noll.
+
 Underlag: WebKits dokumentation om dynamiska viewport-enheter:
 https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/.
 Verifiering: minnestest och testserverbygge samt visuell kontroll av knappar

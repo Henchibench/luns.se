@@ -150,8 +150,8 @@ body {
    för den fasta knappraden genom sin backdrop-filter, så dess höjd måste
    följa den synliga ytan. Första värdet är fallback för äldre webbläsare. */
 .luns-viewport {
-  height: 100vh;
-  height: 100dvh;
+  height: calc(100vh - var(--luns-preview-offset, 0px));
+  height: calc(100dvh - var(--luns-preview-offset, 0px));
 }
 
 .luns-mobile-sheet {

@@ -228,7 +228,7 @@ stil = (
     "position:fixed;top:0;left:0;right:0;height:30px;z-index:2147483647;"
     "background:#ffd400;color:#141414;text-align:center;overflow:hidden;white-space:nowrap;"
     "font:600 13px/30px system-ui,-apple-system,sans-serif;letter-spacing:.01em}"
-    "body{padding-top:30px!important}"
+    "body{--luns-preview-offset:30px;padding-top:30px!important}"
     "</style>"
 )
 
