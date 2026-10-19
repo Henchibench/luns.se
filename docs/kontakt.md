@@ -105,7 +105,11 @@ Codex inbyggda webbläsare fick interaktiv kontroll; ingen slutsats om generellt
 formulärfel dras av det. Ogiltig token/fel origin avvisades också via HTTP.
 2026-10-20: tillagt mejltestläge för riktig inskickning från testservern.
 28 tester passerar inklusive separation mellan mejltest, demo och produktion.
-Riktig leverans ska kontrolleras efter driftsättning.
+Bygget på testservern passerade. Driftsatt endpoint gav HTTP 204 för rätt
+preflight, HTTP 403 för produktionsorigin och HTTP 403 för ogiltig token.
+Henrik skickade därefter från Safari: formuläret visade riktig bekräftelse
+och Resend visade Delivered för mejlet till `luns.se@outlook.com` med ämnet
+`[Luns] Annat`. Inkorgens placering (vanlig inkorg/skräppost) är inte kontrollerad.
 
 Källor: [Turnstile Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
 [Workers rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/),
