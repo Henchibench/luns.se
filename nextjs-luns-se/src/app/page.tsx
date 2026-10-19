@@ -32,6 +32,7 @@ import {
   stripInfoEmoji,
   type LunsLocation,
   type Restaurant,
+  type Dish,
 } from './lib/menu';
 import {
   CRAVINGS,
@@ -251,14 +252,15 @@ export default function LunchBoard() {
 
     return list
       .map(restaurant => {
-        const dishes = visibleDishes(restaurant).map((dish, i) => ({
+        const displayDish = (dish: Dish, i: number) => ({
           key: `${restaurant.name}-${i}-${dish.description}`,
           category: dish.category,
           categoryColor: categoryColor(dish.category),
           description: dish.description,
           price: dish.price,
           starred: isDishFavorite(restaurant.name, dish.description),
-        }));
+        });
+        const dishes = visibleDishes(restaurant).map(displayDish);
 
         const hasDayDishes = restaurant.dishes.some(d => d.day === day);
 
@@ -274,7 +276,7 @@ export default function LunchBoard() {
           menuStatus: restaurant.menuStatus[day] ?? '',
           menuImage: restaurant.menuImage,
           referenceMenu: restaurant.referenceMenu && restaurant.referenceMenu.dishes.some(d => d.day === day)
-            ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day) }
+            ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day).map(displayDish) }
             : undefined,
           description: restaurant.meta.description ?? '',
           // "Ingen meny idag" gäller bara när inget filter är på. Med filter

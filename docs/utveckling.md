@@ -64,7 +64,10 @@ dubblett och synlig klock-emoji.
 
 `MENU_REFERENCE` håller en läsbar men obekräftad PDF-meny skild från dagens
 rätter. Metadata måste ha rubrik, varning, HTTPS-länk och giltiga matrader.
-Frontend visar vald dags rader i en utfälld ruta med varning och källänk.
+Efter Henriks återkoppling 2026-10-19 visas vald dags rader med samma
+kategori-, text-, pris- och bevakningskolumner som övriga restauranger.
+Den separata utfällbara rutan är borttagen. Varning och källänk står direkt
+ovanför rätterna; dubbelt besked om saknad meny döljs när källmenyn visas.
 De ingår inte i maträkning, matsökning eller matfilter; restaurangnamn och
 favoritfilter fungerar. Byns vecka 41 och Heurlins odaterade PDF använder
 detta på Henriks beställning, utan att anta att gammal mat fortfarande gäller.
