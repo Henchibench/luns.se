@@ -16,6 +16,7 @@ export interface NewsItem {
   title: string;
   body: string;
   requiresContact?: boolean;
+  image?: { src: string; alt: string; width: number; height: number };
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
@@ -27,6 +28,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     title: 'Tips & kontakt',
     body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
     requiresContact: true,
+    image: { src: '/images/news/help-me-help-you.png', alt: 'Meme med texten: Help me help you.', width: 696, height: 404 },
   },
   {
     date: '2026-10-19',

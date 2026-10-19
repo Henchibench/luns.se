@@ -3,6 +3,9 @@
 Beställt och byggt 2026-10-19: Tips & kontakt, valfri e-post och Turnstile.
 Sajten förblir statiskt exporterad på GitHub Pages. En separat Cloudflare
 Worker verifierar inskickningen och har stöd för att skicka via Resend.
+Nyheten Tips & kontakt innehåller Henriks bifogade ”Help me help you”-meme
+(oförändrad bild i `public/images/news/`). Nyheten och bilden följer samma
+aktiveringsvillkor som formuläret; nyhetsversion 11 behålls inför samma släpp.
 Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend är ännu inte anslutet.
 
 ## Test och produktion

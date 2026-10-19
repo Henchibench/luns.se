@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import Overlay, { useOverlayClose } from './Overlay';
 import { NEWS_ITEMS, type NewsItem } from '../../lib/news';
 
@@ -54,6 +55,10 @@ function Entry({ item }: { item: NewsItem }) {
       </span>
       <span className="mt-1 block text-13 font-semibold text-[var(--ink)]">{item.title}</span>
       <span className="mt-0.5 block text-12 leading-[1.5] text-[var(--mut)]">{item.body}</span>
+      {item.image && (
+        <Image src={item.image.src} alt={item.image.alt} width={item.image.width} height={item.image.height}
+          unoptimized className="mt-3 h-auto w-full rounded-lg" />
+      )}
     </li>
   );
 }
