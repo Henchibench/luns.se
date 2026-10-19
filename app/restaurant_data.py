@@ -217,7 +217,7 @@ restaurant_locations = {
         "area": "Järntorget/Linné"
     },
     "Restaurang BO": {
-        "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckomenyn publiceras som bild på den officiella lunchsidan.",
+        "description": "Kvarterskrog på Masthamnsgatan som serverar dagens lunch på vardagar. Veckans texträtter hämtas via Menydags; MENY leder till restaurangens original.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang%20BO%2C%20Masthamnsgatan%2015%2C%20413%2029%20G%C3%B6teborg",
         "latitude": 57.7003257,
         "longitude": 11.9467919,
@@ -237,7 +237,7 @@ restaurant_locations = {
         "lunch_hours": "Mån–fre 11.30–14.00"
     },
     "Kathmandu": {
-        "description": "Nepalesiska och indiska rätter på Första Långgatan. Lunchmenyn hämtas från Menydags när restaurangens egen lunchsida inte går att läsa.",
+        "description": "Nepalesiska och indiska rätter på Första Långgatan. Stående lunchmeny för udda och jämna veckor, med momo som dagligt alternativ.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Kathmandu%2C%20F%C3%B6rsta%20L%C3%A5nggatan%2014%2C%20413%2003%20G%C3%B6teborg",
         "latitude": 57.6998394,
         "longitude": 11.9498280,

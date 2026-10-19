@@ -60,7 +60,16 @@ måndag–fredag kl. 11.30–13.30. Node-test täcker källans format, reservtex
 tid och äldre rådata med emoji; byggd förhandsvisning kontrolleras utan
 dubblett och synlig klock-emoji.
 
-## BO:s originalbild i menylistan, 2026-09-21
+## BO:s textmeny och daterad rotation, 2026-10-19
+
+BO skickar inte längre `MENU_IMAGE`. Daterad text från Menydags och Kathmandus
+valda stående vecka skickar `MENU_VALIDITY` med måndag/fredag inklusive år.
+Frontend döljer rätter och info när datan gäller en annan visningsvecka,
+även om samma statiska bygge ligger kvar. Befintligt stöd för äldre
+`MENU_IMAGE` finns kvar för bakåtkompatibilitet. Källa, begränsningar och
+verifiering finns i [skrapor](skrapor.md).
+
+## BO:s originalbild i menylistan, 2026-09-21 (ersatt ovan)
 
 Symptom: bildmenyer gav ett tomt kort trots läsbar officiell meny.
 `MENU_IMAGE:` tolkas nu som separat metadata med URL, vecka och datum.

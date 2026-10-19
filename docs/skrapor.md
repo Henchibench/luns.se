@@ -12,13 +12,13 @@ Läs app/scrapers/AGENTS.md också. Här ges inget utökat uppdragsmandat.
 4. Veckovis PDF med textlager: använd den smala standardbiblioteksläsaren i
    `pdf_text.py`, kontrollera vecka eller källans ändringsdatum och stäng av
    fallback till förra menyn.
-5. Veckovis bild: läs originalet och spara verifierad text med käll-URL,
-   bildens SHA-256 och uttryckliga giltighetsdatum. Kontrollera aktuell bild
-   vid varje skrapning; utgången eller ändrad bild får inte återanvända
-   avskriften. Visa den nya originalbilden på sajten tills den lästs av.
-   Bildläsning i Codex-sessionen är tillåten; produktionsskrapan behöver
-   varken AI, OCR eller webbläsare. Automatisk återkommande textavläsning
-   får inte påstås utan att den faktiskt finns.
+5. Veckovis bild: kontrollera först om samma meny finns som daterad text hos
+   en verifierbar källa. BO läses sedan 2026-10-19 via Menydags; varje dags
+   ISO-datum måste ligga i visningsveckan. Finns bara bild behövs fortfarande
+   källkontrollerad avläsning; påstå inte att automatisk OCR finns.
+6. Stående rotation med uttryckliga udda/jämna veckor kan sparas med källa,
+   datum och hash, precis som annan stående meny. Välj efter ISO-veckan,
+   inte genom att växla var sjunde dag (vecka 53 och vecka 1 är båda udda).
 
 Produktion har bara requests, beautifulsoup4, lxml utöver standardbiblioteket.
 Spaning med scripts/spana.py får ha utvecklingsberoenden; de får inte läcka in
@@ -57,6 +57,56 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
+
+## BO och Kathmandu — fungerande textmenyer 2026-10-19
+
+Detta ersätter BO:s bildreserv och Kathmandus Menydags-reserv från september
+nedan. Äldre kontroller är historik, inte nuvarande implementation.
+
+**BO:** [Menydags](https://www.menydags.se/restaurang/restaurang-bo/lunch)
+gav HTTP 200 och daterad HTML för vecka 43. Alla 24 rätter och priser
+jämfördes med [officiella bilden](https://www.restaurangbo.se/lunchmat):
+5/5/5/5/4 alternativ. Fredagsdessert är information. Skrapan hämtar nu text
+varje produktionskörning, kräver rätt datum inklusive år och matchande dagrubrik,
+och använder bara uttryckliga dietetiketter. Den sparade septemberavskriften
+har tagits bort. Ingen bild bäddas in, inte heller när textkällan saknar mat;
+då ges ett menybesked och MENY leder fortfarande till restaurangens original.
+Automatiken är beroende av Menydags publicering; ingen OCR, AI-tjänst, lokal
+veckokörning eller ändring av Actions krävs.
+
+**Kathmandu:** vanlig HTTP gav fortfarande 403 med `cf-mitigated: challenge`,
+men den officiella sidan öppnades i vanlig webbläsare utan manuell verifiering.
+Den säger uttryckligen ”Välj udda eller jämn vecka och veckodag”. Båda
+veckorna finns som JSON i Nexts publika `self.__next_f.push`-skript, i blocket
+`weeklyLunchMenu`. Endast JSON tolkas; JavaScript exekveras aldrig av skrapan.
+Alla tio dagsval kontrollerades i den synliga webbläsaren mot JSON: 3 rätter
+per dag för 129 kr, samt uttryckligt stående Momo (8 st per person) för 139 kr.
+Dietetiketter och inkluderade tillbehör kommer från restaurangens egna data.
+
+`data/kathmandu.json` är en källkontrollerad stående tvåveckorsrotation med
+`source`, `captured` och SHA-256 `kalla_hash` av menyobjektet serialiserat med
+`json.dumps(menu, ensure_ascii=False, sort_keys=True)`. Det är inte en
+veckomeny sparad för evigt. Vid varje körning försöker skrapan läsa originalet;
+vid åtkomstfel används den verifierade rotationen med en varning i loggen.
+Om originalet går att läsa men har ny eller ofullständig struktur används
+inte den sparade kopian. Ändringar som restaurangen gör medan HTTP är blockerad
+kan däremot inte upptäckas automatiskt: återkontrollera i webbläsaren och
+uppdatera hela rotationen, datumet och hashen tillsammans.
+
+Båda skraporna använder `menu_week.py` för Stockholmsdatum och helgens
+kommande vecka. `MENU_VALIDITY` ger datum till frontend så att även ett gammalt
+bygge spärrar föregående veckas text/rotation. Ingen tidigare skrapning
+återanvänds. `menylage.py` räknar inte datumraden som mat.
+
+Verifiering: Python-tester för BO, Kathmandu och Järntorgets PDF-mallar;
+Node-tester för metadata, utgången text och oförändrade bildmetadata från äldre
+byggen. Produktionsvenv utan Playwright ger BO 5/5/5/5/4 och Kathmandu
+4/4/4/4/4. Nästa vecka, helg, ISO-årsskifte (53→1), ändrat pris, nätfel,
+skadad sparad rotation och ändrad källstruktur är täckta. Full lokal
+produktionskedja och Next-bygge godkända. Webbläsaren verifierade rätt område,
+alla fem dagars antal, noll menybilder och sökning på BO:s pestopasta.
+Övriga restaurangers källfel
+(Feskekörka, Byns och Heurlins) ingår inte i denna ändring.
 
 ## Cuckoo's Nest återinförd, 2026-10-19
 

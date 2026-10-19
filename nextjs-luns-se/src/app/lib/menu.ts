@@ -49,11 +49,25 @@ export interface Restaurant {
   meta: RestaurantMeta;
 }
 
-export interface MenuImage {
-  url: string;
-  week: number;
+interface MenuValidity {
   valid_from: string;
   valid_until: string;
+}
+
+export interface MenuImage extends MenuValidity {
+  url: string;
+  week: number;
+}
+
+function parseMenuValidity(raw: string): MenuValidity | undefined {
+  try {
+    const data = JSON.parse(raw);
+    if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data.valid_from) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(data.valid_until)) return undefined;
+    return data;
+  } catch {
+    return undefined;
+  }
 }
 
 function parseMenuImage(raw: string): MenuImage | undefined {
@@ -70,8 +84,8 @@ function parseMenuImage(raw: string): MenuImage | undefined {
   }
 }
 
-/** Även ett gammalt statiskt bygge ska sluta visa förra veckans BO-mat. */
-export function menuImageIsCurrent(image: MenuImage, now: Date = new Date()): boolean {
+/** Även ett gammalt statiskt bygge ska sluta visa föregående veckas menyval. */
+export function menuImageIsCurrent(image: MenuValidity, now: Date = new Date()): boolean {
   const stockholm = now.toLocaleDateString('sv-SE', { timeZone: 'Europe/Stockholm' });
   const monday = dateForDay('Måndag', new Date(`${stockholm}T12:00:00`));
   const stamp = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
@@ -185,8 +199,13 @@ export function parseRestaurants(
     const info: Record<string, string[]> = {};
     const menuStatus: Record<string, string> = {};
     let menuImage: MenuImage | undefined;
+    let validity: MenuValidity | undefined;
 
     rows.forEach(row => {
+      if (row.startsWith('MENU_VALIDITY:')) {
+        validity = parseMenuValidity(row.slice('MENU_VALIDITY:'.length));
+        return;
+      }
       if (row.startsWith('MENU_IMAGE:')) {
         menuImage = parseMenuImage(row.slice('MENU_IMAGE:'.length));
         return;
@@ -208,13 +227,15 @@ export function parseRestaurants(
       if (dish) dishes.push(dish);
     });
 
-    if (rows.some(row => row.startsWith('MENU_IMAGE:')) &&
-        (!menuImage || !menuImageIsCurrent(menuImage, now))) {
+    if ((rows.some(row => row.startsWith('MENU_IMAGE:')) &&
+        (!menuImage || !menuImageIsCurrent(menuImage, now))) ||
+        (rows.some(row => row.startsWith('MENU_VALIDITY:')) &&
+        (!validity || !menuImageIsCurrent(validity, now)))) {
       dishes.length = 0;
       menuImage = undefined;
       DAYS.forEach(day => {
         delete info[day];
-        menuStatus[day] = 'Den sparade menybilden gäller inte veckan som visas. Se MENY för restaurangens senaste meny.';
+        menuStatus[day] = 'Den sparade menyn gäller inte veckan som visas. Se MENY för restaurangens senaste meny.';
       });
     }
 

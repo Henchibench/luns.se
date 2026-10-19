@@ -7,7 +7,6 @@ from unittest.mock import patch
 from bs4 import BeautifulSoup
 
 from app.scrapers.restaurants.heurlins_scraper import HeurlinsScraper
-from app.scrapers.restaurants.kathmandu_scraper import KathmanduScraper
 
 
 NEW_TEMPLATE = """VECKANS LUNCHGÄST 145:-
@@ -86,37 +85,6 @@ class HeurlinsTests(unittest.TestCase):
         fetch.assert_called_once_with("https://heurlinsgbg.se/menu.pdf")
         self.assertEqual(sum("|" in row for row in rows), 10)
         self.assertFalse(scraper.allow_previous_menu)
-
-
-def day_block(stamp, day):
-    return (f'<div id="{stamp}"><h3>{day}</h3><ul><li>'
-            f'<p>Källtext {stamp}</p><span>145:-</span></li></ul></div>')
-
-
-class KathmanduTests(unittest.TestCase):
-    def scrape_on(self, today, html):
-        scraper = KathmanduScraper()
-        with patch.object(scraper, "_today", return_value=today), \
-                patch.object(scraper, "get_page_content", return_value=BeautifulSoup(html, "html.parser")):
-            return scraper.scrape()[scraper.name]
-
-    def test_previous_and_future_weeks_are_excluded(self):
-        html = "".join(day_block(stamp, "Måndag") for stamp in [
-            "2026-09-14", "2026-09-21", "2026-09-28", "2025-09-22", "2026-99-99",
-        ])
-        rows = self.scrape_on(date(2026, 9, 21), html)
-        dishes = [row for row in rows if "|" in row]
-        self.assertEqual(dishes, ["Måndag|<strong>Dagens</strong> - Källtext 2026-09-21 (145 kr)"])
-        self.assertEqual(sum("Menybesked:" in row for row in rows), 4)
-
-    def test_iso_week_can_cross_calendar_year(self):
-        html = day_block("2025-12-29", "Måndag") + day_block("2026-01-02", "Fredag")
-        rows = self.scrape_on(date(2026, 1, 1), html)
-        self.assertEqual(sum("|" in row for row in rows), 2)
-
-    def test_day_heading_must_match_date(self):
-        rows = self.scrape_on(date(2026, 9, 21), day_block("2026-09-21", "Tisdag"))
-        self.assertTrue(all("Menybesked:" in row for row in rows))
 
 
 if __name__ == "__main__":

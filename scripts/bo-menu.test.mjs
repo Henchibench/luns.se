@@ -57,3 +57,18 @@ test('skadad metadata och andra URL-protokoll underkänns utan krasch', () => {
 test('övriga restaurangers menyer påverkas inte av bildens veckospärr', () => {
   assert.equal(parse([dish], '2027-01-01T10:00:00Z').dishes.length, 1);
 });
+
+test('daterad text behåller priser men skapar ingen bild', () => {
+  const validity = 'MENU_VALIDITY:'+JSON.stringify(image);
+  const result = parse([dish, validity]);
+  assert.equal(result.dishes.length, 1);
+  assert.equal(result.menuImage, undefined);
+  assert.equal(parse([dish, validity], '2026-09-26T10:00:00Z').dishes.length, 0);
+  assert.equal(parse([dish, validity], '2027-09-27T10:00:00Z').dishes.length, 0);
+});
+
+test('skadad giltighet för text får inte visa odaterad mat', () => {
+  for (const raw of ['{','null','{}',JSON.stringify({...image,valid_until:'2027-09-25'})]) {
+    assert.equal(parse([dish,'MENU_VALIDITY:'+raw]).dishes.length,0);
+  }
+});

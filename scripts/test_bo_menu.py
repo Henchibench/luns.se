@@ -1,95 +1,59 @@
-"""BO: källbyte och datum får aldrig lämna gammal mat på sajten."""
-
+"""BO: daterad text måste följa visningsveckan, aldrig bli en bildreserv."""
 from datetime import date
-import hashlib
-import json
 import unittest
 from unittest.mock import patch
-
 from bs4 import BeautifulSoup
-import requests
 
 from app.scrapers.restaurants.restaurang_bo_scraper import RestaurangBOScraper
+from app.scrapers.menu_week import menu_monday
 from scripts.menylage import rakna
 
 
+def block(stamp, heading='Måndag 19 oktober', description='Källans beskrivning', price='<span>159:-</span>'):
+    return f'<div id="{stamp}"><h3>{heading}</h3><ul><li><p>Källans rätt</p><p>{description}</p>{price}</li></ul></div>'
+
+
 class BOMenuTests(unittest.TestCase):
-    def setUp(self):
-        self.scraper = RestaurangBOScraper()
-        self.saved = json.loads(self.scraper.TRANSCRIPT.read_text())
-        self.saved['sha256'] = hashlib.sha256(b'verified image').hexdigest()
-        self.url = self.saved['image_url']
-        self.soup = BeautifulSoup(f'<img src="{self.url}">', 'html.parser')
+    def scrape(self, html, today=date(2026, 10, 19)):
+        scraper = RestaurangBOScraper()
+        soup = BeautifulSoup(html, 'html.parser') if html is not None else None
+        with patch.object(scraper, 'get_page_content', return_value=soup), patch(
+                'app.scrapers.restaurants.restaurang_bo_scraper.menu_monday', return_value=menu_monday(today)):
+            return scraper.scrape()[scraper.name]
 
-    def scrape(self, today=date(2026, 9, 21), image=b'verified image', soup=None):
-        with patch.object(self.scraper, '_today', return_value=today), \
-                patch.object(self.scraper, 'get_page_content', return_value=self.soup if soup is None else soup), \
-                patch.object(self.scraper, 'fetch_image', return_value=image), \
-                patch('pathlib.Path.read_text', return_value=json.dumps(self.saved)):
-            return self.scraper.scrape()[self.scraper.name]
+    def test_only_current_date_and_matching_heading_are_served(self):
+        html = ''.join(block(d) for d in ['2025-10-20','2026-10-12','2026-10-19','2026-10-26'])
+        rows = self.scrape(html)
+        self.assertEqual([r for r in rows if '|' in r],
+                         ['Måndag|<strong>Dagens</strong> - Källans rätt - Källans beskrivning (159 kr)'])
+        self.assertEqual(sum('Menybesked:' in r for r in rows), 4)
+        self.assertFalse(any(r.startswith('MENU_IMAGE:') for r in rows))
+        self.assertEqual(rakna(rows)[1], 0)
+        self.assertEqual(sum('|' in r for r in self.scrape(block('2026-10-19','Tisdag 19 oktober'))), 0)
 
-    def test_verified_original_matches_every_day_and_price(self):
-        rows = self.scrape()
-        self.assertEqual([sum(r.startswith(day+'|') for r in rows) for day in self.scraper.DAYS], [5,5,5,5,4])
-        self.assertIn('Måndag|<strong>Dagens</strong> - Nattbakad karré – potatispuré, rostad pumpa & katrinplommonsky (159 kr)', rows)
-        self.assertEqual(sum('Fredagsdessert' in row for row in rows), 1)
-        self.assertTrue(any(r.startswith('INFO:Fredag') and 'björnbärsockerkaka' in r for r in rows))
-        self.assertEqual(sum(r.startswith('MENU_IMAGE:') for r in rows), 1)
-        self.assertFalse(self.scraper.allow_previous_menu)
+    def test_next_week_is_read_without_changing_saved_data(self):
+        rows = self.scrape(block('2026-10-26','Måndag 26 oktober'), date(2026,10,24))
+        self.assertEqual(sum('|' in r for r in rows), 1)
+        self.assertIn('2026-10-26', rows[-1])
+        self.assertEqual(sum('|' in r for r in self.scrape(block('2026-10-19'),date(2026,10,24))), 0)
 
-    def test_same_url_with_changed_image_drops_all_dishes_and_info(self):
-        rows = self.scrape(image=b'new image')
-        self.assertEqual(len(rows), 1)
-        self.assertTrue(rows[0].startswith('MENU_IMAGE:'))
+    def test_missing_or_unreadable_source_does_not_return_old_text_or_image(self):
+        for html in [None, '', block('2026-10-19',price=''), block('2026-10-19',price='<span>3-4 portioner</span>')]:
+            rows = self.scrape(html)
+            self.assertEqual(sum('Menybesked:' in r for r in rows), 5)
+            self.assertEqual(sum('|' in r for r in rows), 0)
+        self.assertFalse(RestaurangBOScraper.allow_previous_menu)
 
-    def test_report_counts_only_dishes_and_accepts_image_metadata(self):
-        counts, unknown = rakna(self.scrape())
-        self.assertEqual(list(counts.values()), [5,5,5,5,4])
-        self.assertEqual(unknown, 0)
-        counts, unknown = rakna(self.scrape(image=b'new image'))
-        self.assertEqual(sum(counts.values()), 0)
-        self.assertEqual(unknown, 0)
+    def test_explicit_dietary_tag_and_dessert_are_preserved(self):
+        html = block('2026-10-23','Fredag 23 oktober','Tillbehör FREDAGSDESSERT = källans dessert',
+                     '<span>159:-</span><span>Vegetarisk</span>')
+        rows = self.scrape(html)
+        self.assertIn('Fredag|<strong>Vegetarisk</strong> - Källans rätt - Tillbehör (159 kr)',rows)
+        self.assertIn('INFO:Fredag - Restaurant Info: Fredagsdessert: källans dessert',rows)
 
-    def test_changed_url_with_identical_bytes_requires_new_verification(self):
-        self.saved['image_url'] = self.url + '?old'
-        self.assertEqual(len(self.scrape()), 1)
-
-    def test_expired_or_wrong_year_transcript_is_not_reused(self):
-        for start, end in [('2025-09-22','2025-09-26'), ('2026-09-14','2026-09-18'), ('2026-09-21','2026-09-26')]:
-            with self.subTest(start=start, end=end):
-                self.saved.update(valid_from=start, valid_until=end)
-                self.assertEqual(len(self.scrape()), 1)
-
-    def test_next_week_image_displays_without_a_new_transcription(self):
-        url = self.url.replace('v.39.jpg','v.40.jpg')
-        soup = BeautifulSoup(f'<img src="{url}">', 'html.parser')
-        for today in [date(2026,9,26), date(2026,9,28)]:
-            rows = self.scrape(today=today, soup=soup)
-            self.assertEqual(len(rows), 1)
-            image = json.loads(rows[0].removeprefix('MENU_IMAGE:'))
-            self.assertEqual(image['valid_from'], '2026-09-28')
-            self.assertEqual(image['week'], 40)
-
-    def test_old_source_is_not_presented_as_next_week(self):
-        rows = self.scrape(today=date(2026,9,28))
-        self.assertTrue(all('Menybesked:' in r for r in rows))
-
-    def test_incomplete_transcript_falls_back_to_image(self):
-        del self.saved['days']['Fredag']
-        self.assertEqual(len(self.scrape()), 1)
-
-    def test_duplicate_responsive_image_is_ok_but_two_different_current_images_are_not(self):
-        same = BeautifulSoup(f'<img src="{self.url}"><img data-src="{self.url}">','html.parser')
-        self.assertEqual(sum('|' in r for r in self.scrape(soup=same)),24)
-        different = BeautifulSoup(f'<img src="{self.url}"><img src="{self.url.replace("/v.39", "/another/v.39")}">','html.parser')
-        self.assertTrue(all('Menybesked:' in r for r in self.scrape(soup=different)))
-
-    def test_image_fetch_failure_does_not_use_transcript(self):
-        with patch.object(self.scraper, '_today', return_value=date(2026,9,21)), \
-                patch.object(self.scraper, 'get_page_content', return_value=self.soup), \
-                patch.object(self.scraper, 'fetch_image', side_effect=requests.RequestException('offline')):
-            rows = self.scraper.scrape()[self.scraper.name]
-        self.assertTrue(all('Menybesked:' in r for r in rows))
+    def test_iso_year_boundary(self):
+        rows = self.scrape(block('2027-01-01','Fredag 1 januari'),date(2026,12,31))
+        self.assertEqual(sum('|' in r for r in rows),1)
 
 
 if __name__ == '__main__':

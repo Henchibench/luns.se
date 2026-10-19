@@ -39,7 +39,7 @@ def rakna(rader):
     per_dag = {dag: 0 for dag in DAGAR}
     okand = 0
     for rad in rader:
-        if rad.startswith(("INFO:", "MENU_IMAGE:")):
+        if rad.startswith(("INFO:", "MENU_IMAGE:", "MENU_VALIDITY:")):
             continue
         dag, _, _ = rad.partition("|")
         if dag in per_dag:
