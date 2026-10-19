@@ -53,6 +53,7 @@ interface Props {
   searchTerms: string[];
   theme: 'light' | 'dark';
   onToggleFavorite: (name: string) => void;
+  onReport?: (name: string) => void;
   onToggleStar: (restaurant: string, description: string) => void;
 }
 
@@ -89,6 +90,7 @@ export default function MenuList({
   searchTerms,
   theme,
   onToggleFavorite,
+  onReport,
   onToggleStar,
 }: Props) {
   // Bara en karta åt gången. Flera utfällda kartor i samma lista blir både
@@ -157,6 +159,8 @@ export default function MenuList({
               )}
             </div>
           </div>
+
+          {onReport && <button onClick={() => onReport(section.name)} aria-label={`Rapportera fel hos ${section.name}`} className="self-start mb-2 border-0 bg-transparent p-0 text-11 text-[var(--mut)] underline underline-offset-2 hover:text-[var(--acc)]">Rapportera fel</button>}
 
           {openMap === section.name && (
             <div className="mb-2 mt-1">

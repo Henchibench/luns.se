@@ -104,6 +104,16 @@ export default function PrivacyNote({
           bara som summor.
         </p>
 
+        <h3 className="mb-1.5 font-mono text-10 tracking-[.15em] text-[var(--mut)]">KONTAKTFORMULÄR</h3>
+        <p className="mb-5 text-13 leading-[1.6] text-[var(--ink2)]">
+          Kontaktformuläret kräver varken namn eller e-post. När det används behandlar
+          Cloudflare tekniska uppgifter för spamskydd och kontrollerar inskickningen.
+          I det aktiverade formuläret skickas meddelandet och eventuell e-post vidare
+          via Resend till vår inkorg, där vi kan läsa och besvara det. Innehållet går
+          inte till besöksstatistiken. I markerat testläge skickas inga mejl och
+          meddelandet sparas inte. Ingen automatisk kopia skickas till angiven e-post.
+        </p>
+
         <div className="flex justify-end">
           {/* onCloseStart finns bara när rutan öppnades från inställningarna,
               och då leder knappen dit i stället för ut. */}

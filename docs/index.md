@@ -6,6 +6,7 @@ uppdrag. Importerade avsnitt beskriver tidigare observationer, inte nuläget.
 | Uppdrag | Börja här | Historiska detaljer |
 |---|---|---|
 | Sajt, menyvisning, karta, textstorlek | [utveckling](utveckling.md) | [repots två halvor](minne/repo-02.md) |
+| Kontaktformulär, Turnstile, Resend | [kontakt](kontakt.md) | — |
 | Blänkare om nya restauranger sedan besöket | [områdesvis besökshistorik](utveckling.md) | — |
 | Gren, commit, paketfix väntar på släpp | [utveckling](utveckling.md) | [Dev](minne/repo-04.md) |
 | Bygge, testserver, ärvd miljö | [utveckling](utveckling.md) | [testserver](minne/repo-05.md) |

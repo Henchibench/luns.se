@@ -15,12 +15,19 @@ export interface NewsItem {
   date: string;
   title: string;
   body: string;
+  requiresContact?: boolean;
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 10;
+export const NEWS_VERSION = 11;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-10-19',
+    title: 'Tips & kontakt',
+    body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
+    requiresContact: true,
+  },
   {
     date: '2026-10-19',
     title: 'Nya restauranger i ditt område',

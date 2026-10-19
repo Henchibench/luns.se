@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ContactForm from './components/contact/ContactForm';
+import { loadContactConfig, type ContactConfig, type ContactContext } from './lib/contact';
 import Header from './components/board/Header';
 import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
@@ -130,6 +132,13 @@ export default function LunchBoard() {
   const [newsOpen, setNewsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
+  const [contactContext, setContactContext] = useState<ContactContext | null>(null);
+  useEffect(() => {
+    let active = true;
+    loadContactConfig().then(config => { if (active) setContactConfig(config); });
+    return () => { active = false; };
+  }, []);
 
   const mainRef = useRef<HTMLElement | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -542,6 +551,7 @@ export default function LunchBoard() {
         onToggleView={() => setView(v => (v === 'map' ? 'list' : 'map'))}
         onOpenSettings={() => setSettingsOpen(true)}
         newsUnread={news.unread}
+        onOpenContact={contactConfig ? () => setContactContext({ area: location?.label }) : undefined}
       />
       </div>
 
@@ -647,6 +657,7 @@ export default function LunchBoard() {
               theme={theme}
               onToggleFavorite={toggleFavorite}
               onToggleStar={handleToggleStar}
+              onReport={contactConfig ? restaurant => setContactContext({ restaurant, area: location?.label }) : undefined}
             />
           </div>
 
@@ -699,10 +710,13 @@ export default function LunchBoard() {
           newsUnread={news.unread}
           onOpenStats={() => setStatsOpen(true)}
           onOpenPrivacy={() => setPrivacyOpen(true)}
+          onOpenContact={contactConfig ? () => { setSettingsOpen(false); setContactContext({ area: location?.label }); } : undefined}
         />
       )}
 
-      {newsOpen && <NewsNote onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
+      {contactConfig && contactContext && <ContactForm config={contactConfig} context={contactContext} theme={theme} onClose={() => setContactContext(null)} />}
+
+      {newsOpen && <NewsNote contactEnabled={!!contactConfig} onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />

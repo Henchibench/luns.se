@@ -23,6 +23,7 @@ interface Props {
   onToggleView: () => void;
 
   onOpenSettings: () => void;
+  onOpenContact?: () => void;
   /** Finns det något oläst i nyhetslistan? Tänder pricken på kugghjulet. */
   newsUnread: boolean;
 }
@@ -47,6 +48,7 @@ export default function Header({
   view,
   onToggleView,
   onOpenSettings,
+  onOpenContact,
   newsUnread,
 }: Props) {
   return (
@@ -131,6 +133,8 @@ export default function Header({
       >
         {view === 'map' ? 'LISTA' : 'KARTA'}
       </button>
+
+      {onOpenContact && <button onClick={onOpenContact} className={`${CONTROL} order-6 border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[var(--ink2)] hover:bg-[var(--hi)] wide:order-none`}>Kontakt</button>}
 
       {/* Statistiken och integritetsinfon låg som småtext längst ner i
           vänsterspalten, alltså bakom hela restauranglistan och osynliga på

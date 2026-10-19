@@ -39,3 +39,8 @@ nextjs-luns-se/public/data/
 # Personliga Claude Code-inställningar. launch.json är delad och spåras,
 # men behörigheterna i settings.local.json är varje utvecklares egna.
 .claude/settings.local.json
+
+# Lokala Worker-hemligheter och emulatorns tillstånd.
+.dev.vars
+.dev.vars.*
+.wrangler/

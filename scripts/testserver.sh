@@ -194,6 +194,10 @@ echo "== npm run build"
 npm run build || avbryt "bygget föll — samma fel hade stoppat Actions"
 [ -f out/index.html ] || avbryt "bygget gav ingen out/index.html"
 
+# Testkopplingen ligger bara i exporterade out/. Produktionsbyggets kontaktläge
+# förblir avstängt tills riktiga avsändaruppgifter och Resend är inkopplade.
+cp "$ROT/workers/contact/preview-public.json" out/contact-config.json || avbryt "kontaktens testkonfiguration saknas"
+
 # --- 4. bandet ---------------------------------------------------------------
 
 GREN=$(git -C "$ROT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?")

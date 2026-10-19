@@ -73,8 +73,10 @@ function CloseButton({ label }: { label: string }) {
 export default function NewsNote({
   onClose,
   onCloseStart,
+  contactEnabled = false,
 }: {
   onClose: () => void;
+  contactEnabled?: boolean;
   /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
   onCloseStart?: () => void;
 }) {
@@ -97,7 +99,7 @@ export default function NewsNote({
         </p>
 
         <ul className="mb-5 flex list-none flex-col gap-2 p-0">
-          {NEWS_ITEMS.map(item => (
+          {NEWS_ITEMS.filter(item => !item.requiresContact || contactEnabled).map(item => (
             <Entry key={`${item.date}-${item.title}`} item={item} />
           ))}
         </ul>
