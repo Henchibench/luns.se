@@ -289,6 +289,8 @@ komponerade bakgrund. Den ljusaste huvudtexten och bakgrunderna behålls.
 I ljust läge ändras `--mut` från #6E8B92 till #405C65, så sekundärtext
 blir mörkare. Ändringen sker i designtokens och når även öppettider,
 formulärhjälp, datum och etiketter utan lokala färgundantag.
+På Henriks begäran beskrivs kontrastförbättringen i det befintliga
+nyhetskortet ”Större text som standard”, med oförändrad nyhetsversion 13.
 
 Verifiering: beräkning av relativa luminanser för text på solid panel och
 alfa-komponerat kort, minnestest, Next-bygge och visuell kontroll av nyheter,

@@ -45,7 +45,7 @@ export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-20',
     title: 'Större text som standard',
-    body: 'Vi har slagit på större text för alla så att menyerna blir lättare att läsa. Föredrar du mindre text? Öppna Inställningar via kugghjulet och stäng av Större text. Ditt nya val sparas till nästa besök.',
+    body: 'Vi har slagit på större text för alla så att menyerna blir lättare att läsa. Vi har också ökat kontrasten på bland annat nyheter, inställningar och öppettider, särskilt i mörkt läge. Föredrar du mindre text? Öppna Inställningar via kugghjulet och stäng av Större text. Ditt nya val sparas till nästa besök.',
   },
   {
     date: '2026-10-20',
