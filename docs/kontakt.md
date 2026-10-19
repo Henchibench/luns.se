@@ -1,9 +1,12 @@
 # Kontaktformulär
 
-Beställt och byggt 2026-10-19: Tips & kontakt, valfri e-post och Turnstile.
+Beställt och byggt 2026-10-19 med valfri e-post och Turnstile.
+Formuläret heter sedan 2026-10-20 ”Tjôta med Luns” på Henriks begäran.
+Namnet används i formulärrubriken, sidhuvudet, inställningarna och nyheten.
+Verifiering av namnbytet: minnestest, bygge och visuell kontroll på testservern.
 Sajten förblir statiskt exporterad på GitHub Pages. En separat Cloudflare
 Worker verifierar inskickningen och har stöd för att skicka via Resend.
-Nyheten Tips & kontakt innehåller Henriks bifogade ”Help me help you”-meme
+Nyheten Tjôta med Luns innehåller Henriks bifogade ”Help me help you”-meme
 (oförändrad bild i `public/images/news/`). Nyheten och bilden följer samma
 aktiveringsvillkor som formuläret. Nyhetsversion 12 inkluderar också automatisk
 öppning för återkommande besökare, se utveckling.md.
@@ -56,7 +59,7 @@ släpp. Henrik slår ihop Dev till main och kör befintliga **Scrape and Deploy*
 via workflow_dispatch, eller låter nästa schemakörning publicera. En merge
 ensam publicerar inte sajten. Workflow-filerna har inte ändrats.
 
-Efter publicering: öppna Kontakt på luns.se och skicka ett testmeddelande.
+Efter publicering: öppna Tjôta med Luns på luns.se och skicka ett testmeddelande.
 Riktig leverans till Henriks inkorg är redan bekräftad från testservern;
 produktionswidgetens automatiska verifiering kan slutkontrolleras från
 produktionsdomänen först när den nya sidan är publicerad.
@@ -68,7 +71,7 @@ den vanliga mejllänken under inställningar blir då kvar.
 
 ## Flöde och skydd
 
-Kontakt i sidhuvudet och inställningarna öppnar samma formulär. Rapportera fel
+Tjôta med Luns i sidhuvudet och inställningarna öppnar samma formulär. Rapportera fel
 förifyller restaurang och område. Meddelande krävs (10–4000 tecken); e-post,
 restaurang och område är valfria. Inga kontaktutkast läggs i localStorage eller
 analysdata. Cloudflare-scriptet laddas först när formuläret öppnas.

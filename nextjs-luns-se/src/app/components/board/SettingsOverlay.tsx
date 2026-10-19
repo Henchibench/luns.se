@@ -299,7 +299,7 @@ export default function SettingsOverlay({
             ur sajten och handlar om att säga något, inte om att läsa något. */}
         <div className="mt-6">
           <SectionLabel>KONTAKT</SectionLabel>
-          {onOpenContact ? <LinkRow title="Tips & kontakt" hint="Tipsa om ett lunchställe, rapportera ett fel eller skicka en idé. E-post är valfritt." onClick={onOpenContact} /> : <MailRow address={FEEDBACK_ADDRESS} />}
+          {onOpenContact ? <LinkRow title="Tjôta med Luns" hint="Tipsa om ett lunchställe, rapportera ett fel eller skicka en idé. E-post är valfritt." onClick={onOpenContact} /> : <MailRow address={FEEDBACK_ADDRESS} />}
         </div>
 
         <div className="mt-6 flex justify-end">

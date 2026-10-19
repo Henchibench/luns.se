@@ -134,7 +134,7 @@ export default function Header({
         {view === 'map' ? 'LISTA' : 'KARTA'}
       </button>
 
-      {onOpenContact && <button onClick={onOpenContact} className={`${CONTROL} order-6 border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[var(--ink2)] hover:bg-[var(--hi)] wide:order-none`}>Kontakt</button>}
+      {onOpenContact && <button onClick={onOpenContact} className={`${CONTROL} order-6 border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[var(--ink2)] hover:bg-[var(--hi)] wide:order-none`}>Tjôta med Luns</button>}
 
       {/* Statistiken och integritetsinfon låg som småtext längst ner i
           vänsterspalten, alltså bakom hela restauranglistan och osynliga på

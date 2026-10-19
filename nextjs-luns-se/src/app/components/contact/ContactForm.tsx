@@ -101,7 +101,7 @@ function Form({ config, context, theme }: Omit<Props, 'onClose'>) {
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       }}>
       <div className="mb-2 flex items-start justify-between gap-4">
-        <h2 id="luns-contact-title" className="font-heading text-24 font-bold tracking-[-.02em]">{sent ? (config.mode === 'demo' ? 'Testet gick bra' : 'Tack för ditt meddelande!') : 'Tips & kontakt'}</h2>
+        <h2 id="luns-contact-title" className="font-heading text-24 font-bold tracking-[-.02em]">{sent ? (config.mode === 'demo' ? 'Testet gick bra' : 'Tack för ditt meddelande!') : 'Tjôta med Luns'}</h2>
         <button type="button" onClick={close} aria-label="Stäng kontaktformuläret" className="-mr-2 -mt-2 h-11 w-11 flex-none rounded-lg text-24 hover:bg-[var(--hi)]">×</button>
       </div>
       {sent ? <div role="status">

@@ -26,7 +26,7 @@ export const NEWS_VERSION = 13;
 export const NEWS_ITEMS: NewsItem[] = [
   {
     date: '2026-10-20',
-    title: 'Tips & kontakt',
+    title: 'Tjôta med Luns',
     body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
     requiresContact: true,
     image: { src: '/images/news/help-me-help-you.png', alt: 'Meme med texten: Help me help you.', width: 696, height: 404 },
