@@ -6,7 +6,8 @@
  * ingen nytta av att veta att en selektor bytts. Här står bara det som märks
  * på skärmen, med orden en gäst förstår.
  *
- * Lägger du till en post: skriv den överst och höj NEWS_VERSION. Det är
+ * Nyheterna visas i datumordning med senaste först. Vid samma datum behålls
+ * ordningen här. Lägger du till en post: höj NEWS_VERSION. Det är
  * höjningen som öppnar rutan nästa gång en återkommande besökare kommer hit.
  * En ny post utan höjd räknare syns bara för den som öppnar rutan manuellt.
  */
@@ -36,35 +37,16 @@ export const NEWS_ITEMS: NewsItem[] = [
     body: 'När något nytt har tillkommit öppnas den här rutan nästa gång du besöker Luns. Den visas en gång per uppdatering. Du kan alltid läsa nyheterna igen under Inställningar och info.',
   },
   {
+    date: '2026-10-20',
+    title: 'Nytt område: Järntorget/Linné',
+    body: 'Nu finns Järntorget/Linné i Göteborg på Luns! Välj området i platsväljaren för att se lunchmenyerna där.',
+  },
+  {
     date: '2026-10-19',
     title: 'Nya restauranger i ditt område',
     body: 'När en restaurang tillkommer i ett område du besökt får du en liten blänkare ovanför lunchlistan. Tryck på namnet för att se menyn, eller stäng blänkaren. Cuckoo’s Nest finns nu med på Lindholmen.',
   },
-  {
-    date: '2026-10-19',
-    title: 'Fler lunchmenyer i Järntorget/Linné',
-    body: 'Silvis visar nu även veckans rätter och Feskekörkas lunchdagar är uppdaterade. Byns och Heurlins publicerade menyer går att läsa med en tydlig varning när giltigheten är osäker. Fula Hummern har tagits bort eftersom lunchmenyn inte uppdaterats.',
-  },
-  {
-    date: '2026-10-19',
-    title: 'Textmenyer hos BO och Kathmandu',
-    body: 'BO:s veckomeny läses nu automatiskt från restaurangens egen bild och går att söka. Kathmandu visar sin stående lunchmeny för udda eller jämna veckor, med rätt alternativ på varje dag.',
-  },
-  {
-    date: '2026-09-21',
-    title: 'BO:s lunchmeny går att läsa här',
-    body: 'Nu finns BO:s lunchrätter och priser på rätt veckodag. När restaurangen byter menybild visas det nya originalet direkt på kortet tills rätterna har lästs av.',
-  },
-  {
-    date: '2026-09-21',
-    title: 'Tydligare besked när lunchmenyn saknas',
-    body: 'I Järntorget/Linné ser du nu varför en meny saknas när vi vet orsaken. Silvis har exempelvis ingen måndagslunch. Välj tisdag–fredag för deras stående rätter.',
-  },
-  {
-    date: '2026-09-21',
-    title: 'Järntorget/Linné är med',
-    body: 'Göteborg har fått ett område till. Välj Järntorget/Linné för tio lunchställen mellan Masthuggskajen, Långgatorna och Feskekörka.',
-  },
+
   {
     date: '2026-09-11',
     title: 'Kartan är ren igen',

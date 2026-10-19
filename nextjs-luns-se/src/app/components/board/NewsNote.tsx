@@ -97,12 +97,9 @@ export default function NewsNote({
           Nytt på luns.se
         </h2>
 
-        <p className="mb-4 text-13 leading-[1.6] text-[var(--ink2)]">
-          Sajten byggs om lite i taget. Här står det som märks när du använder den, nyast först.
-        </p>
-
         <ul className="mb-5 flex list-none flex-col gap-2 p-0">
-          {NEWS_ITEMS.filter(item => !item.requiresContact || contactEnabled).map(item => (
+          {NEWS_ITEMS.filter(item => !item.requiresContact || contactEnabled)
+            .sort((a, b) => b.date.localeCompare(a.date)).map(item => (
             <Entry key={`${item.date}-${item.title}`} item={item} />
           ))}
         </ul>

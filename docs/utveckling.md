@@ -55,6 +55,20 @@ till lunchlistan, och omladdning öppnade ingen ny ruta. Ett nytt privat
 fönster fick platsval och introduktion; ingen nyhetsruta efter att rundan
 stängts eller efter omladdning. Manuell öppning behöll Tillbaka-knappen.
 
+## Nyhetstexter och datumordning, 2026-10-20
+
+Henrik ville presentera Järntorget/Linné som ett nytt område inför släppet.
+De fem tidigare posterna om områdets restauranger, menyfixar och områdesstart
+ersattes med en enda nyhet: ”Nytt område: Järntorget/Linné”. Inget antal
+restauranger anges, så texten inte blir fel när utbudet ändras. Ingressen
+”Sajten byggs om lite i taget …” togs bort på hans begäran.
+
+Posten från 20 oktober hamnade tidigare under 19 oktober eftersom komponenten
+följde den manuella listans ordning. Visningen sorterar nu en filtrerad kopia
+på ISO-datum, nyast först; samma datum behåller sin inbördes ordning.
+Nyhetsversion 12 behålls för denna redigering av samma ännu osläppta nyheter.
+Verifiering: minnestest, bygge och kontroll av den uppdaterade nyhetsrutan.
+
 ## Nya restauranger per område, 2026-10-19
 
 Henrik beställde en blänkare för restauranger som tillkommit sedan förra
