@@ -11,7 +11,9 @@ export type TextSize = 'normal' | 'stor';
  * attribut med ett värde säger det bättre än en växande hög klassnamn.
  * Skriptet i layout.tsx läser samma nyckel innan sidan målas.
  */
-const STORAGE_KEY = 'luns-text-size';
+// Ny valomgång vid släppet 2026-10-20: alla börjar med stor text.
+// Därefter sparas även ett uttryckligt val av mindre text här.
+const STORAGE_KEY = 'luns-text-size-v2';
 
 function readTextSize(): TextSize {
   if (typeof window === 'undefined') return 'stor';

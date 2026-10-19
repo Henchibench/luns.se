@@ -214,9 +214,12 @@ och paneler. Safaris expanderande adressfält behöver även provas på telefon.
 
 Henrik beställde en nyhet om större text som standard. Kontrollen visade att
 standardläget fortfarande var `normal`. HTML-attributet och `useTextSize`
-startar nu med `stor`; endast ett sparat `normal` ger mindre text.
-Sparade val respekteras. Skriptet före första målningen tillämpar mindre
-text utan att invänta React. Nyheten förklarar reglaget under Inställningar.
+startar nu med `stor`. Henrik förtydligade att även återkommande besökare
+ska börja med större text vid släppet. Nyckeln är därför `luns-text-size-v2`;
+äldre `luns-text-size` ignoreras. Det är en engångsåterställning: ett nytt
+val av `normal` i v2 sparas och respekteras vid följande besök. Skriptet
+före första målningen använder samma nyckel och tillämpar mindre text utan
+att invänta React. Nyheten förklarar reglaget under Inställningar.
 Nyhetsversionen är 13, med släppdatum 20 oktober.
 
 Områdesnyheten använder `public/images/news/jarntorget-linne.jpg` (1536×1024).
@@ -225,7 +228,8 @@ Den skapades med det inbyggda imagegen-verktyget, utan modell-API/nyckel,
 och sparades som JPEG för sajten. Alt-texten beskriver den som illustration.
 
 Verifiering: körd kontroll av både HTML-skript och React-hook för saknat,
-normalt, stort och okänt sparat värde; minnestest och Next-bygge samt
+normalt, stort och okänt sparat värde, inklusive gammalt `normal` utan v2
+och nytt `normal` i v2; minnestest och Next-bygge samt
 visuell kontroll av nyhet och inställningsreglage på testservern.
 
 Bildprompt (inbyggd bildgenerering):

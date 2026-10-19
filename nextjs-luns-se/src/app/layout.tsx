@@ -69,9 +69,9 @@ export default function RootLayout({
                 if (theme === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
-                /* Stor text finns redan i HTML. Återställ ett uttryckligt
-                   val av mindre text före första målningen. */
-                if (localStorage.getItem('luns-text-size') === 'normal') {
+                /* Stor text finns redan i HTML. Samma nya valomgång som
+                   useTextSize: bara val efter släppet återställs här. */
+                if (localStorage.getItem('luns-text-size-v2') === 'normal') {
                   document.documentElement.removeAttribute('data-textsize');
                 }
               })();
