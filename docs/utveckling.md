@@ -70,6 +70,8 @@ Den separata utfällbara rutan är borttagen. Varningen står direkt ovanför
 rätterna; dubbelt besked om saknad meny döljs när källmenyn visas.
 Den extra länken ”Originalmeny” är borttagen på Henriks begäran. Restaurangens
 vanliga MENY-länk finns kvar i rubriken.
+Texten om att menyn inte ingår i dagens antal är också borttagen på Henriks
+begäran. Endast varningen om menyns giltighet visas; räknelogiken är oförändrad.
 De ingår inte i maträkning, matsökning eller matfilter; restaurangnamn och
 favoritfilter fungerar. Byns vecka 41 och Heurlins odaterade PDF använder
 detta på Henriks beställning, utan att anta att gammal mat fortfarande gäller.

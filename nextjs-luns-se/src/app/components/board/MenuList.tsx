@@ -222,8 +222,7 @@ export default function MenuList({
           {section.referenceMenu && (
             <p role="note" className="mt-0.5 mb-2 max-w-[90ch] text-12 leading-relaxed text-[var(--mut)]">
               <strong className="font-semibold text-[var(--acc)]">{section.referenceMenu.label}. </strong>
-              {section.referenceMenu.warning}{' '}
-              Ingår inte i dagens antal rätter.
+              {section.referenceMenu.warning}
             </p>
           )}
 
