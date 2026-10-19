@@ -137,3 +137,32 @@ i bygg-/lintkedjan, inte i den statiska webbplatsens runtime. Kontrollen
 bedömdes inte visa ett hinder för detta funktionssläpp, men larmen kvarstår
 som separat paketunderhåll. Inga automatiska major-uppgraderingar eller
 paketändringar gjordes. Ett rent Next-produktionsbygge passerade.
+
+## Granskning för publikt repo, 2026-10-20
+
+Gitleaks 8.30.1 kördes lokalt med maskerade resultat på Dev `c5118a2`:
+53 commits i origin/main..origin/Dev gav inga hemlighetsträffar. Export av
+samtliga spårade filer gav endast den befintliga CARTO Basemaps-nyckeln i
+webbläsarkoden. Den är klientanvänd och behöver hanteras med leverantörens
+begränsningar, inte betraktas som en dold serverhemlighet.
+
+Skanning av all lokalt tillgänglig Git-historik gav dessutom en äldre,
+separat credential-träff. Den fanns inte i dagens filträd eller det nya
+släppets commits. Historiska träffar måste utredas privat och vid behov
+spärras hos utfärdaren; att radera en fil är inte en återkallelse. Inga
+nyckelvärden eller skanningsrapporter har lagts i repot. Automatisk skanning
+är ingen garanti mot alla slags känsliga uppgifter.
+
+Resend/Turnstile-serverhemligheter finns som Worker-bindningar; publika
+sitekeys, endpoint, konto-ID, kontaktadress och vissa interna testadresser
+är däremot synliga i kod/dokumentation. Sitekey är avsiktligt publik enligt
+Cloudflare: https://developers.cloudflare.com/turnstile/get-started/.
+CARTO beskriver klientnycklar och begränsningar på
+https://www.carto.com/basemaps/apikey/.
+
+`.gitignore` täcker nu alla `.env.*` utom uttryckliga `.env.example` och
+`.env.*.example`, utöver befintliga `.dev.vars*`, `.wrangler/`, virtuella
+miljöer och testserverfiler. Exempelfiler får aldrig innehålla riktiga
+hemligheter. Kontrollerat med git check-ignore och minnestest. Ingen sajt-
+eller driftkod ändrades; föregående produktionsbygge och frisk testserver
+har identisk sajtkod.
