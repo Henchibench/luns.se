@@ -67,7 +67,7 @@ function Entry({ item, onOpenContact }: { item: NewsItem; onOpenContact?: () => 
   );
 }
 
-function CloseButton({ label }: { label: string }) {
+function CloseButton() {
   const close = useOverlayClose();
   return (
     <button
@@ -75,7 +75,7 @@ function CloseButton({ label }: { label: string }) {
       autoFocus
       className="min-h-11 shrink-0 rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]"
     >
-      {label}
+      Stäng
     </button>
   );
 }
@@ -108,7 +108,7 @@ export default function NewsNote({
           <h2 id="luns-news-title" className="font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
             Nytt på luns.se
           </h2>
-          <CloseButton label={onCloseStart ? 'Tillbaka' : 'Stäng'} />
+          <CloseButton />
         </div>
 
         <div className="luns-scroll min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-6">

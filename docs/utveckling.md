@@ -45,7 +45,8 @@ slutföras först. Versionen markeras som sedd vid öppning; omladdning öppnar
 inte samma version igen. Blockerad lagring ger ingen automatisk ruta.
 
 Automatisk öppning har knappen Stäng och går direkt till lunchlistan.
-Manuell öppning från inställningarna har Tillbaka och återgår dit.
+Manuell öppning från inställningarna återgår dit. Henrik bad 2026-10-20
+att knappen alltid ska heta Stäng; etiketten är nu samma i båda fallen.
 `news-open` skiljer automatisk och manuell öppning med en boolesk parameter.
 Detta ingick från nyhetsversion 12; version 13 lägger till större text som standard.
 
@@ -53,7 +54,7 @@ Verifierat 2026-10-20: minnestest och Next-bygge passerar. Safari öppnade
 version 12 automatiskt efter tidigare läst version 11. Stäng gick direkt
 till lunchlistan, och omladdning öppnade ingen ny ruta. Ett nytt privat
 fönster fick platsval och introduktion; ingen nyhetsruta efter att rundan
-stängts eller efter omladdning. Manuell öppning behöll Tillbaka-knappen.
+stängts eller efter omladdning. Manuell öppning behöll återgången till inställningar.
 
 ## Nyhetstexter och datumordning, 2026-10-20
 
@@ -259,7 +260,7 @@ Change only lighting, sky and atmosphere: a long Nordic summer evening shortly a
 
 Henrik rapporterade att stängknappen krävde rullning genom hela historiken
 på mobil och att rutan var för smal på dator. `NewsNote` har nu en fast
-rubrikrad utanför innehållets rullyta. Stäng/Tillbaka är minst 44px hög,
+rubrikrad utanför innehållets rullyta. Stäng är minst 44px hög,
 får fokus vid öppning och behåller befintlig stänganimation och återgång.
 Panelens maxhöjd följer dvh (vh som fallback), med luft runt rutan.
 
