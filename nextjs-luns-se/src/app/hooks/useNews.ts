@@ -9,7 +9,8 @@ import { trackEvent } from '../utils/analytics';
 const STORAGE_KEY = 'luns-news-seen';
 
 /**
- * Pricken på kugghjulet: finns det något i nyhetslistan besökaren inte sett?
+ * Finns det något i nyhetslistan besökaren inte sett? Sidan öppnar då rutan
+ * automatiskt när den är redo; pricken finns kvar tills rutan öppnas.
  *
  * Regeln som håller rundan och nyhetsnotisen isär: den som inte sett rundan
  * är ny, och för en ny besökare är ingenting "nytt sedan sist" — hela sajten
@@ -41,14 +42,14 @@ export function useNews() {
    * Markeras som läst när rutan öppnas, inte när den stängs — samma val som
    * rundan gör. Den som öppnar och stänger direkt har sett vad som fanns.
    */
-  const markSeen = useCallback(() => {
+  const markSeen = useCallback((automatic = false) => {
     setUnread(false);
     try {
       localStorage.setItem(STORAGE_KEY, String(NEWS_VERSION));
     } catch {
       // Går inte att spara — pricken kommer tillbaka nästa besök. Får duga.
     }
-    trackEvent('news-open', { version: NEWS_VERSION });
+    trackEvent('news-open', { version: NEWS_VERSION, automatic });
   }, []);
 
   return { unread, markSeen };

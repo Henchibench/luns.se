@@ -7,8 +7,8 @@
  * på skärmen, med orden en gäst förstår.
  *
  * Lägger du till en post: skriv den överst och höj NEWS_VERSION. Det är
- * höjningen som tänder pricken på kugghjulet — en ny post utan höjd räknare
- * syns bara för den som råkar öppna rutan ändå.
+ * höjningen som öppnar rutan nästa gång en återkommande besökare kommer hit.
+ * En ny post utan höjd räknare syns bara för den som öppnar rutan manuellt.
  */
 export interface NewsItem {
   /** ISO-datum, hämtat från när ändringen faktiskt gick in. */
@@ -20,7 +20,7 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 11;
+export const NEWS_VERSION = 12;
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
@@ -29,6 +29,11 @@ export const NEWS_ITEMS: NewsItem[] = [
     body: 'Tipsa om ett lunchställe, rapportera en felaktig meny eller skicka en idé direkt på sajten. Du behöver inte ange namn eller e-post. Under varje restaurang finns Rapportera fel.',
     requiresContact: true,
     image: { src: '/images/news/help-me-help-you.png', alt: 'Meme med texten: Help me help you.', width: 696, height: 404 },
+  },
+  {
+    date: '2026-10-20',
+    title: 'Nyheter när du kommer tillbaka',
+    body: 'När något nytt har tillkommit öppnas den här rutan nästa gång du besöker Luns. Den visas en gång per uppdatering. Du kan alltid läsa nyheterna igen under Inställningar och info.',
   },
   {
     date: '2026-10-19',

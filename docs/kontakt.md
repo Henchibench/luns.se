@@ -5,7 +5,8 @@ Sajten förblir statiskt exporterad på GitHub Pages. En separat Cloudflare
 Worker verifierar inskickningen och har stöd för att skicka via Resend.
 Nyheten Tips & kontakt innehåller Henriks bifogade ”Help me help you”-meme
 (oförändrad bild i `public/images/news/`). Nyheten och bilden följer samma
-aktiveringsvillkor som formuläret; nyhetsversion 11 behålls inför samma släpp.
+aktiveringsvillkor som formuläret. Nyhetsversion 12 inkluderar också automatisk
+öppning för återkommande besökare, se utveckling.md.
 Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend anslöts 2026-10-20
 efter att Henrik bekräftat Verified för `kontakt.luns.se` hos Resend.
 

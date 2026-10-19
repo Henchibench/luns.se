@@ -8,10 +8,8 @@ import { NEWS_ITEMS, type NewsItem } from '../../lib/news';
 /**
  * Vad som är nytt sedan sist.
  *
- * Rutan är avsiktligt tyst: den öppnas bara av den som klickar på raden i
- * inställningarna, och enda påminnelsen om att den finns är en prick på
- * kugghjulet. En sajt man besöker för att välja lunch ska inte möta en
- * ändringslogg när den laddar.
+ * Öppnas automatiskt en gång per ny version för återkommande besökare,
+ * eller manuellt från inställningarna. Nya besökare får introduktionen.
  *
  * Samma glasruta som integritetsinfon och statistiken, så den känns som en
  * undersida till inställningarna och inte som ett eget meddelande.

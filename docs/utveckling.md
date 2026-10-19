@@ -30,6 +30,28 @@ En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
 
+## Automatisk nyhetslogg, 2026-10-20
+
+Tidigare tändes bara pricken på kugghjulet när `NEWS_VERSION` höjdes.
+Henrik beställde att nyhetsloggen öppnas automatiskt för återkommande
+besökare en gång per uppdatering. `useNews` läser `luns-news-seen` vid
+montering, före introduktionen. En ny besökare får fortfarande bara
+platsval och introduktion, samt en tyst baslinje för nyheter.
+
+Sidan väntar på menydata, platsval och kontaktkonfiguration innan olästa
+nyheter öppnas. Därmed är Tips & kontakt med sin bild med redan när rutan
+visas. Introduktion, kontakt, inställningar och andra öppna paneler får
+slutföras först. Versionen markeras som sedd vid öppning; omladdning öppnar
+inte samma version igen. Blockerad lagring ger ingen automatisk ruta.
+
+Automatisk öppning har knappen Stäng och går direkt till lunchlistan.
+Manuell öppning från inställningarna har Tillbaka och återgår dit.
+`news-open` skiljer automatisk och manuell öppning med en boolesk parameter.
+Nyhetsversion 12 inkluderar detta och kontaktformulärets ännu osläppta nyhet.
+
+Verifiering: minnestest, Next-bygge och webbläsarkontroll av första automatiska
+öppningen, stängning och omladdning före leverans.
+
 ## Nya restauranger per område, 2026-10-19
 
 Henrik beställde en blänkare för restauranger som tillkommit sedan förra

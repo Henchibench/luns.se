@@ -130,13 +130,17 @@ export default function LunchBoard() {
   const [animFlip, setAnimFlip] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
+  const [newsFromSettings, setNewsFromSettings] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [contactConfig, setContactConfig] = useState<ContactConfig | null>(null);
+  const [contactConfigLoaded, setContactConfigLoaded] = useState(false);
   const [contactContext, setContactContext] = useState<ContactContext | null>(null);
   useEffect(() => {
     let active = true;
-    loadContactConfig().then(config => { if (active) setContactConfig(config); });
+    loadContactConfig().then(config => {
+      if (active) { setContactConfig(config); setContactConfigLoaded(true); }
+    });
     return () => { active = false; };
   }, []);
 
@@ -169,6 +173,17 @@ export default function LunchBoard() {
   const news = useNews();
   const weather = useWeather(location?.latitude, location?.longitude);
 
+  // Vänta in både platsval och kontaktkonfiguration så nyheten med formuläret
+  // finns med från början. Lägg inte nyhetsrutan över något besökaren öppnat.
+  useEffect(() => {
+    if (!news.unread || loading || error || needsChoice || !location || !contactConfigLoaded
+      || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
+    setNewsFromSettings(false);
+    setNewsOpen(true);
+    news.markSeen(true);
+  }, [news.unread, news.markSeen, loading, error, needsChoice, location, contactConfigLoaded,
+    welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
+
   useEffect(() => {
     loadMenuData()
       .then(({ restaurants: parsed, locations: places, catalog: registry }) => {
@@ -185,10 +200,8 @@ export default function LunchBoard() {
 
   /**
    * Statistiken, integritetsinfon och nyhetslistan är undersidor till
-   * inställningarna, och kugghjulet är enda vägen in. Att stänga en av dem lämnar därför
-   * alltid tillbaka dit i stället för att kasta ut besökaren till menylistan,
-   * precis som en bakåtknapp. Öppnas de någon gång från ett annat håll får det
-   * bli ett val i stället för en regel.
+   * inställningarna när de öppnas därifrån. Den automatiska nyhetsrutan
+   * stängs däremot direkt till lunchlistan.
    *
    * Rundan räknas inte in. Den tar över hela sajten för att peka ut var
    * sakerna sitter, och att lägga en meny över den när den är slut vore att
@@ -705,6 +718,7 @@ export default function LunchBoard() {
           onRestartTour={welcome.restart}
           onOpenNews={() => {
             news.markSeen();
+            setNewsFromSettings(true);
             setNewsOpen(true);
           }}
           newsUnread={news.unread}
@@ -716,7 +730,7 @@ export default function LunchBoard() {
 
       {contactConfig && contactContext && <ContactForm config={contactConfig} context={contactContext} theme={theme} onClose={() => setContactContext(null)} />}
 
-      {newsOpen && <NewsNote contactEnabled={!!contactConfig} onClose={() => setNewsOpen(false)} onCloseStart={backToSettings} />}
+      {newsOpen && <NewsNote contactEnabled={!!contactConfig} onClose={() => setNewsOpen(false)} onCloseStart={newsFromSettings ? backToSettings : undefined} />}
 
       {privacyOpen && (
         <PrivacyNote onClose={() => setPrivacyOpen(false)} onCloseStart={backToSettings} />
