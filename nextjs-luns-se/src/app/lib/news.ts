@@ -21,7 +21,7 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 12;
+export const NEWS_VERSION = 13;
 
 export const NEWS_ITEMS: NewsItem[] = [
   {
@@ -40,6 +40,12 @@ export const NEWS_ITEMS: NewsItem[] = [
     date: '2026-10-20',
     title: 'Nytt område: Järntorget/Linné',
     body: 'Nu finns Järntorget/Linné i Göteborg på Luns! Välj området i platsväljaren för att se lunchmenyerna där.',
+    image: { src: '/images/news/jarntorget-linne.jpg', alt: 'Illustration inspirerad av Järntorget och Linné, med spårvagn, höstträd och uteserveringar.', width: 1536, height: 1024 },
+  },
+  {
+    date: '2026-10-20',
+    title: 'Större text som standard',
+    body: 'Luns visar nu större text som standard. Vill du ha mindre text? Öppna Inställningar via kugghjulet och stäng av Större text. Har du redan valt textstorlek behåller vi ditt val.',
   },
   {
     date: '2026-10-20',

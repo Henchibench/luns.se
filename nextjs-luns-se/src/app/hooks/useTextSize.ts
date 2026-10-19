@@ -14,16 +14,16 @@ export type TextSize = 'normal' | 'stor';
 const STORAGE_KEY = 'luns-text-size';
 
 function readTextSize(): TextSize {
-  if (typeof window === 'undefined') return 'normal';
+  if (typeof window === 'undefined') return 'stor';
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'stor' ? 'stor' : 'normal';
+    return localStorage.getItem(STORAGE_KEY) === 'normal' ? 'normal' : 'stor';
   } catch {
-    return 'normal';
+    return 'stor';
   }
 }
 
 export function useTextSize() {
-  const [size, setSize] = useState<TextSize>('normal');
+  const [size, setSize] = useState<TextSize>('stor');
 
   useEffect(() => {
     setSize(readTextSize());

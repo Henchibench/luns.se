@@ -47,7 +47,7 @@ inte samma version igen. Blockerad lagring ger ingen automatisk ruta.
 Automatisk öppning har knappen Stäng och går direkt till lunchlistan.
 Manuell öppning från inställningarna har Tillbaka och återgår dit.
 `news-open` skiljer automatisk och manuell öppning med en boolesk parameter.
-Nyhetsversion 12 inkluderar detta och kontaktformulärets ännu osläppta nyhet.
+Detta ingick från nyhetsversion 12; version 13 lägger till större text som standard.
 
 Verifierat 2026-10-20: minnestest och Next-bygge passerar. Safari öppnade
 version 12 automatiskt efter tidigare läst version 11. Stäng gick direkt
@@ -209,3 +209,33 @@ Underlag: WebKits dokumentation om dynamiska viewport-enheter:
 https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/.
 Verifiering: minnestest och testserverbygge samt visuell kontroll av knappar
 och paneler. Safaris expanderande adressfält behöver även provas på telefon.
+
+## Större text som standard och områdesbild, 2026-10-20
+
+Henrik beställde en nyhet om större text som standard. Kontrollen visade att
+standardläget fortfarande var `normal`. HTML-attributet och `useTextSize`
+startar nu med `stor`; endast ett sparat `normal` ger mindre text.
+Sparade val respekteras. Skriptet före första målningen tillämpar mindre
+text utan att invänta React. Nyheten förklarar reglaget under Inställningar.
+Nyhetsversionen är 13, med släppdatum 20 oktober.
+
+Områdesnyheten använder `public/images/news/jarntorget-linne.jpg` (1536×1024).
+Bilden är en konstnärlig tolkning, inte ett platsfoto eller en exakt kartbild.
+Den skapades med det inbyggda imagegen-verktyget, utan modell-API/nyckel,
+och sparades som JPEG för sajten. Alt-texten beskriver den som illustration.
+
+Verifiering: körd kontroll av både HTML-skript och React-hook för saknat,
+normalt, stort och okänt sparat värde; minnestest och Next-bygge samt
+visuell kontroll av nyhet och inställningsreglage på testservern.
+
+Bildprompt (inbyggd bildgenerering):
+
+```text
+Use case: illustration-story
+Asset type: landscape editorial illustration for a small news card on the Swedish lunch website Luns.se.
+Primary request: A beautiful illustration inspired by Järntorget and Linné in Gothenburg, Sweden.
+Scene: the lively meeting of a city square and a leafy street, recognizable Gothenburg blue-and-white tram, turn-of-the-century stone apartment facades, outdoor café tables and a few small strolling figures. Warm early autumn lunchtime light.
+Style: refined hand-painted travel illustration, gouache and subtle paper grain, confident architectural shapes, inviting and locally grounded. Not a photograph or a literal map; an artistic impression of the neighborhood. Muted petrol teal shadows echo the site's teal design, warm ochre and terracotta facades, soft green trees.
+Composition: wide landscape approximately 3:2, clear and readable at 350px wide, scene fills canvas, balanced depth, no border.
+Constraints: no text, no lettering, no logos, no watermark, no invented restaurant names or menus.
+```
