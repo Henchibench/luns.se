@@ -112,8 +112,12 @@ och Resend visade Delivered för mejlet till `luns.se@outlook.com` med ämnet
 
 Produktionsförberedelse 2026-10-20: separat widget och serverhemlighet,
 konfiguration i Dev samt återgång till separat demo på testservern.
-Verifiering av driftsatta origins, nekad ogiltig token och bygge dokumenteras
-efter leverans. Fullständigt formulärtest från luns.se återstår efter publicering.
+Verifierat: produktionens preflight ger 204 för luns.se och www.luns.se,
+403 för testservern; demo ger 204 för testservern och 403 för luns.se.
+Produktion avvisar ogiltig token med 403 verification. Alla 28 tester och
+Next-bygget passerar. Safari verifierade automatiskt och demot gav
+”Testet gick bra” efter miljöbytet. Fullständigt formulärtest från luns.se
+återstår efter publicering.
 
 Källor: [Turnstile Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
 [Workers rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/),
