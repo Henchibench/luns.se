@@ -318,6 +318,17 @@ version 13 behålls för förfiningen av samma ännu osläppta funktion.
 Verifiering: minnestest och testserverbygge, därefter mobil/dator-kontroll
 av rullning, kvarvarande stängknapp, fem senaste och utfälld historik.
 
+## Inställningarnas stängknapp, 2026-10-20
+
+Henrik påpekade att inställningarnas huvudmeny fortfarande krävde rullning
+ned till Stäng på mobil, till skillnad från nyhetsrutan. SettingsOverlay
+har nu samma responsiva skal: en enda Stäng-knapp högst upp till höger på
+mobil, i fast nederkant till höger från 760px. Rubrik och knapp ligger
+utanför rullytan, så endast inställningsinnehållet rullar. Panelens maxhöjd
+följer dvh med vh-fallback; knappen är minst 44px och får fokus vid öppning.
+Verifiering: minnestest, bygge och mobilkontroll före/efter rullning samt
+kontroll av datorplacering och stängning. Nyhetsversionen är oförändrad.
+
 ## Läsbar textkontrast i båda teman, 2026-10-20
 
 Henrik upplevde att nyheter, inställningar och öppettider var svårlästa,
