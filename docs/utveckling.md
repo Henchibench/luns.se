@@ -328,9 +328,12 @@ utanför rullytan, så endast inställningsinnehållet rullar. Panelens maxhöjd
 följer dvh med vh-fallback; knappen är minst 44px och får fokus vid öppning.
 Den första mobilplaceringen trängde ihop rubriken och lämnade ”info” på en
 egen rad. På mobil delar nu LUNS.SE och Stäng den översta raden, medan
-hela rubriken ligger på egen fullbredd under dem i text-18. På dator behålls
-text-24 och stängknappen i nederkant. Kontrollerat i 320px och 390px mobilvy
-med större text, inklusive rullning, samt i datorvy.
+hela rubriken ligger på egen fullbredd under dem. Ett försök med mindre
+mobilrubrik upplevdes för litet på Henriks iPhone; text-24 behålls därför i
+båda lägena och följer fortfarande inställningen för större text. På dator
+ligger stängknappen i nederkant. På mycket smala skärmar får rubriken brytas
+naturligt över hela bredden. Kontrollera mobilvy med större text och rullning
+samt datorvy vid ändringar.
 Verifiering: minnestest, bygge och mobilkontroll före/efter rullning samt
 kontroll av datorplacering och stängning. Nyhetsversionen är oförändrad.
 
