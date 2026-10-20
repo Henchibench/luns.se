@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import Script from 'next/script';
 import Overlay, { useOverlayClose } from '../board/Overlay';
 import { CONTACT_TOPICS, contactError, contactRequestId, type ContactConfig, type ContactContext, type ContactTopic } from '../../lib/contact';
@@ -20,6 +20,94 @@ declare global { interface Window { turnstile?: Turnstile } }
 const INPUT = 'mt-1 block w-full rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-2.5 text-14 text-[var(--ink)] outline-none focus:ring-2 focus:ring-[var(--acc)]';
 const BUTTON = 'rounded-lg px-4 py-2.5 text-13 font-semibold cursor-pointer disabled:cursor-wait disabled:opacity-50';
 interface Props { config: ContactConfig; context: ContactContext; theme: 'light' | 'dark'; onClose: () => void }
+
+// Samma temaytor som platsväljaren. En native select kan rita sin meny med
+// operativsystemets färger, även när själva fältet har sajtens färger.
+function TopicSelect({ value, onChange, disabled }: {
+  value: ContactTopic; onChange: (value: ContactTopic) => void; disabled: boolean;
+}) {
+  const id = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const search = useRef({ text: '', time: 0 });
+  const topics = Object.keys(CONTACT_TOPICS) as ContactTopic[];
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const expanded = open && !disabled;
+
+  useEffect(() => {
+    if (!expanded) return;
+    const outside = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, [expanded]);
+
+  const show = () => {
+    setActive(topics.indexOf(value));
+    search.current = { text: '', time: 0 };
+    setOpen(true);
+  };
+  const choose = (index: number) => {
+    onChange(topics[index]);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={root} className="relative" onBlur={event => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
+    }}>
+      <label id={`${id}-label`} htmlFor={id} className="block text-13 font-semibold">Vad gäller det?</label>
+      <button id={id} type="button" role="combobox" disabled={disabled}
+        aria-labelledby={`${id}-label`} aria-haspopup="listbox" aria-expanded={expanded}
+        aria-controls={expanded ? `${id}-list` : undefined}
+        aria-activedescendant={expanded ? `${id}-${topics[active]}` : undefined}
+        className={`${INPUT} flex items-center justify-between gap-3 text-left disabled:opacity-50`}
+        onClick={() => expanded ? setOpen(false) : show()}
+        onKeyDown={event => {
+          if (event.key === 'Escape' && expanded) {
+            event.preventDefault();
+            event.stopPropagation();
+            setOpen(false);
+          } else if (event.key === 'Tab') {
+            setOpen(false);
+          } else if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].includes(event.key)) {
+            event.preventDefault();
+            if (!expanded) { show(); return; }
+            if (event.key === 'Enter' || event.key === ' ') choose(active);
+            else if (event.key === 'Home') setActive(0);
+            else if (event.key === 'End') setActive(topics.length - 1);
+            else setActive(index => (index + (event.key === 'ArrowDown' ? 1 : -1) + topics.length) % topics.length);
+          } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            event.preventDefault();
+            const now = Date.now();
+            const text = (now - search.current.time < 700 ? search.current.text : '') + event.key.toLocaleLowerCase('sv');
+            search.current = { text, time: now };
+            const index = topics.findIndex(topic => CONTACT_TOPICS[topic].toLocaleLowerCase('sv').startsWith(text));
+            if (!expanded) setOpen(true);
+            setActive(index >= 0 ? index : topics.indexOf(value));
+          }
+        }}>
+        <span>{CONTACT_TOPICS[value]}</span>
+        <span aria-hidden="true" className="text-[var(--mut)]">▾</span>
+      </button>
+      {expanded && <div id={`${id}-list`} role="listbox" aria-labelledby={`${id}-label`}
+        className="luns-panel absolute left-0 right-0 top-full z-10 mt-1 rounded-xl border border-[var(--glassBrd)] bg-[var(--bg)] p-1.5 text-14 text-[var(--ink)]">
+        {topics.map((topic, index) => (
+          <div id={`${id}-${topic}`} key={topic} role="option" aria-selected={topic === value}
+            className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5"
+            style={{ background: index === active ? 'var(--hi)' : undefined, color: topic === value ? 'var(--accStrong)' : undefined }}
+            onPointerDown={event => event.preventDefault()}
+            onMouseEnter={() => setActive(index)}
+            onClick={() => choose(index)}>
+            {CONTACT_TOPICS[topic]}
+            {topic === value && <span aria-hidden="true">✓</span>}
+          </div>
+        ))}
+      </div>}
+    </div>
+  );
+}
 
 function Form({ config, context, theme }: Omit<Props, 'onClose'>) {
   const close = useOverlayClose();
@@ -111,9 +199,7 @@ function Form({ config, context, theme }: Omit<Props, 'onClose'>) {
         <p className="mb-5 text-14 leading-relaxed text-[var(--ink2)]">Saknas ett lunchställe, är menyn fel eller har du en idé? Skriv till oss. Du behöver inte ange namn eller e-post.</p>
         {config.mode === 'demo' && <p className="mb-5 rounded-lg border border-[var(--line)] bg-[var(--accBg)] px-3 py-2 text-12 text-[var(--ink2)]">Testläge: du kan prova formuläret, men inget meddelande skickas.</p>}
         <form onSubmit={submit} className="space-y-4">
-          <label className="block text-13 font-semibold">Vad gäller det?
-            <select disabled={pending} value={topic} onChange={e => setTopic(e.target.value as ContactTopic)} className={INPUT}>{Object.entries(CONTACT_TOPICS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
-          </label>
+          <TopicSelect value={topic} onChange={setTopic} disabled={pending} />
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-13 font-semibold">Restaurang <span className="font-normal text-[var(--ink2)]">(valfritt)</span>
               <input disabled={pending} value={restaurant} maxLength={120} onChange={e => setRestaurant(e.target.value)} className={INPUT} autoComplete="off" />

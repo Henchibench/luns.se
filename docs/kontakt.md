@@ -20,6 +20,27 @@ aktiveringsvillkor som formuläret. Nyhetsversion 12 inkluderar också automatis
 Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend anslöts 2026-10-20
 efter att Henrik bekräftat Verified för `kontakt.luns.se` hos Resend.
 
+## Ämnesväljarens färger, 2026-10-20
+
+Henrik rapporterade vit bakgrund med ljus text i ”Vad gäller det?”.
+Fältet använde native select, vars utfällda meny kan ritas av operativsystemet
+utanför sajtens temafärger. ContactForm använder nu en egen ämneslista med
+samma bakgrund, kant, markering och textfärger som sajtens platsväljare.
+Alternativen och ämnesvärdet som skickas vidare är oförändrade.
+
+Väljaren har combobox/listbox-semantik, namngiven etikett, aktivt alternativ
+och markering av valt ämne. Pilar, Home/End, textsökning och Enter/mellanslag
+fungerar med fokus kvar på fältet. Escape stänger först listan utan att stänga
+formuläret; Tab och klick utanför stänger listan.
+
+Verifierat i byggd Chromium-sida, 1440 respektive 390 pixlar, i båda teman:
+bakgrund och text följer designvariablerna, listan ryms i vyn och klick,
+tangentval, Escape, Tab samt klick utanför fungerar. Next-bygge och samtliga
+49 Node-tester passerade. Safari och fysisk telefon är inte provade här.
+Källa: Henriks felrapport, ContactForm.tsx och lokal webbläsarkontroll.
+Återgång: återställ ändringen i ContactForm.tsx via en riktad revert på Dev,
+bygg testservern igen och använd ordinarie släppflöde om fixen publicerats.
+
 ## Textmarkering och stängning, 2026-10-20
 
 Henrik rapporterade att formuläret stängdes när text i e-postfältet markerades
