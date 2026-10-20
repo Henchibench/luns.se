@@ -242,7 +242,7 @@ export default function SettingsOverlay({
       >
         <div className="col-span-2 row-start-1 min-w-0 border-b border-[var(--line)] p-4 wide:px-7">
           <span className="flex min-h-11 items-center pr-24 font-mono text-10 tracking-[.15em] text-[var(--mut)] wide:min-h-0 wide:pr-0">LUNS.SE</span>
-          <h2 id="luns-settings-title" className="mt-2 font-heading text-20 font-bold tracking-[-.02em] text-[var(--ink)] wide:mt-1 wide:text-24">
+          <h2 id="luns-settings-title" className="mt-2 font-heading text-18 font-bold tracking-[-.02em] text-[var(--ink)] wide:mt-1 wide:text-24">
             Inställningar och info
           </h2>
         </div>
