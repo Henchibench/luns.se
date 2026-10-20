@@ -30,6 +30,16 @@ En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
 
+## Låst Ubuntu-version i Actions, 2026-10-20
+
+GitHub aviserade att ubuntu-latest flyttas till Ubuntu 26.04. På Henriks
+uttryckliga beställning använder scrape-and-deploy nu ubuntu-24.04 tills
+den nya miljön har provats separat. Det låser Ubuntu-utgåvan, inte alla
+paketversioner eller framtida uppdateringar av GitHubs runner-image.
+Schema, behörigheter och byggsteg är oförändrade. Diff och minnestest
+kontrolleras före leverans; körning på GitHubs låsta runner verifieras
+först efter Henriks släpp och nästa Actions-körning.
+
 ## Släppkontroll inför main, 2026-10-20
 
 Kontrollerad sajtkod: Dev `0c92d6f`. Simulerad merge med `git merge-tree`
