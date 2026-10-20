@@ -61,6 +61,7 @@ export default function Overlay({
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const backdropPress = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -101,7 +102,20 @@ export default function Overlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        onClick={requestClose}
+        // Ett drag från innehållet kan ge click på den gemensamma föräldern.
+        // Capture ser även tryck i fält vars click stoppas av panelen.
+        onPointerDownCapture={e => {
+          backdropPress.current = e.isPrimary && e.button === 0 && e.target === e.currentTarget;
+        }}
+        onPointerUpCapture={e => {
+          backdropPress.current = backdropPress.current && e.target === e.currentTarget;
+        }}
+        onPointerCancelCapture={() => { backdropPress.current = false; }}
+        onClick={e => {
+          const close = backdropPress.current && e.target === e.currentTarget;
+          backdropPress.current = false;
+          if (close) requestClose();
+        }}
       >
         {children}
       </div>
