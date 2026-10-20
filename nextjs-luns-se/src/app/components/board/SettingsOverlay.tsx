@@ -237,20 +237,19 @@ export default function SettingsOverlay({
   return (
     <Overlay onClose={onClose} labelledBy="luns-settings-title">
       <div
-        className="luns-panel luns-settings-panel relative grid w-full max-w-md grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
+        className="luns-panel luns-settings-panel grid w-full max-w-md grid-cols-[minmax(0,1fr)] grid-rows-[auto_auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="col-span-2 row-start-1 min-w-0 border-b border-[var(--line)] p-4 wide:px-7">
-          <span className="flex min-h-11 items-center pr-24 font-mono text-10 tracking-[.15em] text-[var(--mut)] wide:min-h-0 wide:pr-0">LUNS.SE</span>
-          <h2 id="luns-settings-title" className="mt-2 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)] wide:mt-1">
-            Inställningar och info
+        <div className="row-start-1 min-w-0 px-4 pt-4 wide:border-b wide:border-[var(--line)] wide:px-7 wide:pb-4">
+          <h2 id="luns-settings-title" className="font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
+            Inställningar å sånt
           </h2>
         </div>
-        <div className="absolute top-4 right-4 flex items-start justify-end wide:static wide:col-span-2 wide:row-start-3 wide:border-t wide:border-[var(--line)] wide:px-7 wide:py-4">
+        <div className="row-start-2 flex justify-end border-b border-[var(--line)] px-4 pt-2 pb-4 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-7 wide:py-4">
           <CloseButton />
         </div>
 
-        <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-7">
+        <div className="luns-scroll row-start-3 min-h-0 overflow-y-auto overscroll-contain p-4 wide:row-start-2 wide:p-7">
           <SectionLabel>INSTÄLLNINGAR</SectionLabel>
           <div className="flex flex-col gap-2">
             <Switch checked={theme === 'dark'} onChange={onToggleTheme} title="Mörkt läge" />
