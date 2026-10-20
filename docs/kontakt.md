@@ -20,6 +20,20 @@ aktiveringsvillkor som formuläret. Nyhetsversion 12 inkluderar också automatis
 Mottagaren är enligt Henrik `luns.se@outlook.com`. Resend anslöts 2026-10-20
 efter att Henrik bekräftat Verified för `kontakt.luns.se` hos Resend.
 
+## Textmarkering och stängning, 2026-10-20
+
+Henrik rapporterade att formuläret stängdes när text i e-postfältet markerades
+med musen och draget släpptes utanför panelen. Overlay stängde på varje click
+som nådde bakgrunden; webbläsaren kan rikta ett klick mot gemensam förälder
+när tryck och släpp sker på olika element.
+Den gemensamma Overlay-komponenten kräver nu att primärknappens tryck och
+släpp båda sker direkt på bakgrunden. Capture-händelser registrerar även
+tryck i panelen, och pointercancel återställer tillståndet. Textmarkering
+kan därmed lämna rutan utan att ett efterföljande bakgrundsklick stänger den.
+Stängknappen och Escape använder samma tidigare stängväg. Skyddet gäller
+även övriga paneler som använder Overlay. Ingen e-postvalidering ändrades.
+Verifiering: minnestest, Next-bygge och drag-/klickkontroll på testservern.
+
 ## Test och produktion
 
 Produktionskopplingen förbereddes och driftsattes 2026-10-20 på Henriks
