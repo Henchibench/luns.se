@@ -329,6 +329,17 @@ följer dvh med vh-fallback; knappen är minst 44px och får fokus vid öppning.
 Verifiering: minnestest, bygge och mobilkontroll före/efter rullning samt
 kontroll av datorplacering och stängning. Nyhetsversionen är oförändrad.
 
+## Rensa mobilens filter, 2026-10-20
+
+Filterpanelen saknade ett gemensamt sätt att avmarkera valen. Rensa ligger
+nu bredvid Stäng i panelens fasta rubrikrad och nollställer mattyper,
+Sugen på-val och det tillfälliga favoritfiltret. Panelen hålls öppen så att
+resultatet syns direkt. Sparade favoriter, favoriternas startinställning,
+söktext, område och dag ändras inte. Knappen är inaktiverad utan aktiva
+filter och visas inte i restaurangpanelen. Båda knapparna är minst 44px höga.
+Verifiering: minnestest, testserverbygge och mobilkontroll av kombinerade
+filter, nollställning, knappstatus och stängning.
+
 ## Läsbar textkontrast i båda teman, 2026-10-20
 
 Henrik upplevde att nyheter, inställningar och öppettider var svårlästa,

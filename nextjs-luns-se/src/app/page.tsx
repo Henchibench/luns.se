@@ -684,6 +684,11 @@ export default function LunchBoard() {
         sheet={sheet}
         onOpen={setSheet}
         onClose={() => setSheet(null)}
+        onClearFilters={() => {
+          setActiveTypes([]);
+          setActiveCravings([]);
+          setShowOnlyFavorites(false);
+        }}
         items={railItems}
         onSelectRestaurant={scrollToRestaurant}
         typeChips={typeChips}
