@@ -237,16 +237,16 @@ export default function SettingsOverlay({
   return (
     <Overlay onClose={onClose} labelledBy="luns-settings-title">
       <div
-        className="luns-panel luns-settings-panel grid w-full max-w-md grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
+        className="luns-panel luns-settings-panel relative grid w-full max-w-md grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
         onClick={e => e.stopPropagation()}
       >
-        <div className="col-start-1 row-start-1 min-w-0 border-b border-[var(--line)] py-4 pl-4 wide:col-span-2 wide:px-7">
-          <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
-          <h2 id="luns-settings-title" className="mt-1 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
+        <div className="col-span-2 row-start-1 min-w-0 border-b border-[var(--line)] p-4 wide:px-7">
+          <span className="flex min-h-11 items-center pr-24 font-mono text-10 tracking-[.15em] text-[var(--mut)] wide:min-h-0 wide:pr-0">LUNS.SE</span>
+          <h2 id="luns-settings-title" className="mt-2 font-heading text-20 font-bold tracking-[-.02em] text-[var(--ink)] wide:mt-1 wide:text-24">
             Inställningar och info
           </h2>
         </div>
-        <div className="col-start-2 row-start-1 flex items-start justify-end border-b border-[var(--line)] py-4 pr-4 pl-3 wide:col-span-2 wide:col-start-1 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-7">
+        <div className="absolute top-4 right-4 flex items-start justify-end wide:static wide:col-span-2 wide:row-start-3 wide:border-t wide:border-[var(--line)] wide:px-7 wide:py-4">
           <CloseButton />
         </div>
 
