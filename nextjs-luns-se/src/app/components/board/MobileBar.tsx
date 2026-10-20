@@ -10,6 +10,7 @@ interface Props {
   sheet: SheetKind;
   onOpen: (kind: Exclude<SheetKind, null>) => void;
   onClose: () => void;
+  onClearFilters: () => void;
   items: RailItem[];
   onSelectRestaurant: (name: string) => void;
   typeChips: ChipSpec[];
@@ -24,6 +25,7 @@ export default function MobileBar({
   sheet,
   onOpen,
   onClose,
+  onClearFilters,
   items,
   onSelectRestaurant,
   typeChips,
@@ -93,12 +95,23 @@ export default function MobileBar({
               <span className="font-mono text-11 tracking-[.15em] text-[var(--mut)]">
                 {sheet === 'rest' ? `RESTAURANGER · ${items.length}` : 'FILTER'}
               </span>
-              <button
-                onClick={onClose}
-                className="rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-12 font-semibold text-[var(--ink2)] cursor-pointer"
-              >
-                Stäng
-              </button>
+              <div className="flex gap-2">
+                {sheet === 'filter' && (
+                  <button
+                    onClick={onClearFilters}
+                    disabled={activeFilterCount === 0}
+                    className="min-h-11 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-1.5 text-12 font-semibold text-[var(--ink2)] cursor-pointer disabled:cursor-default disabled:opacity-50"
+                  >
+                    Rensa
+                  </button>
+                )}
+                <button
+                  onClick={onClose}
+                  className="min-h-11 rounded-lg border-0 bg-[var(--chip)] px-3 py-1.5 text-12 font-semibold text-[var(--ink2)] cursor-pointer"
+                >
+                  Stäng
+                </button>
+              </div>
             </div>
 
             <div className="luns-scroll min-h-0 overflow-y-auto px-3 pt-1 pb-[calc(24px+env(safe-area-inset-bottom,0px))]">

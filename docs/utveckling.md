@@ -318,6 +318,34 @@ version 13 behålls för förfiningen av samma ännu osläppta funktion.
 Verifiering: minnestest och testserverbygge, därefter mobil/dator-kontroll
 av rullning, kvarvarande stängknapp, fem senaste och utfälld historik.
 
+## Inställningarnas stängknapp, 2026-10-20
+
+Henrik påpekade att inställningarnas huvudmeny fortfarande krävde rullning
+ned till Stäng på mobil, till skillnad från nyhetsrutan. SettingsOverlay
+har nu samma responsiva skal: en enda Stäng-knapp högst upp till höger på
+mobil, i fast nederkant till höger från 760px. Rubrik och knapp ligger
+utanför rullytan, så endast inställningsinnehållet rullar. Panelens maxhöjd
+följer dvh med vh-fallback; knappen är minst 44px och får fokus vid öppning.
+Den första mobilplaceringen trängde ihop rubriken och lämnade ”info” på en
+egen rad. Henrik valde sedan rubriken ”Inställningar å sånt” och tog bort
+LUNS.SE. Rubriken och Stäng delar samma kompakta rad på mobil; en separat
+knapprad tog för mycket höjd. Båda ligger kvar ovanför rullytan.
+Text-24 behålls i båda lägena efter att
+en mindre mobilrubrik upplevts för liten. På dator ligger Stäng i nederkant.
+Verifiering: minnestest, bygge och mobilkontroll före/efter rullning samt
+kontroll av datorplacering och stängning. Nyhetsversionen är oförändrad.
+
+## Rensa mobilens filter, 2026-10-20
+
+Filterpanelen saknade ett gemensamt sätt att avmarkera valen. Rensa ligger
+nu bredvid Stäng i panelens fasta rubrikrad och nollställer mattyper,
+Sugen på-val och det tillfälliga favoritfiltret. Panelen hålls öppen så att
+resultatet syns direkt. Sparade favoriter, favoriternas startinställning,
+söktext, område och dag ändras inte. Knappen är inaktiverad utan aktiva
+filter och visas inte i restaurangpanelen. Båda knapparna är minst 44px höga.
+Verifiering: minnestest, testserverbygge och mobilkontroll av kombinerade
+filter, nollställning, knappstatus och stängning.
+
 ## Läsbar textkontrast i båda teman, 2026-10-20
 
 Henrik upplevde att nyheter, inställningar och öppettider var svårlästa,

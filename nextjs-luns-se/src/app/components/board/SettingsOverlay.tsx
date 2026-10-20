@@ -159,7 +159,8 @@ function CloseButton() {
   return (
     <button
       onClick={close}
-      className="rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90"
+      autoFocus
+      className="min-h-11 shrink-0 rounded-lg border-0 bg-[var(--acc)] px-4 py-2 text-12 font-bold text-[var(--bg)] cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]"
     >
       Stäng
     </button>
@@ -236,74 +237,74 @@ export default function SettingsOverlay({
   return (
     <Overlay onClose={onClose} labelledBy="luns-settings-title">
       <div
-        className="luns-panel luns-scroll max-h-[86vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] p-7"
+        className="luns-panel luns-settings-panel grid w-full max-w-md grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-2xl border border-[var(--glassBrd)] bg-[var(--bg)] wide:grid-rows-[auto_minmax(0,1fr)_auto]"
         onClick={e => e.stopPropagation()}
       >
-        <span className="font-mono text-10 tracking-[.15em] text-[var(--mut)]">LUNS.SE</span>
-        <h2
-          id="luns-settings-title"
-          className="mt-2 mb-5 font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]"
-        >
-          Inställningar och info
-        </h2>
-
-        <SectionLabel>INSTÄLLNINGAR</SectionLabel>
-        <div className="flex flex-col gap-2">
-          <Switch checked={theme === 'dark'} onChange={onToggleTheme} title="Mörkt läge" />
-
-          {/* Reglaget står näst överst, ovanför favoritvalet: den som letar
-              efter det gör det för att texten är för liten att leta i. */}
-          <Switch
-            checked={largeText}
-            onChange={onToggleLargeText}
-            title="Större text"
-            hint="Rätter, namn och etiketter växer ett steg. Listan rymmer lika många restauranger — det är bokstäverna som blir större, inte raderna."
-          />
-
-          <div>
-            <Switch
-              checked={startWithFavorites}
-              onChange={onToggleStartWithFavorites}
-              title="Börja med favoriterna"
-              hint="Sajten öppnas med favoritfiltret på, så bara de hjärtmarkerade restaurangerna syns. Filtret går att stänga av som vanligt sedan."
-            />
-            {favoriteCount === 0 && (
-              <p className="mt-2 mb-0 text-12 leading-[1.5] text-[var(--mut)]">
-                Det finns inga favoriter än. Hjärtat bredvid en restaurang sparar den, och då börjar
-                inställningen gälla.
-              </p>
-            )}
-          </div>
+        <div className="col-start-1 row-start-1 flex min-w-0 items-center border-b border-[var(--line)] py-4 pl-4 wide:col-span-2 wide:px-7">
+          <h2 id="luns-settings-title" className="font-heading text-24 font-bold tracking-[-.02em] text-[var(--ink)]">
+            Inställningar å sånt
+          </h2>
         </div>
-
-        {/* Egen rubrik inbakad, så ingen SectionLabel här. Avsnittet finns
-            inte alls när ingenting bevakas. */}
-        {watchedDishes.length > 0 && (
-          <div className="mt-6">
-            <WatchedDishes dishes={watchedDishes} onRemove={onRemoveWatched} />
-          </div>
-        )}
-
-        <div className="mt-6">
-          <SectionLabel>INFORMATION</SectionLabel>
-          <Rows
-            onRestartTour={onRestartTour}
-            onOpenNews={onOpenNews}
-            newsUnread={newsUnread}
-            onOpenStats={onOpenStats}
-            onOpenPrivacy={onOpenPrivacy}
-          />
-        </div>
-
-        {/* Egen rubrik, inte en fjärde rad under INFORMATION. Den här leder ut
-            ur sajten och handlar om att säga något, inte om att läsa något. */}
-        <div className="mt-6">
-          <SectionLabel>KONTAKT</SectionLabel>
-          {onOpenContact ? <LinkRow title="Tjôta med Luns" hint="Tipsa om ett lunchställe, rapportera ett fel eller skicka en idé. E-post är valfritt." onClick={onOpenContact} /> : <MailRow address={FEEDBACK_ADDRESS} />}
-        </div>
-
-        <div className="mt-6 flex justify-end">
+        <div className="col-start-2 row-start-1 flex items-center justify-end border-b border-[var(--line)] py-4 pr-4 pl-2 wide:col-span-2 wide:col-start-1 wide:row-start-3 wide:border-t wide:border-b-0 wide:px-7">
           <CloseButton />
+        </div>
+
+        <div className="luns-scroll col-span-2 row-start-2 min-h-0 overflow-y-auto overscroll-contain p-4 wide:p-7">
+          <SectionLabel>INSTÄLLNINGAR</SectionLabel>
+          <div className="flex flex-col gap-2">
+            <Switch checked={theme === 'dark'} onChange={onToggleTheme} title="Mörkt läge" />
+
+            {/* Reglaget står näst överst, ovanför favoritvalet: den som letar
+                efter det gör det för att texten är för liten att leta i. */}
+            <Switch
+              checked={largeText}
+              onChange={onToggleLargeText}
+              title="Större text"
+              hint="Rätter, namn och etiketter växer ett steg. Listan rymmer lika många restauranger — det är bokstäverna som blir större, inte raderna."
+            />
+
+            <div>
+              <Switch
+                checked={startWithFavorites}
+                onChange={onToggleStartWithFavorites}
+                title="Börja med favoriterna"
+                hint="Sajten öppnas med favoritfiltret på, så bara de hjärtmarkerade restaurangerna syns. Filtret går att stänga av som vanligt sedan."
+              />
+              {favoriteCount === 0 && (
+                <p className="mt-2 mb-0 text-12 leading-[1.5] text-[var(--mut)]">
+                  Det finns inga favoriter än. Hjärtat bredvid en restaurang sparar den, och då börjar
+                  inställningen gälla.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Egen rubrik inbakad, så ingen SectionLabel här. Avsnittet finns
+              inte alls när ingenting bevakas. */}
+          {watchedDishes.length > 0 && (
+            <div className="mt-6">
+              <WatchedDishes dishes={watchedDishes} onRemove={onRemoveWatched} />
+            </div>
+          )}
+
+          <div className="mt-6">
+            <SectionLabel>INFORMATION</SectionLabel>
+            <Rows
+              onRestartTour={onRestartTour}
+              onOpenNews={onOpenNews}
+              newsUnread={newsUnread}
+              onOpenStats={onOpenStats}
+              onOpenPrivacy={onOpenPrivacy}
+            />
+          </div>
+
+          {/* Egen rubrik, inte en fjärde rad under INFORMATION. Den här leder ut
+              ur sajten och handlar om att säga något, inte om att läsa något. */}
+          <div className="mt-6">
+            <SectionLabel>KONTAKT</SectionLabel>
+            {onOpenContact ? <LinkRow title="Tjôta med Luns" hint="Tipsa om ett lunchställe, rapportera ett fel eller skicka en idé. E-post är valfritt." onClick={onOpenContact} /> : <MailRow address={FEEDBACK_ADDRESS} />}
+          </div>
+
         </div>
       </div>
     </Overlay>

@@ -160,7 +160,8 @@ body {
 }
 
 /* Rubrik och stängknapp ligger utanför nyheternas rullande innehåll. */
-.luns-news-panel {
+.luns-news-panel,
+.luns-settings-panel {
   max-height: calc(100vh - 4rem);
   max-height: calc(100dvh - 4rem);
 }
