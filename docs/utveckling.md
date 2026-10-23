@@ -87,9 +87,10 @@ stängts eller efter omladdning. Manuell öppning behöll återgången till inst
 ## Nyhetstexter och datumordning, 2026-10-20
 
 Tillägg 2026-10-23: efter en felanmälan beställde Henrik en kort nyhet om
-Kooperativets återställda fredagsmeny. Posten ”Kooperativets fredag är
-tillbaka” förklarar den saknade markeringen på källsidan och tackar för
-felanmälan utan att ange avsändare. NEWS_VERSION är höjd till 14 så att
+Kooperativets menyfix. På Henriks begäran fokuserar posten ”Kooperativets
+meny är på banan igen” på felet, den saknade markeringen på källsidan och
+att inläsningen är fixad, utan att knyta nyheten till fredagen. Den tackar
+för felanmälan utan att ange avsändare. Textjusteringen behåller version 14. NEWS_VERSION är höjd till 14 så att
 återkommande besökare med Lindholmen som förvalt område får blänkaren efter
 släppet. Henrik avgränsade nyheten till just Lindholmen: samma områdes- och
 kontakturval styr både kortlistan och olästmarkeringen/automatisk öppning.

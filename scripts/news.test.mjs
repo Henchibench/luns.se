@@ -49,7 +49,7 @@ function visitor({ saved = '13', first = false, blocked = false } = {}) {
 test('Kooperativet syns bara på Lindholmen; gemensamma nyheter finns kvar', () => {
   for (const area of [undefined, 'Mjärdevi', 'Järntorget/Linné', 'Lindholmen']) {
     const visible = news.visibleNews(area, true);
-    assert.equal(visible.some(item => item.title === 'Kooperativets fredag är tillbaka'), area === 'Lindholmen');
+    assert.equal(visible.some(item => item.title === 'Kooperativets meny är på banan igen'), area === 'Lindholmen');
     assert.ok(visible.some(item => item.title === 'Större text som standard'));
     assert.equal(news.latestNewsVersion(area, true), area === 'Lindholmen' ? 14 : 13);
   }

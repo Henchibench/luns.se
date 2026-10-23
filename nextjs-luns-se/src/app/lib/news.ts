@@ -33,8 +33,8 @@ export const NEWS_ITEMS: NewsItem[] = [
     version: 14,
     area: 'Lindholmen',
     date: '2026-10-23',
-    title: 'Kooperativets fredag är tillbaka',
-    body: 'Fredagsmenyn hade visst tagit helg lite för tidigt på Luns. En saknad markering på Kooperativets sida gjorde att vi missade den. Nu hittar vi fredagen igen och alla rätter är tillbaka. Tack för felanmälan!',
+    title: 'Kooperativets meny är på banan igen',
+    body: 'En saknad markering på Kooperativets hemsida gjorde att vår menyhämtning missade en del av menyn. Det är nu fixat – maten hittar fram igen. Tack för felanmälan!',
   },
   {
     version: 13,
