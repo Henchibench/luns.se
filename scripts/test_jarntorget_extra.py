@@ -47,6 +47,7 @@ class SchnitzelTests(unittest.TestCase):
             self.assertEqual(len(dishes), 3)
             self.assertIn(f'Rätt för {day}', dishes[0])
             self.assertIn('<strong>Veckans vegetariska</strong>', dishes[2])
+            self.assertTrue(all(r.endswith(' kr)') for r in dishes))
         self.assertFalse(any('1300' in r for r in rows))
         self.assertIn('2026-10-23', rows[0])
 
@@ -73,7 +74,7 @@ class TaiTests(unittest.TestCase):
         for day in DAYS[1:]:
             dishes = [r for r in rows if r.startswith(day + '|')]
             self.assertEqual(len(dishes), 3)
-            self.assertIn('första delen andra delen 101:-', dishes[1])
+            self.assertIn('första delen andra delen (101 kr)', dishes[1])
             self.assertTrue(all('cbh' not in r and 'separat lunchlista' not in r and 'dryck' not in r for r in dishes))
             self.assertTrue(all('<strong>Lunch</strong>' in r for r in dishes))
 
@@ -92,11 +93,11 @@ class TaiTests(unittest.TestCase):
 class VitaTests(unittest.TestCase):
     def test_dated_rows_preserve_price_description_and_declared_allergens(self):
         rows = VitaScraper.parse_lunch([{
-            'menu_date': '2026-10-20', 'name': 'Källrätt', 'description': 'Källans tillbehör',
+            'menu_date': '2026-10-20', 'name': 'Källrätt', 'description': 'Tillbehör & sås',
             'price_cents': 14500, 'allergens': ['MJÖLK'],
         }], MONDAY)
         self.assertEqual(sum('|' in r for r in rows), 1)
-        self.assertIn('Tisdag|<strong>Lunch</strong> - Källrätt – Källans tillbehör (MJÖLK) (145 kr)', rows)
+        self.assertIn('Tisdag|<strong>Lunch</strong> - Källrätt – Tillbehör & sås (MJÖLK) (145 kr)', rows)
         self.assertEqual(sum(r.startswith('INFO:') for r in rows), 4)
 
     def test_no_published_menu_is_not_replaced_with_a_la_carte(self):

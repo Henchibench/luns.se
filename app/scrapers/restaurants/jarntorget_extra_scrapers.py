@@ -1,7 +1,6 @@
 """Källstyrda lunchmenyer för Vita, Schnitzelplatz, Tai Shanghai och Gillestugan."""
 import base64
 from datetime import date, timedelta
-from html import escape
 import json
 import re
 from urllib.parse import urljoin, urlparse
@@ -18,7 +17,10 @@ def notice(text, days=DAYS):
 
 
 def dish(day, category, text):
-    return f'{day}|<strong>{escape(category)}</strong> - {escape(text)}'
+    # Frontendens priskolumn använder kontraktet (NN kr). Texten renderas som
+    # React-text, så HTML-entiteter skulle synas bokstavligt för besökaren.
+    text = re.sub(r'\s+(\d+):-$', r' (\1 kr)', text)
+    return f'{day}|<strong>{category}</strong> - {text}'
 
 
 class VitaScraper(BaseScraper):
@@ -215,7 +217,7 @@ class TaiShanghaiScraper(BaseScraper):
                 elif line.startswith('Vegetariska rätter:'):
                     if pending:
                         raise ValueError('Ofullständig rätt före lunchhänvisning')
-                    rows.append(f'INFO:{day} - Restaurant Info: {escape(line)}')
+                    rows.append(f'INFO:{day} - Restaurant Info: {line}')
                 else:
                     starts_dish = re.match(r'^\d+[.]?\s+', line)
                     if starts_dish and pending:
