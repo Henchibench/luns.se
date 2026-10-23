@@ -307,9 +307,12 @@ export default function LunchBoard() {
             ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day).map(displayDish) }
             : undefined,
           description: restaurant.meta.description ?? '',
-          // "Ingen meny idag" gäller bara när inget filter är på. Med filter
-          // på betyder tomt "inget matchade", och då är raden bara brus.
-          empty: !filtering && !hasDayDishes && !restaurant.menuImage,
+          // Namnsökning (även från en restaurangblänkare) ska visa källbesked
+          // och menylänk även utan dagens rätter. Matfilter ger inga sådana träffar.
+          empty: !hasDayDishes && !restaurant.menuImage && (!filtering || (
+            search.trim().length > 0 && activeTypes.length === 0 && activeCravings.length === 0 &&
+            restaurant.name.toLocaleLowerCase('sv').includes(search.trim().toLocaleLowerCase('sv'))
+          )),
           dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
           menuUrl: restaurant.meta.menu_url,

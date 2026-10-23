@@ -161,6 +161,17 @@ förstagångsbesök, omladdning, kvittering, områden, borttagning, återinföra
 skadad lagring och ändrade menyresultat med oförändrat register. Kontrollera
 även blänkare och navigering i byggd testserver innan leverans.
 
+## Namnsökning när lunchmenyn saknas, 2026-10-23
+
+Vid införandet av Vita och Gillestugan upptäcktes att sökning på restaurangens
+namn dolde hela kortet när dagens rätter saknades. Även klick på den nya
+restaurangblänkaren använder namnsökning och gav därför ”Inga rätter matchar”.
+Tomt kort visas nu också när söktexten matchar restaurangnamnet och inga
+mattyp-/Sugen på-filter är aktiva. Besked, öppettider och MENY-länk finns då
+kvar; inga rätter eller antal skapas. Favoriturvalet sker fortfarande först.
+Verifiering: bygge och webbläsarkontroll med Vita, Gillestugan, Schnitzelplatz
+samt Tai Shanghais måndagsbesked; matfilter ska fortsatt utesluta tomma kort.
+
 ## Menybesked per dag, 2026-09-21
 
 Symptom: restaurangkorten visade samma generella tomrad även när skrapan
