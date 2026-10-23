@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { NEWS_VERSION } from '../lib/news';
+import { NEWS_VERSION, latestNewsVersion } from '../lib/news';
 import { welcomeSeen } from './useWelcome';
 import { trackEvent } from '../utils/analytics';
 
@@ -23,16 +23,20 @@ const STORAGE_KEY = 'luns-news-seen';
  * precis det svar vi vill ha. Rundan sätter sin nyckel först när den öppnas,
  * alltså efter att den här redan sagt sitt.
  */
-export function useNews() {
-  const [unread, setUnread] = useState(false);
+export function useNews(area?: string, contactEnabled = false) {
+  const [seenVersion, setSeenVersion] = useState<number | null>(null);
+  const version = latestNewsVersion(area, contactEnabled);
+  const unread = seenVersion !== null && seenVersion < version;
 
   useEffect(() => {
     try {
       if (!welcomeSeen()) {
+        setSeenVersion(NEWS_VERSION);
         localStorage.setItem(STORAGE_KEY, String(NEWS_VERSION));
         return;
       }
-      setUnread(Number(localStorage.getItem(STORAGE_KEY)) < NEWS_VERSION);
+      const saved = Number(localStorage.getItem(STORAGE_KEY));
+      setSeenVersion(Number.isFinite(saved) ? saved : NEWS_VERSION);
     } catch {
       // Privat läge: en prick som aldrig går att släcka är sämre än ingen.
     }
@@ -43,14 +47,15 @@ export function useNews() {
    * rundan gör. Den som öppnar och stänger direkt har sett vad som fanns.
    */
   const markSeen = useCallback((automatic = false) => {
-    setUnread(false);
+    const nextSeen = Math.max(seenVersion ?? NEWS_VERSION, version);
+    setSeenVersion(nextSeen);
     try {
-      localStorage.setItem(STORAGE_KEY, String(NEWS_VERSION));
+      localStorage.setItem(STORAGE_KEY, String(nextSeen));
     } catch {
       // Går inte att spara — pricken kommer tillbaka nästa besök. Får duga.
     }
-    trackEvent('news-open', { version: NEWS_VERSION, automatic });
-  }, []);
+    trackEvent('news-open', { version, automatic });
+  }, [seenVersion, version]);
 
   return { unread, markSeen };
 }

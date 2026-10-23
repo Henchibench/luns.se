@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Overlay, { useOverlayClose } from './Overlay';
-import { NEWS_ITEMS, type NewsItem } from '../../lib/news';
+import { visibleNews, type NewsItem } from '../../lib/news';
 
 /**
  * Vad som är nytt sedan sist.
@@ -103,16 +103,18 @@ export default function NewsNote({
   onClose,
   onCloseStart,
   contactEnabled = false,
+  area,
   onOpenContact,
 }: {
   onClose: () => void;
   contactEnabled?: boolean;
+  area?: string;
   onOpenContact?: () => void;
   /** Sätts när rutan öppnats från inställningarna och ska lämna tillbaka dit. */
   onCloseStart?: () => void;
 }) {
   const [showOlder, setShowOlder] = useState(false);
-  const sorted = NEWS_ITEMS.filter(item => !item.requiresContact || contactEnabled)
+  const sorted = visibleNews(area, contactEnabled)
     .sort((a, b) => b.date.localeCompare(a.date));
   const latest = sorted.slice(0, 5);
   const older = sorted.slice(5);

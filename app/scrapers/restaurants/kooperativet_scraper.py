@@ -5,7 +5,9 @@ import re
 class KooperativetScraper(BaseScraper):
     """Kooperativet publicerar veckans lunch i WordPress (Enfold-temat).
 
-    Varje veckodag är en <div id="monday">…"friday"> med ett avia_textblock.
+    Varje veckodag har normalt en <div id="monday">…"friday">.
+    Saknas ankaret används dagsrubriken i en entydig entry-content-wrapper,
+    som omfattar båda menykolumnerna (observerat för fredag 2026-10-23).
     Inuti det står en rätt per <p>, på formen
 
         <p><strong>KÖTT</strong><br/>Rätten och dess beskrivning</p>
@@ -155,14 +157,37 @@ class KooperativetScraper(BaseScraper):
         }
         
         for day_id, swedish_day in days_mapping.items():
-            day_section = soup.find('div', id=day_id)
+            day_section = self._find_day_section(soup, day_id, swedish_day)
             if not day_section:
+                self.log_error(f"Ingen entydig menysektion för {swedish_day}")
                 continue
                 
             daily_items = self._extract_daily_menu(day_section, swedish_day)
             weekly_menu.extend(daily_items)
         
         return weekly_menu
+
+    def _find_day_section(self, soup, day_id, day_name):
+        section = soup.find('div', id=day_id)
+        if section is not None:
+            return section
+
+        # Enfold kan tappa ankaret när menyn redigeras. Den synliga rubriken
+        # anger fortfarande dagen, men första kolumnen rymmer bara halva menyn.
+        day_heading = re.compile(r'^Lunch\s+' + re.escape(day_name) + r'\b', re.I)
+        headings = [h for h in soup.find_all(['h1', 'h2', 'h3', 'h4'])
+                    if day_heading.match(h.get_text(' ', strip=True))]
+        if len(headings) != 1:
+            return None
+        section = headings[0].find_parent('div', class_='entry-content-wrapper')
+        if section is None or not section.select('.avia_textblock'):
+            return None
+
+        # Gå aldrig upp till hela sidan och lägg flera dagars mat på samma dag.
+        any_day = re.compile(r'^Lunch\s+(Måndag|Tisdag|Onsdag|Torsdag|Fredag)\b', re.I)
+        section_headings = [h for h in section.find_all(['h1', 'h2', 'h3', 'h4'])
+                            if any_day.match(h.get_text(' ', strip=True))]
+        return section if len(section_headings) == 1 else None
     
     def _extract_daily_menu(self, day_section, day_name):
         """Extract menu items for a specific day"""
@@ -293,4 +318,4 @@ class KooperativetScraper(BaseScraper):
             display_category = category_map.get(category, category)
             return f"<strong>{display_category}</strong> - {clean_desc}"
         
-        return f"<strong>{category}</strong> - {clean_desc}" 
+        return f"<strong>{category}</strong> - {clean_desc}"

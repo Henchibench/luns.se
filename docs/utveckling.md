@@ -86,6 +86,26 @@ stängts eller efter omladdning. Manuell öppning behöll återgången till inst
 
 ## Nyhetstexter och datumordning, 2026-10-20
 
+Tillägg 2026-10-23: efter en felanmälan beställde Henrik en kort nyhet om
+Kooperativets menyfix. På Henriks begäran fokuserar posten ”Kooperativets
+meny är på banan igen” på felet, den saknade markeringen på källsidan och
+att inläsningen är fixad, utan att knyta nyheten till fredagen. Den tackar
+för felanmälan utan att ange avsändare. Textjusteringen behåller version 14. NEWS_VERSION är höjd till 14 så att
+återkommande besökare med Lindholmen som förvalt område får blänkaren efter
+släppet. Henrik avgränsade nyheten till just Lindholmen: samma områdes- och
+kontakturval styr både kortlistan och olästmarkeringen/automatisk öppning.
+Varje post har nu en publiceringsversion och kan ha `area`. Tidigare poster
+har baslinjen 13; Kooperativet är version 14. Vid nya poster ska både räknaren
+och postens version sättas. Nyckeln `luns-news-seen` behålls. Öppning i annat
+område kvitterar bara dess senaste synliga version, och sparad version sänks
+aldrig. Nya besökare får fortsatt en tyst baslinje för hela aktuella släppet.
+Platsväljaren sparar valet som förvalt område, så urvalet följer ett nytt val.
+
+Verifiering: `scripts/news.test.mjs` täcker områdesurval, automatiskt olästläge,
+områdesbyte, kvittering, omladdning, nya besökare, äldre gemensamma nyheter
+samt blockerad/skadad lagring. Minnestest passerar. Bygge och synlig lista
+kontrolleras på testservern före leverans.
+
 Henrik ville presentera Järntorget/Linné som ett nytt område inför släppet.
 De fem tidigare posterna om områdets restauranger, menyfixar och områdesstart
 ersattes med en enda nyhet: ”Nytt område: Järntorget/Linné”. Inget antal
