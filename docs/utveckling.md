@@ -86,6 +86,13 @@ stängts eller efter omladdning. Manuell öppning behöll återgången till inst
 
 ## Nyhetstexter och datumordning, 2026-10-20
 
+Tillägg 2026-10-23: efter en felanmälan beställde Henrik en kort nyhet om
+Kooperativets återställda fredagsmeny. Posten ”Kooperativets fredag är
+tillbaka” förklarar den saknade markeringen på källsidan och tackar för
+felanmälan utan att ange avsändare. NEWS_VERSION är höjd till 14 så att
+återkommande besökare får blänkaren efter släppet. Minnestest och bygge
+kontrolleras, liksom placeringen överst i testserverns nyhetslista.
+
 Henrik ville presentera Järntorget/Linné som ett nytt område inför släppet.
 De fem tidigare posterna om områdets restauranger, menyfixar och områdesstart
 ersattes med en enda nyhet: ”Nytt område: Järntorget/Linné”. Inget antal

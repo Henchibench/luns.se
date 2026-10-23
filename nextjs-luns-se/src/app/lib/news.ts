@@ -22,9 +22,14 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 13;
+export const NEWS_VERSION = 14;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-10-23',
+    title: 'Kooperativets fredag är tillbaka',
+    body: 'Fredagsmenyn hade visst tagit helg lite för tidigt på Luns. En saknad markering på Kooperativets sida gjorde att vi missade den. Nu hittar vi fredagen igen och alla rätter är tillbaka. Tack för felanmälan!',
+  },
   {
     date: '2026-10-20',
     title: 'Tjôta med Luns',
