@@ -114,8 +114,11 @@ Verifiering: 13 syntetiska regressionstester i `scripts/test_jarntorget_extra.py
 täcker källfält, datum/år, helgbyte, dagsfördelning, radbrutna rätter, priser,
 felaktiga mallar och nätfel. Liveutfall vecka 43: Vita 0/0/0/0/0,
 Schnitzelplatz 0/0/0/0/0 (publicerad vecka 44), Tai Shanghai 0/6/6/6/6 och
-Gillestugan 0/0/0/0/0 med ovanstående besked. Minnestest passerar; full
-skrapning, bygge och visuell kontroll görs på testservern vid leverans.
+Gillestugan 0/0/0/0/0 med ovanstående besked. Minnestest, full skrapning och
+bygge passerade på dev01. Webbläsaren verifierade alla fyra kort, områdesblänkaren,
+menylänkarna, Tai Shanghais stängda måndag och sex fredagsrätter. Frontendens
+parser verifierades även separat med alla 24 Tai Shanghai-rader och 25
+Schnitzelplatz-rader för rätt vecka; samtliga priser hamnar i priskolumnen.
 Nedladdad HTML, JavaScript, kartdata och bild ligger endast i /tmp.
 
 ## Kooperativets saknade fredag, 2026-10-23

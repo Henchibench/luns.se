@@ -169,8 +169,10 @@ restaurangblänkaren använder namnsökning och gav därför ”Inga rätter mat
 Tomt kort visas nu också när söktexten matchar restaurangnamnet och inga
 mattyp-/Sugen på-filter är aktiva. Besked, öppettider och MENY-länk finns då
 kvar; inga rätter eller antal skapas. Favoriturvalet sker fortfarande först.
-Verifiering: bygge och webbläsarkontroll med Vita, Gillestugan, Schnitzelplatz
-samt Tai Shanghais måndagsbesked; matfilter ska fortsatt utesluta tomma kort.
+Verifierat: bygge och webbläsarkontroll med Vita, Gillestugan, Schnitzelplatz
+samt Tai Shanghais måndagsbesked. VEG-filtret uteslöt Vitas tomma kort; Rensa
+återställde beskedet. Den befintliga förhandssidan har samma sajtkod efter
+denna dokumentationsuppdatering.
 
 ## Menybesked per dag, 2026-09-21
 
