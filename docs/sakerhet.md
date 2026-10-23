@@ -23,6 +23,25 @@ del av minnesuppdelningen. Gamla antal öppna larm är historiska mätningar.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `next` 15.5.28, 2026-10-23
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-2464-fhr4-w9xw, en
+critical RCE i bildoptimeringen för SVG-filer, och GHSA-p3m5-59mp-jv5r /
+CVE-2026-94482, en high DoS i App Router med Server Actions. Egen mätning med
+`npm ls next --all --include=dev` och `npm ls next --omit=dev` bekräftade
+`next@15.5.27` som direkt produktionsberoende.
+
+Orsak och lösning: Paketintervallet och lockfilen stod på 15.5.27, som ingår
+i båda sårbara intervallen. Miniminivån höjdes till `^15.5.28`, vilket
+uppdaterade Next och dess versionsbundna `@next/env`- och SWC-paket till
+15.5.28.
+
+Källa: Kontrollens paketkort, GitHubs granskade advisories och npm-registret,
+kontrollerade 2026-10-23. Båda advisories angav 15.5.28 som första rättade
+15.x-version och npm-registret bekräftade att versionen finns. Verifiering:
+de båda `npm ls`-mätningarna visade endast 15.5.28 och ett rent
+produktionsbygge samt `npm audit --omit=dev` passerade.
+
 ## `next` 15.5.27, 2026-10-08
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-4jqv-mc3x-m676 /
