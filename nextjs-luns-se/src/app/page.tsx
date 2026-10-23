@@ -170,7 +170,7 @@ export default function LunchBoard() {
   // Nyhetsnotisen blockeras inte på samma sätt: den avgör sitt läge vid
   // montering, innan rundan hunnit sätta sin nyckel, och det är just det som
   // gör att en ny besökare får rundan och aldrig pricken. Se useNews.
-  const news = useNews();
+  const news = useNews(location?.id, !!contactConfig);
   const weather = useWeather(location?.latitude, location?.longitude);
 
   // Vänta in både platsval och kontaktkonfiguration så nyheten med formuläret
@@ -735,7 +735,7 @@ export default function LunchBoard() {
 
       {contactConfig && contactContext && <ContactForm config={contactConfig} context={contactContext} theme={theme} onClose={() => setContactContext(null)} />}
 
-      {newsOpen && <NewsNote contactEnabled={!!contactConfig}
+      {newsOpen && <NewsNote area={location?.id} contactEnabled={!!contactConfig}
         onOpenContact={contactConfig ? () => {
           setNewsOpen(false);
           setNewsFromSettings(false);
