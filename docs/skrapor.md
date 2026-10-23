@@ -59,6 +59,29 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Kooperativets saknade fredag, 2026-10-23
+
+Produktionens menydata från 23 oktober saknade fredagsrätter trots att
+originalsidan visade ”Lunch Fredag v43”. Ankarlänken pekade på #friday, men
+själva div-elementet med detta ID saknades. Fredagens två menykolumner låg
+istället i en vanlig Enfold entry-content-wrapper under after_section_4.
+Skrapan läste bara de fasta dag-ID:na och tappade därför hela fredagen.
+
+När ett dagankare saknas söker skrapan nu den uttryckliga Lunch-dagsrubriken
+och dess närmaste entry-content-wrapper. Exakt en matchande rubrik krävs,
+och behållaren får inte innehålla flera dagsrubriker. Båda kolumnerna läses;
+otydlig eller saknad struktur loggas. Befintliga ankare har företräde så att
+menyerna inte dubbleras. Ingen dag eller kategori härleds från ordningen.
+
+Livejämförelse mot originalet: 9/9/10/9/0 blev 9/9/10/9/10 rader måndag–fredag;
+måndag–torsdag var exakt oförändrade. Området är Lindholmen. Fredagens tio
+rader och kategorier jämfördes med källans två textblock. Källan märker själv
+Chicken Rogan Josh som VEGETARISK trots texten ”gryta med kyckling”; skrapan
+återger källans etikett, detta är inte en verifierad dietuppgift.
+Sju regressionstester täcker saknat ankare, båda kolumnerna, dagsfördelning,
+rubriknivåer, dubbletter och tvetydiga behållare. Full testserverkedja används
+vid leverans; ingen produktionspublicering görs av denna ändring.
+
 ## Järntorget/Linné — kompletterade menyer 2026-10-19
 
 **Feskekörka:** första lunchsektionen på den egna sidan har ändrats från
