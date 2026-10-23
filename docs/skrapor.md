@@ -59,6 +59,65 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Fyra tillskott på Järntorget/Linné, 2026-10-23
+
+Henrik beställde Vita, Gillestugan Jerntorget, Schnitzelplatz Lagerhuset och
+Tai Shanghai (Kvartersmenyn 14533). De är registrerade i Järntorget/Linné och
+kopplade till körningen via `jarntorget_extra_scrapers.py`. Alla stänger av
+återanvändning av tidigare meny. Befintliga områdesblänkare upptäcker dem som
+nya restauranger; ingen extra global nyhetsruta läggs till.
+
+- **Vita:** https://vitarestaurang.se/meny är en JavaScript-sida. Lunchfliken
+  läser daterade poster från restaurangens publika Supabase-tabell `lunch_menu`.
+  Skrapan hittar modulfilen och dess publika anon-anslutning vid varje körning,
+  utan att köra JavaScript eller spara nyckeln. Endast menyfält för aktuell
+  måndag–fredag begärs; inga bokningar eller personuppgifter läses. Namn,
+  beskrivning, pris i ören och uttryckliga allergener bevaras. Ingen kött-/fisk-
+  kategori gissas. Lunchfliken och API:et var tomma för både 19–23 och 26–30
+  oktober; sajten visar därför ett besked per dag. À la carte ersätter inte
+  saknad lunch. När daterade rätter publiceras kan de läsas vid nästa skrapning.
+  Lunchfliken anger mån–fre 11.30–14.00, soppa/sallad, kaffe och kaka.
+- **Schnitzelplatz:** https://schnitzelplatz.se/lunch/ har rå HTML med tydlig
+  veckorubrik och fem dagsrubriker. En dagsrätt plus Alltid på Platz och tre
+  veckorätter ger 5/5/5/5/5. Priser och kategorier kommer från samma block;
+  lunchkortets pris är inte en rätt. Källan hade redan bytt till vecka 44,
+  medan fredag 23 oktober hör till vecka 43. Då visas ett veckobesked. Med
+  visningsvecka 44 verifierades samtliga 25 rader mot originalets text.
+  `menu_week.py` väljer nästa vecka på helgen och `MENU_VALIDITY` spärrar gamla
+  byggen. Källan anger inte årtal, vilket begränsar veckokontrollen.
+- **Tai Shanghai:** https://www.kvartersmenyn.se/index.php/rest/14533/4 används
+  på Henriks uttryckliga beställning. Vecka och år kontrolleras, måndagens
+  Stängt ger menybesked och tis–fre ger sex alternativ vardera: 0/6/6/6/6.
+  Rätten ”2 små rätter” fortsätter på nästa rad och ska förbli en rätt med
+  ett pris. Källans osynliga bokstavsmarkörer tas bort endast i deras särskilda
+  i-element. Hänvisningen till separat vegetarisk lista visas som information,
+  inte som påhittad vegetarisk maträtt. Dryckestillägg och avhämtningspriser
+  räknas inte som rätter. MENY och WWW leder till den verifierade källsidan;
+  den listade egna domänen används inte som menyunderlag.
+- **Gillestugan:** https://gillestuganjerntorget.se/lunch-jarntorget/ anger
+  mån–fre 11.30–15.00 inklusive sallad och kaffe. Bilden på hemsidan är ett
+  matfoto, inte menytext. Lunchknappen leder till restaurangens Facebook-sida
+  `61576829558395`, där vecka 43 finns som bild i ett offentligt inlägg.
+  Bilden kunde läsas i webbläsaren, men vanlig HTTP gav ett sidskal utan
+  inläggen. Det finns därför ännu ingen verifierad automatisk inläsning.
+  Posten visar ett tydligt Facebook-besked och MENY länkar direkt till
+  lunchsidan på Facebook. Ingen veckobild, evig avskrift eller gissad rätt
+  sparas. Detta är en kvarvarande begränsning, inte en fungerande veckoskrapa.
+
+Koordinaterna hämtades från OpenStreetMaps restaurangnoder: Vita 12754779701,
+Gillestugan 1042339576, Schnitzelplatz 3431315351 och Tai Shanghai 8493101010.
+Dessa är restaurangpositioner, inte separat verifierade entrénoder.
+Källorna anger Nordhemsgatan 28, Järntorget 7, Heurlins plats 1 respektive
+Haga Östergata 4. Nya produktionsberoenden, tjänster och workflows behövs inte.
+
+Verifiering: 13 syntetiska regressionstester i `scripts/test_jarntorget_extra.py`
+täcker källfält, datum/år, helgbyte, dagsfördelning, radbrutna rätter, priser,
+felaktiga mallar och nätfel. Liveutfall vecka 43: Vita 0/0/0/0/0,
+Schnitzelplatz 0/0/0/0/0 (publicerad vecka 44), Tai Shanghai 0/6/6/6/6 och
+Gillestugan 0/0/0/0/0 med ovanstående besked. Minnestest passerar; full
+skrapning, bygge och visuell kontroll görs på testservern vid leverans.
+Nedladdad HTML, JavaScript, kartdata och bild ligger endast i /tmp.
+
 ## Kooperativets saknade fredag, 2026-10-23
 
 Produktionens menydata från 23 oktober saknade fredagsrätter trots att

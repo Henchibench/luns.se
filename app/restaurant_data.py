@@ -195,6 +195,45 @@ restaurant_locations = {
         "area": "Lindholmen",
         "lunch_hours": "Mån–fre 07.30–16.00"
     },
+    "Vita": {
+        "description": "Italiensk restaurang i Saluhall Briggen på Nordhemsgatan. Vardagslunch med soppa eller sallad, kaffe och kaka.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Vita%2C%20Nordhemsgatan%2028%2C%20G%C3%B6teborg",
+        "latitude": 57.6984844,
+        "longitude": 11.9497919,
+        "website": "https://vitarestaurang.se/",
+        "menu_url": "https://vitarestaurang.se/meny",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.30–14.00"
+    },
+    "Gillestugan Jerntorget": {
+        "description": "Restaurang och pub vid Järntorget med vardagslunch inklusive sallad och kaffe.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Gillestugan%20Jerntorget%2C%20J%C3%A4rntorget%207%2C%20G%C3%B6teborg",
+        "latitude": 57.6995797,
+        "longitude": 11.9535721,
+        "website": "https://gillestuganjerntorget.se/",
+        "menu_url": "https://www.facebook.com/people/Gillestugan-Jerntorget-Lunch/61576829558395/",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Mån–fre 11.30–15.00"
+    },
+    "Schnitzelplatz Lagerhuset": {
+        "description": "Restaurang i Lagerhuset på Heurlins plats med schnitzel, dagens lunch och veckans vegetariska alternativ.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Schnitzelplatz%20Lagerhuset%2C%20Heurlins%20plats%201%2C%20G%C3%B6teborg",
+        "latitude": 57.7019445,
+        "longitude": 11.9539655,
+        "website": "https://schnitzelplatz.se/",
+        "menu_url": "https://schnitzelplatz.se/lunch/",
+        "area": "Järntorget/Linné"
+    },
+    "Tai Shanghai": {
+        "description": "Kinesisk restaurang på Haga Östergata med lunch tisdag till fredag. Lunchmenyn publiceras på Kvartersmenyn.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Tai%20Shanghai%2C%20Haga%20%C3%96stergata%204%2C%20G%C3%B6teborg",
+        "latitude": 57.6994209,
+        "longitude": 11.9546318,
+        "website": "https://www.kvartersmenyn.se/index.php/rest/14533/4",
+        "menu_url": "https://www.kvartersmenyn.se/index.php/rest/14533/4",
+        "area": "Järntorget/Linné",
+        "lunch_hours": "Tis–fre 11.00–16.00"
+    },
     "Poh-Keh Masthugget": {
         "description": "Poké bowls och bibimbap på Masthuggskajen. Den officiella sidan hänvisar beställningar till restaurangens externa meny.",
         "maps": "https://www.google.com/maps/search/?api=1&query=Poh-Keh%20Masthugget%2C%20Masthamnsgatan%205%2C%20413%2029%20G%C3%B6teborg",
