@@ -204,3 +204,26 @@ Det pausbara förloppets tidsberäkning och marginalerna runt längre
 repliker verifierades med automatiska tester. Fysisk iPhone, högtalarnas
 upplevda ljudnivå, uttal och röstens konstnärliga kvalitet behöver
 bedömas genom Henriks provlyssning. Voice 1 är fortsatt arbetsversionen.
+
+## Verifiering av samlad dom och hel rymdvy, 2026-10-24
+
+Nio tester inklusive minnestester passerar. Testerna kontrollerar att
+ringarna når full inriktning vid fasgränsen och förblir låsta efter domen,
+utan förtida ljuspuls. Produktionsbygget kontrollerar också TypeScript.
+Testservern byggdes utan skrapning från `00d73c1` och rapporterar frisk
+status. De åtta ändrade ljudfilerna svarar med HTTP 200 och `audio/mpeg`,
+med samma SHA256 som de lokala filerna. Alla tio filer är totalt
+1 262 245 byte. Första sidladdningens JavaScript är fortsatt 145 kB.
+
+I webbläsaren verifierades den nya introduktionstexten, ritual, samlade
+ringar och resultat i datorvy och 390 × 844. Rymdbakgrunden täcker hela
+vyn under testbandet. Ett verkligt långt menyval från Kooperativet
+användes för att kontrollera texten och att ansiktet är synligt ovanför.
+Med större text aktiv är rätten 22 px på mobil och 27 px på dator,
+medan kategorin är 18 px. Mobilvyn har ingen horisontell överströmning.
+Webbläsaren registrerade inga fel eller varningar. Tillfällig sökning
+och mobilstorlek återställdes efter kontrollen.
+
+Nivåer och frekvensinnehåll är uppmätta; den subjektiva balansen mellan
+bas, luft, röst och eko behöver bedömas genom provlyssning. Ingen fysisk
+iPhone eller extern högtalare användes vid agentens kontroll.
