@@ -16,8 +16,12 @@ med repliker i nedre delen, stor gestalt ovanför och diskreta kontroller.
 Ingen vanlig panel eller liten figur ovanför ett formulär.
 
 Förlopp: omkring fjorton sekunders inträde, inväntat lunchval, åtta sekunders ritual,
-sedan domen. Kameran färdas fram, ringarna öppnar sig och ljudet tystnar
-före resultatet. Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
+sedan domen. Kameran färdas fram och ringarna rör sig fram till ritualens
+sista 2,4 sekunder, då de samlas i ett gemensamt plan. De låser sig vid
+domen samtidigt som ett basanslag och en luftig efterklang hörs. En enda
+ljuspuls markerar låsningen. Ringarna förblir samlade medan resultatet visas.
+På smal skärm dras kameran tillbaka så att ringarnas bredd ryms.
+Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
 
 Justering 2026-10-24: Henrik upplevde de kringflygande maträtterna under
@@ -37,13 +41,13 @@ rumsverkan läggs på varsamt efteråt så orden förblir begripliga. Ingen
 imitation av en känd skådespelare. Leverera gärna varje replik separat.
 
 1. Du har kallat på Lunsoraklet. Jag har sett stjärnor födas. Imperier falla.
-   Och dig vela mellan pasta och sushi.
+   Och dig vela över vad du ska äta.
 2. Överlämna ditt lunchöde. Trotsa domen, och må ditt kaffe vara ljummet i sju år.
 3. Tystnad. Universum överväger din lunch.
 4. Det är avgjort. Universum har tallrikt.
 5. Ditt beslut har noterats. Av vem är oklart.
 
-Pausen före orden om pasta och sushi är själva skämtet. Den fullständiga
+Pausen före repliken om lunchvelandet är själva skämtet. Den fullständiga
 slumpade menyn ska visas som källtext. Den behöver inte talas, vilket gör
 att fasta inspelningar kan fungera för alla restauranger utan en taltjänst.
 Animationernas tid anpassas till de avkodade ljudfilernas verkliga längd.
@@ -51,17 +55,27 @@ Animationernas tid anpassas till de avkodade ljudfilernas verkliga längd.
 Status 2026-10-24: Henrik har uttryckligen godkänt AI tjänster för att skapa
 material till Lunsoraklet, exempelvis tal och ljud, och bekräftat att han har ElevenLabs.
 Undantaget gäller materialet till detta påskägg. Regeln för övriga projektet
-står kvar. Sju repliker och tre effekter har nu skapats via ElevenLabs
-webbgränssnitt. Ingen modellnyckel eller ny tjänst i drift behövs på sajten.
+står kvar. Sajten använder sju repliker och tre färdiga effekter skapade
+med material från ElevenLabs webbgränssnitt. Ingen modellnyckel eller ny
+tjänst i drift behövs på sajten.
 Det inbyggda bildverktyget i ChatGPT användes för bildmaterialet.
 
 ## Ljudproduktion
 
-Kontot visade Starter och 90 000 krediter före produktion, 87 733 efter.
+Kontot visade Starter och 90 000 krediter före första produktionen, 87 733 efter.
 Förbrukning: 2 267 krediter inom befintligt abonnemang, utan köp eller
 uppgradering. Starter omfattar kommersiell användning enligt
 [ElevenLabs prislista](https://elevenlabs.io/pricing). Delning till SFX
 Explore stängdes av före generering. Inga lösenord eller nycklar lästes ut.
+
+Vid justeringen 2026-10-24 skapades en ny lunchreplik och två ljudlager
+till domen. Kontot gick från 87 733 till 87 128 krediter, alltså ytterligare
+605 krediter utan köp eller uppgradering. Första varianten används från
+varje generering. De två effektlagren skapades med SFX v3, sju sekunder,
+30 procent prompt influence, utan loop, promptförbättring eller delning.
+Det första lagret beskriver ett tungt kosmiskt anslag med subbas och ett
+låsande bronsinstrument. Det andra beskriver en bred luftig tryckvåg med
+diffus efterklang utan bas, röst eller musik. De blandas till `impact.mp3`.
 
 Tre röstprov skapades med Voice Design. Voice 1 sparades som arbetsversion
 under namnet Lunsoraklet medan Henriks lyssningsval inväntades. Röstens ID
@@ -78,20 +92,27 @@ Publicerade filer är bearbetade MP3 filer utan ursprungliga metadata,
 | Fil | Innehåll | Längd i sekunder |
 |---|---|---:|
 | call.mp3 | Du har kallat på Lunsoraklet | 2,72 |
-| cosmos.mp3 | Stjärnor och imperier | 5,09 |
-| lunch.mp3 | Pasta och sushi | 3,19 |
+| cosmos.mp3 | Stjärnor och imperier | 5,12 |
+| lunch.mp3 | Och dig vela över vad du ska äta | 2,98 |
 | invitation.mp3 | Lunchödet och kaffet | 8,54 |
-| ritual.mp3 | Universum överväger lunchen | 4,94 |
-| verdict.mp3 | Domen | 5,28 |
-| declined.mp3 | Beslutet har noterats | 5,28 |
+| ritual.mp3 | Universum överväger lunchen | 4,96 |
+| verdict.mp3 | Domen | 5,30 |
+| declined.mp3 | Beslutet har noterats | 5,30 |
 | atmosphere.mp3 | Sömlös rymdatmosfär | 30,04 |
 | riser.mp3 | Stegring av sten, metall och luft | 6,61 |
-| impact.mp3 | Domsklang | 5,04 |
+| impact.mp3 | Subbas och luftig domsklang | 7,03 |
 
 FFmpeg kontrollerade att samtliga filer kan avkodas. Uppmätt talnivå efter
-bearbetning är mellan minus 18,29 och minus 16,87 LUFS. Högsta uppmätta
-true peak är minus 2,32 dBTP. Spelaren sänker bakgrund och effekter under
-replikerna och lägger en låg filtrerad efterklang på talet. Mastervolym och
+bearbetning är mellan minus 18,75 och minus 17,31 LUFS. Högsta uppmätta
+true peak för talet är minus 2,30 dBTP. Henriks önskemål om basigare röst
+löses med ungefär en halvtons sänkning utan avsiktlig tempoändring och
+2,5 dB basförstärkning vid 145 Hz före nivåutjämningen. Råinspelningarna
+används vid bearbetningen för att undvika upprepad MP3 komprimering.
+
+Spelaren sänker bakgrund och effekter under replikerna. Talet får nu
+3,6 sekunders filtrerad efterklang med 65 ms fördröjning och ett svagt eko
+vid 290 ms. Ekots återkoppling är 20 procent. Låga frekvenser filtreras
+bort ur efterklangen så att orden inte grumlas. Mastervolym och
 kompressor begränsar summan. Detta är mätningar, inte en subjektiv
 lyssningsbedömning av rösten eller uttalet.
 
@@ -103,8 +124,16 @@ Ljudregi:
   lyssnaren och tydligt över bakgrunden.
 * Ritual: ett växande tryck, som om gammal sten och metall sätts i rörelse.
   Tystnad precis före domen ger plats åt avslutningen.
-* Dom: en tung men kort klang med lång efterklang. Berättarrösten kommer
-  efter anslaget så orden inte dränks.
+* Dom: ett tungt basanslag och en bred luftig efterklang. En separat
+  ljudkanal gör att den föregående tystnaden inte tonar bort anslaget.
+  Berättarrösten börjar efter 1,5 sekunder, då domsljudet sänks.
+
+Det färdiga domsljudet mäter minus 18,75 LUFS och minus 3,03 dBTP.
+Det når över minus 40 dB ungefär 17 ms efter filens början. Filtrerad
+RMS nivå är minus 20,61 dB i bandet 30 till 90 Hz och minus 36,13 dB i
+bandet 2 till 10 kHz. Detta bekräftar bas och luftigt innehåll i filen,
+inte hur det upplevs i en viss högtalare. Ändrade filer får versionsfrågan
+`v=2` i ljudadressen för att äldre inspelningar inte ska återanvändas ur cache.
 
 `oracleTiming` använder inläsningens längd för fasbyten och textens inträde.
 En gemensam pausbar klocka driver fasbyten och scenens kamera. Ljud och bild

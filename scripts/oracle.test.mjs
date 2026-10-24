@@ -54,13 +54,26 @@ test('draw returns a source object, covers both endpoints and has no invented fa
 const directionSource=readFileSync(new URL('../nextjs-luns-se/src/app/components/oracle/direction.ts',import.meta.url),'utf8');
 const directed={};
 new Function('exports',ts.transpileModule(directionSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(directed);
-test('cinematic timing reveals gradually, contracts before the verdict and skips motion when requested',()=>{
+test('the rings align at the verdict boundary and stay locked without an early flash',()=>{
   assert.equal(directed.direction('arrival',0,false).reveal,0);
   assert.equal(directed.direction('arrival',11,false).travel,1);
-  assert.equal(directed.direction('ritual',0,false).collapse,0);
-  assert.equal(directed.direction('ritual',7.9,false).collapse,1);
-  for(const phase of ['arrival','ritual','verdict']) {
-    assert.deepEqual(directed.direction(phase,0,true),{reveal:1,travel:1,energy:0,collapse:0,flash:0});
+  const nearEnd=directed.direction('ritual',7.99,false);
+  const end=directed.direction('ritual',directed.RITUAL_MS/1000,false);
+  const verdict=directed.direction('verdict',0,false);
+  assert.equal(directed.direction('ritual',5,false).alignment,0);
+  assert.ok(nearEnd.alignment>.99&&nearEnd.alignment<1);
+  assert.equal(end.alignment,1);
+  assert.equal(end.energy,0);
+  assert.equal(end.flash,0);
+  assert.equal(verdict.alignment,end.alignment);
+  assert.ok(verdict.flash>0);
+  for(const phase of ['verdict','declined']) {
+    assert.equal(directed.direction(phase,30,false).alignment,1);
+  }
+  for(const phase of ['arrival','ritual','verdict','declined']) {
+    const d=directed.direction(phase,0,true);
+    assert.equal(d.reveal,1); assert.equal(d.travel,1);
+    assert.equal(d.energy,0); assert.equal(d.flash,0);
   }
 });
 
@@ -72,7 +85,7 @@ test('recorded lines determine the timing, including a slow delivery and the fin
   assert.ok(score.ritualMs >= 9000 + 2800);
   assert.ok(score.declinedMs > 7000);
   assert.ok(directed.oracleTiming().arrivalMs >= directed.ARRIVAL_MS);
-  assert.deepEqual(directed.direction('loading',30,false),{reveal:0,travel:0,energy:0,collapse:0,flash:0});
+  assert.deepEqual(directed.direction('loading',30,false),{reveal:0,travel:0,energy:0,alignment:0,flash:0});
 });
 
 test('leaving the tab freezes the story, including when a phase resets during loading', () => {

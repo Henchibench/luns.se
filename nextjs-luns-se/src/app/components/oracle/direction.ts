@@ -2,8 +2,9 @@ export type OraclePhase = 'loading' | 'arrival' | 'invitation' | 'ritual' | 'ver
 export type VoiceCue = 'call' | 'cosmos' | 'lunch' | 'invitation' | 'ritual' | 'verdict' | 'declined';
 export const ARRIVAL_MS = 11000;
 export const RITUAL_MS = 8000;
+export const VERDICT_VOICE_DELAY_MS = 1500;
 export const ORACLE_SCRIPT = {
-  arrival: 'Du har kallat på Lunsoraklet. Jag har sett stjärnor födas. Imperier falla. Och dig vela mellan pasta och sushi.',
+  arrival: 'Du har kallat på Lunsoraklet. Jag har sett stjärnor födas. Imperier falla. Och dig vela över vad du ska äta.',
   invitation: 'Överlämna ditt lunchöde. Trotsa domen, och må ditt kaffe vara ljummet i sju år.',
   ritual: 'Tystnad. Universum överväger din lunch.',
   verdict: 'Det är avgjort. Universum har tallrikt.',
@@ -37,14 +38,15 @@ export const smooth = (x: number) => { const t=Math.max(0,Math.min(1,x)); return
 
 /** Visual timing is deterministic. A phase change never jumps a rotation angle. */
 export function direction(phase: OraclePhase, elapsed: number, reduced: boolean) {
-  if(phase==='loading') return {reveal:0,travel:0,energy:0,collapse:0,flash:0};
-  if(reduced) return {reveal:1,travel:1,energy:0,collapse:0,flash:0};
+  const locked = phase === 'verdict' || phase === 'declined';
+  if(phase==='loading') return {reveal:0,travel:0,energy:0,alignment:0,flash:0};
+  if(reduced) return {reveal:1,travel:1,energy:0,alignment:locked?1:0,flash:0};
   if(phase==='arrival') return {
-    reveal:smooth((elapsed-2.5)/5),travel:smooth(elapsed/9),energy:0.2,collapse:0,flash:0,
+    reveal:smooth((elapsed-2.5)/5),travel:smooth(elapsed/9),energy:0.2,alignment:0,flash:0,
   };
-  if(phase==='ritual') return {
-    reveal:1,travel:1,energy:smooth(elapsed/5),collapse:smooth((elapsed-5.6)/1.5),
-    flash:Math.max(0,1-Math.abs(elapsed-7.3)/0.55)*0.6,
-  };
-  return {reveal:1,travel:1,energy:0,collapse:0,flash:phase==='verdict'?Math.max(0,0.4-elapsed):0};
+  if(phase==='ritual') {
+    const alignment=smooth((elapsed-5.6)/(RITUAL_MS/1000-5.6));
+    return {reveal:1,travel:1,energy:smooth(elapsed/5)*(1-alignment),alignment,flash:0};
+  }
+  return {reveal:1,travel:1,energy:0,alignment:locked?1:0,flash:phase==='verdict'?Math.exp(-Math.max(0,elapsed)*3.6)*0.65:0};
 }

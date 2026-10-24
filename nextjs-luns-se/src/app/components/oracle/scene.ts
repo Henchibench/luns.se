@@ -27,6 +27,8 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
 
   const astrolabe=new THREE.Group(); world.add(astrolabe);
   const bands:THREE.Group[]=[];
+  const orbitRotation=new THREE.Euler(), alignedRotation=new THREE.Quaternion();
+  let alignmentOrigins:THREE.Quaternion[]|null=null;
   for(let ringIndex=0;ringIndex<4;ringIndex++) {
     const band=new THREE.Group(); bands.push(band); astrolabe.add(band);
     const radius=3.2+ringIndex*0.36;
@@ -44,6 +46,11 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     band.add(ticks);
     band.rotation.set(ringIndex*0.7,ringIndex*0.42,ringIndex*0.27);
   }
+
+  // One expanding halo marks the instant the instrument locks and the impact sounds.
+  const haloMaterial=new THREE.MeshBasicMaterial({color:0xedcf9c,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending});
+  const halo=new THREE.Mesh(new THREE.TorusGeometry(4.45,0.018,6,160),haloMaterial);
+  world.add(halo);
 
   // The portrait is an authored texture, not presented as a fully modelled head.
   const portraitMaterial=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,depthTest:false,toneMapped:false});
@@ -104,11 +111,22 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     if (playing) { phase = playing.phase; elapsed = playing.elapsed; }
     const d=direction(phase,elapsed,reduced);
     portraitMaterial.opacity=d.reveal;
-    astrolabe.scale.setScalar(1-d.collapse*.42);
-    astrolabe.position.z=d.collapse*2;
+    astrolabe.scale.setScalar(1+d.alignment*.08);
+    if(d.alignment===0) alignmentOrigins=null;
+    else if(!alignmentOrigins) alignmentOrigins=bands.map(band=>band.quaternion.clone());
+    if(!reduced&&!alignmentOrigins) orbit+=dt*(.035+d.energy*.46);
+    bands.forEach((band,i)=> {
+      if(alignmentOrigins) band.quaternion.copy(alignmentOrigins[i]).slerp(alignedRotation,d.alignment);
+      else {
+        orbitRotation.set(i*.7+orbit*(i%2?1:-1),i*.42+orbit*.7,i*.27+orbit*.25);
+        band.quaternion.setFromEuler(orbitRotation);
+      }
+    });
+    const haloAge=phase==='verdict'&&!reduced?elapsed:-1;
+    halo.visible=haloAge>=0&&haloAge<1.8;
+    halo.scale.setScalar(1.08+Math.max(0,haloAge)*.85);
+    haloMaterial.opacity=halo.visible ? .45*Math.pow(1-haloAge/1.8,2) : 0;
     if(!reduced) {
-      orbit+=dt*(.035+d.energy*.46);
-      bands.forEach((band,i)=> {band.rotation.x=i*.7+orbit*(i%2?1:-1); band.rotation.y=i*.42+orbit*.7;band.rotation.z=i*.27+orbit*.25;});
       portrait.rotation.y=Math.sin(time*.16)*.035;
       world.position.y=1.5+Math.sin(time*.4)*.06;
       for(let i=0;i<dustCount;i++) {
@@ -119,11 +137,12 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
       camera.position.x+=(pointerX-camera.position.x)*.025;
       camera.position.y+=(pointerY-camera.position.y)*.025;
     }
-    camera.position.z=baseDistance+(1-d.travel)*22-d.collapse*1.3;
+    const alignedDistance=Math.max(baseDistance,4.95/(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect));
+    camera.position.z=baseDistance+(1-d.travel)*22+(alignedDistance-baseDistance)*d.alignment;
     camera.lookAt(0,.8,0);
     fogMaterial.uniforms.time.value=time; fogMaterial.uniforms.intensity.value=.45+d.reveal*.5+d.energy*.4;
     const voiceGlow = reduced ? 0 : (playing?.voice ?? 0);
-    key.intensity = 130 + voiceGlow * 24;
+    key.intensity = 130 + voiceGlow * 24 + d.flash * 100;
     bloom.strength=.55+d.energy*.3+d.flash*.7+voiceGlow*.04;
     renderer.toneMappingExposure=1.05+d.flash*.6;
     composer.render();

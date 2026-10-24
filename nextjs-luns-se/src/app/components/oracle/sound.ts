@@ -1,4 +1,4 @@
-import { oracleTiming, type OraclePhase, type VoiceCue } from './direction';
+import { oracleTiming, VERDICT_VOICE_DELAY_MS, type OraclePhase, type VoiceCue } from './direction';
 
 const voices: VoiceCue[] = ['call', 'cosmos', 'lunch', 'invitation', 'ritual', 'verdict', 'declined'];
 type Clip = VoiceCue | 'atmosphere' | 'riser' | 'impact';
@@ -14,19 +14,29 @@ export function createOracleSound() {
   master.connect(limiter); limiter.connect(context.destination);
   const bed = context.createGain(); bed.gain.value = 0; bed.connect(master);
   const effects = context.createGain(); effects.gain.value = .6; effects.connect(master);
+  const strike = context.createGain(); strike.gain.value = .9; strike.connect(master);
   const voice = context.createGain(); voice.gain.value = 1; voice.connect(master);
   const analyser = context.createAnalyser(); analyser.fftSize = 256; voice.connect(analyser);
   const waveform = new Uint8Array(analyser.fftSize);
 
-  // A quiet, filtered room tail leaves the words clear and in front of the atmosphere.
+  // Pre-delay keeps the consonants clear before the larger room and two quiet echoes.
   const room = context.createConvolver(), wet = context.createGain(), roomFilter = context.createBiquadFilter();
-  const impulse = context.createBuffer(2, context.sampleRate * 2.4, context.sampleRate);
+  const roomLowCut = context.createBiquadFilter(), preDelay = context.createDelay(.2);
+  roomLowCut.type = 'highpass'; roomLowCut.frequency.value = 220; preDelay.delayTime.value = .065;
+  const impulse = context.createBuffer(2, context.sampleRate * 3.6, context.sampleRate);
   for (let channel = 0; channel < 2; channel++) {
     const data = impulse.getChannelData(channel);
     for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
   }
-  room.buffer = impulse; wet.gain.value = .1; roomFilter.type = 'lowpass'; roomFilter.frequency.value = 2400;
-  voice.connect(room); room.connect(roomFilter); roomFilter.connect(wet); wet.connect(master);
+  room.buffer = impulse; wet.gain.value = .18; roomFilter.type = 'lowpass'; roomFilter.frequency.value = 3000;
+  voice.connect(roomLowCut); roomLowCut.connect(preDelay); preDelay.connect(room);
+  room.connect(roomFilter); roomFilter.connect(wet); wet.connect(master);
+  const echo = context.createDelay(.6), echoFilter = context.createBiquadFilter();
+  const echoFeedback = context.createGain(), echoWet = context.createGain();
+  echo.delayTime.value = .29; echoFilter.type = 'lowpass'; echoFilter.frequency.value = 2200;
+  echoFeedback.gain.value = .2; echoWet.gain.value = .13;
+  roomLowCut.connect(echo); echo.connect(echoFilter); echoFilter.connect(echoFeedback); echoFeedback.connect(echo);
+  echoFilter.connect(echoWet); echoWet.connect(master);
 
   const buffers = new Map<Clip, AudioBuffer>();
   const sources = new Map<AudioBufferSourceNode, { gain: GainNode; persistent: boolean }>();
@@ -38,7 +48,7 @@ export function createOracleSound() {
   void context.resume().catch(() => {});
   const timeout = window.setTimeout(() => abort.abort(), 10000);
   const ready = Promise.allSettled(clips.map(async name => {
-    const response = await fetch(`/oracle/audio/${name}.mp3`, { signal: abort.signal });
+    const response = await fetch(`/oracle/audio/${name}.mp3?v=2`, { signal: abort.signal });
     if (!response.ok) return;
     const buffer = await context.decodeAudioData(await response.arrayBuffer());
     if (!disposed) buffers.set(name, buffer);
@@ -69,7 +79,7 @@ export function createOracleSound() {
     const buffer = buffers.get(name); if (!buffer) return;
     const at = context.currentTime + delay, end = at + buffer.duration;
     // Duck only the supporting tracks; muting remains independent on the master bus.
-    for (const [gain, quiet, normal] of [[bed.gain, .08, .2], [effects.gain, .22, .6]] as const) {
+    for (const [gain, quiet, normal] of [[bed.gain, .08, .2], [effects.gain, .22, .6], [strike.gain, .26, .9]] as const) {
       gain.setValueAtTime(normal, Math.max(context.currentTime, at - .15));
       gain.linearRampToValueAtTime(quiet, at);
       gain.setValueAtTime(quiet, end);
@@ -90,6 +100,7 @@ export function createOracleSound() {
     for (const [gain, value] of [[bed.gain, .2], [effects.gain, .6]] as const) {
       gain.cancelScheduledValues(now); gain.setTargetAtTime(value, now, .12);
     }
+    strike.gain.cancelScheduledValues(now); strike.gain.setValueAtTime(.9, now);
     if (!ambientStarted && next !== 'loading') { play('atmosphere', bed, 0, true); ambientStarted = true; }
     const score = timing();
     if (next === 'arrival') {
@@ -100,7 +111,7 @@ export function createOracleSound() {
     else if (next === 'ritual') {
       narrate('ritual', .1);
       play('riser', effects, 0, false, (score.ritualMs - 1400) / 1000);
-    } else if (next === 'verdict') { play('impact', effects); narrate('verdict', .75); }
+    } else if (next === 'verdict') { play('impact', strike); narrate('verdict', VERDICT_VOICE_DELAY_MS / 1000); }
     else if (next === 'declined') narrate('declined', .2);
   }
 
@@ -132,7 +143,7 @@ export function createOracleSound() {
       });
       sources.clear();
       buffers.clear();
-      for (const node of [bed, effects, voice, analyser, room, roomFilter, wet, master, limiter]) node.disconnect();
+      for (const node of [bed, effects, strike, voice, analyser, room, roomFilter, roomLowCut, preDelay, wet, echo, echoFilter, echoFeedback, echoWet, master, limiter]) node.disconnect();
       void context.close().catch(() => {});
     },
   };

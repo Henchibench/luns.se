@@ -145,7 +145,7 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
           {phase === 'arrival' && <div className={styles.intro}>
             <p>Du har kallat på Lunsoraklet.</p>
             <h1 id="oracle-title">Jag har sett stjärnor födas.<br/>Imperier falla.</h1>
-            <p>Och dig vela mellan pasta och sushi.</p>
+            <p>Och dig vela över vad du ska äta.</p>
           </div>}
           {phase === 'invitation' && <div className={styles.reveal}>
             <h1 id="oracle-title">Överlämna<br/>ditt lunchöde.</h1>
