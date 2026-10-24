@@ -94,15 +94,31 @@ nya restauranger; ingen extra global nyhetsruta läggs till.
   inte som påhittad vegetarisk maträtt. Dryckestillägg och avhämtningspriser
   räknas inte som rätter. MENY och WWW leder till den verifierade källsidan;
   den listade egna domänen används inte som menyunderlag.
-- **Gillestugan:** https://gillestuganjerntorget.se/lunch-jarntorget/ anger
-  mån–fre 11.30–15.00 inklusive sallad och kaffe. Bilden på hemsidan är ett
-  matfoto, inte menytext. Lunchknappen leder till restaurangens Facebook-sida
-  `61576829558395`, där vecka 43 finns som bild i ett offentligt inlägg.
-  Bilden kunde läsas i webbläsaren, men vanlig HTTP gav ett sidskal utan
-  inläggen. Det finns därför ännu ingen verifierad automatisk inläsning.
-  Posten visar ett tydligt Facebook-besked och MENY länkar direkt till
-  lunchsidan på Facebook. Ingen veckobild, evig avskrift eller gissad rätt
-  sparas. Detta är en kvarvarande begränsning, inte en fungerande veckoskrapa.
+- **Gillestugan (rättat 2026-10-24):** Lunchsidan
+  https://gillestuganjerntorget.se/lunch-jarntorget/ laddar originalmenyn via
+  Fouita-widget `0x259c16`. Den inbäddade laddningen missades i första
+  undersökningen; matfotot och Facebook-sidskalet var inte hela källan.
+  Sidans HTTP-hämtning gav 520 med basens äldre Chrome-identitet, men 200
+  med `Mozilla/5.0`; endast Gillestugans User-Agent ändrades.
+  Widgetens eget Facebook-flöde har API-sididentitet `672305505964335`
+  (Facebook-länkens profilnummer är `61576829558395`). Skrapan verifierar
+  widget och sida, hämtar senaste entydiga bild från rätt publiceringsperiod
+  och läser veckonummer, dagskolumn och veckokolumn med befintlig lokal
+  Tesseract/svenska. Signerade bildadresser upptäcks på nytt varje körning;
+  kommentarer, reaktioner, flödesnycklar och råsvar sparas/loggas inte.
+  Publiceringstid kontrolleras mot rätt år och vecka (fredagen före till
+  visningsveckans fredag), sedan måste bildens OCR-lästa veckonummer stämma.
+  Alla fem dagar, källrubriker, priser, sex gemensamma alternativ och sidfot
+  måste kunna läsas; osäker eller ändrad layout ger menybesked utan mat.
+  Ingen gammal meny återanvänds. MENY leder nu till den egna lunchsidan.
+  Avläsningen använder separata beskärningar för den verifierade tvåkolumnsmallen;
+  ny layout kan därför kräva anpassning. OCR är inte teckenperfekt: källans
+  ENTRECÔTE blev ENTRECÖTE, utan automatisk ordlistekorrigering.
+  Livekontroll av originalbilden vecka 43 gav 7/7/7/7/7 rätter, med priser
+  och tillbehör jämförda mot bilden. Vecka 44 saknar ännu publicerad bild
+  vid kontrollen 24 oktober; helgvyn visar därför menybesked, inte vecka 43.
+  Åtta tester i `scripts/test_gillestugan.py` täcker flödesidentitet,
+  datum/år, tvetydig bild, dagsfördelning, priser, OCR-fel och helgbyte.
 
 Koordinaterna hämtades från OpenStreetMaps restaurangnoder: Vita 12754779701,
 Gillestugan 1042339576, Schnitzelplatz 3431315351 och Tai Shanghai 8493101010.
@@ -114,7 +130,7 @@ Verifiering: 13 syntetiska regressionstester i `scripts/test_jarntorget_extra.py
 täcker källfält, datum/år, helgbyte, dagsfördelning, radbrutna rätter, priser,
 felaktiga mallar och nätfel. Liveutfall vecka 43: Vita 0/0/0/0/0,
 Schnitzelplatz 0/0/0/0/0 (publicerad vecka 44), Tai Shanghai 0/6/6/6/6 och
-Gillestugan 0/0/0/0/0 med ovanstående besked. Minnestest, full skrapning och
+Gillestugan gav då 0/0/0/0/0 med Facebook-besked (ersatt av OCR enligt rättelsen ovan). Minnestest, full skrapning och
 bygge passerade på dev01. Webbläsaren verifierade alla fyra kort, områdesblänkaren,
 menylänkarna, Tai Shanghais stängda måndag och sex fredagsrätter. Frontendens
 parser verifierades även separat med alla 24 Tai Shanghai-rader och 25

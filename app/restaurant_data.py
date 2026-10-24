@@ -211,7 +211,7 @@ restaurant_locations = {
         "latitude": 57.6995797,
         "longitude": 11.9535721,
         "website": "https://gillestuganjerntorget.se/",
-        "menu_url": "https://www.facebook.com/people/Gillestugan-Jerntorget-Lunch/61576829558395/",
+        "menu_url": "https://gillestuganjerntorget.se/lunch-jarntorget/",
         "area": "Järntorget/Linné",
         "lunch_hours": "Mån–fre 11.30–15.00"
     },

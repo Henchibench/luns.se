@@ -9,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from ..base_scraper import BaseScraper
+from .. import gillestugan_menu
 from ..menu_week import DAYS, menu_monday, validity_row
 
 
@@ -245,14 +246,31 @@ class TaiShanghaiScraper(BaseScraper):
 
 
 class GillestuganScraper(BaseScraper):
-    """Källhänvisning: veckobilden på Facebook kan ännu inte hämtas automatiskt."""
+    """Läs originalbilden från lunchsidans eget inbäddade flöde med lokal OCR."""
     allow_previous_menu = False
 
     def __init__(self):
         super().__init__({'name': 'Gillestugan Jerntorget',
                           'website': 'https://gillestuganjerntorget.se/',
                           'menu_url': 'https://gillestuganjerntorget.se/lunch-jarntorget/'})
+        # Sajten svarar 520 på basens gamla Chrome-identitet, 200 på denna.
+        self.headers['User-Agent'] = 'Mozilla/5.0'
 
     def scrape(self):
-        self.log_warning('Veckomenyn finns som Facebook-bild; automatisk inläsning saknas')
-        return {self.name: notice('Veckans lunch finns som bild på restaurangens Facebook. Öppna MENY ovan för att läsa den.')}
+        monday = menu_monday()
+        try:
+            soup = self.get_page_content()
+            if soup is None:
+                raise ValueError('Lunchsidan kunde inte hämtas')
+            url = gillestugan_menu.select_image(gillestugan_menu.fetch_posts(soup), monday)
+            if url is None:
+                self.log_warning(f'Ingen menybild publicerad för vecka {monday.isocalendar().week}')
+                rows = notice(f'Ingen verifierad lunchmeny för vecka {monday.isocalendar().week} finns ännu – öppna MENY ovan.')
+            else:
+                columns = gillestugan_menu.read_image(gillestugan_menu.download_image(url))
+                rows = gillestugan_menu.parse_columns(columns, monday)
+        except Exception as error:
+            # HTTP-fel kan innehålla signerade bildadresser; logga bara feltypen.
+            self.log_error(f'Kunde inte verifiera lunchbilden ({type(error).__name__})')
+            rows = notice('Lunchmenyn kunde inte läsas säkert – öppna MENY ovan.')
+        return {self.name: rows + [validity_row(monday)]}

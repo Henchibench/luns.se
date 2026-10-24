@@ -142,8 +142,10 @@ class IntegrationTests(unittest.TestCase):
 
     def test_gillestugan_links_to_source_without_inventing_menu(self):
         scraper = GillestuganScraper()
-        self.assertTrue(all('Facebook' in r and r.startswith('INFO:') for r in scraper.scrape()[scraper.name]))
-        self.assertIn('61576829558395', restaurant_locations[scraper.name]['menu_url'])
+        with patch.object(scraper, 'get_page_content', return_value=None):
+            rows = scraper.scrape()[scraper.name]
+        self.assertFalse(any('|' in r for r in rows))
+        self.assertEqual(restaurant_locations[scraper.name]['menu_url'], scraper.menu_url)
 
 
 if __name__ == '__main__':
