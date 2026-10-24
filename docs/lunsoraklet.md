@@ -33,6 +33,16 @@ Henrik upplevde också rätten som för stor och matkategorin som för liten.
 Rättbeskrivningen använder nu textsteget 24 på dator och 1,1 gånger steg
 18 på mobil. Kategorin använder steg 16 med tydligare vikt och färg.
 Båda följer besökarens val av textstorlek.
+
+Läsbarhet 2026-10-24: ”Universum har tallrikt” hamnade framför ringarnas
+ljusa nederkant och tappade kontrast. Repliken har nu benvit färg,
+halvfet vikt och textsteg 18. En mjuk mörk skugga ligger direkt bakom
+hela repliken, så bakgrundsljuset inte konkurrerar med bokstäverna.
+Minnestester och produktionsbygge passerade. I testserverns mobilvy
+390 × 844 kontrollerades kontrasten framför de samlade ringarna med en
+lång källrätt. Repliken är 20 px med större text aktiv, utan sidledsflöde
+eller fel i webbläsaren. Appbygget är `54ab922`.
+
 Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
 

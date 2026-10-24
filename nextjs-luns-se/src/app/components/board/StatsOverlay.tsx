@@ -222,6 +222,15 @@ export default function StatsOverlay({
                     och VECKAN ovanför. Samlade under en gemensam rubrik fick de
                     brödtextrubriker i stället, och rutan bytte formspråk halvvägs
                     ner. */}
+                {stats.oracleDiscoveries !== undefined && (
+                  <Section label={`PÅSKÄGGET · ${stats.period.label.toUpperCase()}`}>
+                    <Figure value={formatNumber(stats.oracleDiscoveries)} label="HITTAT PÅSKÄGGET" />
+                    <p className="mb-0 mt-3 text-12 leading-[1.6] text-[var(--ink2)]">
+                      Första upptäckten räknas, en gång per webbläsare.
+                    </p>
+                  </Section>
+                )}
+
                 {stats.restaurants.length > 0 && (
                   <Section label="FAVORITMARKERADE STÄLLEN">
                     <BarList items={stats.restaurants} unit="klick" />

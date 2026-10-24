@@ -47,6 +47,8 @@ export interface StatsFile {
    * mellan "ingen sökte" och "vi mätte inte" ska inte suddas ut till en nolla.
    */
   searches?: number;
+  /** Första upptäckter av påskägget under perioden, en gång per webbläsare. */
+  oracleDiscoveries?: number;
   restaurants: Bucket[];
   dishes: Bucket[];
   locations: Bucket[];

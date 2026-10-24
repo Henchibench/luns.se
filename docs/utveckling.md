@@ -67,6 +67,37 @@ Verifiering: kodspårning från händelser via hämtning till BarList, publicera
 statistikfil, minnestest och bygge utan skrapning. Testservern saknade
 stats.json, så samma offentliga fil används där för kontroll av visningen.
 
+### Upptäckter av Lunsoraklet, 2026-10-24
+
+Henrik ville se hur många som hittar påskägget. Händelsen
+`oracle-discovered` skickas när det femte snabba trycket öppnar oraklet.
+`luns-oracle-discovered` sparar en lokal markering, ingen identifierare,
+så återöppning eller omladdning inte ger nya upptäckter. Saknas Umami,
+är den egna statistiken avstängd eller går markeringen inte att spara
+avstår mätningen. Enbart luns.se och www.luns.se får skicka händelsen,
+så testservern och localhost inte fyller räknaren.
+
+”Hittat påskägget” visar första upptäckter under statistikens senaste
+30 dagar. Samma filter för luns.se och Sverige som övrig statistik gäller.
+Antalet är webbläsare, inte verifierade personer. Ny enhet eller rensade
+webbläsardata kan därför räknas igen. Umamis tracker ger ingen säker
+leveranskvittens vid blockerad trafik, så siffran kan underskatta upptäckter.
+Inga egna identifierare eller uppgifter om den slumpade rätten skickas.
+Integritetsinformationen beskriver händelsen och den lokala markeringen.
+
+Statistikhämtningen filtrerar händelsen innan rankningen i Umami. Tomt svar
+ger noll, medan felaktigt svar eller misslyckad hämtning utelämnar måttet.
+Äldre statistikfiler utan fältet fungerar fortfarande. Umami behöver ingen
+manuell registrering av händelsen; den syns under Events efter första
+registreringen från den publicerade sajten. Påskägget får ingen nyhet.
+
+Verifiering: 14 Node tester inklusive oraklet och minnesreglerna samt tre
+Python tester passerar. Testerna täcker återöppning, omladdning, parallella
+öppningar, testvärdar, avstängd statistik, lagringsfel och felaktiga svar.
+Läsning via den befintliga delningskopplingen gav 0 upptäckter och 13 sök
+under de senaste 30 dagarna. Den verkliga statistiken används i testvyn.
+Ingen påhittad händelse skickades till produktionsstatistiken.
+
 ## Låst Ubuntu-version i Actions, 2026-10-20
 
 GitHub aviserade att ubuntu-latest flyttas till Ubuntu 26.04. På Henriks

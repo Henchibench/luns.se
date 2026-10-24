@@ -51,7 +51,7 @@ import {
   matchesTypes,
   searchTerms as expandSearch,
 } from './lib/filters';
-import { trackEvent } from './utils/analytics';
+import { trackEvent, trackOracleDiscovery } from './utils/analytics';
 
 /** Avstånd från huvudytans topp där en sektion räknas som den aktiva. */
 const SPY_OFFSET = 70;
@@ -554,6 +554,7 @@ export default function LunchBoard() {
         onOpenOracle={() => {
           try { oracleAudio.current = createOracleSound(); } catch { oracleAudio.current = null; }
           setOracleOpen(true);
+          void trackOracleDiscovery();
         }}
         days={DAYS}
         selectedDay={day}

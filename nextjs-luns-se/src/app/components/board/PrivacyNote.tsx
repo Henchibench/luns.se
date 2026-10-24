@@ -61,6 +61,7 @@ export default function PrivacyNote({
           webbläsare. Rensar du webbläsardata är de borta, och de följer inte med till en annan
           enhet. Även vilka restauranger du redan sett i ett område sparas här, så att vi
           kan visa en blänkare när nya tillkommer.
+          Även om påskägget har hittats sparas här, så att upptäckten bara räknas en gång.
         </p>
 
         <h3 className="mb-1.5 font-mono text-10 tracking-[.15em] text-[var(--mut)]">
@@ -95,6 +96,7 @@ export default function PrivacyNote({
           <li>· vilket sugen på-filter som slås på</li>
           <li>· att sökfältet användes, aldrig vad som skrevs i det</li>
           <li>· att temat byttes, eller att introduktionen eller nyhetslistan öppnades</li>
+          <li>· att påskägget hittades</li>
         </ul>
         {/* Sista stycket i rutan nu, så det bär avståndet ner till knappen
             som avsnittet under tidigare gjorde. */}
