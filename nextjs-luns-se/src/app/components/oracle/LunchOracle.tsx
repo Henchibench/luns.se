@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { chooseOffering, type Offering } from '../../lib/oracle';
 import type { OracleSound } from './sound';
-import { ARRIVAL_MS, RITUAL_MS, type OraclePhase } from './direction';
+import { createOracleClock, oracleTiming, RITUAL_MS, type OraclePhase } from './direction';
 import styles from './oracle.module.css';
 
 interface Props { audio: OracleSound | null; offerings: Offering[]; context: string; onClose: () => void; onAccept: (restaurant: string) => void }
@@ -12,11 +12,13 @@ interface Props { audio: OracleSound | null; offerings: Offering[]; context: str
 export default function LunchOracle({ audio, offerings, context, onClose, onAccept }: Props) {
   // Freeze the source at entry, including day and filters. No background reroll.
   const [pool] = useState(offerings);
-  const [phase, setPhase] = useState<OraclePhase>('arrival');
+  const [phase, setPhase] = useState<OraclePhase>('loading');
   const [result, setResult] = useState<Offering | null>(null);
   const [muted, setMuted] = useState(false);
-  const audioUnavailable = !audio;
+  const [audioUnavailable, setAudioUnavailable] = useState(!audio);
   const [reduced, setReduced] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [score, setScore] = useState(() => oracleTiming());
   const [sceneReady, setSceneReady] = useState(false);
   const host = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDivElement>(null);
@@ -24,10 +26,19 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
   const scene = useRef<{ phase: (value: OraclePhase) => void; dispose: () => void } | null>(null);
   const currentPhase = useRef(phase); currentPhase.current = phase;
   const close = useRef(onClose); close.current = onClose;
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const clock = useRef(createOracleClock());
+  const timing = useRef(score);
+  const lifetime = useRef(0);
+  const silenced = useRef(false);
   const rolling = useRef(false);
 
+  const enter = (next: OraclePhase) => {
+    clock.current.reset(); currentPhase.current = next; setPhase(next);
+    sound.current?.phase(next, pool.length > 0);
+  };
+
   useEffect(() => {
+    const lease = ++lifetime.current;
     const element = dialog.current!;
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
@@ -47,22 +58,47 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
     element.addEventListener('keydown', keyboard);
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(motion.matches);
-    if (!motion.matches) sound.current?.arrival();
-    const arrival = setTimeout(() => setPhase('invitation'), motion.matches ? 0 : ARRIVAL_MS);
-    let cancelled=false;
+    let cancelled=false, frame=0;
+    const tick = () => {
+      if (cancelled || document.hidden) return;
+      const elapsed = clock.current.elapsed(), current = currentPhase.current;
+      if (current === 'arrival' && elapsed >= timing.current.arrivalMs) enter('invitation');
+      else if (current === 'ritual') {
+        if (!silenced.current && elapsed >= timing.current.ritualMs - 1400) { sound.current?.silence(); silenced.current = true; }
+        if (elapsed >= timing.current.ritualMs) enter('verdict');
+      } else if (current === 'declined' && elapsed >= timing.current.declinedMs) { close.current(); return; }
+      frame = requestAnimationFrame(tick);
+    };
+    void (sound.current?.ready ?? Promise.resolve(false)).then(available => {
+      if (cancelled) return;
+      timing.current = sound.current?.timing() ?? oracleTiming();
+      setScore(timing.current); setAudioUnavailable(!available);
+      enter(motion.matches ? 'invitation' : 'arrival');
+    });
     import('./scene').then(module => {
       if(cancelled || !host.current) return;
       try {
-        scene.current=module.mountOracleScene(host.current, motion.matches);
+        scene.current=module.mountOracleScene(host.current, motion.matches, () => ({
+          phase: currentPhase.current,
+          elapsed: clock.current.elapsed() / 1000 * (currentPhase.current === 'ritual' ? RITUAL_MS / timing.current.ritualMs : 1),
+          voice: sound.current?.level() ?? 0,
+        }));
         scene.current.phase(currentPhase.current);
         setSceneReady(true);
       } catch { /* The illustrated fallback and the actual draw remain usable. */ }
     }).catch(() => {});
-    const visibility = () => { if(document.hidden) sound.current?.pause(); else sound.current?.resume(); };
+    const visibility = () => {
+      cancelAnimationFrame(frame); setPaused(document.hidden);
+      if (document.hidden) { clock.current.pause(); sound.current?.pause(); }
+      else { clock.current.resume(); sound.current?.resume(); frame = requestAnimationFrame(tick); }
+    };
     document.addEventListener('visibilitychange',visibility);
+    visibility();
     return () => {
-      cancelled=true; clearTimeout(arrival); timers.current.forEach(clearTimeout);
-      scene.current?.dispose(); sound.current?.dispose();
+      cancelled=true; cancelAnimationFrame(frame); clock.current.pause();
+      scene.current?.dispose(); sound.current?.pause();
+      // React's development effect replay immediately takes a new lease on the same audio.
+      queueMicrotask(() => { if (lifetime.current === lease) sound.current?.dispose(); });
       document.removeEventListener('visibilitychange',visibility);
       element.removeEventListener('keydown',keyboard);
       siblings.forEach((node,i) => { node.inert=inertStates[i]; });
@@ -81,22 +117,17 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
     if(rolling.current) return;
     const chosen=chooseOffering(pool);
     if(!chosen) return;
-    rolling.current=true; setResult(chosen); setPhase('ritual');
-    if(!reduced) sound.current?.ritual();
-    timers.current.push(setTimeout(() => sound.current?.silence(), reduced ? 0 : 6600));
-    timers.current.push(setTimeout(() => {
-      setPhase('verdict');
-      if(!document.hidden && !reduced) sound.current?.verdict();
-    },reduced ? 100 : RITUAL_MS));
+    rolling.current=true; setResult(chosen); silenced.current=false;
+    enter(reduced ? 'verdict' : 'ritual');
   };
   const decline = () => {
-    setPhase('declined');
-    timers.current.push(setTimeout(() => close.current(),2800));
+    enter('declined');
   };
 
   return createPortal(
     <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="oracle-title" tabIndex={-1}
-      className={`${styles.oracle} ${reduced ? styles.reduced : ''}`} data-phase={phase}>
+      className={`${styles.oracle} ${reduced ? styles.reduced : ''}`} data-phase={phase} data-paused={paused}
+      style={{'--call-at':`${score.callAt}ms`, '--cosmos-at':`${score.cosmosAt}ms`, '--lunch-at':`${score.lunchAt}ms`, '--ritual-orbit':`${score.ritualMs - 1300}ms`} as React.CSSProperties}>
       <div ref={host} className={styles.scene} aria-hidden="true"/>
       {!sceneReady && <div className={styles.backdrop} aria-hidden="true"/>}
       <div className={styles.veil} aria-hidden="true"/>
@@ -115,6 +146,7 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
           </div>}
         </div>
         <div className={styles.words} aria-live="polite" aria-atomic="true">
+          {phase === 'loading' && <div className={styles.loading}><h1 id="oracle-title">Något vaknar.</h1><p>Lyssna.</p></div>}
           {phase === 'arrival' && <div className={styles.intro}>
             <p>Du har kallat på Lunsoraklet.</p>
             <h1 id="oracle-title">Jag har sett stjärnor födas.<br/>Imperier falla.</h1>

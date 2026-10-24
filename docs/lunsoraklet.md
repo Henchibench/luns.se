@@ -15,7 +15,7 @@ bär replikerna och Schibsted Grotesk bär kontrollerna. Scenen fyller skärmen,
 med repliker i nedre delen, stor gestalt ovanför och diskreta kontroller.
 Ingen vanlig panel eller liten figur ovanför ett formulär.
 
-Förlopp: elva sekunders inträde, inväntat lunchval, åtta sekunders ritual,
+Förlopp: omkring fjorton sekunders inträde, inväntat lunchval, åtta sekunders ritual,
 sedan domen. Kameran färdas fram, ringarna öppnar sig, källans rätter dras
 in och ljudet tystnar före resultatet. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
@@ -37,27 +37,59 @@ imitation av en känd skådespelare. Leverera gärna varje replik separat.
 Pausen före orden om pasta och sushi är själva skämtet. Den fullständiga
 slumpade menyn ska visas som källtext. Den behöver inte talas, vilket gör
 att fasta inspelningar kan fungera för alla restauranger utan en taltjänst.
-Animationernas tid ska anpassas till inspelningens verkliga längd när den finns.
+Animationernas tid anpassas till de avkodade ljudfilernas verkliga längd.
 
 Status 2026-10-24: Henrik har uttryckligen godkänt AI tjänster för att skapa
 material till Lunsoraklet, exempelvis tal och ljud, och bekräftat att han har ElevenLabs.
 Undantaget gäller materialet till detta påskägg. Regeln för övriga projektet
-står kvar. Ingen röstfil finns ännu och ElevenLabs väntar på inloggning.
+står kvar. Sju repliker och tre effekter har nu skapats via ElevenLabs
+webbgränssnitt. Ingen modellnyckel eller ny tjänst i drift behövs på sajten.
 Det inbyggda bildverktyget i ChatGPT användes för bildmaterialet.
 
 ## Ljudproduktion
 
-Skapa först ett kort röstprov med inledningens manus. Välj en röst som talar
-naturlig svenska och bär humorn utan att låta som en reklamuppläsare.
-Godkända repliker sparas som separata ljudfiler. Produktion sker en gång,
-inte för varje besökare. Sajten ska spela lokala filer utan nycklar eller
-anrop till en taltjänst. Kontrollera kontots rättigheter och tillgängliga
-krediter före produktion. Köp eller uppgradering ingår inte i godkännandet.
+Kontot visade Starter och 90 000 krediter före produktion, 87 733 efter.
+Förbrukning: 2 267 krediter inom befintligt abonnemang, utan köp eller
+uppgradering. Starter omfattar kommersiell användning enligt
+[ElevenLabs prislista](https://elevenlabs.io/pricing). Delning till SFX
+Explore stängdes av före generering. Inga lösenord eller nycklar lästes ut.
 
-Ljudregi för nästa version:
+Tre röstprov skapades med Voice Design. Voice 1 sparades som arbetsversion
+under namnet Lunsoraklet medan Henriks lyssningsval inväntades. Röstens ID
+är `v4VkqdwiCeqCS0LhAxOW`. Det är en ny fiktiv röst, ingen klon av en person.
+Inläsning: Eleven v4, uttryckligt språkval Swedish, stabilitet 0,5 och
+likhet 0,75. Tonanvisningar calm, solemn, stern och deadpan användes för
+respektive replik. Första generationen av varje replik används.
 
-* Inträde: en väldig port som öppnar sig långt borta, långsam luftförskjutning,
-  dov resonans och glest metalliskt skimmer. Ingen melodislinga eller pling.
+Filerna ligger i `nextjs-luns-se/public/oracle/audio/`. De hämtas först när
+påskägget öppnas. Råa nedladdningar och tillfälliga verktyg ingår inte i Git.
+Publicerade filer är bearbetade MP3 filer utan ursprungliga metadata,
+44,1 kHz och 128 kbit/s. Talet är mono och effekterna stereo.
+
+| Fil | Innehåll | Längd i sekunder |
+|---|---|---:|
+| call.mp3 | Du har kallat på Lunsoraklet | 2,72 |
+| cosmos.mp3 | Stjärnor och imperier | 5,09 |
+| lunch.mp3 | Pasta och sushi | 3,19 |
+| invitation.mp3 | Lunchödet och kaffet | 8,54 |
+| ritual.mp3 | Universum överväger lunchen | 4,94 |
+| verdict.mp3 | Domen | 5,28 |
+| declined.mp3 | Beslutet har noterats | 5,28 |
+| atmosphere.mp3 | Sömlös rymdatmosfär | 30,04 |
+| riser.mp3 | Stegring av sten, metall och luft | 6,61 |
+| impact.mp3 | Domsklang | 5,04 |
+
+FFmpeg kontrollerade att samtliga filer kan avkodas. Uppmätt talnivå efter
+bearbetning är mellan minus 18,29 och minus 16,87 LUFS. Högsta uppmätta
+true peak är minus 2,32 dBTP. Spelaren sänker bakgrund och effekter under
+replikerna och lägger en låg filtrerad efterklang på talet. Mastervolym och
+kompressor begränsar summan. Detta är mätningar, inte en subjektiv
+lyssningsbedömning av rösten eller uttalet.
+
+Ljudregi:
+
+* Inträde: långsam luftförskjutning, dov resonans och glest metalliskt skimmer.
+  Ingen melodislinga eller pling.
 * Väntan: låg, sömlös rumsatmosfär utan tydlig rytm. Talet ska vara närmast
   lyssnaren och tydligt över bakgrunden.
 * Ritual: ett växande tryck, som om gammal sten och metall sätts i rörelse.
@@ -65,14 +97,13 @@ Ljudregi för nästa version:
 * Dom: en tung men kort klang med lång efterklang. Berättarrösten kommer
   efter anslaget så orden inte dränks.
 
-Låt den riktiga inläsningens längd styra fasbyten. Ljud och bild ska pausas
-tillsammans om fliken döljs. Ingen föregående replik får fortsätta när
-besökaren går vidare eller stänger. Minskad rörelse ska inte behöva betyda
-att tal saknas. Ljudknappen ska styra både tal och effekter.
-
-Förberedelsen verifierades med minnestester och produktionsbygge. Sajtkoden
-är oförändrad och befintlig testserver är frisk. Detta verifierar inte någon
-ny röst eller något nytt ljud, eftersom produktionen väntar på kontoåtkomst.
+`oracleTiming` använder inläsningens längd för fasbyten och textens inträde.
+En gemensam pausbar klocka driver fasbyten och scenens kamera. Ljud och bild
+pausas tillsammans när fliken döljs. Pågående och schemalagda repliker
+stoppas när besökaren går vidare eller stänger. Minskad rörelse hoppar över
+inträde och ritual men behåller talet i val, dom och avböjning. Ljudknappen
+styr allt ljud. Nätverksfel får inte blockera den textbaserade lottningen.
+Inläsningen av filer avbryts efter tio sekunder och stängning avbryter direkt.
 
 ## Bildkälla
 
@@ -101,4 +132,4 @@ vid aktivering. Ingen nyhet eller publicering till main ingick.
 
 Detta är visuell kontroll i webbläsaren på dator, inte ett mätprotokoll från
 en fysisk iPhone. Ljudets subjektiva kvalitet är inte verifierad genom
-lyssning här. Tal och en fullt modellerad figur återstår som separata steg.
+lyssning här. En fullt modellerad figur återstår som ett separat steg.

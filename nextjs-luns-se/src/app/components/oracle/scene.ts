@@ -6,7 +6,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { direction, type OraclePhase } from './direction';
 
 /** A cinematic illustration inside a real 3D astrolabe, dust field and camera move. */
-export function mountOracleScene(host: HTMLElement, reduced: boolean) {
+export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?: () => {phase: OraclePhase; elapsed: number; voice: number}) {
   const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'low-power'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.25));
   renderer.setClearColor(0x010305); renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -100,6 +100,8 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean) {
     if(disposed||document.hidden) return;
     const dt=previous?Math.min((stamp-previous)/1000,0.05):0; previous=stamp;
     time+=dt; elapsed+=dt;
+    const playing = playback?.();
+    if (playing) { phase = playing.phase; elapsed = playing.elapsed; }
     const d=direction(phase,elapsed,reduced);
     portraitMaterial.opacity=d.reveal;
     astrolabe.scale.setScalar(1-d.collapse*.42);
@@ -120,7 +122,9 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean) {
     camera.position.z=baseDistance+(1-d.travel)*22-d.collapse*1.3;
     camera.lookAt(0,.8,0);
     fogMaterial.uniforms.time.value=time; fogMaterial.uniforms.intensity.value=.45+d.reveal*.5+d.energy*.4;
-    bloom.strength=.55+d.energy*.3+d.flash*.7;
+    const voiceGlow = reduced ? 0 : (playing?.voice ?? 0);
+    key.intensity = 130 + voiceGlow * 24;
+    bloom.strength=.55+d.energy*.3+d.flash*.7+voiceGlow*.04;
     renderer.toneMappingExposure=1.05+d.flash*.6;
     composer.render();
     if(!reduced) frame=requestAnimationFrame(render);

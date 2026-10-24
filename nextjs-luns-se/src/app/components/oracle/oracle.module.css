@@ -24,12 +24,16 @@
 .primary:hover { background:#534027; box-shadow:0 0 35px #d6b56c45; }
 .secondary { background:transparent; border:0; color:#bfb6a6; padding:12px 20px; text-decoration:underline; text-underline-offset:5px; font-size:var(--fs-13,13px); }
 .actions { display:flex; flex-direction:column; align-items:center; gap:5px; margin-top:24px; }
-.intro p:first-child { animation:materialize 1.8s 1.2s both; }
-.intro h1 { animation:materialize 2s 3.5s both; }
-.intro p:last-child { animation:materialize 1.8s 7s both; }
+.intro p:first-child { animation:materialize 1s var(--call-at,1200ms) both; }
+.intro h1 { animation:materialize 1s var(--cosmos-at,3500ms) both; }
+.intro p:last-child { animation:materialize 1s var(--lunch-at,7000ms) both; }
+.loading { animation:materialize 2s .5s both; }
+.loading h1 { font-size:clamp(28px,4vw,48px); }
+[data-phase='loading'] .backdrop { opacity:0; }
+.oracle[data-paused='true'], .oracle[data-paused='true'] * { animation-play-state:paused!important; }
 .reveal { animation:materialize 1.2s both; }
 .offerings { position:absolute; inset:-20vh 0 0; overflow:hidden; }
-.offerings span { position:absolute; left:50%; top:50%; width:220px; max-height:3.2em; overflow:hidden; font-size:var(--fs-12,12px); color:#e9d7ae; text-shadow:0 2px 7px #000; animation:offering 6.7s linear both; animation-delay:calc(var(--delay) * 0); --radius:clamp(110px,21vw,300px); }
+.offerings span { position:absolute; left:50%; top:50%; width:220px; max-height:3.2em; overflow:hidden; font-size:var(--fs-12,12px); color:#e9d7ae; text-shadow:0 2px 7px #000; animation:offering var(--ritual-orbit,6700ms) linear both; animation-delay:calc(var(--delay) * 0); --radius:clamp(110px,21vw,300px); }
 .offerings span:nth-child(even) { color:#8ebac4; }
 [data-phase='ritual'] .words { animation:materialize 1s both; }
 [data-phase='verdict'] .apparition { min-height:22dvh; }

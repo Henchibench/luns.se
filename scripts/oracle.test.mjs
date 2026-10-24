@@ -63,3 +63,28 @@ test('cinematic timing reveals gradually, contracts before the verdict and skips
     assert.deepEqual(directed.direction(phase,0,true),{reveal:1,travel:1,energy:0,collapse:0,flash:0});
   }
 });
+
+test('recorded lines determine the timing, including a slow delivery and the final response', () => {
+  const score = directed.oracleTiming({call:4, cosmos:8, lunch:5, ritual:9, declined:7});
+  assert.ok(score.cosmosAt >= score.callAt + 4000);
+  assert.ok(score.lunchAt >= score.cosmosAt + 8000);
+  assert.ok(score.arrivalMs > score.lunchAt + 5000);
+  assert.ok(score.ritualMs >= 9000 + 2800);
+  assert.ok(score.declinedMs > 7000);
+  assert.ok(directed.oracleTiming().arrivalMs >= directed.ARRIVAL_MS);
+  assert.deepEqual(directed.direction('loading',30,false),{reveal:0,travel:0,energy:0,collapse:0,flash:0});
+});
+
+test('leaving the tab freezes the story, including when a phase resets during loading', () => {
+  let now = 0;
+  const clock = directed.createOracleClock(() => now);
+  now = 1200; assert.equal(clock.elapsed(),1200);
+  clock.pause(); now = 90000; clock.pause();
+  assert.equal(clock.elapsed(),1200);
+  clock.resume(); clock.resume(); now = 90300;
+  assert.equal(clock.elapsed(),1500);
+  clock.pause(); clock.reset(); now = 100000;
+  assert.equal(clock.elapsed(),0);
+  clock.resume(); now = 100500;
+  assert.equal(clock.elapsed(),500);
+});
