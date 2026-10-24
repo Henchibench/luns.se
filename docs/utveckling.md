@@ -305,15 +305,18 @@ och godkänd kontroll av text- och bildläge på mobil (390 px) och dator
 Henrik ville ge lunchmenyerna mer utrymme på mobilen. Header samlar nu sök,
 karta, kontakt och inställningar i en utfällbar meny under 760px. Loggan,
 platsvalet, vädret och dagarna finns kvar utanför menyn. Ordmärket LUNS.SE
-visas på dator; på mobil räcker loggan. Långa platsnamn får kortas visuellt
+visas både på dator och mobil. Långa platsnamn får kortas visuellt
 med hela namnet tillgängligt i platslistan. Menyn ligger ovanpå innehållet,
 kan rullas på låg skärm och stängs via menyknappen, Escape, klick utanför
 eller ett menyval. Escape lämnar fokus på menyknappen. Olästa nyheter
 markeras på samma knapp och på inställningsvalet.
 
 Henrik justerade placeringen samma dag: temperatur och vecka ligger direkt
-intill loggan, före platsväljaren, även på mobil. Veckan står under
-temperaturen på mobil och bredvid på dator. Nyhetsversion 16 behålls.
+intill loggan, före platsväljaren, även på mobil. Han påpekade också att
+ordmärket LUNS.SE hade försvunnit. Det är återställt med temperatur och
+vecka på en gemensam rad under namnet på mobil. På dator ligger allt
+kvar på samma rad. Veckonumret skrivs kompakt som v.43. Nyhetsversion 16
+behålls.
 
 Sökningen filtrerar som tidigare medan man skriver. Sökknappen eller
 Enter stänger menyn. En aktiv sökning visas separat med Rensa även när

@@ -98,15 +98,17 @@ export default function Header({
           height={36}
           className="flex-none h-8 w-8 object-contain wide:h-9 wide:w-9"
         />
-        <span className="hidden wide:inline font-mono text-16 font-semibold tracking-[.04em] text-[var(--acc)] wide:text-18">
+        <div className="flex flex-none flex-col wide:flex-row wide:items-center wide:gap-3">
+        <span className="font-mono text-16 font-semibold tracking-[.04em] text-[var(--acc)] wide:text-18">
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
-        <div className="flex flex-none flex-col items-start font-mono text-11 text-[var(--mut)] wide:ml-0 wide:flex-row wide:items-center wide:gap-2">
+        <div className="flex flex-none items-center gap-2 font-mono text-11 text-[var(--mut)]">
           <span className="whitespace-nowrap" title={weather.description}>
             {weather.emoji}{weather.temperature ? ` ${weather.temperature}` : ''}
           </span>
-          {week !== null && <span className="whitespace-nowrap" title={`Aktuell kalendervecka: ${week}`} aria-label={`Aktuell vecka ${week}`}>v. {week}</span>}
+          {week !== null && <span className="whitespace-nowrap" title={`Aktuell kalendervecka: ${week}`} aria-label={`Aktuell vecka ${week}`}>v.{week}</span>}
+        </div>
         </div>
         {locations.length > 1 && (
           <div className="ml-auto min-w-0 wide:ml-0 wide:flex-none">
