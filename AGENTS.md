@@ -10,6 +10,8 @@ Svara på svenska. Ett kort ger mandat inom kortets omfattning, inte mer.
 
 - AI körs bara med Codex CLI och ChatGPT-prenumeration. Inga modell-API:er,
   modellnycklar eller fallback. Inga nya AI-tjänster eller OpenClaw.
+  Henrik har godkänt AI tjänster för Lunsoraklets material, exempelvis tal och ljud.
+  Detta undantag gäller skapandet av påskäggets material, se docs/lunsoraklet.md.
 - Hitta aldrig på en rätt, meny, kategori eller allergenuppgift. Allt ska
   kunna härledas till restaurangens källa. Saknas underlag: rapportera det.
 - Rör inte .github/workflows/ utan uttrycklig beställning. Rör inte hubben,

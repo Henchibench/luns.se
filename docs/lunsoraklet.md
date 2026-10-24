@@ -39,10 +39,40 @@ slumpade menyn ska visas som källtext. Den behöver inte talas, vilket gör
 att fasta inspelningar kan fungera för alla restauranger utan en taltjänst.
 Animationernas tid ska anpassas till inspelningens verkliga längd när den finns.
 
-Status: ingen röstfil finns ännu. Henrik har tillfrågats om egen inspelning,
-annan inläsning eller att diskutera undantag för en tjänst som genererar tal.
-Ingen sådan tjänst, modellnyckel eller modell API har kopplats in.
+Status 2026-10-24: Henrik har uttryckligen godkänt AI tjänster för att skapa
+material till Lunsoraklet, exempelvis tal och ljud, och bekräftat att han har ElevenLabs.
+Undantaget gäller materialet till detta påskägg. Regeln för övriga projektet
+står kvar. Ingen röstfil finns ännu och ElevenLabs väntar på inloggning.
 Det inbyggda bildverktyget i ChatGPT användes för bildmaterialet.
+
+## Ljudproduktion
+
+Skapa först ett kort röstprov med inledningens manus. Välj en röst som talar
+naturlig svenska och bär humorn utan att låta som en reklamuppläsare.
+Godkända repliker sparas som separata ljudfiler. Produktion sker en gång,
+inte för varje besökare. Sajten ska spela lokala filer utan nycklar eller
+anrop till en taltjänst. Kontrollera kontots rättigheter och tillgängliga
+krediter före produktion. Köp eller uppgradering ingår inte i godkännandet.
+
+Ljudregi för nästa version:
+
+* Inträde: en väldig port som öppnar sig långt borta, långsam luftförskjutning,
+  dov resonans och glest metalliskt skimmer. Ingen melodislinga eller pling.
+* Väntan: låg, sömlös rumsatmosfär utan tydlig rytm. Talet ska vara närmast
+  lyssnaren och tydligt över bakgrunden.
+* Ritual: ett växande tryck, som om gammal sten och metall sätts i rörelse.
+  Tystnad precis före domen ger plats åt avslutningen.
+* Dom: en tung men kort klang med lång efterklang. Berättarrösten kommer
+  efter anslaget så orden inte dränks.
+
+Låt den riktiga inläsningens längd styra fasbyten. Ljud och bild ska pausas
+tillsammans om fliken döljs. Ingen föregående replik får fortsätta när
+besökaren går vidare eller stänger. Minskad rörelse ska inte behöva betyda
+att tal saknas. Ljudknappen ska styra både tal och effekter.
+
+Förberedelsen verifierades med minnestester och produktionsbygge. Sajtkoden
+är oförändrad och befintlig testserver är frisk. Detta verifierar inte någon
+ny röst eller något nytt ljud, eftersom produktionen väntar på kontoåtkomst.
 
 ## Bildkälla
 

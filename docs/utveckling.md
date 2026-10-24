@@ -537,8 +537,9 @@ med 3D instrument, stoft, kamerafärd, shaderdimma och bloom. Bildmaterialet
 sajten. Web Audio aktiveras av femte trycket på loggan och skapar filtrerad
 luft, resonans och en låg anslagseffekt. Inga externa tjänster anropas av
 besökaren för effekterna. Regi, röststatus och bildkälla finns i
-[lunsoraklet.md](lunsoraklet.md). Tal är ännu inte infört eftersom en
-inspelning eller ett godkänt verktyg saknas. Stäng och ljudknapp finns hela tiden.
+[lunsoraklet.md](lunsoraklet.md). Henrik har godkänt AI tjänster för detta
+påskäggs tal och ljud. Tal är ännu inte infört, eftersom röstfilerna återstår
+att skapa i ElevenLabs. Stäng och ljudknapp finns hela tiden.
 Escape stänger, fokus hålls i dialogen och återgår till loggan. Bakgrunden
 är inert under besöket. Timers, ljud och grafikresurser frigörs vid stängning.
 Minskad rörelse hoppar över väntan och visar stilla grafik. Utan WebGL finns
