@@ -29,6 +29,10 @@ ljuspuls markerar låsningen. Ringarna förblir samlade medan resultatet visas.
 På smal skärm dras kameran tillbaka så att ringarnas bredd ryms och
 gestalten lyfts för att ge plats åt längre rättbeskrivningar. Porträttets
 ytterkanter tonas mjukt så att ingen rak bildkant syns mot rymden.
+Henrik upplevde också rätten som för stor och matkategorin som för liten.
+Rättbeskrivningen använder nu textsteget 24 på dator och 1,1 gånger steg
+18 på mobil. Kategorin använder steg 16 med tydligare vikt och färg.
+Båda följer besökarens val av textstorlek.
 Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
 
