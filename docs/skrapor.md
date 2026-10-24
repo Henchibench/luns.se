@@ -59,6 +59,41 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Ophelia på Lindholmen, 2026-10-24
+
+Tillagd efter Henriks beställning utifrån ett tips via kontaktformuläret.
+Källan är https://www.restaurangophelia.se/sv#lunch, den svenska versionen
+av den inskickade engelska sidan. Synlig HTML visar endast vald dagsflik;
+sidans publika Next-data innehåller hela lunchveckan med `year`, `isoWeek`,
+`weekday`, rättnamn, beskrivningar och priser. `ophelia_scraper.py` läser
+JSON ur `self.__next_f.push` utan att exekvera JavaScript. Endast `week`
+under den entydiga lunchsektionen används; à la carte läses inte som lunch.
+Ingen extern menyförmedlare, OCR, modell-API eller ny nyckel behövs.
+
+År och ISO-vecka måste stämma med `menu_week.py`, inklusive nästa vecka på
+helgen. `MENU_VALIDITY` spärrar gamla byggen och `allow_previous_menu=False`
+förhindrar återanvändning vid fel. Saknad vecka eller dag ger menybesked.
+Tillfälligt slutsålda rätter visas som information och räknas inte som mat.
+Neutral kategori Lunch används; inga kostkategorier eller allergener gissas.
+Källans två pizzor under Alternativ meny visas varje vardag, med besked om
+beställning i baren. De har inget angivet eget lunchpris och får inget gissat
+pris från à la carte. Övriga rätter använder eget pris eller gemensamt
+lunchpris (kampanjpris när angivet). Tider och inkluderat kommer från lunchsidan.
+
+Verifierat mot samtliga fem synliga flikar och de hämtade raderna: vecka 43
+har 6/6/6/6/6 alternativ, varav två dagsrätter, två sallader och två pizzor.
+Dagsrätter 139 kr, sallader 149 kr. Den 24 oktober visar Luns vecka 44,
+medan källan ännu visar 2026 vecka 43; då publiceras enbart menybesked.
+Sju regressionstester i `scripts/test_ophelia.py` täcker uppdelade Next-ramar,
+dagsfördelning, priser, år/vecka/helgbyte, slutsålt, saknad data och fel.
+
+Registrerad som Restaurang Ophelia i Lindholmen, med lunch mån–fre 11–14.
+Adress Theres Svenssons gata 15 och beskrivning kommer från restaurangens
+sida. Kartpunkten 57.7060325, 11.9442223 kommer från OpenStreetMap-noden
+14079346178 (restaurangposition, inte separat verifierad entré).
+Befintlig områdesvis besökshistorik visar nyrestaurangsblänkaren efter släpp;
+ingen separat global nyhet eller ändrad nyhetsversion behövs.
+
 ## Fyra tillskott på Järntorget/Linné, 2026-10-23
 
 Henrik beställde Vita, Gillestugan Jerntorget, Schnitzelplatz Lagerhuset och

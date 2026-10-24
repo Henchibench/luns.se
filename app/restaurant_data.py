@@ -120,6 +120,17 @@ restaurant_locations = {
         "instagram": "https://www.instagram.com/districtone.se/",
         "area": "Lindholmen"
     },
+    "Restaurang Ophelia": {
+        "description": "Kvartersrestaurang vid Lindholmens småbåtshamn med smaker från Sverige och Medelhavet och asiatiska inslag. Serverar vardagslunch och har uteservering under sommaren.",
+        "maps": "https://www.google.com/maps/search/?api=1&query=Restaurang%20Ophelia%2C%20Theres%20Svenssons%20gata%2015%2C%20G%C3%B6teborg",
+        "latitude": 57.7060325,
+        "longitude": 11.9442223,
+        "website": "https://www.restaurangophelia.se/sv",
+        "menu_url": "https://www.restaurangophelia.se/sv#lunch",
+        "instagram": "https://www.instagram.com/restaurang_ophelia",
+        "area": "Lindholmen",
+        "lunch_hours": "Mån–fre 11.00–14.00"
+    },
     "Kooperativet": {
         "description": "Food court med sex kök under samma tak mitt i Lindholmen Science Park, och en av stadens mest välbesökta lunchrestauranger på vardagar.",
         "maps": "https://maps.app.goo.gl/my6t4v54DmjTEBpt6",
