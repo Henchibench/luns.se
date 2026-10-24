@@ -82,7 +82,7 @@ export default function LocationSelect({
   };
 
   return (
-    <div ref={rot} className="relative flex-none">
+    <div ref={rot} className="relative min-w-0">
       <button
         type="button"
         onClick={() => (open ? setOpen(false) : öppna())}
@@ -90,9 +90,9 @@ export default function LocationSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Välj plats"
-        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-11 text-[var(--ink)] transition-colors hover:bg-[var(--hi)]"
+        className="flex max-w-full min-h-11 wide:min-h-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-2 py-1.5 font-mono text-11 text-[var(--ink)] transition-colors hover:bg-[var(--hi)]"
       >
-        {nuvarande?.label}
+        <span className="truncate">{nuvarande?.label}</span>
         <span aria-hidden="true" className="text-[9px] text-[var(--mut)]">
           ▾
         </span>

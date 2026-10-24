@@ -17,7 +17,14 @@ function load(path, dependencies = {}, storage) {
   }, storage);
   return exports;
 }
-const news = load('../nextjs-luns-se/src/app/lib/news.ts');
+const currentNews = load('../nextjs-luns-se/src/app/lib/news.ts');
+// Bevara områdesfallen från version 15 även efter en ny gemensam nyhet.
+const news = {
+  ...currentNews,
+  NEWS_VERSION: 15,
+  visibleNews: (area, contact) => currentNews.visibleNews(area, contact).filter(item => item.version <= 15),
+  latestNewsVersion: (area, contact) => Math.max(0, ...news.visibleNews(area, contact).map(item => item.version)),
+};
 function visitor({ saved = '13', first = false, blocked = false } = {}) {
   let state;
   let mounted = false;
@@ -98,8 +105,8 @@ test('blockerad eller skadad lagring ger ingen automatisk nyhetsruta', () => {
 });
 
 test('alla poster har en publicerad version och senaste räknaren stämmer', () => {
-  for (const item of news.NEWS_ITEMS) assert.ok(Number.isInteger(item.version) && item.version > 0);
-  assert.equal(Math.max(...news.NEWS_ITEMS.map(item => item.version)), news.NEWS_VERSION);
+  for (const item of currentNews.NEWS_ITEMS) assert.ok(Number.isInteger(item.version) && item.version > 0);
+  assert.equal(Math.max(...currentNews.NEWS_ITEMS.map(item => item.version)), currentNews.NEWS_VERSION);
 });
 
 test('Ophelia annonseras efter version 14 bara på Lindholmen och länkar till kontakt', () => {
@@ -110,4 +117,11 @@ test('Ophelia annonseras efter version 14 bara på Lindholmen och länkar till k
   assert.equal(item.action, 'contact');
   assert.equal(item.actionLabel, 'Tjôta here');
   assert.ok(!news.visibleNews('Järntorget/Linné', true).some(item => item.title.includes('Ophelia')));
+});
+
+test('mobilmenyn är en gemensam nyhet efter områdesnyheterna', () => {
+  for (const area of [undefined, 'Mjärdevi', 'Lindholmen', 'Järntorget/Linné']) {
+    assert.equal(currentNews.latestNewsVersion(area, false), 16);
+    assert.ok(currentNews.visibleNews(area, false).some(item => item.version === 16 && item.title.includes('mobilen')));
+  }
 });

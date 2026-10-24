@@ -27,9 +27,15 @@ export interface NewsItem {
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 15;
+export const NEWS_VERSION = 16;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    version: 16,
+    date: '2026-10-24',
+    title: 'Mer plats för lunchen på mobilen',
+    body: 'Sök, karta, Tjôta med Luns och inställningar har flyttat in bakom menyknappen uppe till höger. Platsvalet och veckodagarna finns kvar direkt på sidan. Vid temperaturen ser du också aktuell vecka.',
+  },
   {
     version: 15,
     area: 'Lindholmen',

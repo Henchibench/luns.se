@@ -97,12 +97,9 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp, även om restaurangen skrivit om den lite.',
   },
   {
-    // Kugghjulet är nytt och har ingen självklar innebörd: det kan lika gärna
-    // vara filter eller ett konto. Steget säger vad som finns bakom det, så
-    // det inte blir en knapp man aldrig råkar trycka på.
     targets: ['[data-tour="settings"]'],
-    title: 'Resten bor i kugghjulet',
-    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
+    title: 'Inställningar och mer',
+    body: 'På mobilen finns sök, karta, kontakt och inställningar i menyn här. På datorn öppnar kugghjulet inställningarna. Där väljer du ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.

@@ -300,6 +300,30 @@ Verifiering: `node --test scripts/bo-menu.test.mjs`; full testserverkedja
 och godkänd kontroll av text- och bildläge på mobil (390 px) och dator
 (1440 px), inklusive simulerat bildbyte, sökning och favoritläge.
 
+## Kompakt mobilhuvud och kalendervecka, 2026-10-24
+
+Henrik ville ge lunchmenyerna mer utrymme på mobilen. Header samlar nu sök,
+karta, kontakt och inställningar i en utfällbar meny under 760px. Loggan,
+platsvalet, vädret och dagarna finns kvar utanför menyn. Ordmärket LUNS.SE
+visas på dator; på mobil räcker loggan. Långa platsnamn får kortas visuellt
+med hela namnet tillgängligt i platslistan. Menyn ligger ovanpå innehållet,
+kan rullas på låg skärm och stängs via menyknappen, Escape, klick utanför
+eller ett menyval. Escape lämnar fokus på menyknappen. Olästa nyheter
+markeras på samma knapp och på inställningsvalet.
+
+Sökningen filtrerar som tidigare medan man skriver. Sökknappen eller
+Enter stänger menyn. En aktiv sökning visas separat med Rensa även när
+menyn är stängd. Datorns kontroller ligger kvar direkt i sidhuvudet.
+Introduktionsrundan och nyhetsversion 16 förklarar mobilmenyn.
+
+`calendarWeek.ts` beräknar aktuell kalendervecka i Europe/Stockholm.
+Veckan visas vid temperaturen, uppdateras varje minut och när fönstret får
+fokus. Den avser dagens kalendervecka även under helgen, då själva
+lunchlistan redan kan visa kommande vecka. Test täcker årsskifte, sommartid
+och byte vid svensk midnatt. Veckan beror inte på när den statiska sajten
+byggdes. Minnestest, nyhetstest, veckotest och produktionsbygge passerar.
+Kontroll på fysisk telefon med Safaris tangentbord återstår.
+
 ## Mobilens nedersta knappar och adressfält, 2026-10-20
 
 Henrik rapporterade att Restauranger och Filter kunde hamna bakom mobilens
