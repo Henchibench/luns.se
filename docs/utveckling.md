@@ -351,9 +351,10 @@ separata problem med Safaris adressfält eller vertikal studs.
 MenuList tillåter nu radbrytning även i långa sammanhängande textföljder.
 Rättens textkolumn kan krympa och långa restaurangnamn samt länkrader får
 brytas inom tillgänglig bredd. Texten bevaras; innehåll klipps inte och
-menykällorna ändras inte. Dokumentationstest och bygge körs inför leverans,
-följt av breddkontroll i mobilvyn. Vertikal rullning och kartans gester
-har inte ändrats.
+menykällorna ändras inte. Dokumentationstest och bygge passerade. Efter
+bygget var listans scrollbredd 390px vid 390px skärmbredd och 320px vid
+320px, med samma menydata och större text. Vertikal rullning och kartans
+gester har inte ändrats.
 
 ## Mobilens nedersta knappar och adressfält, 2026-10-20
 
