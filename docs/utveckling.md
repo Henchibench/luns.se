@@ -89,7 +89,7 @@ Statistikhämtningen filtrerar händelsen innan rankningen i Umami. Tomt svar
 ger noll, medan felaktigt svar eller misslyckad hämtning utelämnar måttet.
 Äldre statistikfiler utan fältet fungerar fortfarande. Umami behöver ingen
 manuell registrering av händelsen; den syns under Events efter första
-registreringen från den publicerade sajten. Påskägget får ingen nyhet.
+registreringen från den publicerade sajten.
 
 Verifiering: 14 Node tester inklusive oraklet och minnesreglerna samt tre
 Python tester passerar. Testerna täcker återöppning, omladdning, parallella
@@ -556,7 +556,12 @@ https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html.
 Henrik beställde ett hemligt kosmiskt påskägg med fem snabba tryck på loggan,
 rymddimma, en animerad gud, ljudeffekter och en slumpad riktig lunch.
 Fem tryck inom tre sekunder öppnar `components/oracle/LunchOracle.tsx`.
-Ingen nyhet publiceras eftersom funktionen ska upptäckas som en hemlighet.
+Henrik beställde senare samma dag en ledtråd i den ännu osläppta nyheten
+”Mer plats för lunchen på mobilen”. Den nämner ett gömt påskägg och
+”klicka fem gånger”, men avslöjar inte var besökaren ska klicka.
+Nyhetsversion 16 behålls eftersom samma planerade nyhetskort uppdateras.
+Verifiering av ledtråden: elva tester för nyheter och minnesregler samt
+produktionsbygge passerade.
 
 Urvalet fryses vid öppning från tavlans redan filtrerade `sections.dishes`.
 Område, vald dag, sökning, matfilter och favoritfilter gäller därför även

@@ -34,7 +34,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     version: 16,
     date: '2026-10-24',
     title: 'Mer plats för lunchen på mobilen',
-    body: 'Sök, karta, Tjôta med Luns och inställningar har flyttat in bakom menyknappen uppe till höger. Platsvalet och veckodagarna finns kvar direkt på sidan. Vid temperaturen ser du också aktuell vecka.',
+    body: 'Sök, karta, Tjôta med Luns och inställningar har flyttat in bakom menyknappen uppe till höger. Platsvalet och veckodagarna finns kvar direkt på sidan. Vid temperaturen ser du också aktuell vecka. Psst! Vi har gömt ett påskägg någonstans på sidan. En liten ledtråd: ”klicka fem gånger”.',
   },
   {
     version: 15,
