@@ -97,6 +97,11 @@ Python tester passerar. Testerna täcker återöppning, omladdning, parallella
 Läsning via den befintliga delningskopplingen gav 0 upptäckter och 13 sök
 under de senaste 30 dagarna. Den verkliga statistiken används i testvyn.
 Ingen påhittad händelse skickades till produktionsstatistiken.
+Produktionsbygget passerade. Testservern byggdes utan skrapning från
+`0aad314` och rapporterar frisk status. I mobilvy 390 × 844 visas den
+verifierade nollan, rätt period och förklaringen utan sidledsflöde.
+Inga fel eller varningar registrerades under kontrollen av statistikrutan.
+Första riktiga registreringen i Umami kan kontrolleras efter publicering.
 
 ## Låst Ubuntu-version i Actions, 2026-10-20
 

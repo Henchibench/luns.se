@@ -42,6 +42,7 @@ Minnestester och produktionsbygge passerade. I testserverns mobilvy
 390 × 844 kontrollerades kontrasten framför de samlade ringarna med en
 lång källrätt. Repliken är 20 px med större text aktiv, utan sidledsflöde
 eller fel i webbläsaren. Appbygget är `54ab922`.
+Även datorvy 1280 × 720 kontrollerades efter statistikändringen i `0aad314`.
 
 Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
