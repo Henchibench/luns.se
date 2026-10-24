@@ -6,6 +6,7 @@ uppdrag. Importerade avsnitt beskriver tidigare observationer, inte nuläget.
 | Uppdrag | Börja här | Historiska detaljer |
 |---|---|---|
 | Sajt, menyvisning, karta, textstorlek | [utveckling](utveckling.md) | [repots två halvor](minne/repo-02.md) |
+| Besöksstatistik, sök och bevakningssiffror | [utveckling](utveckling.md) | [äldre statistikflöde](minne/repo-02.md) |
 | Skrivstil och nyhetstexter | [utveckling, skrivstil](utveckling.md) | — |
 | Kontaktformulär, Turnstile, Resend | [kontakt](kontakt.md) | — |
 | Blänkare om nya restauranger sedan besöket | [områdesvis besökshistorik](utveckling.md) | — |

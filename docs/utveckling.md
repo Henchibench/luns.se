@@ -42,6 +42,31 @@ En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
 
+## Statistikens period och bevakningar
+
+Kontrollerat 2026-10-24 efter Henriks frågor om Så används sajten.
+`scripts/fetch_stats.py` använder ett rullande fönster om 30 dagar för sök,
+bevakningshändelser och övriga listor. Bara sammanfattningens BESÖK 7 DAGAR
+har ett separat fönster. Urvalet filtreras till värdnamnet luns.se och Sverige.
+Sök registreras högst en gång per sidladdning efter minst två tecken och
+1,2 sekunders skrivpaus. Ändrade sökord i samma laddning ger inga nya händelser.
+
+`dish-favorite-toggle` skickas både när en bevakning läggs till och tas bort.
+Statistikhämtningen grupperar på rättens normaliserade namn utan att filtrera
+`favorited`. Måttet är därför händelser, inte aktiva bevakningar eller unika
+personer. Hämtningsskriptet behåller högst tio poster i svarets ordning;
+BarList visar alla dessa och har ingen begränsning till två eller de senaste.
+Den offentliga statistikfilen från 2026-10-23 09:33 UTC innehöll två olika
+rättnamn med en händelse vardera och 13 sökhändelser under 30 dagar. Detta
+bevisar inte att bara två rätter är aktivt bevakade i besökarnas webbläsare.
+
+Henrik bad ta bort fottextens två förklarande meningar om sammanräkning och
+byggtid. Endast uppdateringsdatumet är kvar. Sökrubriken visar nu periodens
+etikett från statistikfilen. Insamling och beräkningar ändras inte.
+Verifiering: kodspårning från händelser via hämtning till BarList, publicerad
+statistikfil, minnestest och bygge utan skrapning. Testservern saknade
+stats.json, så samma offentliga fil används där för kontroll av visningen.
+
 ## Låst Ubuntu-version i Actions, 2026-10-20
 
 GitHub aviserade att ubuntu-latest flyttas till Ubuntu 26.04. På Henriks
