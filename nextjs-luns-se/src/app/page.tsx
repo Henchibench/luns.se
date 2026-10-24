@@ -3,6 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ContactForm from './components/contact/ContactForm';
 import { loadContactConfig, type ContactConfig, type ContactContext } from './lib/contact';
+import LunchOracle from './components/oracle/LunchOracle';
+import { offeringsFromSections } from './lib/oracle';
 import Header from './components/board/Header';
 import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
@@ -125,6 +127,7 @@ export default function LunchBoard() {
   const [toast, setToast] = useState<string | null>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
+  const [oracleOpen, setOracleOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
   const [newsFromSettings, setNewsFromSettings] = useState(false);
@@ -174,12 +177,12 @@ export default function LunchBoard() {
   // finns med från början. Lägg inte nyhetsrutan över något besökaren öppnat.
   useEffect(() => {
     if (!news.unread || loading || error || needsChoice || !location || !contactConfigLoaded
-      || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
+      || oracleOpen || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
     setNewsFromSettings(false);
     setNewsOpen(true);
     news.markSeen(true);
   }, [news.unread, news.markSeen, loading, error, needsChoice, location, contactConfigLoaded,
-    welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
+    oracleOpen, welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
 
   useEffect(() => {
     loadMenuData()
@@ -543,8 +546,10 @@ export default function LunchBoard() {
       className="luns-viewport grid grid-cols-1 grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
+      {oracleOpen && <LunchOracle offerings={offeringsFromSections(sections)} context={`${location?.label ?? 'Valt område'}, ${heading}`} onClose={() => setOracleOpen(false)} onAccept={name => { setOracleOpen(false); scrollToRestaurant(name); }} />}
       <div className={shell}>
       <Header
+        onOpenOracle={() => setOracleOpen(true)}
         days={DAYS}
         selectedDay={day}
         onSelectDay={next => {

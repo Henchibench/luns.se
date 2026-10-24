@@ -514,3 +514,31 @@ alfa-komponerat kort, minnestest, Next-bygge och visuell kontroll av nyheter,
 inställningar och lunchlistan i båda teman. Beräkningen omfattar dessa ytor,
 inte en fullständig tillgänglighetsgranskning av hela sajten. Metod:
 https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html.
+
+## Lunsoraklet, 2026-10-24
+
+Henrik beställde ett hemligt kosmiskt påskägg med fem snabba tryck på loggan,
+rymddimma, en animerad gud, ljudeffekter och en slumpad riktig lunch.
+Fem tryck inom tre sekunder öppnar `components/oracle/LunchOracle.tsx`.
+Ingen nyhet publiceras eftersom funktionen ska upptäckas som en hemlighet.
+
+Urvalet fryses vid öppning från tavlans redan filtrerade `sections.dishes`.
+Område, vald dag, sökning, matfilter och favoritfilter gäller därför även
+här. Bildmenyer och äldre referensmenyer deltar aldrig. Tomt urval ger en
+förklaring och återgång till valen. Varje unik rätt per restaurang får en
+lott. Beslutet visar källtext, restaurang och eventuellt pris, och accepterat
+beslut leder tillbaka till restaurangen i lunchlistan. Ingen meny skapas.
+
+Three.js laddas med dynamisk import först när oraklet öppnas. Tallrik,
+ögon, bestick, stjärnor och banor byggs som lokal geometri. Web Audio skapar
+ljud efter knapptrycket som överlämnar lunchvalet. Inga externa modeller,
+ljudfiler, konton eller AI används. Stäng och ljudknapp finns hela tiden.
+Escape stänger, fokus hålls i dialogen och återgår till loggan. Bakgrunden
+är inert under besöket. Timers, ljud och grafikresurser frigörs vid stängning.
+Minskad rörelse hoppar över väntan och visar stilla grafik. Utan WebGL finns
+en stilla tallrik och samma fungerande lottning. Ljudfel hindrar inte valet.
+
+Första verifiering: fem Node tester inklusive minnestester, TypeScript,
+produktionsbygge och npm audit med enbart produktionsberoenden passerade.
+Audit gav noll träffar. Three.js är låst till 0.186.1. Visuell kontroll och
+fullständigt flöde på testservern dokumenteras efter körning.

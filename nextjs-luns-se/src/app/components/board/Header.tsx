@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { nextLogoTaps } from '../../lib/oracle';
 import { calendarWeek } from '../../lib/calendarWeek';
 import LocationSelect from './LocationSelect';
 import type { LunsLocation } from '../../lib/menu';
@@ -23,6 +24,7 @@ interface Props {
   view: 'list' | 'map';
   onToggleView: () => void;
 
+  onOpenOracle: () => void;
   onOpenSettings: () => void;
   onOpenContact?: () => void;
   /** Finns det något oläst i nyhetslistan? Tänder pricken på kugghjulet. */
@@ -49,11 +51,13 @@ export default function Header({
   view,
   onToggleView,
   onOpenSettings,
+  onOpenOracle,
   onOpenContact,
   newsUnread,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [week, setWeek] = useState<number | null>(null);
+  const logoTaps = useRef<number[]>([]);
   const headerRef = useRef<HTMLElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
 
@@ -90,6 +94,11 @@ export default function Header({
   return (
     <header ref={headerRef} className="relative flex flex-wrap items-center gap-x-2 gap-y-2 px-3.5 pt-3 pb-2 wide:gap-x-3.5 wide:px-7 wide:pt-4 wide:pb-2.5">
       <div className="order-1 flex min-w-0 flex-1 items-center gap-2 wide:order-none wide:flex-none wide:gap-3">
+        <button type="button" aria-label="Luns" className="flex-none rounded-lg touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--acc)]" onClick={() => {
+          const next = nextLogoTaps(logoTaps.current, performance.now());
+          logoTaps.current = next.taps;
+          if (next.open) { setMenuOpen(false); onOpenOracle(); }
+        }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/luns-logo-transparent.png"
@@ -98,6 +107,7 @@ export default function Header({
           height={36}
           className="flex-none h-8 w-8 object-contain wide:h-9 wide:w-9"
         />
+        </button>
         <div className="flex flex-none flex-col wide:flex-row wide:items-center wide:gap-3">
         <span className="font-mono text-16 font-semibold tracking-[.04em] text-[var(--acc)] wide:text-18">
           LUNS<span className="text-[var(--mut)]">.SE</span>
