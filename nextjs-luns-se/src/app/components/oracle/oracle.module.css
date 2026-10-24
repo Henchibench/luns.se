@@ -1,4 +1,4 @@
-.oracle { position:fixed; inset:0; z-index:1000; overflow:auto; overscroll-behavior:contain; background:#020409; color:#f1eee5; isolation:isolate; font-family:var(--font-body),sans-serif; animation:arrive 1.2s both; }
+.oracle { position:fixed; inset:var(--luns-preview-offset,0px) 0 0; z-index:1000; overflow:auto; overscroll-behavior:contain; background:#020409; color:#f1eee5; isolation:isolate; font-family:var(--font-body),sans-serif; animation:arrive 1.2s both; }
 .oracle button { min-height:44px; cursor:pointer; }
 .oracle button:focus-visible { outline:2px solid #ffe2a5; outline-offset:5px; }
 .controls { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:12px; padding: max(12px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 10px max(20px, env(safe-area-inset-left)); background:linear-gradient(#020409 45%,#02040900); }
@@ -12,6 +12,7 @@
 .words h1 { font-family:var(--font-heading),sans-serif; font-size:clamp(28px,4.5vw,50px); line-height:1.12; letter-spacing:-.035em; font-weight:600; margin:0 0 22px; text-wrap:balance; }
 .words p { max-width:510px; margin:0 auto 24px; font-size:var(--fs-16,16px); line-height:1.65; color:#c0cbd9; text-wrap:pretty; }
 .words .context { font-size:var(--fs-12,12px); color:#a4b2c7; margin:20px auto 0; }
+.words .category { color:#a4b2c7; font-size:var(--fs-12,12px); margin-bottom:12px; }
 .words .restaurant { color:#e9d7ae; font-size:var(--fs-18,18px); margin-bottom:10px; }
 .words .verdict { color:#e9d7ae; margin-bottom:14px; }
 .words .dish { font-size:clamp(25px,3.3vw,38px); overflow-wrap:anywhere; }

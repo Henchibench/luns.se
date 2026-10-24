@@ -69,6 +69,11 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
     };
   }, []);
 
+  useEffect(() => {
+    // A phase change removes its CTA. Keep Escape and keyboard navigation in the dialog.
+    if (dialog.current && !dialog.current.contains(document.activeElement)) dialog.current.focus();
+  }, [phase]);
+
   const start = () => {
     if(rolling.current) return;
     const chosen=chooseOffering(pool);
@@ -118,9 +123,10 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
             {pool.length ? <>
               <p>Lämna över beslutet till en högre makt. Trotsa domen och må ditt kaffe vara ljummet i sju år.</p>
               <button type="button" className={styles.primary} onClick={start}>Jag överlämnar mitt lunchöde</button>
-              <p className={styles.context}>{context}<br/>{pool.length} rätter. Dina filter gäller även i rymden.</p>
+              <p className={styles.context}>{context}<br/>{pool.length} {pool.length === 1 ? 'rätt' : 'rätter'}. Dina filter gäller även i rymden.</p>
             </> : <>
-              <p>Även en rymdgud behöver en meny. Det finns inga aktuella rätter med dina val för {context.toLocaleLowerCase('sv')}.</p>
+              <p>Även en rymdgud behöver en meny. Det finns inga aktuella rätter med dina val.</p>
+              <p className={styles.context}>{context}</p>
               <button type="button" className={styles.primary} onClick={onClose}>Tillbaka och ändra mina val</button>
             </>}
           </div>}
@@ -130,6 +136,7 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
           </div>}
           {phase === 'verdict' && result && <div className={styles.reveal}>
             <p className={styles.verdict}>Universum har tallrikt.</p>
+            <p className={styles.category}>{result.category}</p>
             <h1 id="oracle-title" className={styles.dish}>{result.description}</h1>
             <p className={styles.restaurant}>{result.restaurant}{result.price ? ` · ${result.price}` : ''}</p>
             <p className={styles.context}>{context}</p>

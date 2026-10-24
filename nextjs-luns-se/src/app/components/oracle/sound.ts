@@ -29,8 +29,8 @@ export function createOracleSound() {
       tone(180, 4.5, 0.15, 680, 1);
     },
     ping() { tone(1320, 1.5, 0.55); tone(1760, 0.8, 0.12); },
-    mute(value: boolean) { muted = value; master.gain.setTargetAtTime(muted ? 0 : 0.16, context.currentTime, 0.05); },
-    pause() { void context.suspend().catch(() => {}); },
+    mute(value: boolean) { muted = value; if (!muted && !document.hidden) void context.resume().catch(() => {}); master.gain.setTargetAtTime(muted ? 0 : 0.16, context.currentTime, 0.05); },
+    pause() { voices.forEach(voice => { try { voice.stop(); } catch { /* Already stopped. */ } }); void context.suspend().catch(() => {}); },
     resume() { if (!muted) void context.resume().catch(() => {}); },
     dispose() { voices.forEach(voice => { try { voice.stop(); } catch { /* Already stopped. */ } }); void context.close().catch(() => {}); },
   };

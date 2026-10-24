@@ -21,13 +21,13 @@ test('five clicks must fit within three seconds and activation resets', () => {
 });
 
 test('only visible real dishes participate, never images or old reference menus', () => {
-  const dish={description:'Källans rätt med tillbehör',price:'145 kr'};
+  const dish={category:'Lunch',description:'Källans rätt med tillbehör',price:'145 kr'};
   const pool=offeringsFromSections([
-    {name:'A',dishes:[dish,dish,{description:'  ',price:''}]},
+    {name:'A',dishes:[dish,dish,{category:'Lunch',description:'  ',price:''}]},
     {name:'B',dishes:[],referenceMenu:{dishes:[dish]},menuImage:{url:'old.jpg'}},
-    {name:'C',dishes:[{description:'Annan rätt',price:''}]},
+    {name:'C',dishes:[{category:'Fisk',description:'Annan rätt',price:''}]},
   ]);
-  assert.deepEqual(pool,[{restaurant:'A',...dish},{restaurant:'C',description:'Annan rätt',price:''}]);
+  assert.deepEqual(pool,[{restaurant:'A',...dish},{restaurant:'C',category:'Fisk',description:'Annan rätt',price:''}]);
   assert.deepEqual(offeringsFromSections([]),[]);
 });
 
@@ -36,4 +36,17 @@ test('draw returns a source object, covers both endpoints and has no invented fa
   assert.equal(chooseOffering(pool,()=>0),pool[0]);
   assert.equal(chooseOffering(pool,()=>0.999999),pool[1]);
   assert.equal(chooseOffering([],()=>0.5),null);
+});
+
+ test('explicit extras are not a lunch, and source category and price distinguish dishes', () => {
+  const dishes = [
+    {category:'Benne bites',description:'Tiramisu',price:'35 kr'},
+    {category:'Sallad',description:'Tillval: bulgur',price:'5 kr'},
+    {category:'Pajer',description:'Dressing: vitlök',price:''},
+    {category:'Caesarsallad',description:'Kyckling',price:'110 kr'},
+    {category:'Sallad',description:'Kyckling',price:'115 kr'},
+  ];
+  const pool=offeringsFromSections([{name:'A',dishes}]);
+  assert.equal(pool.length,2);
+  assert.deepEqual(pool.map(dish=>dish.category),['Caesarsallad','Sallad']);
 });
