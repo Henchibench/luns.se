@@ -25,7 +25,7 @@ const news = {
   visibleNews: (area, contact) => currentNews.visibleNews(area, contact).filter(item => item.version <= 15),
   latestNewsVersion: (area, contact) => Math.max(0, ...news.visibleNews(area, contact).map(item => item.version)),
 };
-function visitor({ saved = '13', first = false, blocked = false } = {}) {
+function visitor({ saved = '13', first = false, blocked = false, catalog = news } = {}) {
   let state;
   let mounted = false;
   let effect;
@@ -39,7 +39,7 @@ function visitor({ saved = '13', first = false, blocked = false } = {}) {
       useEffect(callback) { if (!mounted) effect = callback; },
       useCallback(callback) { return callback; },
     },
-    '../lib/news': news,
+    '../lib/news': catalog,
     './useWelcome': { welcomeSeen: () => !first },
     '../utils/analytics': { trackEvent() {} },
   }, storage);
@@ -122,6 +122,11 @@ test('Ophelia annonseras efter version 14 bara på Lindholmen och länkar till k
 test('mobilmenyn är en gemensam nyhet efter områdesnyheterna', () => {
   for (const area of [undefined, 'Mjärdevi', 'Lindholmen', 'Järntorget/Linné']) {
     assert.equal(currentNews.latestNewsVersion(area, false), 16);
+    const user = visitor({ saved: '15', catalog: currentNews });
+    assert.equal(user.render(area).unread, true);
+    user.render(area).markSeen();
+    assert.equal(user.saved(), '16');
+    assert.equal(user.render(area).unread, false);
     assert.ok(currentNews.visibleNews(area, false).some(item => item.version === 16 && item.title.includes('mobilen')));
   }
 });

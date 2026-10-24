@@ -322,7 +322,15 @@ fokus. Den avser dagens kalendervecka även under helgen, då själva
 lunchlistan redan kan visa kommande vecka. Test täcker årsskifte, sommartid
 och byte vid svensk midnatt. Veckan beror inte på när den statiska sajten
 byggdes. Minnestest, nyhetstest, veckotest och produktionsbygge passerar.
-Kontroll på fysisk telefon med Safaris tangentbord återstår.
+Webbläsarkontroll med större text gjordes vid 320, 390, 760 och 1440px.
+Vid 390px minskade sidhuvudets höjd från 152,75 till 116px. Vid 320px gav
+rutnätets automatiska minsta kolumnbredd först 6px överbredd. En explicit
+kolumn med minsta bredd noll och smalare sidmarginal i dagknapparna löste det;
+uppmätt bredd och scrollbredd är båda 320px även med Järntorget/Linné valt.
+Sök med Rensa, karta och återgång, kontakt, inställningar, Escape och byte
+mellan mobil och dator kontrollerades. Båda färgteman granskades. Ingen
+inskickning gjordes från kontaktformuläret. Kontroll på fysisk telefon med
+Safaris tangentbord återstår.
 
 ## Mobilens nedersta knappar och adressfält, 2026-10-20
 
