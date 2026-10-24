@@ -1,4 +1,4 @@
-.oracle { position:fixed; inset:var(--luns-preview-offset,0px) 0 0; z-index:1000; overflow:auto; overscroll-behavior:contain; background:#010305; color:#f3ede0; isolation:isolate; font-family:var(--font-body),sans-serif; animation:arrive 1s both; }
+.oracle { position:fixed; inset:var(--luns-preview-offset,0px) 0 0; z-index:1000; overflow:auto; overflow-x:hidden; overscroll-behavior:contain; background:#010305; color:#f3ede0; isolation:isolate; font-family:var(--font-body),sans-serif; animation:arrive 1s both; }
 .oracle button { min-height:44px; cursor:pointer; }
 .oracle button:focus-visible { outline:2px solid #f6d097; outline-offset:6px; }
 .controls { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:18px; padding:max(12px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) 12px max(24px,env(safe-area-inset-left)); background:linear-gradient(#010305dc,transparent); }
@@ -28,7 +28,7 @@
 .intro h1 { animation:materialize 2s 3.5s both; }
 .intro p:last-child { animation:materialize 1.8s 7s both; }
 .reveal { animation:materialize 1.2s both; }
-.offerings { position:absolute; inset:-20vh -10vw 0; overflow:hidden; }
+.offerings { position:absolute; inset:-20vh 0 0; overflow:hidden; }
 .offerings span { position:absolute; left:50%; top:50%; width:220px; max-height:3.2em; overflow:hidden; font-size:var(--fs-12,12px); color:#e9d7ae; text-shadow:0 2px 7px #000; animation:offering 6.7s linear both; animation-delay:calc(var(--delay) * 0); --radius:clamp(110px,21vw,300px); }
 .offerings span:nth-child(even) { color:#8ebac4; }
 [data-phase='ritual'] .words { animation:materialize 1s both; }
