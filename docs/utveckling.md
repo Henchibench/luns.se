@@ -339,6 +339,22 @@ mellan mobil och dator kontrollerades. Båda färgteman granskades. Ingen
 inskickning gjordes från kontaktformuläret. Kontroll på fysisk telefon med
 Safaris tangentbord återstår.
 
+## Lunchlistans rörelse i sidled, 2026-10-24
+
+Henrik upplevde att menylistan inte satt fast på mobilen. I testwebbläsaren
+mättes 447px scrollbredd i en 390px bred lunchlista på Lindholmen, med större
+text. Oishiis källtext innehåller långa följder med kommatecken utan
+mellanslag, som inte bröts och skapade horisontellt rullutrymme. Detta är
+en verifierad möjlig orsak till rörelse i sidled, inte belägg för eventuella
+separata problem med Safaris adressfält eller vertikal studs.
+
+MenuList tillåter nu radbrytning även i långa sammanhängande textföljder.
+Rättens textkolumn kan krympa och långa restaurangnamn samt länkrader får
+brytas inom tillgänglig bredd. Texten bevaras; innehåll klipps inte och
+menykällorna ändras inte. Dokumentationstest och bygge körs inför leverans,
+följt av breddkontroll i mobilvyn. Vertikal rullning och kartans gester
+har inte ändrats.
+
 ## Mobilens nedersta knappar och adressfält, 2026-10-20
 
 Henrik rapporterade att Restauranger och Filter kunde hamna bakom mobilens
