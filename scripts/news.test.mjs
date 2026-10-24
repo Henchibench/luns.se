@@ -108,6 +108,6 @@ test('Ophelia annonseras efter version 14 bara på Lindholmen och länkar till k
   assert.equal(user.render('Lindholmen').unread, true);
   const item = news.visibleNews('Lindholmen', true).find(item => item.title.includes('Ophelia'));
   assert.equal(item.action, 'contact');
-  assert.equal(item.actionLabel, 'Tjôta med Luns');
+  assert.equal(item.actionLabel, 'Tjôta here');
   assert.ok(!news.visibleNews('Järntorget/Linné', true).some(item => item.title.includes('Ophelia')));
 });

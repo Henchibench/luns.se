@@ -38,7 +38,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     body: 'Flera av er har tipsat om Restaurang Ophelia — nu finns den med bland lunchställena på Lindholmen. Tack för alla tips! Saknar du också ett ställe?',
     requiresContact: true,
     action: 'contact',
-    actionLabel: 'Tjôta med Luns',
+    actionLabel: 'Tjôta here',
   },
   {
     version: 14,
