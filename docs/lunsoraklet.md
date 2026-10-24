@@ -15,6 +15,12 @@ bär replikerna och Schibsted Grotesk bär kontrollerna. Scenen fyller skärmen,
 med repliker i nedre delen, stor gestalt ovanför och diskreta kontroller.
 Ingen vanlig panel eller liten figur ovanför ett formulär.
 
+Henrik bad också att kosmos skulle fylla hela skärmen. Rymddimman ritas
+nu i skärmkoordinater och täcker hela webbläsarytan oavsett proportioner
+eller kameraläge. Den tidigare svarta toningen över nederdelen är borttagen.
+Stjärnor och dimma fortsätter bakom texten, med en mjuk lokal skugga för
+läsbarhet. Detta ändrar bakgrunden i vyn, inte webbläsarens helskärmsläge.
+
 Förlopp: omkring fjorton sekunders inträde, inväntat lunchval, åtta sekunders ritual,
 sedan domen. Kameran färdas fram och ringarna rör sig fram till ritualens
 sista 2,4 sekunder, då de samlas i ett gemensamt plan. De låser sig vid

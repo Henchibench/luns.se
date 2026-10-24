@@ -6,11 +6,12 @@
 .signature { margin-right:auto; color:#b7b1a5; font-size:var(--fs-13,13px); }
 .scene { position:fixed; inset:var(--luns-preview-offset,0px) 0 0; z-index:-3; overflow:hidden; }
 .scene canvas { width:100%; height:100%; display:block; }
-.backdrop { position:fixed; inset:0; z-index:-2; background:url('/oracle/oracle-entity.webp') center 10% / auto 70% no-repeat #010305; opacity:.6; }
-.veil { position:fixed; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(0deg,#010305 0%,#010305ec 17%,#01030596 36%,transparent 64%),radial-gradient(ellipse at 50% 35%,transparent 28%,#010305a0 90%); }
+.backdrop { position:fixed; inset:0; z-index:-2; background:url('/oracle/oracle-entity.webp') center 10% / auto 70% no-repeat,radial-gradient(ellipse at 10% 80%,#0a2630b3,transparent 65%),radial-gradient(ellipse at 90% 10%,#35230c99,transparent 65%),#010305; opacity:.6; }
+.veil { position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 50% 35%,transparent 35%,#01030528 100%); }
 .content { width:min(100%,1100px); margin:auto; padding:0 24px max(35px,env(safe-area-inset-bottom)); min-height:calc(100dvh - 80px - var(--luns-preview-offset,0px)); display:flex; flex-direction:column; justify-content:flex-end; text-align:center; }
 .apparition { position:relative; flex:1; min-height:32dvh; pointer-events:none; }
-.words { position:relative; width:100%; max-width:760px; margin:0 auto; padding:0 0 12px; text-shadow:0 2px 26px #000; }
+.words { position:relative; isolation:isolate; width:100%; max-width:760px; margin:0 auto; padding:0 0 12px; text-shadow:0 2px 26px #000; }
+.words::before { content:''; position:absolute; z-index:-1; inset:-26px -40px; pointer-events:none; background:radial-gradient(ellipse,#010305a6 5%,#01030566 50%,transparent 74%); filter:blur(18px); }
 .words h1 { font-family:var(--font-heading),sans-serif; font-size:clamp(35px,5.5vw,72px); line-height:1.02; letter-spacing:-.04em; font-weight:500; margin:0 0 20px; text-wrap:balance; }
 .words p { max-width:470px; margin:0 auto 20px; font-size:var(--fs-16,16px); line-height:1.6; color:#d0c8b8; text-wrap:pretty; }
 .words .context { font-size:var(--fs-12,12px); color:#a69f94; margin:18px auto 0; }
@@ -34,7 +35,6 @@
 .reveal { animation:materialize 1.2s both; }
 [data-phase='ritual'] .words { animation:materialize 1s both; }
 [data-phase='verdict'] .apparition { min-height:22dvh; }
-[data-phase='verdict'] .veil { background:linear-gradient(0deg,#010305 0%,#010305ed 44%,#01030580 75%,transparent); }
 @keyframes arrive { from { opacity:0; } to { opacity:1; } }
 @keyframes materialize { from { opacity:0; filter:blur(6px); transform:translateY(8px); } to { opacity:1; filter:blur(0); transform:translateY(0); } }
 .reduced *, .reduced { animation:none!important; transition:none!important; }

@@ -87,17 +87,18 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
   });
   const dust=new THREE.Points(dustGeometry,dustMaterial); scene.add(dust);
 
-  // Animated fractal fog, with room for darkness around the character and captions.
-  const fogMaterial=new THREE.ShaderMaterial({depthWrite:false,transparent:true,
-    uniforms:{time:{value:0},intensity:{value:0}},
-    vertexShader:`varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader:`varying vec2 vUv; uniform float time; uniform float intensity;
+  // A background in screen coordinates keeps the cosmos behind every part of the view.
+  const fogMaterial=new THREE.ShaderMaterial({depthWrite:false,depthTest:false,
+    uniforms:{time:{value:0},intensity:{value:0},aspect:{value:1}},
+    vertexShader:`varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position.xy,1.0,1.0);}`,
+    fragmentShader:`varying vec2 vUv; uniform float time; uniform float intensity; uniform float aspect;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+1.),f.x),f.y);}
       float fbm(vec2 p){float n=0.,a=.5;for(int i=0;i<5;i++){n+=a*noise(p);p=p*2.02+7.1;a*=.5;}return n;}
-      void main(){vec2 p=vUv*5.;float t=time*.025;float f=fbm(p+vec2(fbm(p+t),fbm(p-t)));float cloud=smoothstep(.25,.8,f);vec3 c=mix(vec3(.02,.09,.12),vec3(.18,.12,.055),vUv.x);float edge=1.-smoothstep(.1,.7,distance(vUv,vec2(.5,.6)));gl_FragColor=vec4(c*(.7+cloud*1.2),cloud*intensity*edge);}`,
+      void main(){vec2 p=(vUv-.5)*vec2(aspect,1.)*3.2;float t=time*.018;float f=fbm(p+vec2(fbm(p*.65+t),fbm(p*.65-t)));float cloud=smoothstep(.25,.78,f);float detail=fbm(p*1.7+vec2(t,-t));vec3 tint=mix(vec3(.018,.055,.075),vec3(.07,.037,.014),smoothstep(.15,.85,vUv.x));vec3 cosmos=vec3(.003,.006,.012)+tint*(.13+cloud*.75+detail*.16)*intensity;gl_FragColor=vec4(cosmos,1.0);}`,
   });
-  const fog=new THREE.Mesh(new THREE.PlaneGeometry(55,40),fogMaterial); fog.position.set(0,0,-9); scene.add(fog);
+  const fog=new THREE.Mesh(new THREE.PlaneGeometry(2,2),fogMaterial);
+  fog.frustumCulled=false; fog.renderOrder=-10; scene.add(fog);
   scene.add(new THREE.HemisphereLight(0x9ab6c2,0x16100a,1.5));
   const key=new THREE.PointLight(0xffb45f,130,50); key.position.set(-5,4,7); scene.add(key);
   const rim=new THREE.PointLight(0x408cae,140,50); rim.position.set(5,-1,4); scene.add(rim);
@@ -152,6 +153,7 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     const {width,height}=host.getBoundingClientRect(); if(!width||!height)return;
     renderer.setSize(width,height);composer.setSize(width,height);
     camera.aspect=width/height; baseDistance=camera.aspect<.75?18:14;
+    fogMaterial.uniforms.aspect.value=camera.aspect;
     camera.updateProjectionMatrix(); if(reduced)render(0);
   };
   const observer=new ResizeObserver(resize); observer.observe(host); resize();
