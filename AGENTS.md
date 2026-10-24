@@ -5,6 +5,9 @@ Svara på svenska. Ett kort ger mandat inom kortets omfattning, inte mer.
 
 ## Regler varje gång
 
+- Använd aldrig bindestreck eller tankstreck i egen löptext, nyheter eller svar.
+  Skriv om med punkt, komma eller naturliga meningar. Se docs/utveckling.md.
+
 - AI körs bara med Codex CLI och ChatGPT-prenumeration. Inga modell-API:er,
   modellnycklar eller fallback. Inga nya AI-tjänster eller OpenClaw.
 - Hitta aldrig på en rätt, meny, kategori eller allergenuppgift. Allt ska

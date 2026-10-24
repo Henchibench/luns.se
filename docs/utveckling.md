@@ -13,6 +13,18 @@ Versionsnummer, källor och tjänststatus är inte nyverifierade i denna text.
 - Använd designens text-10 … text-30, inte fasta text-[13px], så textskalning
   fungerar. INFO-emoji används även som signal: testa råtext innan den strippas.
 
+## Skrivstil
+
+Henriks uttryckliga skrivregel från 2026-10-24: använd aldrig bindestreck
+eller tankstreck i egen löptext, nyheter eller svar. Det gäller både korta
+streck och de längre varianterna. Skriv om med punkt, komma eller naturliga
+meningar. Regeln gäller redaktionell text; kodsyntax, adresser, filnamn och
+restaurangernas källtext ska inte förvanskas.
+
+Ophelias och Kooperativets nyheter innehöll tankstreck som Henrik ville ta
+bort. Båda ersattes med punkt och ny mening. Nyhetsversion 15 behålls vid
+textjusteringen. Verifiering: minnestest, nyhetstest och bygge utan skrapning.
+
 ## Leverera till Dev, inte main
 
 1. Läs git status; hämta origin/Dev. Bevara andras arbete.

@@ -35,7 +35,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     area: 'Lindholmen',
     date: '2026-10-24',
     title: 'Ophelia har flyttat in på Luns!',
-    body: 'Flera av er har tipsat om Restaurang Ophelia — nu finns den med bland lunchställena på Lindholmen. Tack för alla tips! Saknar du också ett ställe?',
+    body: 'Flera av er har tipsat om Restaurang Ophelia. Nu finns den med bland lunchställena på Lindholmen. Tack för alla tips! Saknar du också ett ställe?',
     requiresContact: true,
     action: 'contact',
     actionLabel: 'Tjôta here',
@@ -45,7 +45,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     area: 'Lindholmen',
     date: '2026-10-23',
     title: 'Kooperativets meny är på banan igen',
-    body: 'En saknad markering på Kooperativets hemsida gjorde att vår menyhämtning missade en del av menyn. Det är nu fixat – maten hittar fram igen. Tack för felanmälan!',
+    body: 'En saknad markering på Kooperativets hemsida gjorde att vår menyhämtning missade en del av menyn. Det är nu fixat. Maten hittar fram igen. Tack för felanmälan!',
   },
   {
     version: 13,
