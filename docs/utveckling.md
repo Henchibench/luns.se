@@ -541,5 +541,18 @@ en stilla tallrik och samma fungerande lottning. Ljudfel hindrar inte valet.
 
 Första verifiering: sex Node tester inklusive minnestester, TypeScript,
 produktionsbygge och npm audit med enbart produktionsberoenden passerade.
-Audit gav noll träffar. Three.js är låst till 0.186.1. Visuell kontroll och
-fullständigt flöde på testservern dokumenteras efter körning.
+Audit gav noll träffar. Three.js är låst till 0.186.1. Testservern byggdes med `--utan-skrap` på 5d00d35 och rapporterade frisk
+status. Visuellt kontrollerat i bredderna 320, 390 och 1280. Ingen sidledes
+överströmning i dialogen; kontrollerna ligger under testbandet och Stäng
+ligger kvar vid scroll. Verifierat: fem tryck, intro, animerad WebGL scen,
+ritual, källa/pris/kategori i resultat, ljudknapp, accept, avböjning,
+Escape mitt i ritualen, återöppning, fokusåtergång och återställd bakgrund.
+Tom sökträff gav tomläge. Sökning på Wonton nudlar gav endast den rätten
+från Oishii. Webbläsarloggen saknade fel och varningar under kontrollen.
+Elva befintliga kalender och nyhetstester passerade också.
+
+Byggkontrollen hittade Three.js i en separat fil om 356817 byte som inte
+refereras av den initiala HTML sidan. Mobilmått provades i webbläsaren på
+datorn. Fysisk iPhone, hörbar ljudkvalitet och operativsystemets läge för
+minskad rörelse är inte manuellt verifierade. WebGL reservläge är implementerat
+men har inte framtvingats i det visuella provet.
