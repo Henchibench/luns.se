@@ -311,6 +311,10 @@ kan rullas på låg skärm och stängs via menyknappen, Escape, klick utanför
 eller ett menyval. Escape lämnar fokus på menyknappen. Olästa nyheter
 markeras på samma knapp och på inställningsvalet.
 
+Henrik justerade placeringen samma dag: temperatur och vecka ligger direkt
+intill loggan, före platsväljaren, även på mobil. Veckan står under
+temperaturen på mobil och bredvid på dator. Nyhetsversion 16 behålls.
+
 Sökningen filtrerar som tidigare medan man skriver. Sökknappen eller
 Enter stänger menyn. En aktiv sökning visas separat med Rensa även när
 menyn är stängd. Datorns kontroller ligger kvar direkt i sidhuvudet.

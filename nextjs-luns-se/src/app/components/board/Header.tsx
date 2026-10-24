@@ -102,18 +102,18 @@ export default function Header({
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
-        {locations.length > 1 && (
-          <div className="min-w-0 flex-1 wide:order-2 wide:flex-none">
-            <LocationSelect locations={locations} selected={selectedLocation}
-              onSelect={id => { onSelectLocation(id); setMenuOpen(false); }} />
-          </div>
-        )}
-        <div className="ml-auto flex flex-none flex-col items-end font-mono text-11 text-[var(--mut)] wide:ml-0 wide:flex-row wide:items-center wide:gap-2">
+        <div className="flex flex-none flex-col items-start font-mono text-11 text-[var(--mut)] wide:ml-0 wide:flex-row wide:items-center wide:gap-2">
           <span className="whitespace-nowrap" title={weather.description}>
             {weather.emoji}{weather.temperature ? ` ${weather.temperature}` : ''}
           </span>
           {week !== null && <span className="whitespace-nowrap" title={`Aktuell kalendervecka: ${week}`} aria-label={`Aktuell vecka ${week}`}>v. {week}</span>}
         </div>
+        {locations.length > 1 && (
+          <div className="ml-auto min-w-0 wide:ml-0 wide:flex-none">
+            <LocationSelect locations={locations} selected={selectedLocation}
+              onSelect={id => { onSelectLocation(id); setMenuOpen(false); }} />
+          </div>
+        )}
       </div>
 
       <button ref={menuButton} type="button" data-tour="settings"
