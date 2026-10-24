@@ -176,6 +176,23 @@ Slutlig prompt:
 
 > Use case: stylized-concept. Asset type: premium game cinematic character cutout, for a real-time cosmic lunch oracle scene. Create one extraordinarily detailed monumental ancient celestial oracle head and upper shoulders, fully frontal, centered, perfectly symmetrical silhouette, with genuine transparent background. A majestic nonhuman weathered obsidian and dark porcelain sculpted face, fine metallic gold seams like a repaired ancient ceramic relic, deep sculptural eye sockets with restrained molten gold light inside, intricate layered engraved bronze crown suggesting the radial geometry of an ancient ceremonial dinner plate, impossibly old and quietly judgmental. Long dark stone shapes form a beard and temple architecture merging into the shoulders, but no human hair. A monumental god in a lavish cinematic science fiction game, not a cartoon plate, not a cute robot. Tangible physically based materials with scratches, pitted ceramic, oxidized bronze, microdetail. Dark dramatic chiaroscuro with a cold cyan rim light on left and a warm gold rim light on right, very little front fill, still readable facial structure. Face should occupy upper two thirds and shoulders bottom third, entire crown visible with padding all around. Faint gold glowing fissures across brow. No extra objects, no floating rings, no utensils, no stars, no background nebula, no labels or text, no watermark. The expression is solemn and overwhelmingly serious about a trivial lunch decision. This will be composited over procedural volumetric space and moving 3D astrolabe rings.
 
+### Nyhetsbild, 2026-10-24
+
+Henrik beställde en genererad påskäggsbild i samma nyhetskort som
+mobilförbättringarna och ledtråden om fem klick. Bilden anknyter till
+oraklets brons, guld och turkosa rymd genom ett svävande kosmiskt ägg.
+Projektfil: `nextjs-luns-se/public/images/news/kosmiskt-paskagg.webp`.
+Den är genererad med det inbyggda bildverktyget i ChatGPT, utan API nyckel.
+Originalet finns under Codex generated_images. Den publicerade bilden är
+formatkonverterad till WebP och nedskalad till 1280 × 720, 126332 byte.
+Nyhetskortets befintliga bildvisning används och nyhetsversion 16 behålls.
+
+Slutlig prompt:
+
+```text
+Use case: stylized-concept. Asset type: landscape editorial illustration for a Swedish lunch website news card, wide 16:9 composition. Create a beautifully crafted mysterious cosmic Easter egg floating in deep space, a playful secret rendered with the gravitas of a lavish science fiction film. One large unmistakably egg shaped object centered, dark obsidian enamel and oxidized bronze, delicate engraved celestial patterns and tiny star motifs on its shell. A thin irregular crack releases a restrained warm golden light from within, suggesting a hidden secret without showing what is inside. Two fine antique bronze orbital rings loosely surround the egg at different angles, like a small celestial instrument. Rich atmospheric teal nebula and sparse stars fill the background, softly illuminated dust, cinematic depth, tangible material detail, controlled contrast, warm golden rim light and cool teal fill. The entire egg and rings are visible with ample breathing room. The silhouette must read clearly at small mobile card size. Elegant, intriguing, slightly absurd, polished premium 3D artwork, no busy clutter. No text, no letters, no numbers, no logo, no watermark, no food, no people, no face, no screen or interface. No pastel spring decorations or cartoon character. Opaque complete background.
+```
+
 ## Verifiering av andra versionen
 
 2026-10-24: sju Node tester inklusive minnestester, TypeScript och statiskt

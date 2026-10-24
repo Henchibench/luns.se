@@ -35,6 +35,7 @@ export const NEWS_ITEMS: NewsItem[] = [
     date: '2026-10-24',
     title: 'Mer plats för lunchen på mobilen',
     body: 'Sök, karta, Tjôta med Luns och inställningar har flyttat in bakom menyknappen uppe till höger. Platsvalet och veckodagarna finns kvar direkt på sidan. Vid temperaturen ser du också aktuell vecka. Psst! Vi har gömt ett påskägg någonstans på sidan. En liten ledtråd: ”klicka fem gånger”.',
+    image: { src: '/images/news/kosmiskt-paskagg.webp', alt: 'Ett mörkt påskägg med lysande guldsprickor och bronsringar svävar bland stjärnorna.', width: 1280, height: 720 },
   },
   {
     version: 15,

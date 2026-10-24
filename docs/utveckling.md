@@ -563,6 +563,14 @@ Nyhetsversion 16 behålls eftersom samma planerade nyhetskort uppdateras.
 Verifiering av ledtråden: elva tester för nyheter och minnesregler samt
 produktionsbygge passerade.
 
+Henrik beställde även en genererad påskäggsbild till samma kort 2026-10-24.
+`public/images/news/kosmiskt-paskagg.webp` visar ett kosmiskt ägg i oraklets
+färger. Bilden visas under texten genom nyhetskortets befintliga bildfält,
+med beskrivande alternativtext. WebP filen är 1280 × 720 och cirka 123 KiB.
+Bildkälla och slutlig prompt finns i [lunsoraklet.md](lunsoraklet.md).
+Verifiering av bilden: original och komprimerad fil granskades visuellt.
+Elva nyhets och minnestester samt produktionsbygget passerade.
+
 Urvalet fryses vid öppning från tavlans redan filtrerade `sections.dishes`.
 Område, vald dag, sökning, matfilter och favoritfilter gäller därför även
 här. Bildmenyer och äldre referensmenyer deltar aldrig. Tomt urval ger en
