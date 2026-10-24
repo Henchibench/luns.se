@@ -58,6 +58,7 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
       #ifdef USE_MAP
         diffuseColor.a *= smoothstep(0.0,0.28,vMapUv.y);
+        diffuseColor.a *= smoothstep(0.0,0.055,vMapUv.x)*smoothstep(0.0,0.055,1.0-vMapUv.x);
       #endif`);
   };
   const portrait=new THREE.Mesh(new THREE.PlaneGeometry(5.6,6.72),portraitMaterial);
@@ -111,6 +112,9 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     const playing = playback?.();
     if (playing) { phase = playing.phase; elapsed = playing.elapsed; }
     const d=direction(phase,elapsed,reduced);
+    const alignedDistance=Math.max(baseDistance,4.95/(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect));
+    const portraitLift=camera.aspect<.75?Math.min(4.6,(alignedDistance-baseDistance)*.48):0;
+    world.position.y=1.5+(reduced?0:Math.sin(time*.4)*.06)+d.alignment*portraitLift;
     portraitMaterial.opacity=d.reveal;
     astrolabe.scale.setScalar(1+d.alignment*.08);
     if(d.alignment===0) alignmentOrigins=null;
@@ -129,7 +133,6 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
     haloMaterial.opacity=halo.visible ? .45*Math.pow(1-haloAge/1.8,2) : 0;
     if(!reduced) {
       portrait.rotation.y=Math.sin(time*.16)*.035;
-      world.position.y=1.5+Math.sin(time*.4)*.06;
       for(let i=0;i<dustCount;i++) {
         dustPositions[i*3+2]+=dt*(phase==='arrival'?(1-d.travel)*12+.5:d.energy*14+.3);
         if(dustPositions[i*3+2]>32) dustPositions[i*3+2]=-40;
@@ -138,7 +141,6 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean, playback?:
       camera.position.x+=(pointerX-camera.position.x)*.025;
       camera.position.y+=(pointerY-camera.position.y)*.025;
     }
-    const alignedDistance=Math.max(baseDistance,4.95/(Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect));
     camera.position.z=baseDistance+(1-d.travel)*22+(alignedDistance-baseDistance)*d.alignment;
     camera.lookAt(0,.8,0);
     fogMaterial.uniforms.time.value=time; fogMaterial.uniforms.intensity.value=.45+d.reveal*.5+d.energy*.4;

@@ -26,7 +26,9 @@ sedan domen. Kameran färdas fram och ringarna rör sig fram till ritualens
 sista 2,4 sekunder, då de samlas i ett gemensamt plan. De låser sig vid
 domen samtidigt som ett basanslag och en luftig efterklang hörs. En enda
 ljuspuls markerar låsningen. Ringarna förblir samlade medan resultatet visas.
-På smal skärm dras kameran tillbaka så att ringarnas bredd ryms.
+På smal skärm dras kameran tillbaka så att ringarnas bredd ryms och
+gestalten lyfts för att ge plats åt längre rättbeskrivningar. Porträttets
+ytterkanter tonas mjukt så att ingen rak bildkant syns mot rymden.
 Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
 
