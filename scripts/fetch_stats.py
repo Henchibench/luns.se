@@ -131,26 +131,33 @@ def visits_over(website: str, token: str, window: dict, days: int):
     return svar["visits"]
 
 
-def event_total(website: str, token: str, name: str, window: dict) -> int:
+def event_total(website: str, token: str, name: str, window: dict) -> int | None:
     """Hur många gånger en händelse skickats, utan uppdelning på egenskap.
 
-    metrics med type=event listar varje händelsenamn med sitt antal. Ett eget
-    try här, till skillnad från anropen ovanför: skulle just den vyn ändra sig
-    ska resten av statistiken ändå bli av. En nolla ser likadan ut som
-    "ingen har sökt", men det avsnittet visas bara när det finns andra
-    händelser, alltså när vi vet att insamlingen fungerar.
+    Filtrera på namnet före rankning så en ovanlig händelse inte faller
+    utanför resultatets radgräns. Saknade eller trasiga svar ger None,
+    aldrig en nolla som skulle kunna tolkas som att ingen hittat påskägget.
     """
     try:
-        rows = api(f"websites/{website}/metrics", token, type="event", **window)
+        rows = api(f"websites/{website}/metrics", token, type="event", event=name, **window)
     except Unavailable as error:
         print(f"stats: händelsesummor hoppades över ({error})", file=sys.stderr)
-        return 0
+        return None
 
     if not isinstance(rows, list):
-        return 0
+        return None
     for row in rows:
-        if isinstance(row, dict) and row.get("x") == name:
-            return int(row.get("y") or 0)
+        if not isinstance(row, dict) or "x" not in row or "y" not in row:
+            return None
+        if row["x"] == name:
+            value = row["y"]
+            if isinstance(value, bool):
+                return None
+            try:
+                count = int(value)
+                return count if count >= 0 and str(count) == str(value) else None
+            except (ValueError, TypeError, OverflowError):
+                return None
     return 0
 
 
@@ -206,14 +213,18 @@ def build_stats() -> dict:
             ],
         },
         "hours": hours,
-        # Bara antalet. Sökorden skickas aldrig från sajten och finns därför
-        # inte att hämta — se integritetsinfon, som lovar just det.
-        "searches": event_total(website, token, "search-used", window),
         "restaurants": [],
         "dishes": [],
         "locations": [],
         "cravings": [],
     }
+
+    # Bara händelsens antal, inga sökord eller identifierare för besökaren.
+    # Utelämna måttet om hämtningen misslyckas, men behåll en verifierad nolla.
+    for field, event_name in (("searches", "search-used"), ("oracleDiscoveries", "oracle-discovered")):
+        total = event_total(website, token, event_name, window)
+        if total is not None:
+            stats[field] = total
 
     # Tomma listor så länge sajten som ligger live inte skickar händelser.
     # Rutan utelämnar de avsnitten helt i stället för att visa tomma diagram.

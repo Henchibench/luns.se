@@ -13,6 +13,18 @@ Versionsnummer, källor och tjänststatus är inte nyverifierade i denna text.
 - Använd designens text-10 … text-30, inte fasta text-[13px], så textskalning
   fungerar. INFO-emoji används även som signal: testa råtext innan den strippas.
 
+## Skrivstil
+
+Henriks uttryckliga skrivregel från 2026-10-24: använd aldrig bindestreck
+eller tankstreck i egen löptext, nyheter eller svar. Det gäller både korta
+streck och de längre varianterna. Skriv om med punkt, komma eller naturliga
+meningar. Regeln gäller redaktionell text; kodsyntax, adresser, filnamn och
+restaurangernas källtext ska inte förvanskas.
+
+Ophelias och Kooperativets nyheter innehöll tankstreck som Henrik ville ta
+bort. Båda ersattes med punkt och ny mening. Nyhetsversion 15 behålls vid
+textjusteringen. Verifiering: minnestest, nyhetstest och bygge utan skrapning.
+
 ## Leverera till Dev, inte main
 
 1. Läs git status; hämta origin/Dev. Bevara andras arbete.
@@ -29,6 +41,67 @@ har tidigare orsakat fel. Detaljer finns i minne/repo-05.md.
 En ren Dev betyder inte att main har samma paket. Jämför origin/main..Dev
 innan en redan levererad fix görs igen. En merge publicerar inte själv;
 nuvarande workflow ska inspekteras före besked om nästa publicering.
+
+## Statistikens period och bevakningar
+
+Kontrollerat 2026-10-24 efter Henriks frågor om Så används sajten.
+`scripts/fetch_stats.py` använder ett rullande fönster om 30 dagar för sök,
+bevakningshändelser och övriga listor. Bara sammanfattningens BESÖK 7 DAGAR
+har ett separat fönster. Urvalet filtreras till värdnamnet luns.se och Sverige.
+Sök registreras högst en gång per sidladdning efter minst två tecken och
+1,2 sekunders skrivpaus. Ändrade sökord i samma laddning ger inga nya händelser.
+
+`dish-favorite-toggle` skickas både när en bevakning läggs till och tas bort.
+Statistikhämtningen grupperar på rättens normaliserade namn utan att filtrera
+`favorited`. Måttet är därför händelser, inte aktiva bevakningar eller unika
+personer. Hämtningsskriptet behåller högst tio poster i svarets ordning;
+BarList visar alla dessa och har ingen begränsning till två eller de senaste.
+Den offentliga statistikfilen från 2026-10-23 09:33 UTC innehöll två olika
+rättnamn med en händelse vardera och 13 sökhändelser under 30 dagar. Detta
+bevisar inte att bara två rätter är aktivt bevakade i besökarnas webbläsare.
+
+Henrik bad ta bort fottextens två förklarande meningar om sammanräkning och
+byggtid. Endast uppdateringsdatumet är kvar. Sökrubriken visar nu periodens
+etikett från statistikfilen. Insamling och beräkningar ändras inte.
+Verifiering: kodspårning från händelser via hämtning till BarList, publicerad
+statistikfil, minnestest och bygge utan skrapning. Testservern saknade
+stats.json, så samma offentliga fil används där för kontroll av visningen.
+
+### Upptäckter av Lunsoraklet, 2026-10-24
+
+Henrik ville se hur många som hittar påskägget. Händelsen
+`oracle-discovered` skickas när det femte snabba trycket öppnar oraklet.
+`luns-oracle-discovered` sparar en lokal markering, ingen identifierare,
+så återöppning eller omladdning inte ger nya upptäckter. Saknas Umami,
+är den egna statistiken avstängd eller går markeringen inte att spara
+avstår mätningen. Enbart luns.se och www.luns.se får skicka händelsen,
+så testservern och localhost inte fyller räknaren.
+
+”Hittat påskägget” visar första upptäckter under statistikens senaste
+30 dagar. Samma filter för luns.se och Sverige som övrig statistik gäller.
+Antalet är webbläsare, inte verifierade personer. Ny enhet eller rensade
+webbläsardata kan därför räknas igen. Umamis tracker ger ingen säker
+leveranskvittens vid blockerad trafik, så siffran kan underskatta upptäckter.
+Inga egna identifierare eller uppgifter om den slumpade rätten skickas.
+Integritetsinformationen beskriver händelsen och den lokala markeringen.
+
+Statistikhämtningen filtrerar händelsen innan rankningen i Umami. Tomt svar
+ger noll, medan felaktigt svar eller misslyckad hämtning utelämnar måttet.
+Äldre statistikfiler utan fältet fungerar fortfarande. Umami behöver ingen
+manuell registrering av händelsen; den syns under Events efter första
+registreringen från den publicerade sajten.
+
+Verifiering: 14 Node tester inklusive oraklet och minnesreglerna samt tre
+Python tester passerar. Testerna täcker återöppning, omladdning, parallella
+öppningar, testvärdar, avstängd statistik, lagringsfel och felaktiga svar.
+Läsning via den befintliga delningskopplingen gav 0 upptäckter och 13 sök
+under de senaste 30 dagarna. Den verkliga statistiken används i testvyn.
+Ingen påhittad händelse skickades till produktionsstatistiken.
+Produktionsbygget passerade. Testservern byggdes utan skrapning från
+`0aad314` och rapporterar frisk status. I mobilvy 390 × 844 visas den
+verifierade nollan, rätt period och förklaringen utan sidledsflöde.
+Inga fel eller varningar registrerades under kontrollen av statistikrutan.
+Första riktiga registreringen i Umami kan kontrolleras efter publicering.
 
 ## Låst Ubuntu-version i Actions, 2026-10-20
 
@@ -85,6 +158,17 @@ fönster fick platsval och introduktion; ingen nyhetsruta efter att rundan
 stängts eller efter omladdning. Manuell öppning behöll återgången till inställningar.
 
 ## Nyhetstexter och datumordning, 2026-10-20
+
+Tillägg 2026-10-24: Henrik beställde en områdesnyhet om Ophelia efter flera
+inkomna tips. ”Ophelia har flyttat in på Luns!” tackar för tipsen och visas
+bara för förvalt Lindholmen. Version 15 gör nyheten oläst även efter 14.
+Avslutningen ”Tjôta till” utgår; knappen ”Tjôta here” öppnar befintligt
+kontaktformulär med valt område och stänger nyhetsrutan. Henrik valde samma
+knapptext som den äldre kontaktposten. `actionLabel` gör texten valbar per
+nyhet. Textjusteringen behåller version 15.
+Posten följer kontaktens aktiveringsvillkor. Områdes-/versionstester och
+minnestest körs, följt av bygge utan skrapning och knappkontroll på testservern.
+
 
 Tillägg 2026-10-23: efter en felanmälan beställde Henrik en kort nyhet om
 Kooperativets menyfix. På Henriks begäran fokuserar posten ”Kooperativets
@@ -160,6 +244,19 @@ Verifiering: `scripts/restaurant-news.test.mjs` täcker tillägg, flera nyheter,
 förstagångsbesök, omladdning, kvittering, områden, borttagning, återinförande,
 skadad lagring och ändrade menyresultat med oförändrat register. Kontrollera
 även blänkare och navigering i byggd testserver innan leverans.
+
+## Namnsökning när lunchmenyn saknas, 2026-10-23
+
+Vid införandet av Vita och Gillestugan upptäcktes att sökning på restaurangens
+namn dolde hela kortet när dagens rätter saknades. Även klick på den nya
+restaurangblänkaren använder namnsökning och gav därför ”Inga rätter matchar”.
+Tomt kort visas nu också när söktexten matchar restaurangnamnet och inga
+mattyp-/Sugen på-filter är aktiva. Besked, öppettider och MENY-länk finns då
+kvar; inga rätter eller antal skapas. Favoriturvalet sker fortfarande först.
+Verifierat: bygge och webbläsarkontroll med Vita, Gillestugan, Schnitzelplatz
+samt Tai Shanghais måndagsbesked. VEG-filtret uteslöt Vitas tomma kort; Rensa
+återställde beskedet. Den befintliga förhandssidan har samma sajtkod efter
+denna dokumentationsuppdatering.
 
 ## Menybesked per dag, 2026-09-21
 
@@ -238,6 +335,62 @@ Källa, datumkontroller, driftbegränsning och uppdateringsrutin finns i
 Verifiering: `node --test scripts/bo-menu.test.mjs`; full testserverkedja
 och godkänd kontroll av text- och bildläge på mobil (390 px) och dator
 (1440 px), inklusive simulerat bildbyte, sökning och favoritläge.
+
+## Kompakt mobilhuvud och kalendervecka, 2026-10-24
+
+Henrik ville ge lunchmenyerna mer utrymme på mobilen. Header samlar nu sök,
+karta, kontakt och inställningar i en utfällbar meny under 760px. Loggan,
+platsvalet, vädret och dagarna finns kvar utanför menyn. Ordmärket LUNS.SE
+visas både på dator och mobil. Långa platsnamn får kortas visuellt
+med hela namnet tillgängligt i platslistan. Menyn ligger ovanpå innehållet,
+kan rullas på låg skärm och stängs via menyknappen, Escape, klick utanför
+eller ett menyval. Escape lämnar fokus på menyknappen. Olästa nyheter
+markeras på samma knapp och på inställningsvalet.
+
+Henrik justerade placeringen samma dag: temperatur och vecka ligger direkt
+intill loggan, före platsväljaren, även på mobil. Han påpekade också att
+ordmärket LUNS.SE hade försvunnit. Det är återställt med temperatur och
+vecka på en gemensam rad under namnet på mobil. På dator ligger allt
+kvar på samma rad. Veckonumret skrivs kompakt som v.43. Nyhetsversion 16
+behålls.
+
+Sökningen filtrerar som tidigare medan man skriver. Sökknappen eller
+Enter stänger menyn. En aktiv sökning visas separat med Rensa även när
+menyn är stängd. Datorns kontroller ligger kvar direkt i sidhuvudet.
+Introduktionsrundan och nyhetsversion 16 förklarar mobilmenyn.
+
+`calendarWeek.ts` beräknar aktuell kalendervecka i Europe/Stockholm.
+Veckan visas vid temperaturen, uppdateras varje minut och när fönstret får
+fokus. Den avser dagens kalendervecka även under helgen, då själva
+lunchlistan redan kan visa kommande vecka. Test täcker årsskifte, sommartid
+och byte vid svensk midnatt. Veckan beror inte på när den statiska sajten
+byggdes. Minnestest, nyhetstest, veckotest och produktionsbygge passerar.
+Webbläsarkontroll med större text gjordes vid 320, 390, 760 och 1440px.
+Vid 390px minskade sidhuvudets höjd från 152,75 till 116px. Vid 320px gav
+rutnätets automatiska minsta kolumnbredd först 6px överbredd. En explicit
+kolumn med minsta bredd noll och smalare sidmarginal i dagknapparna löste det;
+uppmätt bredd och scrollbredd är båda 320px även med Järntorget/Linné valt.
+Sök med Rensa, karta och återgång, kontakt, inställningar, Escape och byte
+mellan mobil och dator kontrollerades. Båda färgteman granskades. Ingen
+inskickning gjordes från kontaktformuläret. Kontroll på fysisk telefon med
+Safaris tangentbord återstår.
+
+## Lunchlistans rörelse i sidled, 2026-10-24
+
+Henrik upplevde att menylistan inte satt fast på mobilen. I testwebbläsaren
+mättes 447px scrollbredd i en 390px bred lunchlista på Lindholmen, med större
+text. Oishiis källtext innehåller långa följder med kommatecken utan
+mellanslag, som inte bröts och skapade horisontellt rullutrymme. Detta är
+en verifierad möjlig orsak till rörelse i sidled, inte belägg för eventuella
+separata problem med Safaris adressfält eller vertikal studs.
+
+MenuList tillåter nu radbrytning även i långa sammanhängande textföljder.
+Rättens textkolumn kan krympa och långa restaurangnamn samt länkrader får
+brytas inom tillgänglig bredd. Texten bevaras; innehåll klipps inte och
+menykällorna ändras inte. Dokumentationstest och bygge passerade. Efter
+bygget var listans scrollbredd 390px vid 390px skärmbredd och 320px vid
+320px, med samma menydata och större text. Vertikal rullning och kartans
+gester har inte ändrats.
 
 ## Mobilens nedersta knappar och adressfält, 2026-10-20
 
@@ -397,3 +550,65 @@ alfa-komponerat kort, minnestest, Next-bygge och visuell kontroll av nyheter,
 inställningar och lunchlistan i båda teman. Beräkningen omfattar dessa ytor,
 inte en fullständig tillgänglighetsgranskning av hela sajten. Metod:
 https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html.
+
+## Lunsoraklet, 2026-10-24
+
+Henrik beställde ett hemligt kosmiskt påskägg med fem snabba tryck på loggan,
+rymddimma, en animerad gud, ljudeffekter och en slumpad riktig lunch.
+Fem tryck inom tre sekunder öppnar `components/oracle/LunchOracle.tsx`.
+Henrik beställde senare samma dag en ledtråd i den ännu osläppta nyheten
+”Mer plats för lunchen på mobilen”. Den nämner ett gömt påskägg och
+”klicka fem gånger”, men avslöjar inte var besökaren ska klicka.
+Nyhetsversion 16 behålls eftersom samma planerade nyhetskort uppdateras.
+Verifiering av ledtråden: elva tester för nyheter och minnesregler samt
+produktionsbygge passerade.
+
+Henrik beställde även en genererad påskäggsbild till samma kort 2026-10-24.
+`public/images/news/kosmiskt-paskagg.webp` visar ett kosmiskt ägg i oraklets
+färger. Bilden visas under texten genom nyhetskortets befintliga bildfält,
+med beskrivande alternativtext. WebP filen är 1280 × 720 och cirka 123 KiB.
+Bildkälla och slutlig prompt finns i [lunsoraklet.md](lunsoraklet.md).
+Verifiering av bilden: original och komprimerad fil granskades visuellt.
+Elva nyhets och minnestester samt produktionsbygget passerade.
+
+Urvalet fryses vid öppning från tavlans redan filtrerade `sections.dishes`.
+Område, vald dag, sökning, matfilter och favoritfilter gäller därför även
+här. Bildmenyer och äldre referensmenyer deltar aldrig. Tomt urval ger en
+förklaring och återgång till valen. Källans uttryckliga tillval, tillbehör, drycker och desserter undantas.
+Rättens kategori följer med till resultatet. Varje unik kombination av
+restaurang, kategori, beskrivning och pris får en lott. Beslutet visar källtext, restaurang och eventuellt pris, och accepterat
+beslut leder tillbaka till restaurangen i lunchlistan. Ingen meny skapas.
+
+Three.js laddas med dynamisk import först när oraklet öppnas. Efter Henriks
+kritik av första gestaltningen används nu en illustrerad gestalt tillsammans
+med 3D instrument, stoft, kamerafärd, shaderdimma och bloom. Bildmaterialet
+är genererat med det inbyggda bildverktyget i ChatGPT och lagras lokalt i
+sajten. Web Audio aktiveras av femte trycket på loggan och spelar sju
+förgenererade repliker samt tre effekter från egna statiska filer. Filerna
+skapades i ElevenLabs inom Henriks uttryckliga undantag för påskägget.
+Ingen taltjänst anropas av besökaren. Ljudens längd styr pauser och text;
+en gemensam klocka pausar ljud och scen när fliken döljs. Regi, röststatus,
+ljudkälla och bildkälla finns i [lunsoraklet.md](lunsoraklet.md).
+Stäng och ljudknapp finns hela tiden.
+Escape stänger, fokus hålls i dialogen och återgår till loggan. Bakgrunden
+är inert under besöket. Timers, ljud och grafikresurser frigörs vid stängning.
+Minskad rörelse hoppar över väntan och visar stilla grafik. Utan WebGL finns
+den stilla illustrationen och samma fungerande lottning. Ljudfel hindrar inte valet.
+
+Verifiering av första versionen: sex Node tester inklusive minnestester, TypeScript,
+produktionsbygge och npm audit med enbart produktionsberoenden passerade.
+Audit gav noll träffar. Three.js är låst till 0.186.1. Testservern byggdes med `--utan-skrap` på 5d00d35 och rapporterade frisk
+status. Visuellt kontrollerat i bredderna 320, 390 och 1280. Ingen sidledes
+överströmning i dialogen; kontrollerna ligger under testbandet och Stäng
+ligger kvar vid scroll. Verifierat: fem tryck, intro, animerad WebGL scen,
+ritual, källa/pris/kategori i resultat, ljudknapp, accept, avböjning,
+Escape mitt i ritualen, återöppning, fokusåtergång och återställd bakgrund.
+Tom sökträff gav tomläge. Sökning på Wonton nudlar gav endast den rätten
+från Oishii. Webbläsarloggen saknade fel och varningar under kontrollen.
+Elva befintliga kalender och nyhetstester passerade också.
+
+Byggkontrollen hittade Three.js i en separat fil om 356817 byte som inte
+refereras av den initiala HTML sidan. Mobilmått provades i webbläsaren på
+datorn. Fysisk iPhone, hörbar ljudkvalitet och operativsystemets läge för
+minskad rörelse är inte manuellt verifierade. WebGL reservläge är implementerat
+men har inte framtvingats i det visuella provet.

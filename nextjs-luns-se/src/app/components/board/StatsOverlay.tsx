@@ -198,7 +198,7 @@ export default function StatsOverlay({
                 </Section>
 
                 {showSearches && (
-                  <Section label="SÖK">
+                  <Section label={`SÖK · ${stats.period.label.toUpperCase()}`}>
                     <p className="m-0 text-13 leading-[1.6] text-[var(--ink2)]">
                       {stats.searches === 0 ? (
                         'Ingen har använt sökfältet under perioden.'
@@ -222,6 +222,15 @@ export default function StatsOverlay({
                     och VECKAN ovanför. Samlade under en gemensam rubrik fick de
                     brödtextrubriker i stället, och rutan bytte formspråk halvvägs
                     ner. */}
+                {stats.oracleDiscoveries !== undefined && (
+                  <Section label={`PÅSKÄGGET · ${stats.period.label.toUpperCase()}`}>
+                    <Figure value={formatNumber(stats.oracleDiscoveries)} label="HITTAT PÅSKÄGGET" />
+                    <p className="mb-0 mt-3 text-12 leading-[1.6] text-[var(--ink2)]">
+                      Första upptäckten räknas, en gång per webbläsare.
+                    </p>
+                  </Section>
+                )}
+
                 {stats.restaurants.length > 0 && (
                   <Section label="FAVORITMARKERADE STÄLLEN">
                     <BarList items={stats.restaurants} unit="klick" />
@@ -263,8 +272,7 @@ export default function StatsOverlay({
               </div>
 
               <p className="mb-0 mt-6 border-t border-[var(--line)] pt-4 text-11 leading-[1.6] text-[var(--mut)]">
-                Allt är ihopräknat, ingen rad handlar om en enskild besökare. Siffrorna hämtas när
-                sajten byggs och inte när rutan öppnas. Uppdaterad{' '}
+                Uppdaterad{' '}
                 {new Date(stats.generated).toLocaleDateString('sv-SE', {
                   day: 'numeric',
                   month: 'long',

@@ -3,6 +3,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ContactForm from './components/contact/ContactForm';
 import { loadContactConfig, type ContactConfig, type ContactContext } from './lib/contact';
+import { createOracleSound, type OracleSound } from './components/oracle/sound';
+import LunchOracle from './components/oracle/LunchOracle';
+import { offeringsFromSections } from './lib/oracle';
 import Header from './components/board/Header';
 import Rail, { RailItem } from './components/board/Rail';
 import MenuList, { Section } from './components/board/MenuList';
@@ -48,7 +51,7 @@ import {
   matchesTypes,
   searchTerms as expandSearch,
 } from './lib/filters';
-import { trackEvent } from './utils/analytics';
+import { trackEvent, trackOracleDiscovery } from './utils/analytics';
 
 /** Avstånd från huvudytans topp där en sektion räknas som den aktiva. */
 const SPY_OFFSET = 70;
@@ -97,12 +100,9 @@ const TOUR_STEPS: TourStep[] = [
     body: 'Stjärnmärk en rätt du vill äta igen, så säger vi till när den dyker upp, även om restaurangen skrivit om den lite.',
   },
   {
-    // Kugghjulet är nytt och har ingen självklar innebörd: det kan lika gärna
-    // vara filter eller ett konto. Steget säger vad som finns bakom det, så
-    // det inte blir en knapp man aldrig råkar trycka på.
     targets: ['[data-tour="settings"]'],
-    title: 'Resten bor i kugghjulet',
-    body: 'Ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
+    title: 'Inställningar och mer',
+    body: 'På mobilen finns sök, karta, kontakt och inställningar i menyn här. På datorn öppnar kugghjulet inställningarna. Där väljer du ljust eller mörkt läge, om sidan ska öppna med bara favoriterna, dina bevakade rätter, öppen statistik och vad vi sparar. Den här rundan går att köra om därifrån.',
   },
   {
     // Inget mål: sista steget är en avrundning, som det första.
@@ -128,6 +128,8 @@ export default function LunchBoard() {
   const [toast, setToast] = useState<string | null>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
+  const oracleAudio = useRef<OracleSound | null>(null);
+  const [oracleOpen, setOracleOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
   const [newsFromSettings, setNewsFromSettings] = useState(false);
@@ -177,12 +179,12 @@ export default function LunchBoard() {
   // finns med från början. Lägg inte nyhetsrutan över något besökaren öppnat.
   useEffect(() => {
     if (!news.unread || loading || error || needsChoice || !location || !contactConfigLoaded
-      || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
+      || oracleOpen || welcome.open || settingsOpen || privacyOpen || statsOpen || contactContext || sheet || newsOpen) return;
     setNewsFromSettings(false);
     setNewsOpen(true);
     news.markSeen(true);
   }, [news.unread, news.markSeen, loading, error, needsChoice, location, contactConfigLoaded,
-    welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
+    oracleOpen, welcome.open, settingsOpen, privacyOpen, statsOpen, contactContext, sheet, newsOpen]);
 
   useEffect(() => {
     loadMenuData()
@@ -307,9 +309,12 @@ export default function LunchBoard() {
             ? { ...restaurant.referenceMenu, dishes: restaurant.referenceMenu.dishes.filter(d => d.day === day).map(displayDish) }
             : undefined,
           description: restaurant.meta.description ?? '',
-          // "Ingen meny idag" gäller bara när inget filter är på. Med filter
-          // på betyder tomt "inget matchade", och då är raden bara brus.
-          empty: !filtering && !hasDayDishes && !restaurant.menuImage,
+          // Namnsökning (även från en restaurangblänkare) ska visa källbesked
+          // och menylänk även utan dagens rätter. Matfilter ger inga sådana träffar.
+          empty: !hasDayDishes && !restaurant.menuImage && (!filtering || (
+            search.trim().length > 0 && activeTypes.length === 0 && activeCravings.length === 0 &&
+            restaurant.name.toLocaleLowerCase('sv').includes(search.trim().toLocaleLowerCase('sv'))
+          )),
           dailyOnly: restaurant.meta.daily_menu_only === true,
           website: restaurant.meta.website,
           menuUrl: restaurant.meta.menu_url,
@@ -540,11 +545,17 @@ export default function LunchBoard() {
 
   return (
     <div
-      className="luns-viewport grid grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
+      className="luns-viewport grid grid-cols-1 grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
+      {oracleOpen && <LunchOracle audio={oracleAudio.current} offerings={offeringsFromSections(sections)} context={`${location?.label ?? 'Valt område'}, ${heading}`} onClose={() => setOracleOpen(false)} onAccept={name => { setOracleOpen(false); scrollToRestaurant(name); }} />}
       <div className={shell}>
       <Header
+        onOpenOracle={() => {
+          try { oracleAudio.current = createOracleSound(); } catch { oracleAudio.current = null; }
+          setOracleOpen(true);
+          void trackOracleDiscovery();
+        }}
         days={DAYS}
         selectedDay={day}
         onSelectDay={next => {

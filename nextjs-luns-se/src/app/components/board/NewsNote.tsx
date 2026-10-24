@@ -56,7 +56,7 @@ function Entry({ item, onOpenContact }: { item: NewsItem; onOpenContact?: () => 
       {item.action === 'contact' && onOpenContact && (
         <button type="button" onClick={onOpenContact}
           className="mt-3 min-h-11 rounded-lg bg-[var(--acc)] px-4 py-2 text-13 font-semibold text-[var(--bg)] cursor-pointer hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--acc)]">
-          Tjôta here
+          {item.actionLabel ?? 'Tjôta here'}
         </button>
       )}
       {item.image && (

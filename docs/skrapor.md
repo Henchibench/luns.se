@@ -59,6 +59,120 @@ kräver jämförelse för alla restauranger, inte enbart det aktuella kortet.
 Äldre exempel om stående menyer, foodtrucks, selektorer och plattformar finns
 i minne/register.md. De är felsökningsunderlag, inte dagens restauranginventering.
 
+## Ophelia på Lindholmen, 2026-10-24
+
+Tillagd efter Henriks beställning utifrån ett tips via kontaktformuläret.
+Källan är https://www.restaurangophelia.se/sv#lunch, den svenska versionen
+av den inskickade engelska sidan. Synlig HTML visar endast vald dagsflik;
+sidans publika Next-data innehåller hela lunchveckan med `year`, `isoWeek`,
+`weekday`, rättnamn, beskrivningar och priser. `ophelia_scraper.py` läser
+JSON ur `self.__next_f.push` utan att exekvera JavaScript. Endast `week`
+under den entydiga lunchsektionen används; à la carte läses inte som lunch.
+Ingen extern menyförmedlare, OCR, modell-API eller ny nyckel behövs.
+
+År och ISO-vecka måste stämma med `menu_week.py`, inklusive nästa vecka på
+helgen. `MENU_VALIDITY` spärrar gamla byggen och `allow_previous_menu=False`
+förhindrar återanvändning vid fel. Saknad vecka eller dag ger menybesked.
+Tillfälligt slutsålda rätter visas som information och räknas inte som mat.
+Neutral kategori Lunch används; inga kostkategorier eller allergener gissas.
+Källans två pizzor under Alternativ meny visas varje vardag, med besked om
+beställning i baren. De har inget angivet eget lunchpris och får inget gissat
+pris från à la carte. Övriga rätter använder eget pris eller gemensamt
+lunchpris (kampanjpris när angivet). Tider och inkluderat kommer från lunchsidan.
+
+Verifierat mot samtliga fem synliga flikar och de hämtade raderna: vecka 43
+har 6/6/6/6/6 alternativ, varav två dagsrätter, två sallader och två pizzor.
+Dagsrätter 139 kr, sallader 149 kr. Den 24 oktober visar Luns vecka 44,
+medan källan ännu visar 2026 vecka 43; då publiceras enbart menybesked.
+Sju regressionstester i `scripts/test_ophelia.py` täcker uppdelade Next-ramar,
+dagsfördelning, priser, år/vecka/helgbyte, slutsålt, saknad data och fel.
+
+Registrerad som Restaurang Ophelia i Lindholmen, med lunch mån–fre 11–14.
+Adress Theres Svenssons gata 15 och beskrivning kommer från restaurangens
+sida. Kartpunkten 57.7060325, 11.9442223 kommer från OpenStreetMap-noden
+14079346178 (restaurangposition, inte separat verifierad entré).
+Befintlig områdesvis besökshistorik visar nyrestaurangsblänkaren efter släpp.
+Henrik beställde därefter även en Lindholmen-avgränsad nyhet (version 15)
+med tack för flera tips och knapp till kontaktformuläret; se utveckling.md.
+
+## Fyra tillskott på Järntorget/Linné, 2026-10-23
+
+Henrik beställde Vita, Gillestugan Jerntorget, Schnitzelplatz Lagerhuset och
+Tai Shanghai (Kvartersmenyn 14533). De är registrerade i Järntorget/Linné och
+kopplade till körningen via `jarntorget_extra_scrapers.py`. Alla stänger av
+återanvändning av tidigare meny. Befintliga områdesblänkare upptäcker dem som
+nya restauranger; ingen extra global nyhetsruta läggs till.
+
+- **Vita:** https://vitarestaurang.se/meny är en JavaScript-sida. Lunchfliken
+  läser daterade poster från restaurangens publika Supabase-tabell `lunch_menu`.
+  Skrapan hittar modulfilen och dess publika anon-anslutning vid varje körning,
+  utan att köra JavaScript eller spara nyckeln. Endast menyfält för aktuell
+  måndag–fredag begärs; inga bokningar eller personuppgifter läses. Namn,
+  beskrivning, pris i ören och uttryckliga allergener bevaras. Ingen kött-/fisk-
+  kategori gissas. Lunchfliken och API:et var tomma för både 19–23 och 26–30
+  oktober; sajten visar därför ett besked per dag. À la carte ersätter inte
+  saknad lunch. När daterade rätter publiceras kan de läsas vid nästa skrapning.
+  Lunchfliken anger mån–fre 11.30–14.00, soppa/sallad, kaffe och kaka.
+- **Schnitzelplatz:** https://schnitzelplatz.se/lunch/ har rå HTML med tydlig
+  veckorubrik och fem dagsrubriker. En dagsrätt plus Alltid på Platz och tre
+  veckorätter ger 5/5/5/5/5. Priser och kategorier kommer från samma block;
+  lunchkortets pris är inte en rätt. Källan hade redan bytt till vecka 44,
+  medan fredag 23 oktober hör till vecka 43. Då visas ett veckobesked. Med
+  visningsvecka 44 verifierades samtliga 25 rader mot originalets text.
+  `menu_week.py` väljer nästa vecka på helgen och `MENU_VALIDITY` spärrar gamla
+  byggen. Källan anger inte årtal, vilket begränsar veckokontrollen.
+- **Tai Shanghai:** https://www.kvartersmenyn.se/index.php/rest/14533/4 används
+  på Henriks uttryckliga beställning. Vecka och år kontrolleras, måndagens
+  Stängt ger menybesked och tis–fre ger sex alternativ vardera: 0/6/6/6/6.
+  Rätten ”2 små rätter” fortsätter på nästa rad och ska förbli en rätt med
+  ett pris. Källans osynliga bokstavsmarkörer tas bort endast i deras särskilda
+  i-element. Hänvisningen till separat vegetarisk lista visas som information,
+  inte som påhittad vegetarisk maträtt. Dryckestillägg och avhämtningspriser
+  räknas inte som rätter. MENY och WWW leder till den verifierade källsidan;
+  den listade egna domänen används inte som menyunderlag.
+- **Gillestugan (rättat 2026-10-24):** Lunchsidan
+  https://gillestuganjerntorget.se/lunch-jarntorget/ laddar originalmenyn via
+  Fouita-widget `0x259c16`. Den inbäddade laddningen missades i första
+  undersökningen; matfotot och Facebook-sidskalet var inte hela källan.
+  Sidans HTTP-hämtning gav 520 med basens äldre Chrome-identitet, men 200
+  med `Mozilla/5.0`; endast Gillestugans User-Agent ändrades.
+  Widgetens eget Facebook-flöde har API-sididentitet `672305505964335`
+  (Facebook-länkens profilnummer är `61576829558395`). Skrapan verifierar
+  widget och sida, hämtar senaste entydiga bild från rätt publiceringsperiod
+  och läser veckonummer, dagskolumn och veckokolumn med befintlig lokal
+  Tesseract/svenska. Signerade bildadresser upptäcks på nytt varje körning;
+  kommentarer, reaktioner, flödesnycklar och råsvar sparas/loggas inte.
+  Publiceringstid kontrolleras mot rätt år och vecka (fredagen före till
+  visningsveckans fredag), sedan måste bildens OCR-lästa veckonummer stämma.
+  Alla fem dagar, källrubriker, priser, sex gemensamma alternativ och sidfot
+  måste kunna läsas; osäker eller ändrad layout ger menybesked utan mat.
+  Ingen gammal meny återanvänds. MENY leder nu till den egna lunchsidan.
+  Avläsningen använder separata beskärningar för den verifierade tvåkolumnsmallen;
+  ny layout kan därför kräva anpassning. OCR är inte teckenperfekt: källans
+  ENTRECÔTE blev ENTRECÖTE, utan automatisk ordlistekorrigering.
+  Livekontroll av originalbilden vecka 43 gav 7/7/7/7/7 rätter, med priser
+  och tillbehör jämförda mot bilden. Vecka 44 saknar ännu publicerad bild
+  vid kontrollen 24 oktober; helgvyn visar därför menybesked, inte vecka 43.
+  Åtta tester i `scripts/test_gillestugan.py` täcker flödesidentitet,
+  datum/år, tvetydig bild, dagsfördelning, priser, OCR-fel och helgbyte.
+
+Koordinaterna hämtades från OpenStreetMaps restaurangnoder: Vita 12754779701,
+Gillestugan 1042339576, Schnitzelplatz 3431315351 och Tai Shanghai 8493101010.
+Dessa är restaurangpositioner, inte separat verifierade entrénoder.
+Källorna anger Nordhemsgatan 28, Järntorget 7, Heurlins plats 1 respektive
+Haga Östergata 4. Nya produktionsberoenden, tjänster och workflows behövs inte.
+
+Verifiering: 13 syntetiska regressionstester i `scripts/test_jarntorget_extra.py`
+täcker källfält, datum/år, helgbyte, dagsfördelning, radbrutna rätter, priser,
+felaktiga mallar och nätfel. Liveutfall vecka 43: Vita 0/0/0/0/0,
+Schnitzelplatz 0/0/0/0/0 (publicerad vecka 44), Tai Shanghai 0/6/6/6/6 och
+Gillestugan gav då 0/0/0/0/0 med Facebook-besked (ersatt av OCR enligt rättelsen ovan). Minnestest, full skrapning och
+bygge passerade på dev01. Webbläsaren verifierade alla fyra kort, områdesblänkaren,
+menylänkarna, Tai Shanghais stängda måndag och sex fredagsrätter. Frontendens
+parser verifierades även separat med alla 24 Tai Shanghai-rader och 25
+Schnitzelplatz-rader för rätt vecka; samtliga priser hamnar i priskolumnen.
+Nedladdad HTML, JavaScript, kartdata och bild ligger endast i /tmp.
+
 ## Kooperativets saknade fredag, 2026-10-23
 
 Produktionens menydata från 23 oktober saknade fredagsrätter trots att

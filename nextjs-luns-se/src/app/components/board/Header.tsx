@@ -1,6 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { nextLogoTaps } from '../../lib/oracle';
+import { calendarWeek } from '../../lib/calendarWeek';
 import LocationSelect from './LocationSelect';
 import type { LunsLocation } from '../../lib/menu';
 import type { Weather } from '../../hooks/useWeather';
@@ -22,6 +24,7 @@ interface Props {
   view: 'list' | 'map';
   onToggleView: () => void;
 
+  onOpenOracle: () => void;
   onOpenSettings: () => void;
   onOpenContact?: () => void;
   /** Finns det något oläst i nyhetslistan? Tänder pricken på kugghjulet. */
@@ -31,9 +34,9 @@ interface Props {
 const CONTROL =
   'flex-none rounded-lg text-12 font-bold cursor-pointer whitespace-nowrap transition-colors';
 
-/** Kvadratisk knapp utan text, i samma storlek som fältet bredvid. */
+/** Inställningsvalet har etikett på mobil och bara ikon på dator. */
 const ICON_BUTTON =
-  'flex-none h-[38px] w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]';
+  'flex-none min-h-11 w-full wide:h-[38px] wide:min-h-0 wide:w-[38px] rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[var(--ink2)] cursor-pointer transition-colors hover:bg-[var(--hi)]';
 
 export default function Header({
   days,
@@ -48,19 +51,54 @@ export default function Header({
   view,
   onToggleView,
   onOpenSettings,
+  onOpenOracle,
   onOpenContact,
   newsUnread,
 }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [week, setWeek] = useState<number | null>(null);
+  const logoTaps = useRef<number[]>([]);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const refresh = () => setWeek(calendarWeek());
+    refresh();
+    const timer = setInterval(refresh, 60_000);
+    window.addEventListener('focus', refresh);
+    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const outside = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setMenuOpen(false); menuButton.current?.focus(); }
+    };
+    const desktop = window.matchMedia('(min-width: 760px)');
+    const resize = () => { if (desktop.matches) setMenuOpen(false); };
+    document.addEventListener('pointerdown', outside);
+    window.addEventListener('keydown', escape);
+    desktop.addEventListener('change', resize);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      window.removeEventListener('keydown', escape);
+      desktop.removeEventListener('change', resize);
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => { setMenuOpen(false); menuButton.current?.focus(); };
+
   return (
-    <header className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 pt-3 pb-2 wide:px-7 wide:pt-4 wide:pb-2.5">
-      {/* På mobil radbryter headern ändå, så ordningen styrs om till tre täta
-          rader: logga + tema, dagflikar, sök + knappar. I bredd nollställs
-          order och allt ligger som i källan, på en rad. */}
-      {/* Med temperaturen på plats fattas det sju pixlar för att logga,
-          namn, väder, platsväljare och temaknapp ska rymmas på en rad vid
-          375px. Logga, mellanrum och ordmärke krymper något på mobil så att
-          temaknappen slipper hamna först på dagraden. */}
-      <div className="order-1 flex flex-1 items-center gap-2.5 wide:order-none wide:flex-none wide:gap-3">
+    <header ref={headerRef} className="relative flex flex-wrap items-center gap-x-2 gap-y-2 px-3.5 pt-3 pb-2 wide:gap-x-3.5 wide:px-7 wide:pt-4 wide:pb-2.5">
+      <div className="order-1 flex min-w-0 flex-1 items-center gap-2 wide:order-none wide:flex-none wide:gap-3">
+        <button type="button" aria-label="Luns" className="flex-none rounded-lg touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--acc)]" onClick={() => {
+          const next = nextLogoTaps(logoTaps.current, performance.now());
+          logoTaps.current = next.taps;
+          if (next.open) { setMenuOpen(false); onOpenOracle(); }
+        }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/luns-logo-transparent.png"
@@ -69,37 +107,47 @@ export default function Header({
           height={36}
           className="flex-none h-8 w-8 object-contain wide:h-9 wide:w-9"
         />
+        </button>
+        <div className="flex flex-none flex-col wide:flex-row wide:items-center wide:gap-3">
         <span className="font-mono text-16 font-semibold tracking-[.04em] text-[var(--acc)] wide:text-18">
           LUNS<span className="text-[var(--mut)]">.SE</span>
         </span>
 
-        {/* Vädret avgör om man går ut och äter, så det står bredvid namnet. */}
-        <span
-          className="flex-none font-mono text-11 text-[var(--mut)] whitespace-nowrap"
-          title={weather.description}
-        >
-          {weather.emoji}
-          {weather.temperature ? ` ${weather.temperature}` : ''}
-        </span>
-
+        <div className="flex flex-none items-center gap-2 font-mono text-11 text-[var(--mut)]">
+          <span className="whitespace-nowrap" title={weather.description}>
+            {weather.emoji}{weather.temperature ? ` ${weather.temperature}` : ''}
+          </span>
+          {week !== null && <span className="whitespace-nowrap" title={`Aktuell kalendervecka: ${week}`} aria-label={`Aktuell vecka ${week}`}>v.{week}</span>}
+        </div>
+        </div>
         {locations.length > 1 && (
-          <LocationSelect
-            locations={locations}
-            selected={selectedLocation}
-            onSelect={onSelectLocation}
-          />
+          <div className="ml-auto min-w-0 wide:ml-0 wide:flex-none">
+            <LocationSelect locations={locations} selected={selectedLocation}
+              onSelect={id => { onSelectLocation(id); setMenuOpen(false); }} />
+          </div>
         )}
       </div>
 
-      <div className="order-3 flex flex-none gap-1.5 max-w-full overflow-x-auto luns-scroll wide:order-none">
+      <button ref={menuButton} type="button" data-tour="settings"
+        aria-label={menuOpen ? 'Stäng menyn' : (newsUnread ? 'Öppna menyn, något är nytt' : 'Öppna menyn')}
+        aria-expanded={menuOpen} aria-controls="luns-header-tools"
+        onClick={() => setMenuOpen(open => !open)}
+        className="relative order-2 flex h-11 w-11 flex-none items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--chip)] text-[var(--ink2)] wide:hidden">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+          {menuOpen ? <path d="m6 6 12 12M6 18 18 6" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
+        </svg>
+        {newsUnread && <span aria-hidden="true" className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--acc)]" />}
+      </button>
+
+      <div className="order-3 flex w-full flex-none gap-1.5 max-w-full wide:w-auto overflow-x-auto luns-scroll wide:order-none">
         {days.map(day => {
           const active = day === selectedDay;
           return (
             <button
               key={day}
-              onClick={() => onSelectDay(day)}
+              onClick={() => { onSelectDay(day); setMenuOpen(false); }}
               aria-pressed={active}
-              className="flex-none rounded-lg border px-[13px] py-[7px] text-12 cursor-pointer transition-colors"
+              className="min-h-11 min-w-0 flex-1 wide:min-h-0 wide:flex-none rounded-lg border px-2 wide:px-[13px] py-[7px] text-12 cursor-pointer transition-colors"
               style={{
                 background: active ? 'var(--acc)' : 'transparent',
                 color: active ? 'var(--bg)' : 'var(--ink2)',
@@ -113,52 +161,57 @@ export default function Header({
         })}
       </div>
 
+      <div id="luns-header-tools"
+        onBlur={event => {
+          if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)
+            && event.relatedTarget !== menuButton.current) setMenuOpen(false);
+        }}
+        className={`${menuOpen ? 'flex' : 'hidden'} absolute left-3.5 right-3.5 top-full z-40 max-h-[60dvh] flex-col gap-2 overflow-y-auto rounded-xl border border-[var(--glassBrd)] bg-[var(--bg)] p-3 shadow-lg wide:contents`}>
+      <form role="search" className="flex min-w-0 gap-2 wide:flex-1 wide:basis-40"
+        onSubmit={event => { event.preventDefault(); closeMenu(); }}>
       <input
         value={search}
         onChange={e => onSearch(e.target.value)}
-        placeholder="⌕  Sök rätt eller restaurang…"
+        type="search" enterKeyHint="search"
+        placeholder="Sök rätt eller restaurang…"
         aria-label="Sök rätt eller restaurang"
-        className="order-4 min-w-0 flex-1 basis-[110px] rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-13 text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
+        className="min-w-0 flex-1 rounded-lg border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-16 wide:text-13 text-[var(--ink)] outline-none focus:border-[var(--acc)] wide:order-none wide:basis-40 wide:px-3.5"
       />
 
+        <button type="submit" className="min-h-11 rounded-lg bg-[var(--acc)] px-3 text-13 font-bold text-[var(--bg)] wide:hidden">Sök</button>
+      </form>
+
       <button
-        onClick={onToggleView}
+        onClick={() => { onToggleView(); closeMenu(); }}
         title="Växla lista och karta"
         aria-pressed={view === 'map'}
-        className={`${CONTROL} order-6 border border-[var(--line)] px-3 py-[9px] wide:order-none wide:px-3.5`}
+        className={`${CONTROL} min-h-11 wide:min-h-0 border border-[var(--line)] px-3 py-[9px] wide:order-none wide:px-3.5`}
         style={{
           background: view === 'map' ? 'var(--accBg)' : 'var(--chip)',
           color: view === 'map' ? 'var(--accStrong)' : 'var(--ink2)',
         }}
       >
-        {view === 'map' ? 'LISTA' : 'KARTA'}
+        <span className="wide:hidden">{view === 'map' ? 'Visa lunchlistan' : 'Visa karta'}</span>
+        <span className="hidden wide:inline">{view === 'map' ? 'LISTA' : 'KARTA'}</span>
       </button>
 
-      {onOpenContact && <button onClick={onOpenContact} className={`${CONTROL} order-6 border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[var(--ink2)] hover:bg-[var(--hi)] wide:order-none`}>Tjôta med Luns</button>}
+      {onOpenContact && <button onClick={() => { closeMenu(); onOpenContact(); }} className={`${CONTROL} min-h-11 wide:min-h-0 border border-[var(--line)] bg-[var(--chip)] px-3 py-[9px] text-[var(--ink2)] hover:bg-[var(--hi)] wide:order-none`}>Tjôta med Luns</button>}
 
-      {/* Statistiken och integritetsinfon låg som småtext längst ner i
-          vänsterspalten, alltså bakom hela restauranglistan och osynliga på
-          mobil. Kugghjulet är samma avstånd från maten var man än står, och
-          tar över platsen där temaknappen stod. */}
       <button
-        onClick={onOpenSettings}
+        onClick={() => { closeMenu(); onOpenSettings(); }}
         data-tour="settings"
-        title={newsUnread ? 'Inställningar och info — något är nytt' : 'Inställningar och info'}
+        title={newsUnread ? 'Inställningar och info, något är nytt' : 'Inställningar och info'}
         aria-label={
           newsUnread ? 'Inställningar och info, något är nytt' : 'Inställningar och info'
         }
-        className={`${ICON_BUTTON} relative order-2 inline-flex items-center justify-center wide:order-none`}
+        className={`${ICON_BUTTON} relative inline-flex items-center justify-center gap-2`}
       >
         <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9.5 3h5l.4 2.3 1.4.8 2.2-.8L21 9.7l-1.8 1.5v1.6l1.8 1.5-2.5 4.4-2.2-.8-1.4.8-.4 2.3h-5l-.4-2.3-1.4-.8-2.2.8L3 14.3l1.8-1.5v-1.6L3 9.7l2.5-4.4 2.2.8 1.4-.8Z" />
           <circle cx="12" cy="12" r="3" />
         </svg>
-        {/* Pricken ligger innanför knappens hörn och inte utanför kanten:
-            innanför har den alltid knappens egen bakgrund bakom sig, medan
-            headern utanför är glas med suddad mesh-gradient — där hade den
-            behövt en ring i en färg som inte finns. Att den bara syns och
-            aldrig hörs är avsikten, så aria-label bär samma besked. */}
+        <span className="text-12 font-bold wide:hidden">Inställningar och info</span>
         {newsUnread && (
           <span
             aria-hidden="true"
@@ -166,6 +219,13 @@ export default function Header({
           />
         )}
       </button>
+      </div>
+      {search.trim() && (
+        <div className="order-4 flex w-full items-center gap-2 rounded-lg bg-[var(--chip)] pl-3 text-12 text-[var(--ink2)] wide:hidden">
+          <button onClick={() => setMenuOpen(true)} className="min-w-0 flex-1 truncate text-left" aria-label={`Ändra sökning: ${search}`}>Sök: {search}</button>
+          <button onClick={() => onSearch('')} className="min-h-11 flex-none px-3 font-bold" aria-label="Rensa sökning">Rensa</button>
+        </div>
+      )}
     </header>
   );
 }

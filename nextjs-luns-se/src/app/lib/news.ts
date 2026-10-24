@@ -22,19 +22,37 @@ export interface NewsItem {
   body: string;
   requiresContact?: boolean;
   action?: 'contact';
+  actionLabel?: string;
   image?: { src: string; alt: string; width: number; height: number };
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 14;
+export const NEWS_VERSION = 16;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    version: 16,
+    date: '2026-10-24',
+    title: 'Mer plats för lunchen på mobilen',
+    body: 'Sök, karta, Tjôta med Luns och inställningar har flyttat in bakom menyknappen uppe till höger. Platsvalet och veckodagarna finns kvar direkt på sidan. Vid temperaturen ser du också aktuell vecka. Psst! Vi har gömt ett påskägg någonstans på sidan. En liten ledtråd: ”klicka fem gånger”.',
+    image: { src: '/images/news/kosmiskt-paskagg.webp', alt: 'Ett mörkt påskägg med lysande guldsprickor och bronsringar svävar bland stjärnorna.', width: 1280, height: 720 },
+  },
+  {
+    version: 15,
+    area: 'Lindholmen',
+    date: '2026-10-24',
+    title: 'Ophelia har flyttat in på Luns!',
+    body: 'Flera av er har tipsat om Restaurang Ophelia. Nu finns den med bland lunchställena på Lindholmen. Tack för alla tips! Saknar du också ett ställe?',
+    requiresContact: true,
+    action: 'contact',
+    actionLabel: 'Tjôta here',
+  },
   {
     version: 14,
     area: 'Lindholmen',
     date: '2026-10-23',
     title: 'Kooperativets meny är på banan igen',
-    body: 'En saknad markering på Kooperativets hemsida gjorde att vår menyhämtning missade en del av menyn. Det är nu fixat – maten hittar fram igen. Tack för felanmälan!',
+    body: 'En saknad markering på Kooperativets hemsida gjorde att vår menyhämtning missade en del av menyn. Det är nu fixat. Maten hittar fram igen. Tack för felanmälan!',
   },
   {
     version: 13,

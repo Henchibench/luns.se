@@ -100,11 +100,9 @@ export default function MenuList({
   return (
     <>
       {sections.map(section => (
-        <div key={section.name} data-sec={section.name} className="flex flex-col">
-          {/* Raden får radbrytas på smal skärm. Utan det bröts långa namn
-              mitt itu när de växte, och "STÅNGS MJÄRDEVI" stod på två rader
-              medan länkarna satt kvar uppe till höger. Nu håller namnet ihop
-              och länkarna flyttar ner i stället. */}
+        <div key={section.name} data-sec={section.name} className="flex min-w-0 flex-col [overflow-wrap:anywhere]">
+          {/* Länkar flyttar ned när raden blir full. Även namnet får brytas
+              om det ensamt är bredare än skärmen. */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 pb-2">
             <button
               data-tour="favorite"
@@ -121,7 +119,7 @@ export default function MenuList({
             {/* Namnet var mindre än rätterna under det, alltså listans minsta
                 text trots att det är dess rubrik. Vid scroll gick gränsen
                 mellan två restauranger obemärkt förbi. */}
-            <span className="whitespace-nowrap font-mono text-14 font-semibold tracking-[.1em] text-[var(--acc)]">
+            <span className="min-w-0 max-w-full font-mono text-14 font-semibold tracking-[.1em] text-[var(--acc)]">
               {section.name.toUpperCase()}
             </span>
 
@@ -131,7 +129,7 @@ export default function MenuList({
             {/* Länkarna stod i --mut, samma dämpade ton som priser och
                 allergener. De är saker man klickar på, inte fotnoter, så de
                 får samma läsbarhet som rätterna. */}
-            <div className="flex flex-none gap-3 font-mono text-11 font-medium text-[var(--ink2)]">
+            <div className="flex max-w-full flex-none flex-wrap gap-3 font-mono text-11 font-medium text-[var(--ink2)]">
               {/* Kartan fälls ut här nere i stället för att kasta iväg
                   besökaren till Google Maps i en ny flik. */}
               <button
@@ -283,7 +281,7 @@ export default function MenuList({
                     {dish.category.toUpperCase()}
                   </span>
 
-                  <span className="flex-1 text-13 leading-[1.55] text-[var(--ink2)]">
+                  <span className="min-w-0 flex-1 text-13 leading-[1.55] text-[var(--ink2)]">
                     <Highlight text={dish.description} terms={searchTerms} />
                   </span>
                 </div>

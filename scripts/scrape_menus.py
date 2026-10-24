@@ -29,6 +29,9 @@ from app.scrapers.restaurants.brodernas_kok_scraper import BrodernasKokScraper
 from app.scrapers.restaurants.bombay_bistro_scraper import BombayBistroScraper
 from app.scrapers.restaurants.chili_lime_scraper import ChiliLimeScraper
 from app.scrapers.restaurants.cuckoos_nest_scraper import CuckoosNestScraper
+from app.scrapers.restaurants.jarntorget_extra_scrapers import (
+    VitaScraper, GillestuganScraper, SchnitzelplatzScraper, TaiShanghaiScraper,
+)
 from app.scrapers.restaurants.district_one_scraper import DistrictOneScraper
 from app.scrapers.restaurants.encounter_asian_scraper import EncounterAsianScraper
 from app.scrapers.restaurants.feskekorka_scraper import FeskekorkaScraper
@@ -43,6 +46,7 @@ from app.scrapers.restaurants.masala_scraper import MasalaScraper
 from app.scrapers.restaurants.mimolett_scraper import MimolettScraper
 from app.scrapers.restaurants.miss_f_scraper import MissFScraper
 from app.scrapers.restaurants.oishii_scraper import OishiiScraper
+from app.scrapers.restaurants.ophelia_scraper import OpheliaScraper
 from app.scrapers.restaurants.ostgota_kok_scraper import OstgotaKokScraper
 from app.scrapers.restaurants.pegs_and_tails_scraper import PegsAndTailsScraper
 from app.scrapers.restaurants.pier11_scraper import Pier11Scraper
@@ -133,6 +137,10 @@ def scrape_all_menus(previous_menus):
         BombayBistroScraper(),
         ChiliLimeScraper(),
         CuckoosNestScraper(),
+        VitaScraper(),
+        GillestuganScraper(),
+        SchnitzelplatzScraper(),
+        TaiShanghaiScraper(),
         DistrictOneScraper(),
         EncounterAsianScraper(),
         FeskekorkaScraper(),
@@ -147,6 +155,7 @@ def scrape_all_menus(previous_menus):
         MimolettScraper(),
         MissFScraper(),
         OishiiScraper(),
+        OpheliaScraper(),
         OstgotaKokScraper(),
         PegsAndTailsScraper(),
         Pier11Scraper(),
