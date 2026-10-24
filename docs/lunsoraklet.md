@@ -24,6 +24,10 @@ Justering 2026-10-24: Henrik upplevde de kringflygande maträtterna under
 ritualen som störande. De kom från sex källrätter som animerades i text
 ovanpå scenen. Textlagret och dess animation har tagits bort. Ringarnas
 rörelse, ljuset och ljudet bär nu ritualen. Själva lottningen är oförändrad.
+Verifiering: minnestester och produktionsbygge passerar. Testservern byggdes
+utan skrapning från `549ceab`. I webbläsaren visas ritualen utan maträtter
+och övergår till en rätt med restaurang, kategori och pris. Inga fel eller
+varningar registrerades i webbläsaren.
 
 ## Röstmanus
 
