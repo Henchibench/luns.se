@@ -540,7 +540,7 @@ export default function LunchBoard() {
 
   return (
     <div
-      className="luns-viewport grid grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
+      className="luns-viewport grid grid-cols-1 grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
       <div className={shell}>

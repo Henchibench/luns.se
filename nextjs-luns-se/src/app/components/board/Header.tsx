@@ -135,7 +135,7 @@ export default function Header({
               key={day}
               onClick={() => { onSelectDay(day); setMenuOpen(false); }}
               aria-pressed={active}
-              className="min-h-11 flex-1 wide:min-h-0 wide:flex-none rounded-lg border px-[13px] py-[7px] text-12 cursor-pointer transition-colors"
+              className="min-h-11 min-w-0 flex-1 wide:min-h-0 wide:flex-none rounded-lg border px-2 wide:px-[13px] py-[7px] text-12 cursor-pointer transition-colors"
               style={{
                 background: active ? 'var(--acc)' : 'transparent',
                 color: active ? 'var(--bg)' : 'var(--ink2)',
