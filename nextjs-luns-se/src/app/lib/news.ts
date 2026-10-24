@@ -22,13 +22,24 @@ export interface NewsItem {
   body: string;
   requiresContact?: boolean;
   action?: 'contact';
+  actionLabel?: string;
   image?: { src: string; alt: string; width: number; height: number };
 }
 
 /** Höjs när listan fått något nytt värt att peka på. */
-export const NEWS_VERSION = 14;
+export const NEWS_VERSION = 15;
 
 export const NEWS_ITEMS: NewsItem[] = [
+  {
+    version: 15,
+    area: 'Lindholmen',
+    date: '2026-10-24',
+    title: 'Ophelia har flyttat in på Luns!',
+    body: 'Flera av er har tipsat om Restaurang Ophelia — nu finns den med bland lunchställena på Lindholmen. Tack för alla tips! Saknar du också ett ställe?',
+    requiresContact: true,
+    action: 'contact',
+    actionLabel: 'Tjôta med Luns',
+  },
   {
     version: 14,
     area: 'Lindholmen',

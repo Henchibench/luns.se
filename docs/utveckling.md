@@ -86,6 +86,16 @@ stängts eller efter omladdning. Manuell öppning behöll återgången till inst
 
 ## Nyhetstexter och datumordning, 2026-10-20
 
+Tillägg 2026-10-24: Henrik beställde en områdesnyhet om Ophelia efter flera
+inkomna tips. ”Ophelia har flyttat in på Luns!” tackar för tipsen och visas
+bara för förvalt Lindholmen. Version 15 gör nyheten oläst även efter 14.
+Avslutningen ”Tjôta till” utgår; knappen ”Tjôta med Luns” öppnar befintligt
+kontaktformulär med valt område och stänger nyhetsrutan. `actionLabel` gör
+knapptexten valbar per nyhet; den äldre kontaktposten behåller ”Tjôta here”.
+Posten följer kontaktens aktiveringsvillkor. Områdes-/versionstester och
+minnestest körs, följt av bygge utan skrapning och knappkontroll på testservern.
+
+
 Tillägg 2026-10-23: efter en felanmälan beställde Henrik en kort nyhet om
 Kooperativets menyfix. På Henriks begäran fokuserar posten ”Kooperativets
 meny är på banan igen” på felet, den saknade markeringen på källsidan och

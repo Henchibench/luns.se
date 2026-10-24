@@ -91,8 +91,9 @@ Registrerad som Restaurang Ophelia i Lindholmen, med lunch mån–fre 11–14.
 Adress Theres Svenssons gata 15 och beskrivning kommer från restaurangens
 sida. Kartpunkten 57.7060325, 11.9442223 kommer från OpenStreetMap-noden
 14079346178 (restaurangposition, inte separat verifierad entré).
-Befintlig områdesvis besökshistorik visar nyrestaurangsblänkaren efter släpp;
-ingen separat global nyhet eller ändrad nyhetsversion behövs.
+Befintlig områdesvis besökshistorik visar nyrestaurangsblänkaren efter släpp.
+Henrik beställde därefter även en Lindholmen-avgränsad nyhet (version 15)
+med tack för flera tips och knapp till kontaktformuläret; se utveckling.md.
 
 ## Fyra tillskott på Järntorget/Linné, 2026-10-23
 
