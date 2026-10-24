@@ -16,9 +16,14 @@ med repliker i nedre delen, stor gestalt ovanför och diskreta kontroller.
 Ingen vanlig panel eller liten figur ovanför ett formulär.
 
 Förlopp: omkring fjorton sekunders inträde, inväntat lunchval, åtta sekunders ritual,
-sedan domen. Kameran färdas fram, ringarna öppnar sig, källans rätter dras
-in och ljudet tystnar före resultatet. Vid minskad rörelse hoppas väntan
+sedan domen. Kameran färdas fram, ringarna öppnar sig och ljudet tystnar
+före resultatet. Rättens namn visas först vid domen. Vid minskad rörelse hoppas väntan
 över. Bibliotek och gestalt hämtas först när hemligheten öppnas.
+
+Justering 2026-10-24: Henrik upplevde de kringflygande maträtterna under
+ritualen som störande. De kom från sex källrätter som animerades i text
+ovanpå scenen. Textlagret och dess animation har tagits bort. Ringarnas
+rörelse, ljuset och ljudet bär nu ritualen. Själva lottningen är oförändrad.
 
 ## Röstmanus
 

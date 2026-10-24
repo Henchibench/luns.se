@@ -127,7 +127,7 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
   return createPortal(
     <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="oracle-title" tabIndex={-1}
       className={`${styles.oracle} ${reduced ? styles.reduced : ''}`} data-phase={phase} data-paused={paused}
-      style={{'--call-at':`${score.callAt}ms`, '--cosmos-at':`${score.cosmosAt}ms`, '--lunch-at':`${score.lunchAt}ms`, '--ritual-orbit':`${score.ritualMs - 1300}ms`} as React.CSSProperties}>
+      style={{'--call-at':`${score.callAt}ms`, '--cosmos-at':`${score.cosmosAt}ms`, '--lunch-at':`${score.lunchAt}ms`} as React.CSSProperties}>
       <div ref={host} className={styles.scene} aria-hidden="true"/>
       {!sceneReady && <div className={styles.backdrop} aria-hidden="true"/>}
       <div className={styles.veil} aria-hidden="true"/>
@@ -139,12 +139,7 @@ export default function LunchOracle({ audio, offerings, context, onClose, onAcce
         <button type="button" onClick={onClose}>Stäng</button>
       </div>
       <div className={styles.content}>
-        <div className={styles.apparition} aria-hidden="true">
-
-          {phase === 'ritual' && <div className={styles.offerings}>
-            {pool.filter((_,i) => i % Math.max(1,Math.ceil(pool.length/6)) === 0).slice(0,6).map((dish,i) => <span key={i} style={{'--orbit':`${i*60}deg`, '--delay':`${i*-0.9}s`} as React.CSSProperties}>{dish.description}</span>)}
-          </div>}
-        </div>
+        <div className={styles.apparition} aria-hidden="true"/>
         <div className={styles.words} aria-live="polite" aria-atomic="true">
           {phase === 'loading' && <div className={styles.loading}><h1 id="oracle-title">Något vaknar.</h1><p>Lyssna.</p></div>}
           {phase === 'arrival' && <div className={styles.intro}>

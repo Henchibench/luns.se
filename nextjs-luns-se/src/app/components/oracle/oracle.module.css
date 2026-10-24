@@ -32,15 +32,11 @@
 [data-phase='loading'] .backdrop { opacity:0; }
 .oracle[data-paused='true'], .oracle[data-paused='true'] * { animation-play-state:paused!important; }
 .reveal { animation:materialize 1.2s both; }
-.offerings { position:absolute; inset:-20vh 0 0; overflow:hidden; }
-.offerings span { position:absolute; left:50%; top:50%; width:220px; max-height:3.2em; overflow:hidden; font-size:var(--fs-12,12px); color:#e9d7ae; text-shadow:0 2px 7px #000; animation:offering var(--ritual-orbit,6700ms) linear both; animation-delay:calc(var(--delay) * 0); --radius:clamp(110px,21vw,300px); }
-.offerings span:nth-child(even) { color:#8ebac4; }
 [data-phase='ritual'] .words { animation:materialize 1s both; }
 [data-phase='verdict'] .apparition { min-height:22dvh; }
 [data-phase='verdict'] .veil { background:linear-gradient(0deg,#010305 0%,#010305ed 44%,#01030580 75%,transparent); }
 @keyframes arrive { from { opacity:0; } to { opacity:1; } }
 @keyframes materialize { from { opacity:0; filter:blur(6px); transform:translateY(8px); } to { opacity:1; filter:blur(0); transform:translateY(0); } }
-@keyframes offering { 0% {transform:translate(-50%,-50%) rotate(var(--orbit)) translateX(var(--radius)) rotate(calc(-1 * var(--orbit)));opacity:0;} 18%,65% {opacity:.8;} 72% {transform:translate(-50%,-50%) rotate(calc(var(--orbit) + 220deg)) translateX(var(--radius)) rotate(calc(-1 * var(--orbit) - 220deg));opacity:.8;} 100% {transform:translate(-50%,-50%) rotate(calc(var(--orbit) + 330deg)) translateX(0) scale(.01);opacity:0;} }
 .reduced *, .reduced { animation:none!important; transition:none!important; }
 @media (prefers-reduced-motion:reduce) { .oracle *, .oracle { animation:none!important; transition:none!important; } }
 @media (max-width:500px) { .controls { gap:18px; padding-left:18px; padding-right:18px; } .content { padding-left:22px; padding-right:22px; padding-bottom:max(24px,env(safe-area-inset-bottom)); } .apparition { min-height:29dvh; } .words h1 { font-size:42px; } .words .dish { font-size:27px; } .words p { line-height:1.5; } .words .context { font-size:var(--fs-11,11px); } .primary { padding:15px 30px; } }
