@@ -133,3 +133,24 @@ vid aktivering. Ingen nyhet eller publicering till main ingick.
 Detta är visuell kontroll i webbläsaren på dator, inte ett mätprotokoll från
 en fysisk iPhone. Ljudets subjektiva kvalitet är inte verifierad genom
 lyssning här. En fullt modellerad figur återstår som ett separat steg.
+
+## Verifiering med inspelat ljud, 2026-10-24
+
+Nio Node tester inklusive minnestester, TypeScript och statiskt
+produktionsbygge passerar. Testservern byggdes utan skrapning från
+`6679fed`. Samtliga tio ljudfiler svarar med HTTP 200 och `audio/mpeg`.
+Deras SHA256 stämmer med de lokala produktionsfilerna. Tillsammans är de
+1 232 152 byte. Ingen ljudfil förladdas i initial HTML. Första
+sidladdningens JavaScript är nu 145 kB enligt byggsammanfattningen.
+
+I datorvy verifierades inträde, inbjudan, ritual, källans slumpade rätt,
+avböjning, ljudknapp och återöppning. Textens fördröjningar följer de
+avkodade replikerna. I mobilvy 390 × 844 ryms text och kontroller utan
+horisontell överströmning. Escape under ritualen stänger dialogen och
+återställer fokus till loggan. Inga fel eller varningar registrerades i
+webbläsaren. Den tillfälliga mobilstorleken återställdes efter kontrollen.
+
+Det pausbara förloppets tidsberäkning och marginalerna runt längre
+repliker verifierades med automatiska tester. Fysisk iPhone, högtalarnas
+upplevda ljudnivå, uttal och röstens konstnärliga kvalitet behöver
+bedömas genom Henriks provlyssning. Voice 1 är fortsatt arbetsversionen.
