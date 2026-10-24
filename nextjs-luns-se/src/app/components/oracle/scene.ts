@@ -22,7 +22,6 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean) {
   let orbit=0, baseDistance=15, pointerX=0, pointerY=0;
   const world=new THREE.Group(); world.position.y=1.5; scene.add(world);
   const gold=new THREE.MeshStandardMaterial({color:0x967747,metalness:0.85,roughness:0.36});
-  const darkGold=new THREE.MeshStandardMaterial({color:0x30291f,metalness:0.8,roughness:0.55});
   const lightGold=new THREE.MeshBasicMaterial({color:new THREE.Color(2.2,1.15,0.36)});
   const coldLight=new THREE.MeshBasicMaterial({color:new THREE.Color(0.24,0.65,0.8)});
 
@@ -45,19 +44,17 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean) {
     band.add(ticks);
     band.rotation.set(ringIndex*0.7,ringIndex*0.42,ringIndex*0.27);
   }
-  // Broken monumental plates establish depth, rather than a small avatar on a page.
-  const relics=new THREE.Group(); world.add(relics);
-  for(let i=0;i<16;i++) {
-    const a=i/16*Math.PI*2;
-    const shard=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.5+(i%3)*0.24,0.14),i%4===0?gold:darkGold);
-    shard.position.set(Math.cos(a)*5,Math.sin(a)*4.6,Math.sin(i*3)*2);
-    shard.rotation.set(i*0.37,i*0.41,-a); relics.add(shard);
-  }
 
   // The portrait is an authored texture, not presented as a fully modelled head.
-  const portraitMaterial=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,toneMapped:false});
+  const portraitMaterial=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,depthTest:false,toneMapped:false});
+  portraitMaterial.onBeforeCompile=shader=> {
+    shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
+      #ifdef USE_MAP
+        diffuseColor.a *= smoothstep(0.0,0.28,vMapUv.y);
+      #endif`);
+  };
   const portrait=new THREE.Mesh(new THREE.PlaneGeometry(5.6,6.72),portraitMaterial);
-  portrait.position.set(0,0.7,0.7); world.add(portrait);
+  portrait.renderOrder=3; portrait.position.set(0,0.7,0.7); world.add(portrait);
   const texture=new THREE.TextureLoader().load('/oracle/oracle-entity.webp',loaded=> {
     if(disposed) { loaded.dispose(); return; }
     loaded.colorSpace=THREE.SRGBColorSpace; portraitMaterial.map=loaded; portraitMaterial.needsUpdate=true;
@@ -110,7 +107,6 @@ export function mountOracleScene(host: HTMLElement, reduced: boolean) {
     if(!reduced) {
       orbit+=dt*(.035+d.energy*.46);
       bands.forEach((band,i)=> {band.rotation.x=i*.7+orbit*(i%2?1:-1); band.rotation.y=i*.42+orbit*.7;band.rotation.z=i*.27+orbit*.25;});
-      relics.rotation.z=time*.018;
       portrait.rotation.y=Math.sin(time*.16)*.035;
       world.position.y=1.5+Math.sin(time*.4)*.06;
       for(let i=0;i<dustCount;i++) {
