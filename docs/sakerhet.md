@@ -207,6 +207,17 @@ Lokal skanning ersätter inte kontinuerlig bevakning. Ingen ny sådan
 konfiguration infördes inom släppkontrollen och operativsystemets paket
 ingår inte i denna granskning.
 
+Slutlig verifiering på dev01: hela `scripts/testserver.sh` med skrapning
+och bygge passerade på `39b7a2f`. Alla 46 restauranger har samma antal
+rätter och menybesked per vardag som före paketbytet. BO och Gillestugan
+visar fortfarande besked för vecka 44 eftersom den nya källmenyn saknas;
+kontrollbilderna för vecka 43 användes bara till jämförelsen ovan.
+Testservern rapporterar frisk status på http://10.0.1.34:3002/ och ger
+HTTP 200 för startsida, kontaktkonfiguration, nyhetsbild och oraklets ljud.
+En ny advisorykontroll av Linuxmiljöns elva paket gav noll träffar, med
+Pillow 12.3.0 som fungerande kontrollprov. Henrik publicerar genom merge
+till main och därefter ordinarie Scrape and Deploy.
+
 Källor kontrollerade 2026-10-24:
 
 * https://github.com/postcss/postcss-selector-parser/releases/tag/6.1.5
