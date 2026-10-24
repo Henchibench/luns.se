@@ -3,25 +3,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { chooseOffering, type Offering } from '../../lib/oracle';
-import { createOracleSound } from './sound';
+import type { OracleSound } from './sound';
+import { ARRIVAL_MS, RITUAL_MS, type OraclePhase } from './direction';
 import styles from './oracle.module.css';
 
-type Phase = 'arrival' | 'invitation' | 'ritual' | 'verdict' | 'declined';
-interface Props { offerings: Offering[]; context: string; onClose: () => void; onAccept: (restaurant: string) => void }
+interface Props { audio: OracleSound | null; offerings: Offering[]; context: string; onClose: () => void; onAccept: (restaurant: string) => void }
 
-export default function LunchOracle({ offerings, context, onClose, onAccept }: Props) {
+export default function LunchOracle({ audio, offerings, context, onClose, onAccept }: Props) {
   // Freeze the source at entry, including day and filters. No background reroll.
   const [pool] = useState(offerings);
-  const [phase, setPhase] = useState<Phase>('arrival');
+  const [phase, setPhase] = useState<OraclePhase>('arrival');
   const [result, setResult] = useState<Offering | null>(null);
   const [muted, setMuted] = useState(false);
-  const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const audioUnavailable = !audio;
   const [reduced, setReduced] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const host = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDivElement>(null);
-  const sound = useRef<ReturnType<typeof createOracleSound> | null>(null);
-  const scene = useRef<{ ritual: (value: boolean) => void; dispose: () => void } | null>(null);
+  const sound = useRef(audio);
+  const scene = useRef<{ phase: (value: OraclePhase) => void; dispose: () => void } | null>(null);
+  const currentPhase = useRef(phase); currentPhase.current = phase;
   const close = useRef(onClose); close.current = onClose;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const rolling = useRef(false);
@@ -46,13 +47,14 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
     element.addEventListener('keydown', keyboard);
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(motion.matches);
-    const arrival = setTimeout(() => setPhase('invitation'), motion.matches ? 0 : 6500);
+    if (!motion.matches) sound.current?.arrival();
+    const arrival = setTimeout(() => setPhase('invitation'), motion.matches ? 0 : ARRIVAL_MS);
     let cancelled=false;
     import('./scene').then(module => {
       if(cancelled || !host.current) return;
       try {
         scene.current=module.mountOracleScene(host.current, motion.matches);
-        scene.current.ritual(rolling.current);
+        scene.current.phase(currentPhase.current);
         setSceneReady(true);
       } catch { /* The illustrated fallback and the actual draw remain usable. */ }
     }).catch(() => {});
@@ -72,22 +74,20 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
   useEffect(() => {
     // A phase change removes its CTA. Keep Escape and keyboard navigation in the dialog.
     if (dialog.current && !dialog.current.contains(document.activeElement)) dialog.current.focus();
+    scene.current?.phase(phase);
   }, [phase]);
 
   const start = () => {
     if(rolling.current) return;
     const chosen=chooseOffering(pool);
     if(!chosen) return;
-    rolling.current=true; setResult(chosen); setPhase('ritual'); scene.current?.ritual(true);
-    try {
-      sound.current ??= createOracleSound();
-      sound.current.mute(muted);
-      if(!reduced) sound.current.ritual();
-    } catch { setAudioUnavailable(true); }
+    rolling.current=true; setResult(chosen); setPhase('ritual');
+    if(!reduced) sound.current?.ritual();
+    timers.current.push(setTimeout(() => sound.current?.silence(), reduced ? 0 : 6600));
     timers.current.push(setTimeout(() => {
-      scene.current?.ritual(false); setPhase('verdict');
-      if(!document.hidden) sound.current?.ping();
-    },reduced ? 100 : 6500));
+      setPhase('verdict');
+      if(!document.hidden && !reduced) sound.current?.verdict();
+    },reduced ? 100 : RITUAL_MS));
   };
   const decline = () => {
     setPhase('declined');
@@ -97,7 +97,9 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
   return createPortal(
     <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="oracle-title" tabIndex={-1}
       className={`${styles.oracle} ${reduced ? styles.reduced : ''}`} data-phase={phase}>
-      <div className={styles.nebula} aria-hidden="true"><i/><i/><i/></div>
+      <div ref={host} className={styles.scene} aria-hidden="true"/>
+      {!sceneReady && <div className={styles.backdrop} aria-hidden="true"/>}
+      <div className={styles.veil} aria-hidden="true"/>
       <div className={styles.controls}>
         <span className={styles.signature}>Lunsoraklet</span>
         <button type="button" disabled={audioUnavailable} aria-pressed={!muted} onClick={() => {
@@ -107,22 +109,22 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
       </div>
       <div className={styles.content}>
         <div className={styles.apparition} aria-hidden="true">
-          <div ref={host} className={styles.scene}/>
-          {!sceneReady && <div className={styles.fallback}><span>✦</span><span>✦</span></div>}
+
           {phase === 'ritual' && <div className={styles.offerings}>
-            {pool.slice(0,6).map((dish,i) => <span key={i} style={{'--orbit':`${i*60}deg`, '--delay':`${i*-0.9}s`} as React.CSSProperties}>{dish.description}</span>)}
+            {pool.filter((_,i) => i % Math.max(1,Math.ceil(pool.length/6)) === 0).slice(0,6).map((dish,i) => <span key={i} style={{'--orbit':`${i*60}deg`, '--delay':`${i*-0.9}s`} as React.CSSProperties}>{dish.description}</span>)}
           </div>}
         </div>
         <div className={styles.words} aria-live="polite" aria-atomic="true">
           {phase === 'arrival' && <div className={styles.intro}>
-            <p>I miljarder år har universum expanderat.</p>
-            <h1 id="oracle-title">Ändå kan du inte bestämma<br/>vad du ska äta.</h1>
+            <p>Du har kallat på Lunsoraklet.</p>
+            <h1 id="oracle-title">Jag har sett stjärnor födas.<br/>Imperier falla.</h1>
+            <p>Och dig vela mellan pasta och sushi.</p>
           </div>}
           {phase === 'invitation' && <div className={styles.reveal}>
-            <h1 id="oracle-title">Ditt lunchöde<br/>står skrivet i stjärnorna.</h1>
+            <h1 id="oracle-title">Överlämna<br/>ditt lunchöde.</h1>
             {pool.length ? <>
-              <p>Lämna över beslutet till en högre makt. Trotsa domen och må ditt kaffe vara ljummet i sju år.</p>
-              <button type="button" className={styles.primary} onClick={start}>Jag överlämnar mitt lunchöde</button>
+              <p>Trotsa domen och må ditt kaffe vara ljummet i sju år.</p>
+              <button type="button" className={styles.primary} onClick={start}>Låt oraklet välja</button>
               <p className={styles.context}>{context}<br/>{pool.length} {pool.length === 1 ? 'rätt' : 'rätter'}. Dina filter gäller även i rymden.</p>
             </> : <>
               <p>Även en rymdgud behöver en meny. Det finns inga aktuella rätter med dina val.</p>
@@ -131,8 +133,8 @@ export default function LunchOracle({ offerings, context, onClose, onAccept }: P
             </>}
           </div>}
           {phase === 'ritual' && <div className={styles.reveal}>
-            <h1 id="oracle-title">Universum dukar upp.</h1>
-            <p className={styles.ritualText}>Stjärnorna rådfrågas. Matlådan ignoreras.</p>
+            <h1 id="oracle-title">Tystnad.</h1>
+            <p className={styles.ritualText}>Universum överväger din lunch.</p>
           </div>}
           {phase === 'verdict' && result && <div className={styles.reveal}>
             <p className={styles.verdict}>Universum har tallrikt.</p>

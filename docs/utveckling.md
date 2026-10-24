@@ -530,16 +530,21 @@ Rättens kategori följer med till resultatet. Varje unik kombination av
 restaurang, kategori, beskrivning och pris får en lott. Beslutet visar källtext, restaurang och eventuellt pris, och accepterat
 beslut leder tillbaka till restaurangen i lunchlistan. Ingen meny skapas.
 
-Three.js laddas med dynamisk import först när oraklet öppnas. Tallrik,
-ögon, bestick, stjärnor och banor byggs som lokal geometri. Web Audio skapar
-ljud efter knapptrycket som överlämnar lunchvalet. Inga externa modeller,
-ljudfiler, konton eller AI används. Stäng och ljudknapp finns hela tiden.
+Three.js laddas med dynamisk import först när oraklet öppnas. Efter Henriks
+kritik av första gestaltningen används nu en illustrerad gestalt tillsammans
+med 3D instrument, stoft, kamerafärd, shaderdimma och bloom. Bildmaterialet
+är genererat med det inbyggda bildverktyget i ChatGPT och lagras lokalt i
+sajten. Web Audio aktiveras av femte trycket på loggan och skapar filtrerad
+luft, resonans och en låg anslagseffekt. Inga externa tjänster anropas av
+besökaren för effekterna. Regi, röststatus och bildkälla finns i
+[lunsoraklet.md](lunsoraklet.md). Tal är ännu inte infört eftersom en
+inspelning eller ett godkänt verktyg saknas. Stäng och ljudknapp finns hela tiden.
 Escape stänger, fokus hålls i dialogen och återgår till loggan. Bakgrunden
 är inert under besöket. Timers, ljud och grafikresurser frigörs vid stängning.
 Minskad rörelse hoppar över väntan och visar stilla grafik. Utan WebGL finns
-en stilla tallrik och samma fungerande lottning. Ljudfel hindrar inte valet.
+den stilla illustrationen och samma fungerande lottning. Ljudfel hindrar inte valet.
 
-Första verifiering: sex Node tester inklusive minnestester, TypeScript,
+Verifiering av första versionen: sex Node tester inklusive minnestester, TypeScript,
 produktionsbygge och npm audit med enbart produktionsberoenden passerade.
 Audit gav noll träffar. Three.js är låst till 0.186.1. Testservern byggdes med `--utan-skrap` på 5d00d35 och rapporterade frisk
 status. Visuellt kontrollerat i bredderna 320, 390 och 1280. Ingen sidledes

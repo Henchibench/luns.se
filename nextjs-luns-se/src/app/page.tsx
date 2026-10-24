@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ContactForm from './components/contact/ContactForm';
 import { loadContactConfig, type ContactConfig, type ContactContext } from './lib/contact';
+import { createOracleSound, type OracleSound } from './components/oracle/sound';
 import LunchOracle from './components/oracle/LunchOracle';
 import { offeringsFromSections } from './lib/oracle';
 import Header from './components/board/Header';
@@ -127,6 +128,7 @@ export default function LunchBoard() {
   const [toast, setToast] = useState<string | null>(null);
   const [spacerHeight, setSpacerHeight] = useState(0);
   const [animFlip, setAnimFlip] = useState(false);
+  const oracleAudio = useRef<OracleSound | null>(null);
   const [oracleOpen, setOracleOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
@@ -546,10 +548,13 @@ export default function LunchBoard() {
       className="luns-viewport grid grid-cols-1 grid-rows-[auto_1fr] overflow-hidden text-[var(--ink)]"
       style={{ background: 'var(--glass)', backdropFilter: 'blur(30px) saturate(1.15)' }}
     >
-      {oracleOpen && <LunchOracle offerings={offeringsFromSections(sections)} context={`${location?.label ?? 'Valt område'}, ${heading}`} onClose={() => setOracleOpen(false)} onAccept={name => { setOracleOpen(false); scrollToRestaurant(name); }} />}
+      {oracleOpen && <LunchOracle audio={oracleAudio.current} offerings={offeringsFromSections(sections)} context={`${location?.label ?? 'Valt område'}, ${heading}`} onClose={() => setOracleOpen(false)} onAccept={name => { setOracleOpen(false); scrollToRestaurant(name); }} />}
       <div className={shell}>
       <Header
-        onOpenOracle={() => setOracleOpen(true)}
+        onOpenOracle={() => {
+          try { oracleAudio.current = createOracleSound(); } catch { oracleAudio.current = null; }
+          setOracleOpen(true);
+        }}
         days={DAYS}
         selectedDay={day}
         onSelectDay={next => {

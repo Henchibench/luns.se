@@ -5,7 +5,7 @@ uppdrag. Importerade avsnitt beskriver tidigare observationer, inte nuläget.
 
 | Uppdrag | Börja här | Historiska detaljer |
 |---|---|---|
-| Lunsoraklet, hemligt lunchval | [utveckling](utveckling.md) | — |
+| Lunsoraklet, hemligt lunchval, regi och röst | [utveckling](utveckling.md), [gestaltning och manus](lunsoraklet.md) | — |
 | Sajt, menyvisning, karta, textstorlek | [utveckling](utveckling.md) | [repots två halvor](minne/repo-02.md) |
 | Besöksstatistik, sök och bevakningssiffror | [utveckling](utveckling.md) | [äldre statistikflöde](minne/repo-02.md) |
 | Skrivstil och nyhetstexter | [utveckling, skrivstil](utveckling.md) | — |

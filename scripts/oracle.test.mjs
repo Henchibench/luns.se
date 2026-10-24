@@ -50,3 +50,16 @@ test('draw returns a source object, covers both endpoints and has no invented fa
   assert.equal(pool.length,2);
   assert.deepEqual(pool.map(dish=>dish.category),['Caesarsallad','Sallad']);
 });
+
+const directionSource=readFileSync(new URL('../nextjs-luns-se/src/app/components/oracle/direction.ts',import.meta.url),'utf8');
+const directed={};
+new Function('exports',ts.transpileModule(directionSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(directed);
+test('cinematic timing reveals gradually, contracts before the verdict and skips motion when requested',()=>{
+  assert.equal(directed.direction('arrival',0,false).reveal,0);
+  assert.equal(directed.direction('arrival',11,false).travel,1);
+  assert.equal(directed.direction('ritual',0,false).collapse,0);
+  assert.equal(directed.direction('ritual',7.9,false).collapse,1);
+  for(const phase of ['arrival','ritual','verdict']) {
+    assert.deepEqual(directed.direction(phase,0,true),{reveal:1,travel:1,energy:0,collapse:0,flash:0});
+  }
+});
