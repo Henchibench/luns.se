@@ -24,6 +24,33 @@ Vid minnesuppdelningen i september gjordes ingen ny sårbarhetsskanning.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `picomatch` 2.3.2 och 4.0.4, 2026-11-18
+
+Symptom: Kontrollens mätning på Dev pekade ut GHSA-fc5q-39xc-vjpf och
+CVE-2026-112366, en high ReDoS genom upprepade extglobs med en gren. Egen
+mätning med `npm ls picomatch --all --include=dev` bekräftade 2.3.2 via
+Tailwind och 4.0.4 via ESLints TypeScriptresolver. Mätningen utan
+utvecklingsberoenden med `npm ls picomatch --omit=dev` var tom.
+
+Status och beslut: Ingen rättad paketversion finns. GitHubs advisory anger
+alla versioner till och med 4.0.7 som sårbara och saknar en första rättad
+version. Npm registret har 4.0.7 som senaste utgåva. Ingen override eller
+paketuppgradering gjordes eftersom varje tillgänglig version fortfarande är
+sårbar. Auditens förslag om en brytande uppgradering till Tailwind 4 är
+därför inte en upstreamrättning och lämnar dessutom ESLintkedjan att hantera.
+
+Exponering: Paketet finns bara i utvecklingsberoenden för byggens
+globmatchning. Repot importerar inte paketet direkt och Tailwinds
+innehållsmönster är fasta i versionsstyrd konfiguration. Den exporterade
+statiska sajten innehåller inte paketet. Bedömningen gäller dagens träd och
+ersätter inte en uppgradering när upstream publicerar en rättad version.
+
+Källa: Kontrollens paketkort, GitHubs granskade advisory och npm registret,
+kontrollerade 2026-11-18. Verifiering: båda `npm ls` mätningarna ovan,
+`npm explain picomatch`, sökning efter direkt användning i repot och
+`npm audit --include=dev`. Auditen gav den förväntade high träffen för båda
+installerade kopiorna.
+
 ## `next` 15.5.28, 2026-10-23
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-2464-fhr4-w9xw, en
