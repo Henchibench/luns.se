@@ -24,6 +24,28 @@ Vid minnesuppdelningen i september gjordes ingen ny sårbarhetsskanning.
 Detaljer och tidigare incidenter: minne/register.md → säkerhetsavsnitten.
 Ny utredning ska ange datum, källa, berörda versioner och verifierat resultat.
 
+## `next` 15.5.29, 2026-11-20
+
+Symptom: Kontrollens mätning på Dev pekade ut tre moderate sårbarheter i
+`next@15.5.28`: GHSA-f3mh-rxg3-f5g2 och CVE-2026-119346 om exponering av
+HttpOnly kakor, GHSA-7qx7-33qx-rqx2 och CVE-2026-119347 om kringgående av
+SVG spärren samt GHSA-pc58-hwjq-p385 och CVE-2026-119348 om injicering och
+informationsläckage mellan klienter. Egen mätning med
+`npm ls next --all --include=dev` och `npm ls next --omit=dev` bekräftade
+15.5.28 som direkt produktionsberoende.
+
+Orsak och lösning: Paketintervallet och lockfilen stod på 15.5.28, som ingår
+i samtliga tre sårbara intervall. Miniminivån höjdes till `^15.5.29`, vilket
+uppdaterade Next och dess versionsbundna `@next/env` och SWC paket till
+15.5.29.
+
+Källa: Kontrollens paketkort, GitHubs tre granskade rådgivningar och npm
+registret, kontrollerade 2026-11-20. Samtliga rådgivningar anger 15.5.29 som
+första rättade version i 15.x serien och npm registret bekräftade att versionen
+finns. Verifiering: de båda `npm ls` mätningarna visar endast 15.5.29 och
+`env -u NODE_ENV npm audit --omit=dev` ger noll produktionssårbarheter.
+Samtliga 46 Nodetester och produktionsbygget med Next 15.5.29 passerar.
+
 ## `picomatch` 2.3.2 och 4.0.4, 2026-11-18
 
 Symptom: Kontrollens mätning på Dev pekade ut GHSA-fc5q-39xc-vjpf och
